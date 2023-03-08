@@ -15,40 +15,57 @@ slice_num = 89
 
 def main() -> None:
     reader = sitk.ImageFileReader()
-    reader.SetFileName(NRRD1_PATH)
+    reader.SetFileName(NRRD3_PATH)
     image = reader.Execute()
-    # FG/BG selection
-    otsu = sitk.OtsuThresholdImageFilter().Execute(image)
-    # Fill holes -- maybe kind of works
-    hole_filling = sitk.GrayscaleGrindPeakImageFilter().Execute(otsu)
-    # Select largest component -- does not work
-    largest_component = select_largest_component(hole_filling)
-    show_current_slice(largest_component)
+    rotated_image = apply_rotations(image, 0, 0, 30)
+    current_slice = rotated_image[:, :, slice_num]
+    show_current_slice(current_slice)
+    #current_slice = image[:, :, slice_num]
+    #process_slice(current_slice)
 
-def show_current_slice(image) -> None:
-    current_slice = image[:, :, slice_num]
+def process_slice(current_slice: sitk.Image) -> None:
+    #show_current_slice(current_slice)
+    # TODO: image smoothing -- GradientAnisotropicDiffusionImageFilter
+    # FG/BG selection
+    # TODO: user chooses between otsu and BinaryThresholdImageFilter
+    otsu = sitk.OtsuThresholdImageFilter().Execute(current_slice)
+    #show_current_slice(otsu)
+    # Fill holes
+    hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
+    #show_current_slice(hole_filling)
+    inverted_image = sitk.NotImageFilter().Execute(hole_filling)
+    #show_current_slice(inverted_image)
+    # Select largest component
+    largest_component = select_largest_component(inverted_image)
+    #show_current_slice(largest_component)
+    # Generate contour
+    contour = sitk.BinaryContourImageFilter().Execute(largest_component)
+    show_current_slice(contour)
+
+def show_current_slice(current_slice: sitk.Image) -> None:
     plt.imshow(sitk.GetArrayViewFromImage(current_slice))
     plt.axis('off')
     plt.show()
 
-def show_fiji(image):
+def show_fiji(image: sitk.Image) -> None:
     sitk.Show(sitk.Cast(image,sitk.sitkFloat32) + 255)
 
-# Does not work
 # Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
-def select_largest_component(binary_image):
-    component_image = sitk.ConnectedComponent(binary_image)
+def select_largest_component(binary_image: sitk.Image) -> sitk.Image:
+    component_image = sitk.ConnectedComponentImageFilter().Execute(binary_image)
     sorted_component_image = sitk.RelabelComponent(component_image, sortByObjectSize=True)
     largest_component_binary_image = sorted_component_image == 1
     return largest_component_binary_image
 
-def apply_rotations(image):
-    euler_transform = sitk.Euler3DTransform(image.TransformContinuousIndexToPhysicalPoint([(sz-1 / 2.0) for sz in image.GetSize()]))
+def apply_rotations(image: sitk.Image, x_rotation: int, y_rotation: int, z_rotation: int) -> sitk.Image:
+    euler_transform = sitk.Euler3DTransform()
+    euler_transform.SetCenter(image.TransformContinuousIndexToPhysicalPoint([((sz-1) / 2.0) for sz in image.GetSize()]))
+    center = image.TransformContinuousIndexToPhysicalPoint([((sz-1) / 2.0) for sz in image.GetSize()])
     euler_transform.SetRotation(degrees_to_radians(x_rotation), degrees_to_radians(y_rotation), degrees_to_radians(z_rotation))
     rotated_image = sitk.Resample(image, euler_transform)
     return rotated_image
 
-def degrees_to_radians(num: float):
+def degrees_to_radians(num: float) -> float:
     return num * np.pi / 180
 
 if __name__ == "__main__":
