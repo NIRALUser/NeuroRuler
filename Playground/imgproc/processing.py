@@ -11,33 +11,36 @@ NIFTI_PATH = 'ExampleData/MicroBiome_1month_T1w.nii.gz'
 x_rotation = 0
 y_rotation = 0
 z_rotation = 0
-slice_num = 89
+slice_num = 150
 
 def main() -> None:
     reader = sitk.ImageFileReader()
-    reader.SetFileName(NRRD3_PATH)
+    reader.SetFileName(NIFTI_PATH)
     image = reader.Execute()
-    rotated_image = apply_rotations(image, 0, 0, 30)
-    current_slice = rotated_image[:, :, slice_num]
-    show_current_slice(current_slice)
-    #current_slice = image[:, :, slice_num]
-    #process_slice(current_slice)
+    #rotated_image = apply_rotations(image, 0, 0, 30)
+    #current_slice = rotated_image[:, :, slice_num]
+    #show_current_slice(current_slice)
+    current_slice = image[:, :, slice_num]
+    process_slice(current_slice)
 
 def process_slice(current_slice: sitk.Image) -> None:
-    #show_current_slice(current_slice)
-    # TODO: image smoothing -- GradientAnisotropicDiffusionImageFilter
+    show_current_slice(current_slice)
+    # Image smoothing
+    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(sitk.Cast(current_slice, sitk.sitkFloat64))
+    show_current_slice(smooth_slice)
     # FG/BG selection
     # TODO: user chooses between otsu and BinaryThresholdImageFilter
-    otsu = sitk.OtsuThresholdImageFilter().Execute(current_slice)
-    #show_current_slice(otsu)
+    otsu = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
+    show_current_slice(otsu)
     # Fill holes
     hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
-    #show_current_slice(hole_filling)
+    show_current_slice(hole_filling)
+    # Invert image
     inverted_image = sitk.NotImageFilter().Execute(hole_filling)
-    #show_current_slice(inverted_image)
+    show_current_slice(inverted_image)
     # Select largest component
     largest_component = select_largest_component(inverted_image)
-    #show_current_slice(largest_component)
+    show_current_slice(largest_component)
     # Generate contour
     contour = sitk.BinaryContourImageFilter().Execute(largest_component)
     show_current_slice(contour)
