@@ -4,6 +4,8 @@ import argparse
 import SimpleITK as sitk
 import numpy as np
 from PIL import Image
+import cv2
+import matplotlib.pyplot as plt
 
 
 OUTPUT_DIR = 'out'
@@ -66,7 +68,6 @@ def rotate_and_export_slice(
     temp = ((temp - temp.min()) / (temp.max() - temp.min()) * 240).astype(np.uint8)
     JPG = Image.fromarray(temp)
     JPG.save(OUTPUT_DIR + "/test.jpg")
-
 
 def parse_cli():
     parser = argparse.ArgumentParser()
