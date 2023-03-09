@@ -26,7 +26,7 @@ def main() -> None:
 def process_slice(current_slice: sitk.Image) -> None:
     show_current_slice(current_slice)
     # Image smoothing
-    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(sitk.Cast(current_slice, sitk.sitkFloat64))
+    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(current_slice)
     show_current_slice(smooth_slice)
     # FG/BG selection
     # TODO: user chooses between otsu and BinaryThresholdImageFilter

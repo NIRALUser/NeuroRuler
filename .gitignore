@@ -1,3 +1,6 @@
 .ipynb_checkpoints
 .DS_Store
 venv/
+# This is for local testing, does not need to be on GitHub
+Playground/imgproc/contour_numpy.txt
+Playground/imgproc/contour_sitk.txt

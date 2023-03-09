@@ -22,12 +22,16 @@ def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z:
         The number of the slice"""
 
     euler_3d_transform = sitk.Euler3DTransform()
+    # NOTE: This center is possibly incorrect.
     euler_3d_transform.SetCenter(img.TransformContinuousIndexToPhysicalPoint([((dimension - 1) / 2.0) for dimension in img.GetSize()]))
     euler_3d_transform.SetRotation(degrees_to_radians(theta_x), degrees_to_radians(theta_y), degrees_to_radians(theta_z))
     rotated_image = sitk.Resample(img, euler_3d_transform)
     rotated_image_slice = rotated_image[:,:,slice_z]
 
-    otsu = sitk.OtsuThresholdImageFilter().Execute(rotated_image_slice)
+    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
+    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(sitk.Cast(rotated_image_slice, sitk.sitkFloat64))
+
+    otsu = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
 
     hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
 
@@ -92,3 +96,9 @@ def write_numpy_array_image(matrix: np.ndarray, filename: str):
 
 def show_fiji(image: sitk.Image) -> None:
     sitk.Show(sitk.Cast(image,sitk.sitkFloat32) + 255)
+
+
+def show_current_slice(current_slice: sitk.Image) -> None:
+    plt.imshow(sitk.GetArrayViewFromImage(current_slice))
+    plt.axis('off')
+    plt.show()

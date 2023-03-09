@@ -3,5 +3,4 @@ matplotlib==3.5.2
 numpy==1.21.6
 ipywidgets==7.7.0
 argparse==1.4.0
-cv2==4.70.72
 opencv-python==4.7.0.72

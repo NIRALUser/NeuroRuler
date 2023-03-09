@@ -29,7 +29,6 @@ def test_arc_length_works_same_on_binary_0_1_slice_and_binary_0_255_slice():
                     binary_contour = helpers.rotate_and_get_contour(image, theta_x, theta_y, theta_z, slice_z)
                     circumference_1 = helpers.get_contour_length(binary_contour)
 
-
                     contour_255 = helpers.rotate_and_get_contour(image, theta_x, theta_y, theta_z, slice_z)
                     array_255: np.ndarray = sitk.GetArrayFromImage(contour_255)
                     for i in range(len(array_255)):
