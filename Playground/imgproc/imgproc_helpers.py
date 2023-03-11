@@ -6,6 +6,8 @@ import cv2
 import matplotlib.pyplot as plt
 import warnings
 import functools
+from typing import Union
+# import imutils
 
 
 def deprecated(func):
@@ -73,8 +75,7 @@ def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z:
     return contour
 
 
-# TODO: Implement this but with pixel spacing
-# TODO: Make this work but on the transposed representation
+@deprecated
 def arc_length(contour_boundary_points: np.ndarray) -> float:
     """Given a numpy array representing boundary points of a contour, such as the result of `cv2.findContours`, return arc length.
 
@@ -94,27 +95,36 @@ def arc_length(contour_boundary_points: np.ndarray) -> float:
     return arc_length
 
 
+@deprecated
 def distance_2d(x, y):
     """Return the distance between two 2D iterables."""
     assert (len(x) == 2) and (len(y) == 2)
     return np.sqrt((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
 
 
-@deprecated
-def get_contour_length(contour_2D_slice: sitk.Image) -> float:
-    """Given a 2D slice containing only the contour, return the arc length.
+def get_contour_length(contour_2D_slice: Union[sitk.Image, np.ndarray]) -> float:
+    """Given a 2D binary (0|1) or (0|255) slice containing only the contour, return the arc length.
+    
+    Based on commit a230a6b discussion, may not need to worry about non-square pixels.
+    
+    Parameter
+    ---------
+    contour_2D_slice: Union[sitk.Image, np.ndarray]
+        Either `sitk.Image` or `np.ndarray`, for testing purposes.
 
-    NOT A FINISHED IMPLEMENTATION. DOES NOT ACCOUNT FOR NON-SQUARE PIXELS."""
-    # NOTE: np.ndarray is the transpose of sitk.Image image representation.
-    # Compare write_sitk_image() and write_numpy_array(), which write the same result but have reversed indexing.
-    slice_array: np.ndarray = sitk.GetArrayFromImage(contour_2D_slice)
+        Note that if passing in a `sitk.Image`, then `sitk.GetArrayFromImage` will return a transposed `np.ndarray`.
+        
+        However, based on some tests in `test_imgproc.py`, this will not affect the arc length result."""
+    slice_array: np.ndarray = sitk.GetArrayFromImage(contour_2D_slice) if isinstance(contour_2D_slice, sitk.Image) else contour_2D_slice
     contours, hierarchy = cv2.findContours(
         slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
     # TODO: This might not return the right contour. contours is a list of the contours that cv2 finds.
-    # We need to make sure contours[0] is always the outer contour.
+    # Maybe we want to always select the parent contour? contours[0] should always be the parent contour if there are no islands, based on a unit test.
+    # NOTE: select_largest_component removes all "islands" from the image. There can still be contours within the largest contour. But we select the parent contour for consistency.
     contour = contours[0]
-    circumference = cv2.arcLength(contour, True)
-    return circumference
+    length = cv2.arcLength(contour, True)
+    return length
 
 
 def degrees_to_radians(num: float) -> float:

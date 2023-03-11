@@ -8,3 +8,9 @@ Playground/imgproc/numpy_array_255.png
 out/
 .pytest_cache/
 __pycache__/
+bin/
+lib/
+etc/
+include/
+share/
+pyvenv.cfg
