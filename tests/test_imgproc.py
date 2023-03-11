@@ -7,12 +7,15 @@ import numpy as np
 import cv2
 import pytest
 import Playground.imgproc.imgproc_helpers as imgproc_helpers
+import Playground.imgproc.exceptions as exceptions
 
 OUTPUT_DIR = 'out'
 NRRD1_PATH = 'ExampleData/BCP_Dataset_2month_T1w.nrrd'
 NRRD2_PATH = 'ExampleData/IBIS_Dataset_12month_T1w.nrrd'
 NRRD3_PATH = 'ExampleData/IBIS_Dataset_NotAligned_6month_T1w.nrrd'
 NIFTI_PATH = 'ExampleData/MicroBiome_1month_T1w.nii.gz'
+IMAGE_PATHS = [NRRD1_PATH, NRRD2_PATH, NRRD3_PATH, NIFTI_PATH]
+"""For iterating over all images."""
 EPSILON = 0.001
 """Used for `float` comparisons."""
 
@@ -22,6 +25,28 @@ IMAGE_DONT_MUTATE = reader.Execute()
 """Reuse this image for tests; DO NOT MUTATE."""
 
 
+def test_dimensions_of_np_array_same_as_original_image():
+    """Probably not needed but just in case.
+    
+    The dimensions of the numpy array are the same as the original image.
+     
+    Additionally, PNG files generated from numpy arrays (no metadata) look the same as slices of the original image (i.e., spacing correct).
+    
+    Pretty sure that means the arc length generated from the numpy array is the arc length of the original image, with the same units as the original image."""
+    for image_path in IMAGE_PATHS:
+        reader = sitk.ImageFileReader()
+        reader.SetFileName(image_path)
+        image = reader.Execute()
+        for slice_z in range(image.GetSize()[2]):
+            slice = image[:, :, slice_z]
+            # Transposed
+            np_slice = sitk.GetArrayFromImage(slice)
+
+            assert slice.GetSize()[0] == np_slice.shape[1]
+            assert slice.GetSize()[1] == np_slice.shape[0]
+
+
+# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
 def test_arc_length_works_same_on_binary_0_1_slice_and_binary_0_255_slice():
     """Test that cv2.arclength returns the same numbers for a file with 0's and 1's and a file with 0's and 255's.
 
@@ -54,7 +79,7 @@ def test_arc_length_works_same_on_binary_0_1_slice_and_binary_0_255_slice():
                     assert circumference_1 == circumference_2
 
 
-@pytest.mark.skip(reason="Don't need this function")
+# @pytest.mark.skip(reason="Don't need this function")
 def test_our_arc_length_implementation_against_cv2_arc_length_implementation():
     """Test that our `arc_length` function works the same as cv2's."""
     for slice_z in range(0, 150, 15):
@@ -72,6 +97,7 @@ def test_our_arc_length_implementation_against_cv2_arc_length_implementation():
         assert abs(cv2_arc_length - our_arc_length) < EPSILON
 
 
+# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
 def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
     """Confirm that the numpy matrix representation of a 2D slice is the transpose of the sitk matrix representation of a slice.
 
@@ -86,6 +112,7 @@ def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
                 assert numpy_contour[i][j] == sitk_contour.GetPixel(j, i)
 
 
+# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
 def test_arc_length_of_transposed_matrix_is_same():
     """Per discussion here https://github.com/COMP523TeamD/HeadCircumferenceTool/commit/a230a6b57dc34ec433e311d760cc53841ddd6a49,
 
@@ -100,6 +127,9 @@ def test_arc_length_of_transposed_matrix_is_same():
     But the pixel spacing of the underlying `np.ndarray` passed into cv2.findContours *seems* to be fine. See discussion in the GH link.
     
     TODO: Unit test with pre-computed circumferences to really confirm this."""
+    # Write settings of slices with more than 5 contours to a file to make sure they actually are just noise and not brain slices.
+    f = open('tests/noise_vals.txt', 'w')
+    f.write('From test_arc_length_of_transposed_matrix_is_same\n')
 
     for theta_x in range(0, 90, 45):
         for theta_y in range(0, 90, 45):
@@ -110,18 +140,28 @@ def test_arc_length_of_transposed_matrix_is_same():
 
                     assert (sitk_contour.GetSize()[0] == np_contour_non_transposed.shape[0]) and (sitk_contour.GetSize()[1] == np_contour_non_transposed.shape[1])
 
-                    # get_contour_length will call sitk.GetArrayFromImage on the sitk.Image, returning a transposed np.ndarray()
-                    length_of_transposed_contour = imgproc_helpers.get_contour_length(sitk_contour)
-                    # But if passing in a np.ndarray, then it won't transpose it
-                    length_of_non_transposed_contour = imgproc_helpers.get_contour_length(np_contour_non_transposed)
+                    try:
+                        # get_contour_length will call sitk.GetArrayFromImage on the sitk.Image, returning a transposed np.ndarray()
+                        length_of_transposed_contour = imgproc_helpers.get_contour_length(sitk_contour)
+                        # But if passing in a np.ndarray, then it won't transpose it
+                        length_of_non_transposed_contour = imgproc_helpers.get_contour_length(np_contour_non_transposed)
 
-                    assert length_of_transposed_contour == length_of_non_transposed_contour
+                        assert length_of_transposed_contour == length_of_non_transposed_contour
+
+                    except exceptions.ComputeCircumferenceOfNoise:
+                        f.write(f'{theta_x, theta_y, theta_z, slice_z}\n')
+    f.close()
 
 
+# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
 def test_arc_length_of_transposed_matrix_is_same_hardcoded():
     """Same as above test but no rotations. Checks that the matrices are actually transposed.
     
     Tests all slices but ignores the result when there are more than 4 contours (usually occurs for very large slice value), which indicates that slice isn't a brain slice and looks like NIFTI slice 162."""
+    # Write settings of slices with more than 5 contours to a file to make sure they actually are just noise and not brain slices.
+    f = open('tests/noise_vals.txt', 'a')
+    f.write('From test_arc_length_of_transposed_matrix_is_same_hardcoded\n')
+
     for slice_z in range(0, IMAGE_DONT_MUTATE.GetSize()[2]):
         sitk_contour: sitk.Image = imgproc_helpers.rotate_and_get_contour(IMAGE_DONT_MUTATE, 0, 0, 0, slice_z)
         np_contour_transposed = sitk.GetArrayFromImage(sitk_contour)
@@ -134,12 +174,16 @@ def test_arc_length_of_transposed_matrix_is_same_hardcoded():
         contours_not_transposed, hierarchy2 = cv2.findContours(np_contour_not_transposed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         # Number of contours should be the same if transposed or not transposed but check both just in case
-        if len(contours_transposed) < 5 and len(contours_not_transposed) < 5:
+        if len(contours_transposed) <= 5 and len(contours_not_transposed) <= 5:
             transposed_length = cv2.arcLength(contours_transposed[0], True)
             not_transposed_length = cv2.arcLength(contours_not_transposed[0], True)
             assert transposed_length == not_transposed_length
+        else:
+            f.write(f'(0, 0, 0, {slice_z})\n')
+    f.close()
 
 
+# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
 def test_contours_0_is_always_parent_contour_if_no_islands():
     """Assuming there are no islands in the image, then contours[0] results in the parent contour.
     
@@ -152,7 +196,7 @@ def test_contours_0_is_always_parent_contour_if_no_islands():
         assert hierarchy[0][0][3] == -1
 
 
-@pytest.mark.skip(reason="This is trivial")
+# @pytest.mark.skip(reason="This is trivial")
 def test_distance_2d():
     """Really don't need to test this. Testing just in case."""
     x: np.ndarray = np.array([0, 0])

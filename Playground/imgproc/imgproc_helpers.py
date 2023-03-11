@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import warnings
 import functools
 from typing import Union
-# import imutils
+import Playground.imgproc.exceptions as exceptions
 
 
 def deprecated(func):
@@ -114,14 +114,16 @@ def get_contour_length(contour_2D_slice: Union[sitk.Image, np.ndarray]) -> float
 
         Note that if passing in a `sitk.Image`, then `sitk.GetArrayFromImage` will return a transposed `np.ndarray`.
         
-        However, based on some tests in `test_imgproc.py`, this will not affect the arc length result."""
+        However, based on tests in `test_imgproc.py`, this will not affect the arc length result."""
     slice_array: np.ndarray = sitk.GetArrayFromImage(contour_2D_slice) if isinstance(contour_2D_slice, sitk.Image) else contour_2D_slice
     contours, hierarchy = cv2.findContours(
         slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    # TODO: This might not return the right contour. contours is a list of the contours that cv2 finds.
-    # Maybe we want to always select the parent contour? contours[0] should always be the parent contour if there are no islands, based on a unit test.
-    # NOTE: select_largest_component removes all "islands" from the image. There can still be contours within the largest contour. But we select the parent contour for consistency.
+    if len(contours) >= 10:
+        raise exceptions.ComputeCircumferenceOfNoise()
+
+    # NOTE: select_largest_component removes all "islands" from the image. But there can still be contours within the largest contour. Most brain slices have 2 contours, rarely 3.
+    # Assuming there are no islands, contours[0] is always the parent contour. See unit test in test_imgproc.py.
     contour = contours[0]
     length = cv2.arcLength(contour, True)
     return length

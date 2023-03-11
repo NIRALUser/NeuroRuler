@@ -5,6 +5,7 @@ venv/
 Playground/imgproc/contour_numpy.txt
 Playground/imgproc/contour_sitk.txt
 Playground/imgproc/numpy_array_255.png
+tests/noise_vals.txt
 out/
 .pytest_cache/
 __pycache__/
