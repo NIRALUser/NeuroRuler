@@ -4,3 +4,7 @@ venv/
 # This is for local testing, does not need to be on GitHub
 Playground/imgproc/contour_numpy.txt
 Playground/imgproc/contour_sitk.txt
+Playground/imgproc/numpy_array_255.png
+out/
+.pytest_cache/
+__pycache__/

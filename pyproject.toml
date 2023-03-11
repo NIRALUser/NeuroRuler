@@ -1,5 +1,5 @@
 [project]
-name = "Head Circumference Tool"
+name = "HeadCircumferenceTool"
 version = "0.0"
 authors = [
     { name="Peifeng He", email="hankhe@ad.unc.edu" },
