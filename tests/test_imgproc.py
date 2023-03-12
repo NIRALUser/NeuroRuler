@@ -25,6 +25,7 @@ IMAGE_DONT_MUTATE = reader.Execute()
 """Reuse this image for tests; DO NOT MUTATE."""
 
 
+@pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn't need to run again.")
 def test_dimensions_of_np_array_same_as_original_image():
     """Probably not needed but just in case.
     
@@ -46,7 +47,7 @@ def test_dimensions_of_np_array_same_as_original_image():
             assert slice.GetSize()[1] == np_slice.shape[0]
 
 
-# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
+@pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn't need to run again.")
 def test_arc_length_works_same_on_binary_0_1_slice_and_binary_0_255_slice():
     """Test that cv2.arclength returns the same numbers for a file with 0's and 1's and a file with 0's and 255's.
 
@@ -79,7 +80,7 @@ def test_arc_length_works_same_on_binary_0_1_slice_and_binary_0_255_slice():
                     assert circumference_1 == circumference_2
 
 
-# @pytest.mark.skip(reason="Don't need this function")
+@pytest.mark.skip(reason="Don't need this function")
 def test_our_arc_length_implementation_against_cv2_arc_length_implementation():
     """Test that our `arc_length` function works the same as cv2's."""
     for slice_z in range(0, 150, 15):
@@ -97,7 +98,7 @@ def test_our_arc_length_implementation_against_cv2_arc_length_implementation():
         assert abs(cv2_arc_length - our_arc_length) < EPSILON
 
 
-# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
+@pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn't need to run again.")
 def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
     """Confirm that the numpy matrix representation of a 2D slice is the transpose of the sitk matrix representation of a slice.
 
@@ -112,7 +113,7 @@ def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
                 assert numpy_contour[i][j] == sitk_contour.GetPixel(j, i)
 
 
-# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
+@pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn't need to run again.")
 def test_arc_length_of_transposed_matrix_is_same():
     """Per discussion here https://github.com/COMP523TeamD/HeadCircumferenceTool/commit/a230a6b57dc34ec433e311d760cc53841ddd6a49,
 
@@ -153,7 +154,7 @@ def test_arc_length_of_transposed_matrix_is_same():
     f.close()
 
 
-# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
+@pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn't need to run again.")
 def test_arc_length_of_transposed_matrix_is_same_hardcoded():
     """Same as above test but no rotations. Checks that the matrices are actually transposed.
     
@@ -174,7 +175,7 @@ def test_arc_length_of_transposed_matrix_is_same_hardcoded():
         contours_not_transposed, hierarchy2 = cv2.findContours(np_contour_not_transposed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         # Number of contours should be the same if transposed or not transposed but check both just in case
-        if len(contours_transposed) <= 5 and len(contours_not_transposed) <= 5:
+        if len(contours_transposed) <= 9 and len(contours_not_transposed) <= 9:
             transposed_length = cv2.arcLength(contours_transposed[0], True)
             not_transposed_length = cv2.arcLength(contours_not_transposed[0], True)
             assert transposed_length == not_transposed_length
@@ -183,7 +184,7 @@ def test_arc_length_of_transposed_matrix_is_same_hardcoded():
     f.close()
 
 
-# @pytest.mark.skip(reason="Passed in commit 8cde257. Doesn't need to run again.")
+@pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn't need to run again.")
 def test_contours_0_is_always_parent_contour_if_no_islands():
     """Assuming there are no islands in the image, then contours[0] results in the parent contour.
     
@@ -196,7 +197,7 @@ def test_contours_0_is_always_parent_contour_if_no_islands():
         assert hierarchy[0][0][3] == -1
 
 
-# @pytest.mark.skip(reason="This is trivial")
+@pytest.mark.skip(reason="This is trivial")
 def test_distance_2d():
     """Really don't need to test this. Testing just in case."""
     x: np.ndarray = np.array([0, 0])

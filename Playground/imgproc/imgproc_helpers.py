@@ -10,6 +10,7 @@ from typing import Union
 import Playground.imgproc.exceptions as exceptions
 
 
+# Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 def deprecated(func):
     """This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
@@ -27,14 +28,16 @@ def deprecated(func):
 
 def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z: int, slice_z: int) -> sitk.Image:
     """
-    Do 3D rotation, get 2D slice, apply Otsu threshold, hole filling, and get contours.
+    Do 3D rotation, then get 2D slice. Then, apply smoothing, Otsu threshold, hole filling, remove islands, and get contours.
 
-    Return 2D slice containing only the contour. RV is a sitk.Image with UInt8 pixels, only 0 or 1.
+    Return 2D `sitk.Image` containing only the largest connected contour (but may have child contours).
+
+    RV is a binary (0|1) `sitk.Image` with UInt8 pixels.
 
     Parameters
     ----------
-    img
-        `sitk.Image` 3D image
+    img: `sitk.Image`
+        3D image
     theta_x, theta_y, theta_z
         In degrees
     slice_z
@@ -96,7 +99,7 @@ def arc_length(contour_boundary_points: np.ndarray) -> float:
 
 
 @deprecated
-def distance_2d(x, y):
+def distance_2d(x, y) -> float:
     """Return the distance between two 2D iterables."""
     assert (len(x) == 2) and (len(y) == 2)
     return np.sqrt((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
@@ -104,37 +107,44 @@ def distance_2d(x, y):
 
 def get_contour_length(contour_2D_slice: Union[sitk.Image, np.ndarray]) -> float:
     """Given a 2D binary (0|1) or (0|255) slice containing only the contour, return the arc length.
-    
+
     Based on commit a230a6b discussion, may not need to worry about non-square pixels.
-    
+
     Parameter
     ---------
     contour_2D_slice: Union[sitk.Image, np.ndarray]
         Either `sitk.Image` or `np.ndarray`, for testing purposes.
 
         Note that if passing in a `sitk.Image`, then `sitk.GetArrayFromImage` will return a transposed `np.ndarray`.
-        
-        However, based on tests in `test_imgproc.py`, this will not affect the arc length result."""
-    slice_array: np.ndarray = sitk.GetArrayFromImage(contour_2D_slice) if isinstance(contour_2D_slice, sitk.Image) else contour_2D_slice
+
+        However, based on tests in `test_imgproc.py`, this will not affect the arc length result except in irrelevant edge cases where the slice is invalid."""
+    slice_array: np.ndarray = sitk.GetArrayFromImage(contour_2D_slice) if isinstance(
+        contour_2D_slice, sitk.Image) else contour_2D_slice
     contours, hierarchy = cv2.findContours(
         slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     if len(contours) >= 10:
         raise exceptions.ComputeCircumferenceOfNoise()
 
-    # NOTE: select_largest_component removes all "islands" from the image. But there can still be contours within the largest contour. Most brain slices have 2 contours, rarely 3.
+    # NOTE: select_largest_component removes all "islands" from the image.
+    # But there can still be contours within the largest contour.
+    # Most valid brain slices have 2 contours, rarely 3.
     # Assuming there are no islands, contours[0] is always the parent contour. See unit test in test_imgproc.py.
     contour = contours[0]
     length = cv2.arcLength(contour, True)
     return length
 
 
-def degrees_to_radians(num: float) -> float:
+def degrees_to_radians(num: Union[int, float]) -> float:
+    """Convert degrees to radians."""
     return num * np.pi / 180
 
 
 # Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
 def select_largest_component(binary_slice: sitk.Image):
+    """Remove islands.
+
+    Given a binary (0|1) binary slice, return a binary slice containing only the largest connected component."""
     component_image = sitk.ConnectedComponent(binary_slice)
     sorted_component_image = sitk.RelabelComponent(
         component_image, sortByObjectSize=True)
@@ -182,6 +192,7 @@ def show_fiji(image: sitk.Image) -> None:
 
 
 def show_current_slice(current_slice: sitk.Image) -> None:
+    """Show current slice using `matplotlib.pyplot`."""
     plt.imshow(sitk.GetArrayViewFromImage(current_slice))
     plt.axis('off')
     plt.show()
