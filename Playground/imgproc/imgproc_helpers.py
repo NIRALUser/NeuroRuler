@@ -7,7 +7,12 @@ import matplotlib.pyplot as plt
 import warnings
 import functools
 from typing import Union
-import Playground.imgproc.exceptions as exceptions
+try:
+    # This is for pytest
+    import Playground.imgproc.exceptions as exceptions
+except ModuleNotFoundError:
+    # This is for processing.ipynb
+    import exceptions
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
