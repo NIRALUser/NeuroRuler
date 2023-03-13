@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1071</width>
-    <height>804</height>
+    <height>776</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,9 +50,19 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="circumference_text">
+       <widget class="QLabel" name="image_num_label">
         <property name="text">
-         <string>Calculated head circumference:
+         <string>Image 0 of 0</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="circumference_label">
+        <property name="text">
+         <string>Circumference:
 50.123456789 cm</string>
         </property>
         <property name="alignment">
@@ -62,6 +72,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="export_button">
+        <property name="statusTip">
+         <string>Export data.</string>
+        </property>
         <property name="text">
          <string>Export</string>
         </property>
@@ -83,16 +96,22 @@
       </item>
       <item>
        <widget class="QLabel" name="slice_settings_text">
+        <property name="statusTip">
+         <string>Slice settings selected from main window.</string>
+        </property>
         <property name="text">
-         <string>X rotation: 123
-Y rotation: 45
-Z rotation: 67
-Slice: 89</string>
+         <string>X rotation: 123°
+Y rotation: 45°
+Z rotation: 67°
+Slice: 89°</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="adjust_slice_button">
+        <property name="statusTip">
+         <string>Go back to main window to adjust slice settings.</string>
+        </property>
         <property name="text">
          <string>Adjust</string>
         </property>
@@ -120,6 +139,9 @@ Another setting: 89</string>
       </item>
       <item>
        <widget class="QPushButton" name="adjust_trace_button">
+        <property name="statusTip">
+         <string>Adjust trace settings.</string>
+        </property>
         <property name="text">
          <string>Adjust</string>
         </property>

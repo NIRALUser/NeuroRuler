@@ -42,7 +42,7 @@ def test_init_and_getters():
     assert IMAGE_1.get_slice_z() == 0
 
 def test_image_repr():
-    assert str(IMAGE_0) == f'Image(\'{NRRD0_PATH}\', 0, 0, 0, 0)'
+    assert str(IMAGE_0) == f'MRIImage(\'{NRRD0_PATH}\', 0, 0, 0, 0)'
 
 def test_setters():
     img = MRIImage(NRRD0_PATH)
@@ -122,7 +122,7 @@ def test_initialize_with_no_arg():
     assert len(image_list) == 1
 
 def test_repr():
-    assert str(IMAGE_LIST) == f'[Image(\'{NRRD0_PATH}\', 0, 0, 0, 0), Image(\'{NRRD1_PATH}\', 3, 2, 1, 0), Image(\'{NRRD2_PATH}\', 0, 1, 2, 3)]'
+    assert str(IMAGE_LIST) == f'[MRIImage(\'{NRRD0_PATH}\', 0, 0, 0, 0), MRIImage(\'{NRRD1_PATH}\', 3, 2, 1, 0), MRIImage(\'{NRRD2_PATH}\', 0, 1, 2, 3)]'
 
 # The invididual Image elements are not deep copied
 # This is the same as normal Python behavior: https://stackoverflow.com/questions/19068707/does-a-slicing-operation-give-me-a-deep-or-shallow-copy

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1071</width>
-    <height>804</height>
+    <height>776</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
          </size>
         </property>
         <property name="statusTip">
-         <string>~/Documents/GitHub/COMP523/HeadCircumferenceTool/ExampleData/......</string>
+         <string>Image path is displayed here.</string>
         </property>
         <property name="text">
          <string>Select image(s) using File &gt; Open!</string>
@@ -59,6 +59,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QPushButton" name="previous_button">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="statusTip">
+           <string>Previous image.</string>
+          </property>
           <property name="text">
            <string>Previous</string>
           </property>
@@ -66,8 +72,11 @@
         </item>
         <item>
          <widget class="QLabel" name="image_num_label">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
-           <string>Image 1 of 10</string>
+           <string>Image 0 of 0</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -76,6 +85,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="next_button">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="statusTip">
+           <string>Next image.</string>
+          </property>
           <property name="text">
            <string>Next</string>
           </property>
@@ -85,6 +100,12 @@
       </item>
       <item>
        <widget class="QPushButton" name="apply_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="statusTip">
+         <string>Compute circumference using current settings.</string>
+        </property>
         <property name="text">
          <string>Apply</string>
         </property>
@@ -95,9 +116,9 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QLabel" name="x_degrees">
+       <widget class="QLabel" name="x_rotation_label">
         <property name="text">
-         <string>X rotation:</string>
+         <string>X rotation</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -106,6 +127,12 @@
       </item>
       <item>
        <widget class="QScrollBar" name="x_slider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="statusTip">
+         <string>Control X rotation value.</string>
+        </property>
         <property name="maximum">
          <number>180</number>
         </property>
@@ -115,9 +142,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="y_degrees">
+       <widget class="QLabel" name="y_rotation_label">
         <property name="text">
-         <string>Y rotation:</string>
+         <string>Y rotation</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -126,6 +153,12 @@
       </item>
       <item>
        <widget class="QScrollBar" name="y_slider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="statusTip">
+         <string>Control Y rotation value.</string>
+        </property>
         <property name="maximum">
          <number>180</number>
         </property>
@@ -135,9 +168,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="z_degrees">
+       <widget class="QLabel" name="z_rotation_label">
         <property name="text">
-         <string>Z rotation:</string>
+         <string>Z rotation</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -146,6 +179,12 @@
       </item>
       <item>
        <widget class="QScrollBar" name="z_slider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="statusTip">
+         <string>Control Z rotation value.</string>
+        </property>
         <property name="maximum">
          <number>180</number>
         </property>
@@ -155,9 +194,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="slice_num">
+       <widget class="QLabel" name="slice_num_label">
         <property name="text">
-         <string>Slice num:</string>
+         <string>Slice</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -166,11 +205,30 @@
       </item>
       <item>
        <widget class="QScrollBar" name="slice_slider">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="statusTip">
+         <string>Control slice number.</string>
+        </property>
         <property name="maximum">
          <number>100</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="reset_button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="statusTip">
+         <string>Reset rotation and slice values to 0 (default) for the current image.</string>
+        </property>
+        <property name="text">
+         <string>Reset</string>
         </property>
        </widget>
       </item>
