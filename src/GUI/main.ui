@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1071</width>
-    <height>860</height>
+    <height>804</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
        </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer">
+       <spacer name="vertical_spacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -190,7 +190,7 @@
      <x>0</x>
      <y>0</y>
      <width>1071</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_file">
@@ -198,24 +198,64 @@
      <string>File</string>
     </property>
     <addaction name="action_open"/>
+    <addaction name="action_add_image"/>
+    <addaction name="action_remove_image"/>
+    <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="action_documentation"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_documentation">
+   <property name="text">
+    <string>Documentation</string>
+   </property>
+   <property name="statusTip">
+    <string>Link to documentation page.</string>
+   </property>
+  </action>
+  <action name="action_exit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+   <property name="statusTip">
+    <string>Exit.</string>
+   </property>
+   <property name="shortcut">
+    <string>Meta+W, Ctrl+W</string>
+   </property>
+  </action>
   <action name="action_open">
    <property name="text">
     <string>Open</string>
    </property>
+   <property name="statusTip">
+    <string>Select file(s) to be opened in .nrrd, .nii.gz, or .nii.gz formats.</string>
+   </property>
+   <property name="shortcut">
+    <string>Meta+O, Ctrl+O</string>
+   </property>
   </action>
-  <action name="action_documentation">
+  <action name="action_add_image">
    <property name="text">
-    <string>Documentation</string>
+    <string>Add Image</string>
+   </property>
+   <property name="statusTip">
+    <string>Add a single image.</string>
+   </property>
+  </action>
+  <action name="action_remove_image">
+   <property name="text">
+    <string>Remove Image</string>
+   </property>
+   <property name="statusTip">
+    <string>Remove a single image.</string>
    </property>
   </action>
  </widget>
