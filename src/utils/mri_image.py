@@ -180,6 +180,9 @@ class MRIImage:
 
 # Credit: https://github.com/python/cpython/blob/208a7e957b812ad3b3733791845447677a704f3e/Lib/collections/__init__.py#L1174
 class MRIImageList(_collections_abc.MutableSequence):
+    """There should only be a single instance of `MRIImageList`. It modifies global variables.
+    
+    Not enforced, but don't make more than one instance."""
     # Commented out because this syntax doesn't work on older versions of Python
     # images: list[MRIImage]
     index: int = 0

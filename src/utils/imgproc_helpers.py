@@ -16,6 +16,7 @@ except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
 from src.utils.mri_image import MRIImage, MRIImageList
+import src.utils.globs as globs
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
