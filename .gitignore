@@ -1,0 +1,21 @@
+.ipynb_checkpoints
+.DS_Store
+venv/
+.idea/
+.tox/
+img/
+# This is for local testing, does not need to be on GitHub
+Playground/imgproc/contour_numpy.txt
+Playground/imgproc/contour_sitk.txt
+Playground/imgproc/numpy_array_255.png
+src/HeadCircumferenceTool.egg-info
+tests/noise_vals.txt
+out/
+.pytest_cache/
+__pycache__/
+bin/
+lib/
+etc/
+include/
+share/
+pyvenv.cfg
