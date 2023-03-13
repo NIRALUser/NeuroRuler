@@ -72,8 +72,6 @@ class MainWindow(QMainWindow):
 
     
 class CircumferenceWindow(QMainWindow):
-    from src.utils.globs import IMAGE_LIST
-
     def __init__(self):
         super(CircumferenceWindow, self).__init__()
         loadUi('src/GUI/circumference.ui', self)
