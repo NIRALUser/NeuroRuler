@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1071</width>
-    <height>804</height>
+    <height>932</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -168,7 +168,7 @@ Another setting: 89</string>
     <string>Select file(s) to be opened in .nrrd, .nii.gz, or .nii.gz formats.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+O, Meta+O</string>
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="action_documentation">

@@ -6,6 +6,8 @@ import cv2
 import matplotlib.pyplot as plt
 import warnings
 import functools
+import pathlib
+from PIL import Image
 from typing import Union
 try:
     # This is for pytest
@@ -13,6 +15,7 @@ try:
 except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
+from src.utils.mri_image import MRIImage, MRIImageList
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
@@ -31,6 +34,7 @@ def deprecated(func):
     return new_func
 
 
+# TODO: Make this call process_slice_and_get_contour?
 def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z: int, slice_z: int) -> sitk.Image:
     """
     Do 3D rotation, then get 2D slice. Then, apply smoothing, Otsu threshold, hole filling, remove islands, and get contours.
@@ -81,6 +85,47 @@ def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z:
     contour = sitk.BinaryContourImageFilter().Execute(largest_component)
 
     return contour
+
+
+def process_slice_and_get_contour(slice: sitk.Image) -> sitk.Image:
+    """Apply smoothing, Otsu threshold, hole filling, island removal, and get contours."""
+    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
+    # However, this does throw some weird errors
+    # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
+    # Stable time step for this image must be smaller than 0.0997431
+    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+        sitk.Cast(slice, sitk.sitkFloat64))
+
+    otsu = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
+
+    hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
+
+    # BinaryGrindPeakImageFilter has inverted foreground/background 0 and 1, need to invert
+    inverted = sitk.NotImageFilter().Execute(hole_filling)
+
+    largest_component = select_largest_component(inverted)
+
+    contour = sitk.BinaryContourImageFilter().Execute(largest_component)
+
+    return contour
+
+
+def save_sitk_slice_to_file(slice: sitk.Image, filepath: pathlib.Path) -> None:
+    """Should be called after `MRIImage.resample` and `process_slice_and_get_contour`.
+
+    Parameters
+    ----------
+    img
+        2D slice
+    filepath
+        Should usually be in the `./img` directory. Any extension supported by `PIL.Image` is supported here. Should usually be jpg or png."""
+    # This is transposed
+    np_array: np.ndarray = sitk.GetArrayFromImage(slice)
+    # Untranspose it to display the actual representation (i.e., what you'd see in Fiji)
+    np_array = np.ndarray.transpose(np_array)
+    # See https://stackoverflow.com/questions/16720682/pil-cannot-write-mode-f-to-jpeg
+    img = Image.fromarray(np_array).convert("L")
+    img.save(str(filepath))
 
 
 @deprecated
