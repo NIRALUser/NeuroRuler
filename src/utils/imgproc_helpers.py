@@ -10,12 +10,13 @@ import pathlib
 from PIL import Image
 from typing import Union
 try:
-    # This is for pytest
-    import Playground.imgproc.exceptions as exceptions
+    # This is for pytest and normal use
+    import src.utils.exceptions as exceptions
 except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
 from src.utils.mri_image import MRIImage, MRIImageList
+import src.utils.globs as globs
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
@@ -174,7 +175,7 @@ def get_contour_length(contour_2D_slice: Union[sitk.Image, np.ndarray]) -> float
         slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     if len(contours) >= 10:
-        raise exceptions.ComputeCircumferenceOfNoise()
+        raise exceptions.ComputeCircumferenceOfInvalidSlice()
 
     # NOTE: select_largest_component removes all "islands" from the image.
     # But there can still be contours within the largest contour.

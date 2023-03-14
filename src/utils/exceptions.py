@@ -3,7 +3,7 @@
 
 # TODO: Make __init__ accept theta_x, theta_y, theta_z, slice_num as parameters to display those to the user?
 # Probably not necessary because those will be displayed in the GUI.
-class ComputeCircumferenceOfNoise(Exception):
+class ComputeCircumferenceOfInvalidSlice(Exception):
     """User attempted to compute circumference of a slice that's just noise.
 
     We detect this by noticing that the number of contours in the slice > 9.
@@ -25,8 +25,13 @@ class RemoveFromEmptyList(Exception):
         self.message = f'You attempted to remove an image from an empty list of images.'
         super().__init__(self.message)
 
+class RemoveFromListOfLengthOne(Exception):
+    def __init__(self):
+        self.message = f'You attempted to remove an image from a list of size 1 (i.e., the list would become empty after the delete).'
+        super().__init__(self.message)
 
 class RemoveAtInvalidIndex(Exception):
+    """This account for the user seeing a 1-indexed list."""
     def __init__(self, index: int):
-        self.message = f'You attempted to remove an image at index {index}, which doesn\'t exist in the list of images.'
+        self.message = f'You attempted to remove an image at index {index + 1}, which doesn\'t exist in the list of images.'
         super().__init__(self.message)

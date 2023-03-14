@@ -8,6 +8,7 @@ TODO: Test this later."""
 
 import pytest
 import pathlib
+import src.utils.exceptions as exceptions
 from src.utils.mri_image import MRIImage, MRIImageList
 
 NRRD0_PATH = pathlib.Path('ExampleData/BCP_Dataset_2month_T1w.nrrd')
@@ -158,8 +159,7 @@ def test_del_item():
     assert clone[1] == IMAGE_2
     del clone[0]
     assert clone[0] == IMAGE_2
-    del clone[0]
-    with pytest.raises(IndexError):
+    with pytest.raises(exceptions.RemoveFromListOfLengthOne):
         del clone[0]
 
 def test_set_item():
