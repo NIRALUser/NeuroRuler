@@ -1,41 +1,175 @@
-"""Some helper functions for image processing."""
+"""Some helper functions for image processing.
+
+Deprecated functions that aren't currently in use are at the bottom. They should be removed when we're sure we won't
+have any further use for them.
+"""
 
 import SimpleITK as sitk
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-import warnings
-import functools
 import pathlib
 from PIL import Image
+from multipledispatch import dispatch
 from typing import Union
+
 try:
     # This is for pytest and normal use
     import src.utils.exceptions as exceptions
 except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
-# This file has some deprecated functions that use globs.IMAGE_LIST, but this will be removed later
 import src.utils.globs as globs
+from src.utils.globs import deprecated
 
 
-# Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
-def deprecated(func):
-    """This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used."""
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
-        warnings.warn("Call to deprecated function {}.".format(func.__name__),
-                      category=DeprecationWarning,
-                      stacklevel=2)
-        warnings.simplefilter('default', DeprecationWarning)  # reset filter
-        return func(*args, **kwargs)
-    return new_func
+def mri_slice_to_np_array_uint16(mri_slice: sitk.Image, new_min: int, new_max: int) -> np.ndarray:
+    """For image rendering. Given a mri_slice of unsigned values, convert to a np array of uint16.
+    
+    Parameter
+    ---------
+    mri_slice
+        2D slice that can hold int16 or """
 
 
-# TODO: Make this call process_slice_and_get_contour?
+
+def get_contour(mri_slice: sitk.Image) -> sitk.Image:
+    """Given a rotated slice, apply smoothing, Otsu threshold, hole filling, island removal, and get contours."""
+    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
+    # However, this does throw some weird errors
+    # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
+    # Stable time step for this image must be smaller than 0.0997431
+    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+        sitk.Cast(mri_slice, sitk.sitkFloat64))
+
+    otsu = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
+
+    hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
+
+    # BinaryGrindPeakImageFilter has inverted foreground/background 0 and 1, need to invert
+    inverted = sitk.NotImageFilter().Execute(hole_filling)
+
+    largest_component = select_largest_component(inverted)
+
+    contour = sitk.BinaryContourImageFilter().Execute(largest_component)
+
+    return contour
+
+
+# Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
+def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
+    """Remove islands.
+
+    Given a binary (0|1) binary slice, return a binary slice containing only the largest connected component."""
+    component_image = sitk.ConnectedComponent(binary_slice)
+    sorted_component_image = sitk.RelabelComponent(
+        component_image, sortByObjectSize=True)
+    largest_component_binary_image = sorted_component_image == 1
+    return largest_component_binary_image
+
+
+def get_contour_length(contour_slice: Union[sitk.Image, np.ndarray]) -> float:
+    """Given a 2D binary (0|1 or 0|255) slice containing a single contour, return the arc length of the parent contour.
+
+    Based on commit a230a6b discussion, may not need to worry about non-square pixels.
+
+    Parameter
+    ---------
+    contour_slice: Union[sitk.Image, np.ndarray]
+        This needs to be a 2D binary (0|1 or 0|255, doesn't make a difference) slice containing a contour.
+
+        Note that if contour_slice is a `sitk.Image`, then `sitk.GetArrayFromImage` will return a transposed `np.ndarray`.
+
+        However, based on tests in `test_imgproc.py`, this will not affect the arc length result except in irrelevant edge cases where the slice is invalid.
+        
+        Therefore, if passing in a sitk.Image, this function does not re-transpose after calling sitk.GetArrayFromImage.."""
+    slice_array: np.ndarray = sitk.GetArrayFromImage(contour_slice) if isinstance(
+        contour_slice, sitk.Image) else contour_slice
+    contours, hierarchy = cv2.findContours(
+        slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    if len(contours) >= 10:
+        raise exceptions.ComputeCircumferenceOfInvalidSlice()
+
+    # NOTE: select_largest_component removes all "islands" from the image.
+    # But there can still be contours within the largest contour.
+    # Most valid brain slices have 2 contours, rarely 3.
+    # Assuming there are no islands, contours[0] is always the parent contour.
+    # See unit test in test_imgproc.py: test_contours_0_is_always_parent_contour_if_no_islands
+    contour = contours[0]
+    length = cv2.arcLength(contour, True)
+    return length
+
+
+def degrees_to_radians(num: Union[int, float]) -> float:
+    return num * np.pi / 180
+
+
+def scale_unsigned_np_array_to_uint16(arr: np.ndarray, new_max: int) -> np.ndarray:
+    """Scale `arr` to a new unsigned range defined by `new_max`. The minimum of the range is assumed to be 0.
+ 
+    Used to cast `numpy` array of int16 or float32/64 (actual min usually 0, actual max usually 255 to 1000) to uint16 in src/GUI/main.py.
+    
+    Any floats will be floored. `new_max` should be large enough that the flooring won't matter, but this is not checked for in the code."""
+    old_min = arr.min()
+    assert old_min == 0
+    old_max = arr.max()
+    return (arr / old_max * new_max).astype('uint16')
+
+
+# Credit: https://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
+def scale_to_range(num: Union[int, float], old_min: int, old_max: int, new_min: int, new_max: int) -> int:
+    """Warning: Do not use with negative ranges. This function assumes everything is positive.
+    
+    Scale `num` in old range (defined by `old_min` and `old_max`) to a new range, returns a floored integer.
+
+    It's assumed that when using this function, the new range is large enough that the flooring won't matter.
+
+    Use to cast `numpy` array of int16 or float32/64 (actual min usually 0, actual max usually 255 to 1000) to uint16 in src/GUI/main.py.
+
+    Per https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/4#issuecomment-1468552326
+    
+    Parameters
+    ----------
+    num
+        Can be `int` or `float`
+    
+    old_min, old_max, new_min, new_max
+        Must be `int`"""
+    if num < 0 or old_min < 0 or old_max < 0 or new_min < 0 or new_max < 0:
+        raise exceptions.UnexpectedNegativeNum
+    old_range = old_max - old_min
+    new_range = new_max - new_min
+    if old_range < 100 or new_range < 100:
+        raise exceptions.RangeTooSmallForAccurateFlooredResult(old_range, new_range)
+    return int((((num - old_min) / old_range) * new_range) + new_min)
+
+
+def scale_unsigned_num_to_unsigned_range(num: Union[int, float], old_max, new_max) -> int:
+    """Warning: Do not use with negative ranges. This function assumes everything is unsigned with min value 0 and does not do error checking.
+
+    Scale `num` in old range (assumes old_min is 0) to a new range (assumes new_min is 0) and return a floored integer.
+
+    Use `scale_to_range` for error checking and to define old_min and new_min.
+
+    It's assumed that when using this function, the new range is large enough that the flooring won't matter.
+
+    Use to cast `numpy` array of int16 or float32/64 (actual min usually 0, actual max usually 255 to 1000) to uint16 in src/GUI/main.py.
+
+    Per https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/4#issuecomment-1468552326
+    
+    Parameters
+    ----------
+    num
+        - Can be `int` or `float`
+    
+    old_max, new_max
+        - Must be `int`.
+        
+        - Old min and old max are assumed to be 0 in this function to avoid having to compute the range"""
+    return int(num / old_max * new_max)
+    
+
 @deprecated
 def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z: int, slice_z: int) -> sitk.Image:
     """
@@ -89,71 +223,6 @@ def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z:
     return contour
 
 
-def get_contour(slice: sitk.Image) -> sitk.Image:
-    """Given a rotated slice, apply smoothing, Otsu threshold, hole filling, island removal, and get contours."""
-    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
-    # However, this does throw some weird errors
-    # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
-    # Stable time step for this image must be smaller than 0.0997431
-    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
-        sitk.Cast(slice, sitk.sitkFloat64))
-
-    otsu = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
-
-    hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
-
-    # BinaryGrindPeakImageFilter has inverted foreground/background 0 and 1, need to invert
-    inverted = sitk.NotImageFilter().Execute(hole_filling)
-
-    largest_component = select_largest_component(inverted)
-
-    contour = sitk.BinaryContourImageFilter().Execute(largest_component)
-
-    return contour
-
-
-# Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
-def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
-    """Remove islands.
-
-    Given a binary (0|1) binary slice, return a binary slice containing only the largest connected component."""
-    component_image = sitk.ConnectedComponent(binary_slice)
-    sorted_component_image = sitk.RelabelComponent(
-        component_image, sortByObjectSize=True)
-    largest_component_binary_image = sorted_component_image == 1
-    return largest_component_binary_image
-
-
-def get_contour_length(contour_2D_slice: Union[sitk.Image, np.ndarray]) -> float:
-    """Given a 2D binary (0|1) or (0|255) slice containing only the contour, return the arc length.
-
-    Based on commit a230a6b discussion, may not need to worry about non-square pixels.
-
-    Parameter
-    ---------
-    contour_2D_slice: Union[sitk.Image, np.ndarray]
-        Either `sitk.Image` or `np.ndarray`, for testing purposes.
-
-        Note that if passing in a `sitk.Image`, then `sitk.GetArrayFromImage` will return a transposed `np.ndarray`.
-
-        However, based on tests in `test_imgproc.py`, this will not affect the arc length result except in irrelevant edge cases where the slice is invalid."""
-    slice_array: np.ndarray = sitk.GetArrayFromImage(contour_2D_slice) if isinstance(
-        contour_2D_slice, sitk.Image) else contour_2D_slice
-    contours, hierarchy = cv2.findContours(
-        slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    if len(contours) >= 10:
-        raise exceptions.ComputeCircumferenceOfInvalidSlice()
-
-    # NOTE: select_largest_component removes all "islands" from the image.
-    # But there can still be contours within the largest contour.
-    # Most valid brain slices have 2 contours, rarely 3.
-    # Assuming there are no islands, contours[0] is always the parent contour. See unit test in test_imgproc.py.
-    contour = contours[0]
-    length = cv2.arcLength(contour, True)
-    return length
-
-
 @deprecated
 def save_sitk_slice_to_file(slice: sitk.Image, filepath: pathlib.Path) -> None:
     """Should be called after `MRIImage.resample` and `process_slice_and_get_contour`.
@@ -173,7 +242,6 @@ def save_sitk_slice_to_file(slice: sitk.Image, filepath: pathlib.Path) -> None:
     img.save(str(filepath))
 
 
-@deprecated
 def save_all_slices_to_img_dir():
     """Only called after `Open` is pressed. Saves all `rotated_slice`s in `globs.IMAGE_LIST` to `./img/` to ensure that all can be rendered.
     
@@ -182,12 +250,12 @@ def save_all_slices_to_img_dir():
         save_sitk_slice_to_file(mri_image.get_rotated_slice(), globs.IMG_DIR / f'{i}.{globs.IMAGE_EXTENSION}')
 
 
-@deprecated
 def save_curr_slice_to_img_dir():
     """Save the current slice to `IMG_DIR`."""
     index: int = globs.IMAGE_LIST.get_index()
     # This is not a syntax error at runtime. MRIImageList.__gt__'s return value can't be Union[MRIImage, MRIImageList], so Python is confused before runtime.
-    save_sitk_slice_to_file(globs.IMAGE_LIST[index].get_rotated_slice(), globs.IMG_DIR / f'{index}.{globs.IMAGE_EXTENSION}')
+    save_sitk_slice_to_file(globs.IMAGE_LIST[index].get_rotated_slice(),
+                            globs.IMG_DIR / f'{index}.{globs.IMAGE_EXTENSION}')
 
 
 @deprecated
@@ -204,11 +272,6 @@ def binary_array_to_255_array(arr: np.ndarray) -> np.ndarray:
             if arr[i][j] == 1:
                 arr_copy[i][j] = 255
     return arr_copy
-
-
-def degrees_to_radians(num: Union[int, float]) -> float:
-    """Convert degrees to radians."""
-    return num * np.pi / 180
 
 
 @deprecated

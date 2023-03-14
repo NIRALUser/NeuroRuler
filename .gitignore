@@ -20,3 +20,4 @@ include/
 share/
 pyvenv.cfg
 src/GUI/np_array_slice.txt
+test.txt
