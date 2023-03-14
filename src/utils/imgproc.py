@@ -15,6 +15,7 @@ try:
 except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
+# This file has some deprecated functions that use globs.IMAGE_LIST, but this will be removed later
 import src.utils.globs as globs
 
 
@@ -35,6 +36,7 @@ def deprecated(func):
 
 
 # TODO: Make this call process_slice_and_get_contour?
+@deprecated
 def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z: int, slice_z: int) -> sitk.Image:
     """
     Do 3D rotation, then get 2D slice. Then, apply smoothing, Otsu threshold, hole filling, remove islands, and get contours.
@@ -87,7 +89,7 @@ def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z:
     return contour
 
 
-def process_slice_and_get_contour(slice: sitk.Image) -> sitk.Image:
+def get_contour(slice: sitk.Image) -> sitk.Image:
     """Given a rotated slice, apply smoothing, Otsu threshold, hole filling, island removal, and get contours."""
     # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
     # However, this does throw some weird errors
@@ -152,6 +154,7 @@ def get_contour_length(contour_2D_slice: Union[sitk.Image, np.ndarray]) -> float
     return length
 
 
+@deprecated
 def save_sitk_slice_to_file(slice: sitk.Image, filepath: pathlib.Path) -> None:
     """Should be called after `MRIImage.resample` and `process_slice_and_get_contour`.
 
@@ -170,6 +173,7 @@ def save_sitk_slice_to_file(slice: sitk.Image, filepath: pathlib.Path) -> None:
     img.save(str(filepath))
 
 
+@deprecated
 def save_all_slices_to_img_dir():
     """Only called after `Open` is pressed. Saves all `rotated_slice`s in `globs.IMAGE_LIST` to `./img/` to ensure that all can be rendered.
     
@@ -178,6 +182,7 @@ def save_all_slices_to_img_dir():
         save_sitk_slice_to_file(mri_image.get_rotated_slice(), globs.IMG_DIR / f'{i}.{globs.IMAGE_EXTENSION}')
 
 
+@deprecated
 def save_curr_slice_to_img_dir():
     """Save the current slice to `IMG_DIR`."""
     index: int = globs.IMAGE_LIST.get_index()
@@ -185,6 +190,7 @@ def save_curr_slice_to_img_dir():
     save_sitk_slice_to_file(globs.IMAGE_LIST[index].get_rotated_slice(), globs.IMG_DIR / f'{index}.{globs.IMAGE_EXTENSION}')
 
 
+@deprecated
 def binary_array_to_255_array(arr: np.ndarray) -> np.ndarray:
     """Given a binary (0|1) numpy array, returns a binary (0|255) array to display black and white in png/jpg images.
 
