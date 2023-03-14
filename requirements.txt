@@ -7,3 +7,4 @@ opencv-python==4.7.0.72
 pytest==6.2.5
 autopep8==2.0.2
 PyQt6==6.4.2
+multipledispatch==0.6.0

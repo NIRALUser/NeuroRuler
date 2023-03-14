@@ -11,10 +11,10 @@ import pathlib
 import src.utils.exceptions as exceptions
 from src.utils.mri_image import MRIImage, MRIImageList
 
-NRRD0_PATH = pathlib.Path('ExampleData/BCP_Dataset_2month_T1w.nrrd')
-NRRD1_PATH = pathlib.Path('ExampleData/IBIS_Dataset_12month_T1w.nrrd')
-NRRD2_PATH = pathlib.Path('ExampleData/IBIS_Dataset_NotAligned_6month_T1w.nrrd')
-NIFTI_PATH = pathlib.Path('ExampleData/MicroBiome_1month_T1w.nii.gz')
+NRRD0_PATH = pathlib.Path('ExampleData') / 'BCP_Dataset_2month_T1w.nrrd'
+NRRD1_PATH = pathlib.Path('ExampleData') / 'IBIS_Dataset_12month_T1w.nrrd'
+NRRD2_PATH = pathlib.Path('ExampleData') / 'IBIS_Dataset_NotAligned_6month_T1w.nrrd'
+NIFTI_PATH = pathlib.Path('ExampleData') / 'MicroBiome_1month_T1w.nii.gz'
 
 IMAGE_0 = MRIImage(NRRD0_PATH, 0, 0, 0, 0)
 IMAGE_1 = MRIImage(NRRD1_PATH, 3, 2, 1, 0)
