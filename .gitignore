@@ -19,4 +19,4 @@ etc/
 include/
 share/
 pyvenv.cfg
-test.txt
+src/GUI/np_array_slice.txt

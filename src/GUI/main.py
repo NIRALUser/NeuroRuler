@@ -96,25 +96,28 @@ class MainWindow(QMainWindow):
         Also sets text for `image_num_label` and file path in the status bar tooltip."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
         slice: sitk.Image = curr_mri_image.get_rotated_slice()
-        print(f'sitk: {slice.GetPixelIDTypeAsString()}')
+        print(f'sitk.Image data type: {slice.GetPixelIDTypeAsString()}')
         # sitk: 16-bit signed integer
         index: int = globs.IMAGE_LIST.get_index()
 
         slice_np: np.ndarray = sitk.GetArrayFromImage(slice)
-        print(f'np: {slice_np.dtype}')
+        print(f'np array data type: {slice_np.dtype}')
         # np: int16
         # NOTE: When you print slice_np to a file, it's only 0-255, i.e. uint8, even though the np type is int16.
 
+        print(f'np.min(): {slice_np.min()}')
         print(f'np.max(): {slice_np.max()}')
 
-        # with open('test.txt', 'w') as f:
-        #     for i in range(slice_np.shape[0]):
-        #         for j in range(slice_np.shape[1]):
-        #             f.write(f'{slice_np[i][j]},')
-        #         f.write('\n')
+        with open(str(pathlib.Path('.') / 'src' / 'GUI' / 'np_array_slice.txt'), 'w') as f:
+            for i in range(slice_np.shape[0]):
+                for j in range(slice_np.shape[1]):
+                    f.write(f'{slice_np[i][j]},')
+                f.write('\n')
 
         # No need to add a .copy() to the end of this, but if something breaks, try that
+        # This cast causes issues for most files but it makes the NIFTI file at the bottom work fine
         slice_np = slice_np.astype('uint8')
+
         # sitk.GetArrayFromImage results in the transpose of the original sitk representation, so transpose back
         # .copy() is necessary here
         slice_np = np.ndarray.transpose(slice_np).copy()
