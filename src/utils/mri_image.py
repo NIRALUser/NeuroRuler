@@ -9,10 +9,6 @@ import numpy as np
 
 READER = sitk.ImageFileReader()
 
-
-def degrees_to_radians(degrees: Union[int, float]) -> float:
-    return degrees * np.pi / 180
-
 class MRIImage:
     """Fields
     ------
@@ -132,7 +128,7 @@ class MRIImage:
         
         Keeps the same `Euler3DTransform` but sets its center to the center of the new file.
         
-        Sets rotation values and slice num to 0."""
+        Sets rotation values and slice num to 0 and `resample`s."""
         self.path = path
         READER.SetFileName(str(path))
         self.base_img = READER.Execute()
@@ -143,6 +139,7 @@ class MRIImage:
         self.theta_y = 0
         self.theta_z = 0
         self.slice_z = 0
+        self.resample()
 
     def set_theta_x(self, theta_x: int):
         """Sets `theta_x` field in the `MRIImage` and in the `euler_3d_transform` object.
@@ -172,14 +169,16 @@ class MRIImage:
         self.slice_z = slice_z
     
     def resample(self) -> None:
-        """Sets `rotated_slice` to the result of resampling with this instance's rotation and slice values.
-        
-        Could resample after setter methods, but that's inefficient."""
+        """Sets `rotated_slice` to the result of resampling with this instance's rotation and slice values."""
         self.rotated_slice = sitk.Resample(self.base_img, self.euler_3d_transform)[:, :, self.slice_z]
 
 
 # Credit: https://github.com/python/cpython/blob/208a7e957b812ad3b3733791845447677a704f3e/Lib/collections/__init__.py#L1174
 class MRIImageList(_collections_abc.MutableSequence):
+    """There should only be a single instance of `MRIImageList`.
+    
+    Not enforced, but don't make more than one instance."""
+
     # Commented out because this syntax doesn't work on older versions of Python
     # images: list[MRIImage]
     index: int = 0
@@ -216,20 +215,24 @@ class MRIImageList(_collections_abc.MutableSequence):
     
     # TODO: Make GUI comply with the docstring
     def __delitem__(self, i: int):
-        """Does not advance `index` if `i == index`. The GUI should refresh the image after a delete.
+        """If `i == index`, the GUI should re-render the image afterward.
         
-        This edge case should not be handled here. TODO"""
+        TODO: GUI should prevent delete when there's only one image."""
+        if len(self) == 0:
+            raise exceptions.RemoveFromEmptyList()
+        if len(self) == 1:
+            raise exceptions.RemoveFromListOfLengthOne()
         del self.images[i]
     
     def __setitem__(self, i: int, image: MRIImage):
-        """Doesn't modify `index`."""
+        """If `i == index`, the GUI should re-render the image."""
         self.images[i] = image
 
     def __contains__(self, image: MRIImage) -> bool:
         return image in self.images
 
     def insert(self, i: int, image: MRIImage):
-        """Doesn't modify `index`."""
+        """If `i == index`, GUI should re-render the image."""
         self.images.insert(i, image)
         
     def append(self, image: MRIImage):
@@ -245,10 +248,20 @@ class MRIImageList(_collections_abc.MutableSequence):
             self.images.extend(other)
 
     def clear(self):
+        """If this is called, reset GUI to initial state (i.e., everything disabled)."""
         self.images.clear()
+        self.index = 0
 
     def pop(self, i=-1) -> MRIImage:
-        """Default parameter -1 (i.e., pop last element)."""
+        """Default parameter -1 (i.e., pop last element).
+        
+        If `i == index`, GUI should re-render image afterward.
+        
+        TODO: GUI should prevent pop when there's only one image."""
+        if len(self) == 0:
+            raise exceptions.RemoveFromEmptyList()
+        if len(self) == 1:
+            raise exceptions.RemoveFromListOfLengthOne()
         return self.images.pop(i)
 
     def next(self):
@@ -285,3 +298,6 @@ class MRIImageList(_collections_abc.MutableSequence):
 
     def get_index(self) -> int:
         return self.index
+
+def degrees_to_radians(degrees: Union[int, float]) -> float:
+    return degrees * np.pi / 180
