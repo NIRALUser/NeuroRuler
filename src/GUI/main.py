@@ -81,9 +81,11 @@ class MainWindow(QMainWindow):
         Compute circumference and update slice settings."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
         widget.setCurrentIndex(CIRCUMFERENCE_WINDOW_INDEX)
-        # circumference_window.render_curr_slice()
 
-        circumference_window.render_curr_slice_from_img_dir()
+        if USE_JPG:
+            circumference_window.render_curr_slice_from_img_dir()
+        else:
+            circumference_window.render_curr_slice()
 
         circumference: float = imgproc.get_contour_length(
             imgproc.get_contour(curr_mri_image.get_rotated_slice()))
