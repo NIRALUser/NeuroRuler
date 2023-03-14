@@ -23,14 +23,21 @@ import src.utils.globs as globs
 from src.utils.globs import deprecated
 
 
+# Probably will not end up using this, dw about it
 def mri_slice_to_np_array_uint16(mri_slice: sitk.Image, new_min: int, new_max: int) -> np.ndarray:
-    """For image rendering. Given a mri_slice of unsigned values, convert to a np array of uint16.
+    """Not a finished function.
     
-    Parameter
+    For image rendering. Given a mri_slice of unsigned values, convert to a np array of uint16.
+    
+    Parameters
     ---------
     mri_slice
-        2D slice that can hold int16 or """
+        2D slice that can hold int16 or float32/64
 
+    new_min
+
+    new_max"""
+    return np.array([0])
 
 
 def get_contour(mri_slice: sitk.Image) -> sitk.Image:
@@ -223,7 +230,6 @@ def rotate_and_get_contour(img: sitk.Image, theta_x: int, theta_y: int, theta_z:
     return contour
 
 
-@deprecated
 def save_sitk_slice_to_file(slice: sitk.Image, filepath: pathlib.Path) -> None:
     """Should be called after `MRIImage.resample` and `process_slice_and_get_contour`.
 
@@ -235,9 +241,10 @@ def save_sitk_slice_to_file(slice: sitk.Image, filepath: pathlib.Path) -> None:
         Should usually be in the `./img` directory. Any extension supported by `PIL.Image` is supported here. Should usually be jpg or png."""
     # This is transposed
     np_array: np.ndarray = sitk.GetArrayFromImage(slice)
-    # Untranspose it to display the actual representation (i.e., what you'd see in Fiji)
+    # Retranspose it to make it the same as the sitk representation
     np_array = np.ndarray.transpose(np_array)
     # See https://stackoverflow.com/questions/16720682/pil-cannot-write-mode-f-to-jpeg
+    # Don't know what "L" does but it's necessary
     img = Image.fromarray(np_array).convert("L")
     img.save(str(filepath))
 

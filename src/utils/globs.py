@@ -13,7 +13,7 @@ IMAGE_LIST: MRIImageList = MRIImageList()
 
 # Since QPixmap doesn't support rendering from a sitk.Image or np.ndarray, must save images as jpg/png
 # https://doc.qt.io/qtforpython-5/PySide2/QtGui/QPixmap.html
-IMG_DIR: pathlib.Path = pathlib.Path('.') / 'img'
+IMG_DIR: pathlib.Path = pathlib.Path.cwd() / 'img'
 """Directory used to save f'{i}.{IMAGE_EXTENSION}' files corresponding to the currently open images, where `i` is the index (zero-indexed) of the image.
 
 Files will need to be renamed during Add Image or Delete Image operations."""

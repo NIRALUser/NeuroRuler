@@ -17,8 +17,9 @@ from PyQt6.uic.load_ui import loadUi
 from src.utils.mri_image import MRIImage, MRIImageList
 import src.utils.imgproc as imgproc
 import src.utils.globs as globs
+import src.utils.parser as parser
 
-USE_JPG: bool = True
+SAVE_IMG_TO_DISK: bool = True
 
 DEFAULT_WIDTH: int = 1000
 """Startup width of the GUI"""
@@ -67,7 +68,7 @@ class MainWindow(QMainWindow):
         globs.IMAGE_LIST = MRIImageList(images)
         self.enable_elements()
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             imgproc.save_all_slices_to_img_dir()
             self.render_curr_slice_from_img_dir()
         else:
@@ -82,7 +83,7 @@ class MainWindow(QMainWindow):
         curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
         widget.setCurrentIndex(CIRCUMFERENCE_WINDOW_INDEX)
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             circumference_window.render_curr_slice_from_img_dir()
         else:
             circumference_window.render_curr_slice()
@@ -126,7 +127,7 @@ class MainWindow(QMainWindow):
 
         # sitk.GetArrayFromImage() results in a np array that's the transpose of the original sitk representation,
         # so transpose back .copy() is necessary here, otherwise error occurs
-        # slice_np = np.ndarray.transpose(slice_np).copy()
+        slice_np = np.ndarray.transpose(slice_np).copy()
 
         w, h = slice_np.shape
 
@@ -176,7 +177,7 @@ class MainWindow(QMainWindow):
         globs.IMAGE_LIST.next()
         # self.render_curr_slice()
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             self.render_curr_slice_from_img_dir()
         else:
             self.render_curr_slice()
@@ -187,7 +188,7 @@ class MainWindow(QMainWindow):
         """Decrement index and render."""
         globs.IMAGE_LIST.previous()
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             self.render_curr_slice_from_img_dir()
         else:
             self.render_curr_slice()
@@ -201,7 +202,7 @@ class MainWindow(QMainWindow):
         curr_mri_image.set_theta_x(x_slider_val)
         curr_mri_image.resample()
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             imgproc.save_curr_slice_to_img_dir()
             self.render_curr_slice_from_img_dir()
         else:
@@ -216,7 +217,7 @@ class MainWindow(QMainWindow):
         curr_mri_image.set_theta_y(y_slider_val)
         curr_mri_image.resample()
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             imgproc.save_curr_slice_to_img_dir()
             self.render_curr_slice_from_img_dir()
         else:
@@ -231,7 +232,7 @@ class MainWindow(QMainWindow):
         curr_mri_image.set_theta_z(z_slider_val)
         curr_mri_image.resample()
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             imgproc.save_curr_slice_to_img_dir()
             self.render_curr_slice_from_img_dir()
         else:
@@ -246,7 +247,7 @@ class MainWindow(QMainWindow):
         curr_mri_image.set_slice_z(slice_slider_val)
         curr_mri_image.resample()
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             imgproc.save_curr_slice_to_img_dir()
             self.render_curr_slice_from_img_dir()
         else:
@@ -263,7 +264,7 @@ class MainWindow(QMainWindow):
         curr_mri_image.set_slice_z(0)
         curr_mri_image.resample()
 
-        if USE_JPG:
+        if SAVE_IMG_TO_DISK:
             imgproc.save_curr_slice_to_img_dir()
             self.render_curr_slice_from_img_dir()
         else:
@@ -333,6 +334,24 @@ class CircumferenceWindow(QMainWindow):
         self.image.setStatusTip(str(curr_mri_image.get_path()))
 
 def main() -> None:
+    # Parse CLI args.
+    # As mentioned in src.utils.parser.py, this is temporary and for testing
+    global SAVE_IMG_TO_DISK
+    args = parser.parse_cli()
+
+    if args.jpg:
+        if not globs.IMG_DIR.exists():
+            globs.IMG_DIR.mkdir()
+        SAVE_IMG_TO_DISK = True
+        globs.IMAGE_EXTENSION = 'jpg'
+    if args.png:
+        if not globs.IMG_DIR.exists():
+            globs.IMG_DIR.mkdir()
+        SAVE_IMG_TO_DISK = True
+        globs.IMAGE_EXTENSION = 'png'
+    if args.np:
+        SAVE_IMG_TO_DISK = False
+
     app = QApplication(sys.argv)
     global widget
     widget = QtWidgets.QStackedWidget()
