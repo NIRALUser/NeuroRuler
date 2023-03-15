@@ -8,6 +8,7 @@ import cv2
 import pytest
 import pathlib
 import src.utils.imgproc as imgproc
+from src.utils.imgproc import rotate_and_slice, contour, length_of_contour
 import src.utils.exceptions as exceptions
 
 OUTPUT_DIR = pathlib.Path('out')
@@ -68,8 +69,7 @@ def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
 
     Can ignore this test later."""
     for z_slice in range(10):
-        sitk_contour: sitk.Image = imgproc.rotate_and_get_contour(
-            IMAGE_DONT_MUTATE, 0, 0, 0, z_slice)
+        sitk_contour: sitk.Image = contour(rotate_and_slice(IMAGE_DONT_MUTATE, 0, 0, 0, z_slice))
         numpy_contour: np.ndarray = sitk.GetArrayFromImage(sitk_contour)
 
         for i in range(len(numpy_contour)):
@@ -90,13 +90,11 @@ def test_arc_length_works_same_on_binary_0_1_slice_and_binary_0_255_slice():
         for theta_y in range(2):
             for theta_z in range(2):
                 for slice_z in range(2):
-                    binary_contour = imgproc.rotate_and_get_contour(
-                        IMAGE_DONT_MUTATE, theta_x, theta_y, theta_z, slice_z)
-                    circumference_1 = imgproc.get_contour_length(
+                    binary_contour = contour(rotate_and_slice(IMAGE_DONT_MUTATE, theta_x, theta_y, theta_z, slice_z))
+                    circumference_1 = imgproc.length_of_contour(
                         binary_contour)
 
-                    contour_255 = imgproc.rotate_and_get_contour(
-                        IMAGE_DONT_MUTATE, theta_x, theta_y, theta_z, slice_z)
+                    contour_255 = contour(rotate_and_slice(IMAGE_DONT_MUTATE, theta_x, theta_y, theta_z, slice_z))
                     array_255: np.ndarray = sitk.GetArrayFromImage(contour_255)
                     for i in range(len(array_255)):
                         for j in range(len(array_255[0])):
@@ -104,28 +102,10 @@ def test_arc_length_works_same_on_binary_0_1_slice_and_binary_0_255_slice():
                                 array_255[i][j] = 255
                     contours, hierarchy = cv2.findContours(
                         array_255, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-                    contour = contours[0]
-                    circumference_2 = cv2.arcLength(contour, True)
+                    parent_contour = contours[0]
+                    circumference_2 = cv2.arcLength(parent_contour, True)
 
                     assert circumference_1 == circumference_2
-
-
-# @pytest.mark.skip(reason="Don't need this function")
-def test_our_arc_length_implementation_against_cv2_arc_length_implementation():
-    """Test that our `arc_length` function works the same as cv2's."""
-    for slice_z in range(0, 150, 15):
-        contour_slice = imgproc.rotate_and_get_contour(
-            IMAGE_DONT_MUTATE, 0, 0, 0, slice_z)
-        # NOTE: np_contour_slice is the transpose of the sitk representation.
-        # But don't need to worry about that for this test.
-        np_contour_slice = sitk.GetArrayFromImage(contour_slice)
-        contours, hierarchy = cv2.findContours(
-            np_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        contour = contours[0]
-
-        cv2_arc_length = cv2.arcLength(contour, True)
-        our_arc_length = imgproc.arc_length(contour)
-        assert abs(cv2_arc_length - our_arc_length) < EPSILON
 
 
 # @pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn't need to run again.")
@@ -151,16 +131,16 @@ def test_arc_length_of_transposed_matrix_is_same():
         for theta_y in range(0, 90, 45):
             for theta_z in range(0, 90, 45):
                 for slice_z in range(0, 150, 15):
-                    sitk_contour: sitk.Image = imgproc.rotate_and_get_contour(IMAGE_DONT_MUTATE, theta_x, theta_y, theta_z, slice_z)
+                    sitk_contour = contour(rotate_and_slice(IMAGE_DONT_MUTATE, theta_x, theta_y, theta_z, slice_z))
                     np_contour_non_transposed = np.ndarray.transpose(sitk.GetArrayFromImage(sitk_contour))
 
                     assert (sitk_contour.GetSize()[0] == np_contour_non_transposed.shape[0]) and (sitk_contour.GetSize()[1] == np_contour_non_transposed.shape[1])
 
                     try:
                         # get_contour_length will call sitk.GetArrayFromImage on the sitk.Image, returning a transposed np.ndarray()
-                        length_of_transposed_contour = imgproc.get_contour_length(sitk_contour)
+                        length_of_transposed_contour = imgproc.length_of_contour(sitk_contour)
                         # But if passing in a np.ndarray, then it won't transpose it
-                        length_of_non_transposed_contour = imgproc.get_contour_length(np_contour_non_transposed)
+                        length_of_non_transposed_contour = imgproc.length_of_contour(np_contour_non_transposed)
 
                         assert length_of_transposed_contour == length_of_non_transposed_contour
 
@@ -179,7 +159,7 @@ def test_arc_length_of_transposed_matrix_is_same_hardcoded():
     f.write('From test_arc_length_of_transposed_matrix_is_same_hardcoded\n')
 
     for slice_z in range(0, IMAGE_DONT_MUTATE.GetSize()[2]):
-        sitk_contour: sitk.Image = imgproc.rotate_and_get_contour(IMAGE_DONT_MUTATE, 0, 0, 0, slice_z)
+        sitk_contour: sitk.Image = contour(rotate_and_slice(IMAGE_DONT_MUTATE, 0, 0, 0, slice_z))
         np_contour_transposed = sitk.GetArrayFromImage(sitk_contour)
         np_contour_not_transposed = np.ndarray.transpose(np_contour_transposed)
 
@@ -207,32 +187,6 @@ def test_contours_0_is_always_parent_contour_if_no_islands():
     hierarchy[0][i][3] is information about the parent contour of the i'th contour. So if hierarchy[0][0][3] = -1, then the 0'th contour is the parent."""
     for slice_z in range(IMAGE_DONT_MUTATE.GetSize()[2]):
         # rotate_and_get_contour removes islands
-        sitk_contour: sitk.Image = imgproc.rotate_and_get_contour(IMAGE_DONT_MUTATE, 0, 0, 0, slice_z)
+        sitk_contour: sitk.Image = contour(rotate_and_slice(IMAGE_DONT_MUTATE, 0, 0, 0, slice_z))
         contours, hierarchy = cv2.findContours(sitk.GetArrayFromImage(sitk_contour), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         assert hierarchy[0][0][3] == -1
-
-    
-def test_scale_to_range():
-    old_val = 500
-    old_min = 0
-    old_max = 1000
-    new_min = 0
-    new_max = 65535
-    # Since the new range is 0 to 65535, difference of 1 is fine
-    # The function assumes new range is large
-    assert abs(imgproc.scale_to_range(old_val, old_min, old_max, new_min, new_max) - 32767) < 1
-
-
-def test_scale_unsigned_num_to_unsigned_range():
-    assert abs(imgproc.scale_unsigned_num_to_unsigned_range(500, 1000, 65535) - 32767) < 1
-
-
-# @pytest.mark.skip(reason="This is trivial")
-def test_distance_2d():
-    """Really don't need to test this. Testing just in case."""
-    x: np.ndarray = np.array([0, 0])
-    y: np.ndarray = np.array([3, 4])
-    assert abs(imgproc.distance_2d(x, y) - 5.0) < EPSILON
-    y = np.ndarray([3, 4, 5])
-    with pytest.raises(AssertionError):
-        imgproc.distance_2d(x, y)
