@@ -14,12 +14,10 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QPixmap, QImage
 from PyQt6.QtWidgets import QDialog, QApplication, QMainWindow, QFileDialog
 from PyQt6.uic.load_ui import loadUi
+import qimage2ndarray
 from src.utils.mri_image import MRIImage, MRIImageList
 import src.utils.imgproc as imgproc
 import src.utils.globs as globs
-import src.utils.parser as parser
-
-SAVE_IMG_TO_DISK: bool = True
 
 DEFAULT_WIDTH: int = 1000
 """Startup width of the GUI"""
@@ -33,8 +31,6 @@ NIFTI_PATH: pathlib.Path = pathlib.Path('ExampleData') / 'MicroBiome_1month_T1w.
 
 MAIN_WINDOW_INDEX: int = 0
 CIRCUMFERENCE_WINDOW_INDEX: int = 1
-
-UINT16_MAX: int = 2 ** 16 - 1
 
 
 class MainWindow(QMainWindow):
@@ -67,13 +63,7 @@ class MainWindow(QMainWindow):
         images = list(map(MRIImage, paths))
         globs.IMAGE_LIST = MRIImageList(images)
         self.enable_elements()
-
-        if SAVE_IMG_TO_DISK:
-            imgproc.save_all_slices_to_img_dir()
-            self.render_curr_slice_from_img_dir()
-        else:
-            self.render_curr_slice()
-
+        self.render_curr_slice()
         self.render_all_sliders()
 
     def goto_circumference(self):
@@ -81,15 +71,10 @@ class MainWindow(QMainWindow):
         
         Compute circumference and update slice settings."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
-        widget.setCurrentIndex(CIRCUMFERENCE_WINDOW_INDEX)
-
-        if SAVE_IMG_TO_DISK:
-            circumference_window.render_curr_slice_from_img_dir()
-        else:
-            circumference_window.render_curr_slice()
-
-        circumference: float = imgproc.get_contour_length(
-            imgproc.get_contour(curr_mri_image.get_rotated_slice()))
+        stacked_widget.setCurrentIndex(CIRCUMFERENCE_WINDOW_INDEX)
+        circumference_window.render_curr_slice()
+        circumference: float = imgproc.length_of_contour(
+            imgproc.contour(curr_mri_image.get_rotated_slice()))
         circumference_window.circumference_label.setText(f'Circumference: {circumference}')
         circumference_window.slice_settings_text.setText(
             f'X rotation: {curr_mri_image.get_theta_x()}°\nY rotation: {curr_mri_image.get_theta_y()}°\nZ rotation: {curr_mri_image.get_theta_z()}°\nSlice: {curr_mri_image.get_slice_z()}')
@@ -113,41 +98,26 @@ class MainWindow(QMainWindow):
         Also sets text for `image_num_label` and file path in the status bar tooltip."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
         index: int = globs.IMAGE_LIST.get_index()
+        # Usually signed int16, sometimes float32/64 data type
+        # See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/4#issuecomment-1468552326
+        # But when printed to a file, the actual array has minimum 0. Maximum is usually 500-1000 in a slice.
         mri_slice: sitk.Image = curr_mri_image.get_rotated_slice()
-        """Usually 16-bit signed integer data type, sometimes float32/64.
-        
-        See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/4#issuecomment-1468552326
-        
-        But when printed to a file, the actual array has minimum 0. Maximum is usually 500-1000 in a slice."""
 
+        # Note: sitk.GetArrayFromImage returns a numpy array that is the transpose of the sitk representation.
         slice_np: np.ndarray = sitk.GetArrayFromImage(mri_slice)
-        """Same as above."""
 
-        slice_np = imgproc.scale_unsigned_np_array_to_uint16(slice_np, UINT16_MAX)
+        # Retranspose.
+        # TODO: There used to be a .copy() after the transpose because there'd be an error otherwise.
+        # After switching to qimage2ndarray.gray2qimage, it seems .copy() is no longer needed, but might need to investigate.
+        slice_np = np.ndarray.transpose(slice_np)
 
-        # sitk.GetArrayFromImage() results in a np array that's the transpose of the original sitk representation,
-        # so transpose back .copy() is necessary here, otherwise error occurs
-        slice_np = np.ndarray.transpose(slice_np).copy()
-
-        w, h = slice_np.shape
-
-        # Note reversed order of w and h since PyQt treats them differently. But otherwise the image looks the same
-        # as the array.
-        q_img: QImage = QImage(slice_np.data, h, w, QImage.Format.Format_Grayscale16)
+        # TODO: Investigate normalization parameters further
+        # http://hmeine.github.io/qimage2ndarray/#converting-ndarrays-into-qimages
+        q_img = qimage2ndarray.gray2qimage(slice_np, normalize=True)
 
         q_pixmap: QPixmap = QPixmap(q_img)
 
         self.image.setPixmap(q_pixmap)
-        # No zero-indexing when displaying to user
-        self.image_num_label.setText(f'Image {index + 1} of {len(globs.IMAGE_LIST)}')
-        # TODO: Can probably truncate the path
-        self.image.setStatusTip(str(curr_mri_image.get_path()))
-
-    def render_curr_slice_from_img_dir(self):
-        curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
-        index: int = globs.IMAGE_LIST.get_index()
-        path = globs.IMG_DIR / f'{index}.{globs.IMAGE_EXTENSION}'
-        self.image.setPixmap(QPixmap(str(path)))
         # No zero-indexing when displaying to user
         self.image_num_label.setText(f'Image {index + 1} of {len(globs.IMAGE_LIST)}')
         # TODO: Can probably truncate the path
@@ -175,24 +145,13 @@ class MainWindow(QMainWindow):
     def next_img(self):
         """Advance index and render."""
         globs.IMAGE_LIST.next()
-        # self.render_curr_slice()
-
-        if SAVE_IMG_TO_DISK:
-            self.render_curr_slice_from_img_dir()
-        else:
-            self.render_curr_slice()
-
+        self.render_curr_slice()
         self.render_all_sliders()
 
     def previous_img(self):
         """Decrement index and render."""
         globs.IMAGE_LIST.previous()
-
-        if SAVE_IMG_TO_DISK:
-            self.render_curr_slice_from_img_dir()
-        else:
-            self.render_curr_slice()
-
+        self.render_curr_slice()
         self.render_all_sliders()
 
     def rotate_x(self):
@@ -201,13 +160,7 @@ class MainWindow(QMainWindow):
         x_slider_val: int = self.x_slider.value()
         curr_mri_image.set_theta_x(x_slider_val)
         curr_mri_image.resample()
-
-        if SAVE_IMG_TO_DISK:
-            imgproc.save_curr_slice_to_img_dir()
-            self.render_curr_slice_from_img_dir()
-        else:
-            self.render_curr_slice()
-
+        self.render_curr_slice()
         self.x_rotation_label.setText(f'X rotation: {x_slider_val}°')
 
     def rotate_y(self):
@@ -216,13 +169,7 @@ class MainWindow(QMainWindow):
         y_slider_val: int = self.y_slider.value()
         curr_mri_image.set_theta_y(y_slider_val)
         curr_mri_image.resample()
-
-        if SAVE_IMG_TO_DISK:
-            imgproc.save_curr_slice_to_img_dir()
-            self.render_curr_slice_from_img_dir()
-        else:
-            self.render_curr_slice()
-
+        self.render_curr_slice()
         self.y_rotation_label.setText(f'Y rotation: {y_slider_val}°')
 
     def rotate_z(self):
@@ -231,13 +178,7 @@ class MainWindow(QMainWindow):
         z_slider_val: int = self.z_slider.value()
         curr_mri_image.set_theta_z(z_slider_val)
         curr_mri_image.resample()
-
-        if SAVE_IMG_TO_DISK:
-            imgproc.save_curr_slice_to_img_dir()
-            self.render_curr_slice_from_img_dir()
-        else:
-            self.render_curr_slice()
-
+        self.render_curr_slice()
         self.z_rotation_label.setText(f'Z rotation: {z_slider_val}°')
 
     def slice_update(self):
@@ -246,13 +187,7 @@ class MainWindow(QMainWindow):
         slice_slider_val: int = self.slice_slider.value()
         curr_mri_image.set_slice_z(slice_slider_val)
         curr_mri_image.resample()
-
-        if SAVE_IMG_TO_DISK:
-            imgproc.save_curr_slice_to_img_dir()
-            self.render_curr_slice_from_img_dir()
-        else:
-            self.render_curr_slice()
-
+        self.render_curr_slice()
         self.slice_num_label.setText(f'Slice: {slice_slider_val}')
 
     def reset_settings(self):
@@ -263,13 +198,7 @@ class MainWindow(QMainWindow):
         curr_mri_image.set_theta_z(0)
         curr_mri_image.set_slice_z(0)
         curr_mri_image.resample()
-
-        if SAVE_IMG_TO_DISK:
-            imgproc.save_curr_slice_to_img_dir()
-            self.render_curr_slice_from_img_dir()
-        else:
-            self.render_curr_slice()
-
+        self.render_curr_slice()
         self.render_all_sliders()
 
 
@@ -286,34 +215,30 @@ class CircumferenceWindow(QMainWindow):
         """Switch to MainWindow.
         
         Image and sliders aren't modified in `CircumferenceWindow` so no need to re-render anything."""
-        widget.setCurrentIndex(MAIN_WINDOW_INDEX)
+        stacked_widget.setCurrentIndex(MAIN_WINDOW_INDEX)
 
     def render_curr_slice(self):
-        """Same as `MainWindow.render_curr_slice()`.
+        """Same as `CircumferenceWindow.render_curr_slice()`.
 
         Also sets text for `image_num_label` and file path in the status bar tooltip."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
-        slice: sitk.Image = curr_mri_image.get_rotated_slice()
-        # print(f'sitk: {slice.GetPixelIDTypeAsString()}')
-        # sitk: 16-bit signed integer
         index: int = globs.IMAGE_LIST.get_index()
+        # Usually signed int16, sometimes float32/64 data type
+        # See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/4#issuecomment-1468552326
+        # But when printed to a file, the actual array has minimum 0. Maximum is usually 500-1000 in a slice.
+        mri_slice: sitk.Image = curr_mri_image.get_rotated_slice()
 
-        slice_np: np.ndarray = sitk.GetArrayFromImage(slice)
-        # print(f'np: {slice_np.dtype}')
-        # np: int16
-        # NOTE: When you print slice_np to a file, it's only 0-255, i.e. uint8, even though the np type is int16.
+        # Note: sitk.GetArrayFromImage returns a numpy array that is the transpose of the sitk representation.
+        slice_np: np.ndarray = sitk.GetArrayFromImage(mri_slice)
 
-        # No need to add a .copy() to the end of this, but if something breaks, try that
-        slice_np = slice_np.astype('uint8')
-        # sitk.GetArrayFromImage results in the transpose of the original sitk representation, so transpose back
-        # .copy() is necessary here
-        slice_np = np.ndarray.transpose(slice_np).copy()
+        # Retranspose.
+        # TODO: There used to be a .copy() after the transpose because there'd be an error otherwise.
+        # After switching to qimage2ndarray.gray2qimage, it seems .copy() is no longer needed, but might need to investigate.
+        slice_np = np.ndarray.transpose(slice_np)
 
-        w, h = slice_np.shape
-
-        # Note reversed order of w and h since PyQt treats them differently. But otherwise the image looks the same
-        # as the array.
-        q_img: QImage = QImage(slice_np.data, h, w, QImage.Format.Format_Grayscale8)
+        # TODO: Investigate normalization parameters further
+        # http://hmeine.github.io/qimage2ndarray/#converting-ndarrays-into-qimages
+        q_img = qimage2ndarray.gray2qimage(slice_np, normalize=True)
 
         q_pixmap: QPixmap = QPixmap(q_img)
 
@@ -323,48 +248,24 @@ class CircumferenceWindow(QMainWindow):
         # TODO: Can probably truncate the path
         self.image.setStatusTip(str(curr_mri_image.get_path()))
 
-    def render_curr_slice_from_img_dir(self):
-        curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
-        index: int = globs.IMAGE_LIST.get_index()
-        path = globs.IMG_DIR / f'{index}.{globs.IMAGE_EXTENSION}'
-        self.image.setPixmap(QPixmap(str(path)))
-        # No zero-indexing when displaying to user
-        self.image_num_label.setText(f'Image {index + 1} of {len(globs.IMAGE_LIST)}')
-        # TODO: Can probably truncate the path
-        self.image.setStatusTip(str(curr_mri_image.get_path()))
 
 def main() -> None:
-    # Parse CLI args.
-    # As mentioned in src.utils.parser.py, this is temporary and for testing
-    global SAVE_IMG_TO_DISK
-    args = parser.parse_cli()
-
-    if args.jpg:
-        if not globs.IMG_DIR.exists():
-            globs.IMG_DIR.mkdir()
-        SAVE_IMG_TO_DISK = True
-        globs.IMAGE_EXTENSION = 'jpg'
-    if args.png:
-        if not globs.IMG_DIR.exists():
-            globs.IMG_DIR.mkdir()
-        SAVE_IMG_TO_DISK = True
-        globs.IMAGE_EXTENSION = 'png'
-    if args.np:
-        SAVE_IMG_TO_DISK = False
-
     app = QApplication(sys.argv)
-    global widget
-    widget = QtWidgets.QStackedWidget()
+    global stacked_widget
+    # This holds MainWindow and CircumferenceWindow.
+    # Setting the index allows for switching between windows.
+    stacked_widget = QtWidgets.QStackedWidget()
     global main_window
     main_window = MainWindow()
     global circumference_window
     circumference_window = CircumferenceWindow()
-    widget.addWidget(main_window)
-    widget.addWidget(circumference_window)
-    widget.setMinimumWidth(DEFAULT_WIDTH)
-    widget.setMinimumHeight(DEFAULT_HEIGHT)
-    widget.setCurrentWidget(main_window)
-    widget.show()
+
+    stacked_widget.addWidget(main_window)
+    stacked_widget.addWidget(circumference_window)
+    stacked_widget.setMinimumWidth(DEFAULT_WIDTH)
+    stacked_widget.setMinimumHeight(DEFAULT_HEIGHT)
+    stacked_widget.setCurrentWidget(main_window)
+    stacked_widget.show()
     try:
         sys.exit(app.exec())
     except:

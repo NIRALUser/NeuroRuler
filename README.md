@@ -14,10 +14,6 @@ We are currently working on the GUI and confirming that our circumference measur
 ## Starting GUI
 
 - `python -m src.GUI.main`.
-- Apply `-j` or `-p` option to write JPG or PNG files, respectively, to `img/` for image rendering.
-- Apply `-n` option to use `numpy` arrays only during image rendering (currently does not render most images correctly, also bugged after clicking Apply).
-- If no flag is applied, the program writes JPG to `img/`.
-- [Speed comparison between jpg and np only](https://youtu.be/GE80cbHEBy8)
 
 ## Running tests
 

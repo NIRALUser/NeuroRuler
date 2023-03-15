@@ -36,11 +36,6 @@ class RemoveAtInvalidIndex(Exception):
         self.message = f'You attempted to remove an image at index {index + 1}, which doesn\'t exist in the list of images.'
         super().__init__(self.message)
 
-class RangeTooSmallForAccurateFlooredResult(Exception):
-    def __init__(self, old_range, new_range):
-        self.message = f'Old range {old_range} or new range {new_range} is too small for a floored result to be accurate.'
-        super().__init__(self.message)
-
 class UnexpectedNegativeNum(Exception):
     def __init__(self):
         self.message = f''
