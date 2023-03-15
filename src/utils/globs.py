@@ -1,14 +1,24 @@
 """Global variables.
 
-Note: For some reason, can't do from src.utils.globs import IMAGE_LIST in GUI/main.py or utils/imgproc.py or things break.
-
-Idk why. But import src.utils.globs as globs works fine."""
+Can run this file as module (python -m src.utils.globs) to test stuff."""
 
 import warnings
 import functools
 from src.utils.mri_image import MRIImageList
+from pathlib import Path
 
 IMAGE_LIST: MRIImageList = MRIImageList()
+SUPPORTED_EXTENSIONS = ('*.nii.gz', '*.nii', '*.nrrd')
+EXAMPLE_DATA_DIR: Path = Path.cwd() / 'ExampleData'
+EXAMPLE_IMAGE_PATHS = []
+
+for type in SUPPORTED_EXTENSIONS:
+    for path in EXAMPLE_DATA_DIR.glob(type):
+        EXAMPLE_IMAGE_PATHS.append(path)
+
+NUM_CONTOURS_IN_INVALID_SLICE: int = 10
+"""If this number of contours or more is detected in a slice after processing (Otsu, largest component, etc.), then the slice is considered invalid."""
+
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 def deprecated(func):
@@ -26,3 +36,12 @@ def deprecated(func):
         return func(*args, **kwargs)
 
     return new_func
+
+def main():
+    """For testing."""
+    for path in EXAMPLE_IMAGE_PATHS:
+        print(path.parent.name + '/' + path.name)
+    print(f'\nNumber of example images in {str(EXAMPLE_DATA_DIR.name)}: {len(EXAMPLE_IMAGE_PATHS)}')
+
+if __name__ == "__main__":
+    main()

@@ -24,15 +24,6 @@ DEFAULT_WIDTH: int = 1000
 DEFAULT_HEIGHT: int = 700
 """Startup height of the GUI"""
 
-NRRD0_PATH: pathlib.Path = pathlib.Path('ExampleData') / 'BCP_Dataset_2month_T1w.nrrd'
-NRRD1_PATH: pathlib.Path = pathlib.Path('ExampleData') / 'IBIS_Dataset_12month_T1w.nrrd'
-NRRD2_PATH: pathlib.Path = pathlib.Path('ExampleData') / 'IBIS_Dataset_NotAligned_6month_T1w.nrrd'
-NIFTI_PATH: pathlib.Path = pathlib.Path('ExampleData') / 'MicroBiome_1month_T1w.nii.gz'
-
-MAIN_WINDOW_INDEX: int = 0
-CIRCUMFERENCE_WINDOW_INDEX: int = 1
-
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -71,12 +62,12 @@ class MainWindow(QMainWindow):
         
         Compute circumference and update slice settings."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
-        stacked_widget.setCurrentIndex(CIRCUMFERENCE_WINDOW_INDEX)
-        circumference_window.render_curr_slice()
+        STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
+        CIRCUMFERENCE_WINDOW.render_curr_slice()
         circumference: float = imgproc.length_of_contour(
             imgproc.contour(curr_mri_image.get_rotated_slice()))
-        circumference_window.circumference_label.setText(f'Circumference: {circumference}')
-        circumference_window.slice_settings_text.setText(
+        CIRCUMFERENCE_WINDOW.circumference_label.setText(f'Circumference: {circumference}')
+        CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
             f'X rotation: {curr_mri_image.get_theta_x()}°\nY rotation: {curr_mri_image.get_theta_y()}°\nZ rotation: {curr_mri_image.get_theta_z()}°\nSlice: {curr_mri_image.get_slice_z()}')
 
     def enable_elements(self):
@@ -214,8 +205,8 @@ class CircumferenceWindow(QMainWindow):
     def goto_main(self):
         """Switch to MainWindow.
         
-        Image and sliders aren't modified in `CircumferenceWindow` so no need to re-render anything."""
-        stacked_widget.setCurrentIndex(MAIN_WINDOW_INDEX)
+        Image and sliders can't be modified in `CircumferenceWindow`, so no need to re-render anything."""
+        STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
 
     def render_curr_slice(self):
         """Same as `CircumferenceWindow.render_curr_slice()`.
@@ -251,21 +242,21 @@ class CircumferenceWindow(QMainWindow):
 
 def main() -> None:
     app = QApplication(sys.argv)
-    global stacked_widget
+    global STACKED_WIDGET
     # This holds MainWindow and CircumferenceWindow.
     # Setting the index allows for switching between windows.
-    stacked_widget = QtWidgets.QStackedWidget()
-    global main_window
-    main_window = MainWindow()
-    global circumference_window
-    circumference_window = CircumferenceWindow()
+    STACKED_WIDGET = QtWidgets.QStackedWidget()
+    global MAIN_WINDOW
+    MAIN_WINDOW = MainWindow()
+    global CIRCUMFERENCE_WINDOW
+    CIRCUMFERENCE_WINDOW = CircumferenceWindow()
 
-    stacked_widget.addWidget(main_window)
-    stacked_widget.addWidget(circumference_window)
-    stacked_widget.setMinimumWidth(DEFAULT_WIDTH)
-    stacked_widget.setMinimumHeight(DEFAULT_HEIGHT)
-    stacked_widget.setCurrentWidget(main_window)
-    stacked_widget.show()
+    STACKED_WIDGET.addWidget(MAIN_WINDOW)
+    STACKED_WIDGET.addWidget(CIRCUMFERENCE_WINDOW)
+    STACKED_WIDGET.setMinimumWidth(DEFAULT_WIDTH)
+    STACKED_WIDGET.setMinimumHeight(DEFAULT_HEIGHT)
+    STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
+    STACKED_WIDGET.show()
     try:
         sys.exit(app.exec())
     except:

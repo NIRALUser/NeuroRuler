@@ -14,7 +14,7 @@ try:
 except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
-from src.utils.globs import deprecated
+from src.utils.globs import deprecated, NUM_CONTOURS_IN_INVALID_SLICE
 
 
 # Not actually used except in unit tests. GUI rotations occur in mri_image.py.
@@ -82,18 +82,24 @@ def length_of_contour(contour_slice: Union[sitk.Image, np.ndarray]) -> float:
     contour_slice: Union[sitk.Image, np.ndarray]
         This needs to be a 2D binary (0|1 or 0|255, doesn't make a difference) slice containing a contour.
 
-        Note that if contour_slice is a `sitk.Image`, then `sitk.GetArrayFromImage` will return a transposed `np.ndarray`.
+        Note that if contour_slice is a `sitk.Image`, then `sitk.GetArrayFromImage` will return a `np.ndarray` that is the transpose of the `sitk` representation.
 
-        However, based on tests in `test_imgproc.py`, this will not affect the arc length result except in irrelevant edge cases where the slice is invalid.
+        Therefore, if passing in a `sitk.Image`, this function will re-transpose the numpy array resulting from `sitk.GetArrayFromImage`.
         
-        Therefore, if passing in a sitk.Image, this function does not re-transpose after calling sitk.GetArrayFromImage.."""
-    slice_array: np.ndarray = sitk.GetArrayFromImage(contour_slice) if isinstance(
-        contour_slice, sitk.Image) else contour_slice
-    contours, hierarchy = cv2.findContours(
-        slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        Numpy's transpose will change the stride of the array, not the internal memory representation (i.e., no copy). But further np operations might be slowed.
 
-    if len(contours) >= 10:
-        raise exceptions.ComputeCircumferenceOfInvalidSlice()
+        See https://blog.paperspace.com/numpy-optimization-internals-strides-reshape-transpose/. Should avoid the transpose if possible.
+
+        But test_arc_length_of_transposed_matrix_is_same_hardcoded() showed that arc length might be different on transposed vs. non-transposed contours (might be an edge case though).
+        
+        test_arc_length_of_copy_after_transpose_same_as_no_copy_after_transpose() checks that the result with transpose then copy is the same as transpose without copy.
+        
+        So this function does not do .copy() after transpose."""
+    slice_array: np.ndarray = np.ndarray.transpose(sitk.GetArrayFromImage(contour_slice)) if isinstance(contour_slice, sitk.Image) else contour_slice
+    contours, hierarchy = cv2.findContours(slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    if len(contours) >= NUM_CONTOURS_IN_INVALID_SLICE:
+        raise exceptions.ComputeCircumferenceOfInvalidSlice(len(contours))
 
     # NOTE: select_largest_component removes all "islands" from the image.
     # But there can still be contours within the largest contour.
