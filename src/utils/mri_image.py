@@ -1,4 +1,6 @@
-"""Defines the `MRIImage` and `MRIImageList` classes."""
+"""Defines the `MRIImage` and `MRIImageList` classes.
+
+See https://stackoverflow.com/questions/2627002/whats-the-pythonic-way-to-use-getters-and-setters."""
 
 import _collections_abc
 from typing import Union
@@ -6,8 +8,32 @@ import pathlib
 import src.utils.exceptions as exceptions
 import SimpleITK as sitk
 import numpy as np
+import warnings
+import functools
 
 READER = sitk.ImageFileReader()
+ROTATION_MIN: int = 0
+"""Degrees"""
+ROTATION_MAX: int = 180
+"""Degrees"""
+
+# Can't import this from globs due to circular import
+# Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used."""
+
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+        warnings.warn("Call to deprecated function {}.".format(func.__name__),
+                      category=DeprecationWarning,
+                      stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning)  # reset filter
+        return func(*args, **kwargs)
+
+    return new_func
 
 class MRIImage:
     """Fields
@@ -15,6 +41,7 @@ class MRIImage:
     
     `base_img: sitk.Image`
         - Get
+        - Never mutate this
 
     `euler_3d_transform: sitk.Euler3DTransform`
         - Center of rotation set during initialization
@@ -26,34 +53,14 @@ class MRIImage:
         - Updated by `resample()`
 
     `path: pathlib.Path`
-        - Get, set (should never be called, just make a new `MRIImage`)
+        - Get
 
-    `theta_x: int`
-        - In degrees
-        - Get, set
-
-    `theta_y: int`
-        - In degrees
-        - Get, set
-
-    `theta_z: int`
+    `theta_x: int, theta_y: int, theta_z: intt`
         - In degrees
         - Get, set
 
     `slice_z: int`
         - Get, set"""
-    base_img: sitk.Image
-    """This is never mutated unless `set_path` is called.
-    
-    Of course, possible to access this field directly to modify it, but don't do that."""
-    euler_3d_transform: sitk.Euler3DTransform
-    rotated_slice: sitk.Image
-    """`resample` applies the transform and sets this field."""
-    path: pathlib.Path
-    theta_x: int
-    theta_y: int
-    theta_z: int
-    slice_z: int
 
     def __init__(self, path: pathlib.Path, theta_x: int=0, theta_y: int=0, theta_z: int=0, slice_z: int=0):
         """Sets the `base_img` field to be the result of using `sitk` to read `path`.
@@ -72,7 +79,8 @@ class MRIImage:
         # TODO: This could be the wrong center
         self.euler_3d_transform.SetCenter(self.base_img.TransformContinuousIndexToPhysicalPoint([((dimension - 1) / 2.0) for dimension in self.base_img.GetSize()]))
         self.euler_3d_transform.SetRotation(degrees_to_radians(theta_x), degrees_to_radians(theta_y), degrees_to_radians(theta_z))
-        self.rotated_slice = sitk.Resample(self.base_img, self.euler_3d_transform)[:, :, slice_z]
+        # Sets self.rotated_slice
+        self.resample()
 
     def __repr__(self):
         """Prints only the necessary information to identify an `MRIImage`.
@@ -123,6 +131,7 @@ class MRIImage:
 
     # No set_img or set_euler_3d_transform functions. set_path does it.
 
+    @deprecated
     def set_path(self, path: pathlib.Path):
         """Honestly, this function should never be called. Just delete the old `MRIImage`, and construct a new one.
         
@@ -167,7 +176,7 @@ class MRIImage:
         
         Does not `resample`."""
         self.slice_z = slice_z
-    
+
     def resample(self) -> None:
         """Sets `rotated_slice` to the result of resampling with this instance's rotation and slice values."""
         self.rotated_slice = sitk.Resample(self.base_img, self.euler_3d_transform)[:, :, self.slice_z]

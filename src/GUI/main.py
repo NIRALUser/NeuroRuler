@@ -27,7 +27,7 @@ DEFAULT_HEIGHT: int = 700
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        loadUi(str(pathlib.Path('.') / 'src' / 'GUI' / 'main.ui'), self)
+        loadUi(str(pathlib.Path.cwd() / 'src' / 'GUI' / 'main.ui'), self)
         self.setWindowTitle('Head Circumference Tool')
         self.action_open.triggered.connect(self.browse_files)
         self.action_exit.triggered.connect(exit)
@@ -62,12 +62,12 @@ class MainWindow(QMainWindow):
         
         Compute circumference and update slice settings."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST.get_curr_mri_image()
-        STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
-        CIRCUMFERENCE_WINDOW.render_curr_slice()
+        stacked_widget.setCurrentWidget(circumference_window)
+        circumference_window.render_curr_slice()
         circumference: float = imgproc.length_of_contour(
             imgproc.contour(curr_mri_image.get_rotated_slice()))
-        CIRCUMFERENCE_WINDOW.circumference_label.setText(f'Circumference: {circumference}')
-        CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
+        circumference_window.circumference_label.setText(f'Circumference: {circumference}')
+        circumference_window.slice_settings_text.setText(
             f'X rotation: {curr_mri_image.get_theta_x()}°\nY rotation: {curr_mri_image.get_theta_y()}°\nZ rotation: {curr_mri_image.get_theta_z()}°\nSlice: {curr_mri_image.get_slice_z()}')
 
     def enable_elements(self):
@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
 class CircumferenceWindow(QMainWindow):
     def __init__(self):
         super(CircumferenceWindow, self).__init__()
-        loadUi(str(pathlib.Path('.') / 'src' / 'GUI' / 'circumference.ui'), self)
+        loadUi(str(pathlib.Path.cwd() / 'src' / 'GUI' / 'circumference.ui'), self)
         self.setWindowTitle('Circumference')
         self.action_exit.triggered.connect(exit)
         self.adjust_slice_button.clicked.connect(self.goto_main)
@@ -206,7 +206,7 @@ class CircumferenceWindow(QMainWindow):
         """Switch to MainWindow.
         
         Image and sliders can't be modified in `CircumferenceWindow`, so no need to re-render anything."""
-        STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
+        stacked_widget.setCurrentWidget(main_window)
 
     def render_curr_slice(self):
         """Same as `CircumferenceWindow.render_curr_slice()`.
@@ -242,21 +242,21 @@ class CircumferenceWindow(QMainWindow):
 
 def main() -> None:
     app = QApplication(sys.argv)
-    global STACKED_WIDGET
+    global stacked_widget
     # This holds MainWindow and CircumferenceWindow.
     # Setting the index allows for switching between windows.
-    STACKED_WIDGET = QtWidgets.QStackedWidget()
-    global MAIN_WINDOW
-    MAIN_WINDOW = MainWindow()
-    global CIRCUMFERENCE_WINDOW
-    CIRCUMFERENCE_WINDOW = CircumferenceWindow()
+    stacked_widget = QtWidgets.QStackedWidget()
+    global main_window
+    main_window = MainWindow()
+    global circumference_window
+    circumference_window = CircumferenceWindow()
 
-    STACKED_WIDGET.addWidget(MAIN_WINDOW)
-    STACKED_WIDGET.addWidget(CIRCUMFERENCE_WINDOW)
-    STACKED_WIDGET.setMinimumWidth(DEFAULT_WIDTH)
-    STACKED_WIDGET.setMinimumHeight(DEFAULT_HEIGHT)
-    STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
-    STACKED_WIDGET.show()
+    stacked_widget.addWidget(main_window)
+    stacked_widget.addWidget(circumference_window)
+    stacked_widget.setMinimumWidth(DEFAULT_WIDTH)
+    stacked_widget.setMinimumHeight(DEFAULT_HEIGHT)
+    stacked_widget.setCurrentWidget(main_window)
+    stacked_widget.show()
     try:
         sys.exit(app.exec())
     except:

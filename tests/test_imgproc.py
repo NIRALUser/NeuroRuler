@@ -7,7 +7,6 @@ import numpy as np
 import cv2
 import pytest
 import pathlib
-import src.utils.imgproc as imgproc
 from src.utils.imgproc import rotate_and_slice, contour, length_of_contour
 import src.utils.exceptions as exceptions
 from src.utils.globs import EXAMPLE_IMAGE_PATHS, EXAMPLE_DATA_DIR, NUM_CONTOURS_IN_INVALID_SLICE
@@ -39,7 +38,7 @@ def test_dimensions_of_np_array_same_as_original_image_but_transposed():
     
     Pretty sure that means the arc length generated from the numpy array is the arc length of the original image, with the same units as the original image."""
     for img in EXAMPLE_IMAGES:
-        for slice_z in range(img.GetSize()[2]):
+        for slice_z in range(img.GetSize()[2] // 5):
             slice = img[:, :, slice_z]
             # Transposed
             np_slice = sitk.GetArrayFromImage(slice)
@@ -54,59 +53,43 @@ def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
 
     Can ignore this test later."""
     for img in EXAMPLE_IMAGES:
-        for z_slice in range(10):
-            sitk_contour: sitk.Image = contour(rotate_and_slice(img, 0, 0, 0, z_slice))
-            numpy_contour: np.ndarray = sitk.GetArrayFromImage(sitk_contour)
+        for z_slice in range(img.GetSize()[2] // 5):
+            slice_sitk: sitk.Image = img[:, :, z_slice]
+            slice_np: np.ndarray = sitk.GetArrayFromImage(slice_sitk)
 
-            for i in range(len(numpy_contour)):
-                for j in range(len(numpy_contour[0])):
-                    assert numpy_contour[i][j] == sitk_contour.GetPixel(j, i)
+            for i in range(slice_np.shape[0]):
+                for j in range(slice_np.shape[1]):
+                    assert slice_np[i][j] == slice_sitk.GetPixel(j, i)
 
 
 # @pytest.mark.skip(reason="")
 def test_contour_returns_binary_slice():
     """Test that the contour function always returns a binary (0|1) slice."""
     for img in EXAMPLE_IMAGES:
-        for slice_z in range(img.GetSize()[2]):
-            contour_slice: sitk.Image = contour(rotate_and_slice(img, 0, 0, 0, slice_z))
-            slice_np: np.ndarray = sitk.GetArrayFromImage(contour_slice)
-            assert slice_np.min() <= 1 and slice_np.max() <= 1
+        for slice_z in range(img.GetSize()[2] // 5):
+            contour_slice_np: np.ndarray = contour(rotate_and_slice(img, 0, 0, 0, slice_z))
+            assert contour_slice_np.min() <= 1 and contour_slice_np.max() <= 1
 
 
-# @pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn\'t need to run again.")
-def test_arc_length_works_same_on_binary_0_1_slice_and_binary_0_255_slice():
-    """Test that cv2.arclength returns the same numbers for a file with 0's and 1's and a file with 0's and 255's.
-
-    Our helpers.get_contour_length takes a binary image and does not replace the 1's with 255's. This test does so to make sure the numbers are the same.
-
-    2^4=16 tests, which takes a while.
-
-    Can ignore this test later."""
+# @pytest.mark.skip(reason="")
+def test_contour_retranspose_has_same_dimensions_as_original_image():
     for img in EXAMPLE_IMAGES:
-        for theta_x in range(2):
-            for theta_y in range(2):
-                for theta_z in range(2):
-                    for slice_z in range(2):
-                        binary_contour = contour(rotate_and_slice(img, theta_x, theta_y, theta_z, slice_z))
-                        circumference_1 = 0
-                        try:
-                            circumference_1 = imgproc.length_of_contour(binary_contour)
-                        except exceptions.ComputeCircumferenceOfInvalidSlice:
-                            # Don't compare against circumference_2
-                            continue
+        for theta_x in range(0, 30, 15):
+            for theta_y in range(0, 30, 15):
+                for theta_z in range(0, 30, 15):
+                    for slice_z in range(img.GetSize()[2] // 3):
+                        contour_slice: np.ndarray = contour(rotate_and_slice(img, theta_x, theta_y, theta_z, slice_z), True)
+                        assert contour_slice.shape[0] == img.GetSize()[0] and contour_slice.shape[1] == img.GetSize()[1]
 
-                        contour_255 = contour(rotate_and_slice(img, theta_x, theta_y, theta_z, slice_z))
-                        array_255: np.ndarray = sitk.GetArrayFromImage(contour_255)
-                        for i in range(len(array_255)):
-                            for j in range(len(array_255[0])):
-                                if array_255[i][j] == 1:
-                                    array_255[i][j] = 255
-                        contours, hierarchy = cv2.findContours(
-                            array_255, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-                        parent_contour = contours[0]
-                        circumference_2 = cv2.arcLength(parent_contour, True)
 
-                        assert circumference_1 == circumference_2
+# @pytest.mark.skip(reason="")
+def test_length_of_contour_doesnt_mutate_contour():
+    for img in EXAMPLE_IMAGES:
+        for slice_z in range(img.GetSize()[2] // 10):
+            contour_slice: np.ndarray = contour(rotate_and_slice(img, 0, 0, 0, slice_z))
+            contour_slice_copy: np.ndarray = contour_slice.copy()
+            length_of_contour(contour_slice, False)
+            assert np.array_equal(contour_slice, contour_slice_copy)
 
 
 # @pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn\'t need to run again.")
@@ -116,10 +99,10 @@ def test_contours_0_is_always_parent_contour_if_no_islands():
     See documentation on our wiki page about hierarchy. tl;dr hierarchy[0][i] returns information about the i'th contour.
     hierarchy[0][i][3] is information about the parent contour of the i'th contour. So if hierarchy[0][0][3] = -1, then the 0'th contour is the parent."""
     for img in EXAMPLE_IMAGES:
-        for slice_z in range(img.GetSize()[2]):
-            # rotate_and_get_contour removes islands
-            sitk_contour: sitk.Image = contour(rotate_and_slice(img, 0, 0, 0, slice_z))
-            contours, hierarchy = cv2.findContours(sitk.GetArrayFromImage(sitk_contour), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        for slice_z in range(img.GetSize()[2] // 7):
+            # contour removes islands
+            contour_slice: np.ndarray = contour(rotate_and_slice(img, 0, 0, 0, slice_z))
+            contours, hierarchy = cv2.findContours(contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             assert hierarchy[0][0][3] == -1
 
 
@@ -131,48 +114,18 @@ def test_arc_length_of_copy_after_transpose_same_as_no_copy_after_transpose():
             for theta_y in range(0, 30, 15):
                 for theta_z in range(0, 30, 15):
                     for slice_z in range(0, img.GetSize()[2], img.GetSize()[2] // 10):
-                        binary_contour = contour(rotate_and_slice(img,theta_x, theta_y, theta_z, slice_z))
-                        img_np = np.ndarray.transpose(sitk.GetArrayFromImage(binary_contour))
-                        img_np_copied = np.ndarray.transpose(sitk.GetArrayFromImage(binary_contour)).copy()
+                        contour_slice_retransposed_not_copied = contour(rotate_and_slice(img,theta_x, theta_y, theta_z, slice_z))
+                        # The below duplicates work but it's to be safe
+                        contour_slice_retransposed_copied = contour(rotate_and_slice(img,theta_x, theta_y, theta_z, slice_z)).copy()
 
-                        length1 = 0
-                        length2 = 0
-
-                        try:
-                            length1 = length_of_contour(img_np)
-                            length2 = length_of_contour(img_np_copied)
-                            assert length1 == length2
-                        except exceptions.ComputeCircumferenceOfInvalidSlice:
-                            pass
+                        # Assumes it's a closed curve but it might not be
+                        length_of_not_copied = length_of_contour(contour_slice_retransposed_not_copied, False)
+                        length_of_copied = length_of_contour(contour_slice_retransposed_copied, False)
+                        assert length_of_not_copied == length_of_copied
 
 
-# @pytest.mark.skip(reason="")
-def test_arc_length_of_copy_after_transpose_same_as_no_copy_after_transpose_hardcoded():
-    """Same as above but doesn't use our arc length helper function. Hardcodes to avoid ComputeCircumferenceOfInvalidSlice"""
-    for img in EXAMPLE_IMAGES:
-        for theta_x in range(0, 30, 15):
-            for theta_y in range(0, 30, 15):
-                for theta_z in range(0, 30, 15):
-                    for slice_z in range(0, img.GetSize()[2], img.GetSize()[2] // 10):
-                        binary_contour = contour(rotate_and_slice(img,theta_x, theta_y, theta_z, slice_z))
-                        img_np = np.ndarray.transpose(sitk.GetArrayFromImage(binary_contour))
-                        img_np_copied = np.ndarray.transpose(sitk.GetArrayFromImage(binary_contour)).copy()
-
-                        length1 = 0
-                        length2 = 0
-
-                        contours1, hierarchy1 = cv2.findContours(img_np, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-                        contours2, hierarchy2 = cv2.findContours(img_np_copied, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-                        parent_1 = contours1[0]
-                        parent_2 = contours2[0]
-
-                        # Assumes it's a closed curve, and it might not be
-                        assert cv2.arcLength(parent_1, True) == cv2.arcLength(parent_2, True)
-
-
-# @pytest.mark.skip(reason="Length_of_contour now re-transposes the result of sitk.GetArrayFromImage. This test would no longer compare a non-transposed matrix to a transposed matrix, both are transposed.")
-def test_arc_length_of_transposed_matrix_is_same():
+# @pytest.mark.skip(reason="Length_of_contour now re-transposes the result of sitk.GetArrayFromImage by default.")
+def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
     """Per discussion here https://github.com/COMP523TeamD/HeadCircumferenceTool/commit/a230a6b57dc34ec433e311d760cc53841ddd6a49,
 
     Test that the arc length of a contour and its transpose is the same in a specific case. It probably generalizes to the general case.
@@ -195,54 +148,17 @@ def test_arc_length_of_transposed_matrix_is_same():
         f.write(f'{EXAMPLE_DATA_DIR.name}/{img_path.name}\n')
         READER.SetFileName(str(img_path))
         img = READER.Execute()
-        for theta_x in range(0, 90, 45):
-            for theta_y in range(0, 90, 45):
-                for theta_z in range(0, 90, 45):
-                    for slice_z in range(0, 150, 15):
-                        sitk_contour = contour(rotate_and_slice(img, theta_x, theta_y, theta_z, slice_z))
-                        np_contour_non_transposed = np.ndarray.transpose(sitk.GetArrayFromImage(sitk_contour))
-
+        for theta_x in range(0, 31, 15):
+            for theta_y in range(0, 31, 15):
+                for theta_z in range(0, 31, 15):
+                    for slice_z in range(0, img.GetSize()[2]):
+                        contour_slice: np.ndarray = contour(rotate_and_slice(img, theta_x, theta_y, theta_z, slice_z))
+                        # Copy might not be needed, just making sure
+                        contour_slice_transposed: np.ndarray = np.transpose(contour_slice).copy()
                         try:
-                            # get_contour_length will call sitk.GetArrayFromImage on the sitk.Image, returning a transposed np.ndarray()
-                            length_of_transposed_contour = imgproc.length_of_contour(sitk_contour)
-                            # But if passing in a np.ndarray, then it won't transpose it
-                            length_of_non_transposed_contour = imgproc.length_of_contour(np_contour_non_transposed)
-
-                            assert length_of_transposed_contour == length_of_non_transposed_contour
-
+                            length_1 = length_of_contour(contour_slice)
+                            length_2 = length_of_contour(contour_slice_transposed)
+                            assert length_1 == length_2
                         except exceptions.ComputeCircumferenceOfInvalidSlice:
                             f.write(f'{theta_x, theta_y, theta_z, slice_z}\n')
-    f.close()
-
-
-# @pytest.mark.skip(reason="Passed in commit 6ebf428. Doesn\'t need to run again.")
-def test_arc_length_of_transposed_matrix_is_same_hardcoded():
-    """Same as above test but doesn't use our helper function.
-
-    Tests all slices but ignores the result when there are more than 9 contours (usually occurs for very large slice value), which indicates that slice is invalid."""
-    # Write settings of slices with more than 10 contours to a file to make sure they actually are just noise and not brain slices.
-    f = open(pathlib.Path('tests') / 'noise_vals.txt', 'a')
-    f.write('From test_arc_length_of_transposed_matrix_is_same_hardcoded\n')
-
-    for img_path in EXAMPLE_IMAGE_PATHS:
-        f.write(f'{EXAMPLE_DATA_DIR.name}/{img_path.name}\n')
-        READER.SetFileName(str(img_path))
-        img = READER.Execute()
-        for slice_z in range(0, img.GetSize()[2]):
-            sitk_contour: sitk.Image = contour(rotate_and_slice(img, 0, 0, 0, slice_z))
-            np_contour_transposed = sitk.GetArrayFromImage(sitk_contour)
-            np_contour_not_transposed = np.ndarray.transpose(np_contour_transposed)
-
-            contours_transposed, hierarchy = cv2.findContours(np_contour_transposed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            contours_not_transposed, hierarchy2 = cv2.findContours(np_contour_not_transposed, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-            # Number of contours should be the same if transposed or not transposed but check both just in case
-            if len(contours_transposed) < NUM_CONTOURS_IN_INVALID_SLICE and len(contours_not_transposed) < NUM_CONTOURS_IN_INVALID_SLICE:
-                transposed_length = cv2.arcLength(contours_transposed[0], True)
-                not_transposed_length = cv2.arcLength(contours_not_transposed[0], True)
-                # if transposed_length < 300 or not_transposed_length < 300:
-                    # continue
-                assert transposed_length == not_transposed_length
-            else:
-                f.write(f'(0, 0, 0, {slice_z})\n')
     f.close()

@@ -1,8 +1,4 @@
-"""Some helper functions for image processing.
-
-Deprecated functions that aren't currently in use are at the bottom. They should be removed when we're sure we won't
-have any further use for them.
-"""
+"""Some helper functions for image processing."""
 
 import SimpleITK as sitk
 import numpy as np
@@ -18,6 +14,8 @@ from src.utils.globs import deprecated, NUM_CONTOURS_IN_INVALID_SLICE
 
 
 # Not actually used except in unit tests. GUI rotations occur in mri_image.py.
+# MRIImage doesn't call this function because MRIImage encapsulates its own Euler3DTransform object
+# This function creates Euler3DTransform so it's a waste
 def rotate_and_slice(mri_image: sitk.Image, theta_x: int, theta_y: int, theta_z: int, slice_z: int) -> sitk.Image:
     """Given a 3D MRI image, 3D rotate it, and return a 2D slice.
     
@@ -29,7 +27,7 @@ def rotate_and_slice(mri_image: sitk.Image, theta_x: int, theta_y: int, theta_z:
     theta_x, theta_y, theta_y
         All ints and in degrees
         
-    slice_z
+    slice_z: int
         Slice num"""
     euler_3d_transform: sitk.Euler3DTransform = sitk.Euler3DTransform()
     euler_3d_transform.SetCenter(mri_image.TransformContinuousIndexToPhysicalPoint([((dimension - 1) / 2.0) for dimension in mri_image.GetSize()]))
@@ -37,27 +35,49 @@ def rotate_and_slice(mri_image: sitk.Image, theta_x: int, theta_y: int, theta_z:
     return sitk.Resample(mri_image, euler_3d_transform)[:, :, slice_z]
 
 
-def contour(mri_slice: sitk.Image) -> sitk.Image:
-    """Given a rotated slice, apply smoothing, Otsu threshold, hole filling, island removal, and get contours."""
+# The RV is a np array, not sitk.Image, because we can't actually use a sitk.Image contour in the program, besides for testing purposes
+# To compute arc length, we need a np array
+# To overlay the contour on top of the base image in the GUI, we need a np array
+def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
+    """Given a rotated slice, apply smoothing, Otsu threshold, hole filling, and island removal. Return a binary (0|1) numpy
+    array with only the points on the contour=1.
+
+    Parameter
+    --------
+    mri_slice: sitk.Image
+        2D MRI slice
+
+    retranspose: bool
+        sitk.GetArrayFromImage returns a numpy array that's the transpose of the sitk representation.
+
+        If True (default), this function will return a re-transposed result to match the sitk representation.
+
+    Return value
+    ------------
+    binary (0|1) numpy array with only the points on the contour = 1"""
     # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
     # However, this does throw some weird errors
     # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
     # Stable time step for this image must be smaller than 0.0997431
-    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+    smooth_slice: sitk.Image = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
         sitk.Cast(mri_slice, sitk.sitkFloat64))
 
-    otsu = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
+    otsu: sitk.Image = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
 
-    hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
+    hole_filling: sitk.Image = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
 
     # BinaryGrindPeakImageFilter has inverted foreground/background 0 and 1, need to invert
-    inverted = sitk.NotImageFilter().Execute(hole_filling)
+    inverted: sitk.Image = sitk.NotImageFilter().Execute(hole_filling)
 
-    largest_component = select_largest_component(inverted)
+    largest_component: sitk.Image = select_largest_component(inverted)
 
-    contour = sitk.BinaryContourImageFilter().Execute(largest_component)
+    contour: sitk.Image = sitk.BinaryContourImageFilter().Execute(largest_component)
 
-    return contour
+    contour_np = sitk.GetArrayFromImage(contour)
+
+    if retranspose:
+        return np.transpose(contour_np)
+    return contour_np
 
 
 # Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
@@ -72,33 +92,24 @@ def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
     return largest_component_binary_image
 
 
-def length_of_contour(contour_slice: Union[sitk.Image, np.ndarray]) -> float:
+# Based on commit a230a6b discussion, may not need to worry about non-square pixels
+def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = True) -> float:
     """Given a 2D binary (0|1 or 0|255) slice containing a single contour, return the arc length of the parent contour.
 
-    Based on commit a230a6b discussion, may not need to worry about non-square pixels.
+    This function assumes the contour is a closed curve.
 
-    Parameter
+    Parameters
     ---------
-    contour_slice: Union[sitk.Image, np.ndarray]
+    contour_slice: np.ndarray
         This needs to be a 2D binary (0|1 or 0|255, doesn't make a difference) slice containing a contour.
-
-        Note that if contour_slice is a `sitk.Image`, then `sitk.GetArrayFromImage` will return a `np.ndarray` that is the transpose of the `sitk` representation.
-
-        Therefore, if passing in a `sitk.Image`, this function will re-transpose the numpy array resulting from `sitk.GetArrayFromImage`.
+    
+    raise_exception: bool
+        If True (default), will raise ComputeCircumferenceOfInvalidSlice when too many contours are detected, indicating the slice is invalid
         
-        Numpy's transpose will change the stride of the array, not the internal memory representation (i.e., no copy). But further np operations might be slowed.
+        Should be set to False only for unit tests"""
+    contours, hierarchy = cv2.findContours(binary_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        See https://blog.paperspace.com/numpy-optimization-internals-strides-reshape-transpose/. Should avoid the transpose if possible.
-
-        But test_arc_length_of_transposed_matrix_is_same_hardcoded() showed that arc length might be different on transposed vs. non-transposed contours (might be an edge case though).
-        
-        test_arc_length_of_copy_after_transpose_same_as_no_copy_after_transpose() checks that the result with transpose then copy is the same as transpose without copy.
-        
-        So this function does not do .copy() after transpose."""
-    slice_array: np.ndarray = np.ndarray.transpose(sitk.GetArrayFromImage(contour_slice)) if isinstance(contour_slice, sitk.Image) else contour_slice
-    contours, hierarchy = cv2.findContours(slice_array, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    if len(contours) >= NUM_CONTOURS_IN_INVALID_SLICE:
+    if raise_exception and len(contours) >= NUM_CONTOURS_IN_INVALID_SLICE:
         raise exceptions.ComputeCircumferenceOfInvalidSlice(len(contours))
 
     # NOTE: select_largest_component removes all "islands" from the image.
@@ -107,8 +118,8 @@ def length_of_contour(contour_slice: Union[sitk.Image, np.ndarray]) -> float:
     # Assuming there are no islands, contours[0] is always the parent contour.
     # See unit test in test_imgproc.py: test_contours_0_is_always_parent_contour_if_no_islands
     contour = contours[0]
-    length = cv2.arcLength(contour, True)
-    return length
+    arc_length = cv2.arcLength(contour, True)
+    return arc_length
 
 
 def degrees_to_radians(num: Union[int, float]) -> float:

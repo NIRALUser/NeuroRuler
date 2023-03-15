@@ -10,6 +10,7 @@ Playground/imgproc/contour_sitk.txt
 Playground/imgproc/numpy_array_255.png
 src/HeadCircumferenceTool.egg-info
 tests/noise_vals.txt
+tests/noise_vals_copy.txt
 out/
 .pytest_cache/
 __pycache__/
