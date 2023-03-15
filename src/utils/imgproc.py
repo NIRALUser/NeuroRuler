@@ -80,19 +80,24 @@ def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
 
 # Based on commit a230a6b discussion, may not need to worry about non-square pixels
 def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = True) -> float:
-    """Given a 2D binary (0|1 or 0|255) slice containing a single contour, return the arc length of the parent contour.
+    """Given a 2D binary slice containing a single contour, return the arc length of the parent contour.
 
     This function assumes the contour is a closed curve.
 
     Parameters
     ---------
-    contour_slice: np.ndarray
-        This needs to be a 2D binary (0|1 or 0|255, doesn't make a difference) slice containing a contour.
+    binary_contour_slice: np.ndarray
+        This needs to be a 2D binary (0|1 or 0|255) slice containing a contour.
     
     raise_exception: bool
-        If True (default), will raise ComputeCircumferenceOfInvalidSlice when too many contours are detected, indicating the slice is invalid
+        If True (default), will raise ComputeCircumferenceOfInvalidSlice when too many contours are detected, indicating the slice is invalid.
         
-        Should be set to False only for unit tests"""
+        Should be set to False only for unit testing purposes."""
+    # contours is an array of contours
+    # A single contour, contours[0], looks like [[[122  76]] [[121  77]] [[107  77]] ... [[106  78]]], representing boundary points of the contour
+    # contours[1] would be another contour, and so on
+    # hierarchy is a list of the same length as contours that provides information about each contour
+    # See the documentation for more detail
     contours, hierarchy = cv2.findContours(binary_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     if raise_exception and len(contours) >= NUM_CONTOURS_IN_INVALID_SLICE:
@@ -104,6 +109,7 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
     # Assuming there are no islands, contours[0] is always the parent contour.
     # See unit test in test_imgproc.py: test_contours_0_is_always_parent_contour_if_no_islands
     parent_contour: np.ndarray = contours[0]
+    # True means we assume the contour is a closed curve.
     arc_length = cv2.arcLength(parent_contour, True)
     return arc_length
 

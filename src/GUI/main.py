@@ -67,12 +67,14 @@ class MainWindow(QMainWindow):
     def browse_files(self) -> None:
         """This needs to be checked for compatibility on Windows.
         
-        The return value of `getOpenFileNames` is a tuple `(list[str], str)`, where the left element is a list of paths.
+        The return value of `getOpenFileNames` is a tuple (list[str], str), where the left element is a list of paths.
         
         So `fnames[0][i]` is the i'th path selected."""
+        # str(globs.SUPPORTED_EXTENSIONS) returns "('*.nii.gz', '*.nii', '*.nrrd' ... )"
+        # getOpenFileNames expects the form "Name (*.nii.gz *.nii *.nrrd)"
+        file_filter: str = 'MRI images ' + str(globs.SUPPORTED_EXTENSIONS).replace("'", "").replace(",", "")
         # TODO: Let starting directory be a configurable setting in JSON
-        files = QFileDialog.getOpenFileNames(self, 'Open file(s)', str(Path.cwd()),
-                                             'MRI images (*.nii.gz *.nii *.nrrd)')
+        files = QFileDialog.getOpenFileNames(self, 'Open files', str(Path.cwd()), file_filter)
         self.enable_and_disable_elements()
         paths = map(Path, files[0])
         images = list(map(MRIImage, paths))
@@ -252,7 +254,8 @@ class CircumferenceWindow(QMainWindow):
 
     def enable_and_disable_elements(self):
         """Needs only handle the things that are different from MainWindow."""
-        print("enabling and disabling circumference window elements, but it's not working. specifically export csv isn't enabled")
+        print(
+            "enabling and disabling circumference window elements, but it's not working. specifically export csv isn't enabled")
         # TODO: Doesn't work
         self.action_export_csv.setEnabled(True)
 
@@ -288,7 +291,6 @@ class CircumferenceWindow(QMainWindow):
         # TODO: Can probably truncate the path
         self.image.setStatusTip(str(curr_mri_image.path))
 
-
     def export_slice_as_img(self, extension: str):
         """Same as MainWindow.export_slice_as_img.
 
@@ -312,13 +314,7 @@ class CircumferenceWindow(QMainWindow):
 
 
 def main() -> None:
-    cli_args = parse_gui_cli()
-    if cli_args.smooth:
-        settings.SMOOTH_BEFORE_RENDERING = True
-        print('Smooth CLI option supplied.')
-    if cli_args.export_index:
-        settings.EXPORTED_FILE_NAMES_USE_INDEX = True
-        print('Exported files will use the index displayed in the GUI.')
+    parse_gui_cli()
 
     if not (Path.cwd() / settings.IMG_DIR).exists():
         (Path.cwd() / settings.IMG_DIR).mkdir()
