@@ -8,12 +8,20 @@ We are currently working on the GUI and confirming that our circumference measur
 
 ## Setup
 
-1. Clone the repository.
-2. Run `pip install -r requirements.txt`.
+1. Clone the repository
+2. Run `pip install -r requirements.txt`
 
 ## Starting GUI
 
-- `python -m src.GUI.main`.
+```
+usage: python -m [-s] [-e] src.GUI.main
+
+options:
+  -h, --help          show this help message and exit
+  -s, --smooth        smooth image before rendering (False by default)
+  -e, --export_index  exported filenames will use the index displayed in the GUI
+
+```
 
 ## Running tests
 

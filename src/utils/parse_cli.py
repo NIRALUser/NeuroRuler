@@ -7,9 +7,12 @@ import argparse
 
 def parse_gui_cli():
     """Parse cli args using argparse, return parser.parse_args() to main()."""
-    parser = argparse.ArgumentParser(usage='python -m [-s] src.GUI.main')
+    parser = argparse.ArgumentParser(usage='python -m [-s] [-e] src.GUI.main')
     parser.add_argument('-s', '--smooth',
-                        help='smooth image before rendering',
+                        help='smooth image before rendering (False by default)',
+                        action='store_true')
+    parser.add_argument('-e', '--export_index',
+                        help='exported filenames will use the index displayed in the GUI',
                         action='store_true')
     args = parser.parse_args()
     return args

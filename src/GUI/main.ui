@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1071</width>
-    <height>776</height>
+    <height>748</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
          <string>Image path is displayed here.</string>
         </property>
         <property name="text">
-         <string>Select image(s) using File &gt; Open!</string>
+         <string>Select images using File &gt; Open!</string>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -117,6 +117,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QLabel" name="x_rotation_label">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>X rotation</string>
         </property>
@@ -143,6 +146,9 @@
       </item>
       <item>
        <widget class="QLabel" name="y_rotation_label">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Y rotation</string>
         </property>
@@ -169,6 +175,9 @@
       </item>
       <item>
        <widget class="QLabel" name="z_rotation_label">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Z rotation</string>
         </property>
@@ -195,6 +204,9 @@
       </item>
       <item>
        <widget class="QLabel" name="slice_num_label">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Slice</string>
         </property>
@@ -249,9 +261,29 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="action_export">
+     <property name="toolTip">
+      <string extracomment="Export slice data to CSV or to image format.">Export slice data to CSV or to image format.</string>
+     </property>
+     <property name="statusTip">
+      <string extracomment="Export slice data to CSV or to image format.">Export slice data to CSV or to image format.</string>
+     </property>
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="action_export_csv"/>
+     <addaction name="separator"/>
+     <addaction name="action_export_png"/>
+     <addaction name="action_export_jpg"/>
+     <addaction name="action_export_bmp"/>
+     <addaction name="action_export_ppm"/>
+     <addaction name="action_export_xbm"/>
+     <addaction name="action_export_xpm"/>
+    </widget>
     <addaction name="action_open"/>
     <addaction name="action_add_image"/>
     <addaction name="action_remove_image"/>
+    <addaction name="action_export"/>
     <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menu_help">
@@ -296,7 +328,7 @@
   </action>
   <action name="action_add_image">
    <property name="text">
-    <string>Add Image</string>
+    <string>Add Images</string>
    </property>
    <property name="statusTip">
     <string>Add a single image.</string>
@@ -304,10 +336,117 @@
   </action>
   <action name="action_remove_image">
    <property name="text">
-    <string>Remove Image</string>
+    <string>Remove Images</string>
    </property>
    <property name="statusTip">
     <string>Remove a single image.</string>
+   </property>
+  </action>
+  <action name="action_export_png">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>PNG</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="Export slice as PNG.">Export slice as PNG.</string>
+   </property>
+   <property name="statusTip">
+    <string extracomment="Export slice as PNG.">Export slice as PNG.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="action_export_jpg">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>JPG</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="Export slice as JPG.">Export slice as JPG.</string>
+   </property>
+   <property name="statusTip">
+    <string extracomment="Export slice as JPG.">Export slice as JPG.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+J</string>
+   </property>
+  </action>
+  <action name="action_export_csv">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>CSV</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="Click Apply to enable this option.">Click Apply to enable this option.</string>
+   </property>
+   <property name="statusTip">
+    <string extracomment="Click Apply to enable this option.">Click Apply to enable this option.</string>
+   </property>
+  </action>
+  <action name="action_export_bmp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>BMP</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="Export slice as BMP.">Export slice as BMP.</string>
+   </property>
+   <property name="statusTip">
+    <string extracomment="Export slice as BMP.">Export slice as BMP.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="action_export_ppm">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>PPM</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="Export slice as PPM.">Export slice as PPM.</string>
+   </property>
+   <property name="statusTip">
+    <string extracomment="Export slice as PPM.">Export slice as PPM.</string>
+   </property>
+  </action>
+  <action name="action_export_xbm">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>XBM</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="Export slice as XBM.">Export slice as XBM.</string>
+   </property>
+   <property name="statusTip">
+    <string extracomment="Export slice as XBM.">Export slice as XBM.</string>
+   </property>
+  </action>
+  <action name="action_export_xpm">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>XPM</string>
+   </property>
+   <property name="toolTip">
+    <string extracomment="Export slice as XPM.">Export slice as XPM.</string>
+   </property>
+   <property name="statusTip">
+    <string extracomment="Export slice as XPM.">Export slice as XPM.</string>
    </property>
   </action>
  </widget>

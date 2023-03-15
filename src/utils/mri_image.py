@@ -65,16 +65,16 @@ class MRIImage:
         
     Don't *have* to encapsulate rotation and slice value, but it allows the GUI to remember settings for MRIImages after clicking Next, Previous."""
 
-    def __init__(self, filepath: pathlib.Path, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_z: int = 0):
+    def __init__(self, path: pathlib.Path, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_z: int = 0):
         """Sets the `base_img` field to be the result of using `sitk` to read `path`.
         
         Initializes a unique `Euler3DTransform` with center and rotation fields."""
-        self._filepath = filepath
+        self._path = path
         self._theta_x = theta_x
         self._theta_y = theta_y
         self._theta_z = theta_z
         self._slice_z = slice_z
-        READER.SetFileName(str(filepath))
+        READER.SetFileName(str(path))
         self._base_img = READER.Execute()
         self._euler_3d_transform = sitk.Euler3DTransform()
         # TODO: This could be the wrong center
@@ -89,7 +89,7 @@ class MRIImage:
         That is, ignores `base_img`, `euler_3d_transform`, and `rotated_slice` since those are determined by `path` and rotation and slice values.
         
         But also, those fields can't be represented as `str`."""
-        return f'MRIImage(\'{self._filepath}\', {self._theta_x}, {self._theta_y}, {self._theta_z}, {self._slice_z})'
+        return f'MRIImage(\'{self._path}\', {self._theta_x}, {self._theta_y}, {self._theta_z}, {self._slice_z})'
 
     # == and != will check reference equality like normal. Use .equals() for deep equality.
     # def __eq__(self, other):
@@ -97,10 +97,10 @@ class MRIImage:
 
     def equals(self, other) -> bool:
         """Ignores `img` field. If the conditions checked are true, then `img` is the same."""
-        return self._filepath == other._filepath and self._euler_3d_transform.GetCenter() == other.euler_3d_transform.GetCenter() and self._theta_x == other.theta_x and self._theta_y == other.theta_y and self._theta_z == other.theta_z and self._slice_z == other.slice_z
+        return self._path == other.path and self._euler_3d_transform.GetCenter() == other.euler_3d_transform.GetCenter() and self._theta_x == other.theta_x and self._theta_y == other.theta_y and self._theta_z == other.theta_z and self._slice_z == other.slice_z
 
     def deepcopy(self) -> 'MRIImage':
-        return MRIImage(self._filepath, self._theta_x, self._theta_y, self._theta_z, self._slice_z)
+        return MRIImage(self._path, self._theta_x, self._theta_y, self._theta_z, self._slice_z)
 
     @property
     def base_img(self) -> sitk.Image:
@@ -115,9 +115,8 @@ class MRIImage:
         return self._base_img.GetSize()
 
     @property
-    def filepath(self) -> pathlib.Path:
-        """Based on test_mri_image, this getter is sometimes glitchy and you might have to use ._filepath (note the underscore) instead."""
-        return self._filepath
+    def path(self) -> pathlib.Path:
+        return self._path
 
     @property
     def theta_x(self) -> int:
@@ -137,17 +136,14 @@ class MRIImage:
 
     # No set_img or set_euler_3d_transform functions.
 
-    @deprecated
-    @filepath.setter
-    def filepath(self, path: pathlib.Path) -> None:
+    @path.setter
+    def path(self, path: pathlib.Path) -> None:
         """Honestly, this function should never be called. Just delete the old `MRIImage`, and construct a new one.
-
-        Also, based on test_mri_image, this setter might be bugged and you might have to do ._filepath (note the underscore) instead.
 
         Keeps the same `Euler3DTransform` but sets its center to the center of the new file.
         
         Sets rotation values and slice num to 0 and `resample`s."""
-        self._filepath = path
+        self._path = path
         READER.SetFileName(str(path))
         self._base_img = READER.Execute()
         # TODO: This could be the wrong center

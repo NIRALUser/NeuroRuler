@@ -29,14 +29,15 @@ IMAGE_LIST = MRIImageList(IMAGES)
 Image tests
 ===========
 """
+
 def test_init_and_getters():
-    assert IMAGE_0._filepath == NRRD0_PATH
+    assert IMAGE_0.path == NRRD0_PATH
     assert IMAGE_0.theta_x == 0
     assert IMAGE_0.theta_y == 0
     assert IMAGE_0.theta_z == 0
     assert IMAGE_0.slice_z == 0
 
-    assert IMAGE_1._filepath == NRRD1_PATH
+    assert IMAGE_1.path == NRRD1_PATH
     assert IMAGE_1.theta_x == 3
     assert IMAGE_1.theta_y == 2
     assert IMAGE_1.theta_z == 1
@@ -47,12 +48,12 @@ def test_image_repr():
 
 def test_setters():
     img = MRIImage(NRRD0_PATH)
-    img.filepath = NRRD1_PATH
+    img.path = NRRD1_PATH
     img.theta_x = 1
     img.theta_y = 2
     img.theta_z = 3
     img.slice_z = 4
-    assert img.filepath == NRRD1_PATH
+    assert img.path == NRRD1_PATH
     assert img.theta_x == 1
     assert img.theta_y == 2
     assert img.theta_z == 3
@@ -69,26 +70,26 @@ def test_eq_and_neq():
 
 def test_deepcopy():
     clone = IMAGE_2.deepcopy()
-    assert clone._filepath == NRRD2_PATH
+    assert clone.path == NRRD2_PATH
     assert clone.theta_x == 0
     assert clone.theta_y == 1
     assert clone.theta_z == 2
     assert clone.slice_z == 3
 
-    clone._filepath = NRRD0_PATH
+    clone.path = NRRD0_PATH
     clone.theta_x = 1700
     clone.theta_y = 1800
     clone.theta_z = 1900
     clone.slice_z = 9001
 
-    assert clone._filepath == NRRD0_PATH
+    assert clone.path == NRRD0_PATH
     assert clone.theta_x == 1700
     assert clone.theta_y == 1800
     assert clone.theta_z == 1900
     assert clone.slice_z == 9001
 
     # Check that the original wasn't mutated
-    assert IMAGE_2._filepath == NRRD2_PATH
+    assert IMAGE_2.path == NRRD2_PATH
     assert IMAGE_2.theta_x == 0
     assert IMAGE_2.theta_y == 1
     assert IMAGE_2.theta_z == 2
