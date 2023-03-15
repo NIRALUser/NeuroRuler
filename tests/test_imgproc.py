@@ -124,7 +124,7 @@ def test_arc_length_of_copy_after_transpose_same_as_no_copy_after_transpose():
                         assert length_of_not_copied == length_of_copied
 
 
-# @pytest.mark.skip(reason="Length_of_contour now re-transposes the result of sitk.GetArrayFromImage by default.")
+@pytest.mark.skip(reason="Length_of_contour now re-transposes the result of sitk.GetArrayFromImage by default.")
 def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
     """Per discussion here https://github.com/COMP523TeamD/HeadCircumferenceTool/commit/a230a6b57dc34ec433e311d760cc53841ddd6a49,
 
