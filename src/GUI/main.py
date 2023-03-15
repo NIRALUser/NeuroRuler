@@ -18,11 +18,14 @@ import qimage2ndarray
 from src.utils.mri_image import MRIImage, MRIImageList
 import src.utils.imgproc as imgproc
 import src.utils.globs as globs
+import src.utils.settings as settings
+from src.utils.parse_cli import parse_gui_cli
 
 DEFAULT_WIDTH: int = 1000
 """Startup width of the GUI"""
 DEFAULT_HEIGHT: int = 700
 """Startup height of the GUI"""
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -62,12 +65,12 @@ class MainWindow(QMainWindow):
         
         Compute circumference and update slice settings."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-        stacked_widget.setCurrentWidget(circumference_window)
-        circumference_window.render_curr_slice()
+        STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
+        CIRCUMFERENCE_WINDOW.render_curr_slice()
         circumference: float = imgproc.length_of_contour(
             imgproc.contour(curr_mri_image.resample()))
-        circumference_window.circumference_label.setText(f'Circumference: {circumference}')
-        circumference_window.slice_settings_text.setText(
+        CIRCUMFERENCE_WINDOW.circumference_label.setText(f'Circumference: {circumference}')
+        CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
             f'X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_z}')
 
     def enable_elements(self) -> None:
@@ -94,6 +97,7 @@ class MainWindow(QMainWindow):
         # But when printed to a file, the actual array has minimum 0. Maximum is usually 500-1000 in a slice.
         rotated_slice: sitk.Image = curr_mri_image.resample()
 
+        # GUI code should not contain anything that has to do with transpose stuff but no way around it
         # Note: sitk.GetArrayFromImage returns a numpy array that is the transpose of the sitk representation.
         slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
@@ -201,7 +205,7 @@ class CircumferenceWindow(QMainWindow):
         """Switch to MainWindow.
         
         Image and sliders can't be modified in `CircumferenceWindow`, so no need to re-render anything."""
-        stacked_widget.setCurrentWidget(main_window)
+        STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
 
     def render_curr_slice(self):
         """Same as `MainWindow.render_curr_slice()`.
@@ -214,6 +218,7 @@ class CircumferenceWindow(QMainWindow):
         # But when printed to a file, the actual array has minimum 0. Maximum is usually 500-1000 in a slice.
         rotated_slice: sitk.Image = curr_mri_image.resample()
 
+        # GUI code should not contain anything that has to do with transpose stuff but no way around it
         # Note: sitk.GetArrayFromImage returns a numpy array that is the transpose of the sitk representation.
         slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
@@ -236,22 +241,27 @@ class CircumferenceWindow(QMainWindow):
 
 
 def main() -> None:
+    cli_args = parse_gui_cli()
+    if cli_args.smooth:
+        settings.SMOOTH_BEFORE_RENDERING = True
+        print('Smooth CLI option supplied.')
+
     app = QApplication(sys.argv)
-    global stacked_widget
+    global STACKED_WIDGET
     # This holds MainWindow and CircumferenceWindow.
     # Setting the index allows for switching between windows.
-    stacked_widget = QtWidgets.QStackedWidget()
-    global main_window
-    main_window = MainWindow()
-    global circumference_window
-    circumference_window = CircumferenceWindow()
+    STACKED_WIDGET = QtWidgets.QStackedWidget()
+    global MAIN_WINDOW
+    MAIN_WINDOW = MainWindow()
+    global CIRCUMFERENCE_WINDOW
+    CIRCUMFERENCE_WINDOW = CircumferenceWindow()
 
-    stacked_widget.addWidget(main_window)
-    stacked_widget.addWidget(circumference_window)
-    stacked_widget.setMinimumWidth(DEFAULT_WIDTH)
-    stacked_widget.setMinimumHeight(DEFAULT_HEIGHT)
-    stacked_widget.setCurrentWidget(main_window)
-    stacked_widget.show()
+    STACKED_WIDGET.addWidget(MAIN_WINDOW)
+    STACKED_WIDGET.addWidget(CIRCUMFERENCE_WINDOW)
+    STACKED_WIDGET.setMinimumWidth(DEFAULT_WIDTH)
+    STACKED_WIDGET.setMinimumHeight(DEFAULT_HEIGHT)
+    STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
+    STACKED_WIDGET.show()
     try:
         sys.exit(app.exec())
     except:

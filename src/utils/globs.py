@@ -37,6 +37,7 @@ def deprecated(func):
 
     return new_func
 
+
 def main():
     """For testing."""
     print(EXAMPLE_IMAGES)
@@ -44,6 +45,7 @@ def main():
     print(f'img.get_size(): {EXAMPLE_IMAGES[0].get_size()}')
     # Errors for some reason, but the return type of sitk.Image.GetSize() is tuple, tested in terminal
     # print(f'type(img.get_size()): {type(EXAMPLE_IMAGES[0].get_size())}')
+
 
 if __name__ == "__main__":
     main()

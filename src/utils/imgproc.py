@@ -4,6 +4,7 @@ import SimpleITK as sitk
 import numpy as np
 import cv2
 from typing import Union
+
 try:
     # This is for pytest and normal use
     import src.utils.exceptions as exceptions
@@ -11,6 +12,7 @@ except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
 from src.utils.globs import deprecated, NUM_CONTOURS_IN_INVALID_SLICE
+import src.utils.settings as settings
 
 
 # The RV is a np array, not sitk.Image, because we can't actually use a sitk.Image contour in the program, besides for testing purposes
@@ -23,7 +25,11 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
     Parameter
     --------
     mri_slice: sitk.Image
-        2D MRI slice
+        2D MRI slice.
+
+        If settings.SMOOTH_BEFORE_RENDERING is True, then this function will not apply smoothing to mri_slice.
+
+        Else, it'll operate on a smoothed copy of the slice.
 
     retranspose: bool
         sitk.GetArrayFromImage returns a numpy array that's the transpose of the sitk representation.
@@ -37,7 +43,9 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
     # However, this does throw some weird errors
     # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
     # Stable time step for this image must be smaller than 0.0997431
-    smooth_slice: sitk.Image = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+    if not settings.SMOOTH_BEFORE_RENDERING:
+        print('contour() smoothed the slice provided to it')
+    smooth_slice: sitk.Image = mri_slice if settings.SMOOTH_BEFORE_RENDERING else sitk.GradientAnisotropicDiffusionImageFilter().Execute(
         sitk.Cast(mri_slice, sitk.sitkFloat64))
 
     otsu: sitk.Image = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)

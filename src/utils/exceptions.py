@@ -20,21 +20,26 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
                        f'Likely noise or otherwise not a valid brain slice.'
         super().__init__(self.message)
 
+
 class RemoveFromEmptyList(Exception):
     def __init__(self):
         self.message = f'You attempted to remove an image from an empty list of images.'
         super().__init__(self.message)
+
 
 class RemoveFromListOfLengthOne(Exception):
     def __init__(self):
         self.message = f'You attempted to remove an image from a list of size 1 (i.e., the list would become empty after the delete).'
         super().__init__(self.message)
 
+
 class RemoveAtInvalidIndex(Exception):
     """This account for the user seeing a 1-indexed list."""
+
     def __init__(self, index: int):
         self.message = f'You attempted to remove an image at index {index + 1}, which doesn\'t exist in the list of images.'
         super().__init__(self.message)
+
 
 class UnexpectedNegativeNum(Exception):
     def __init__(self):

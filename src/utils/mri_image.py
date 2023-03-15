@@ -7,11 +7,12 @@ And https://realpython.com/python-property/."""
 import _collections_abc
 from typing import Union
 import pathlib
-import src.utils.exceptions as exceptions
 import SimpleITK as sitk
 import numpy as np
 import warnings
 import functools
+import src.utils.exceptions as exceptions
+import src.utils.settings as settings
 
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 ROTATION_MIN: int = 0
@@ -184,14 +185,26 @@ class MRIImage:
         """Sets `slice_z` field in the `MRIImage`."""
         self._slice_z = slice_z
 
+    # TODO: Should this apply smoothing first (and remove it from imgproc.py), then return to GUI for display?
     def resample(self) -> sitk.Image:
-        """Returns the rotated slice that's the result of resampling with this instance's rotation and slice values."""
-        return sitk.Resample(self._base_img, self._euler_3d_transform)[:, :, self._slice_z]
+        """Returns the rotated slice that's the result of resampling with this instance's rotation and slice values.
 
+        The slice is also smoothed if settings.SMOOTH_BEFORE_RENDERING is True."""
+        rotated_slice: sitk.Image = sitk.Resample(self._base_img, self._euler_3d_transform)[:, :, self._slice_z]
+        if settings.SMOOTH_BEFORE_RENDERING:
+            smooth_slice: sitk.Image = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+                sitk.Cast(rotated_slice, sitk.sitkFloat64))
+            print('resample() returned a smoothed slice')
+            return smooth_slice
+        return rotated_slice
+
+    # TODO: Should this apply smoothing first (and remove it from imgproc.py), then return to GUI for display?
     def resample_hardcoded(self, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_z: int = 0) -> sitk.Image:
         """Return the rotated slice with hardcoded settings (i.e., not the instance's settings). Mostly used in test functions.
 
         Changes the instance's Euler3DTransform's rotation values but resets the values back to original values.
+
+        The slice is also smoothed if settings.SMOOTH_BEFORE_RENDERING is True.
         
         Parameters
         ----------
@@ -204,6 +217,11 @@ class MRIImage:
         self._euler_3d_transform.SetRotation(theta_x, theta_y, theta_z)
         rotated_slice: sitk.Image = sitk.Resample(self._base_img, self._euler_3d_transform)[:, :, slice_z]
         self._euler_3d_transform.SetRotation(self._theta_x, self._theta_y, self._theta_z)
+        if settings.SMOOTH_BEFORE_RENDERING:
+            smooth_slice: sitk.Image = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+                sitk.Cast(rotated_slice, sitk.sitkFloat64))
+            print('resample() returned a smoothed slice')
+            return smooth_slice
         return rotated_slice
 
 
