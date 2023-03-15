@@ -13,28 +13,6 @@ except ModuleNotFoundError:
 from src.utils.globs import deprecated, NUM_CONTOURS_IN_INVALID_SLICE
 
 
-# Not actually used except in unit tests. GUI rotations occur in mri_image.py.
-# MRIImage doesn't call this function because MRIImage encapsulates its own Euler3DTransform object
-# This function creates Euler3DTransform so it's a waste
-def rotate_and_slice(mri_image: sitk.Image, theta_x: int, theta_y: int, theta_z: int, slice_z: int) -> sitk.Image:
-    """Given a 3D MRI image, 3D rotate it, and return a 2D slice.
-    
-    Parameters
-    ----------
-    mri_image: sitk.Image
-        3D MRI image
-        
-    theta_x, theta_y, theta_y
-        All ints and in degrees
-        
-    slice_z: int
-        Slice num"""
-    euler_3d_transform: sitk.Euler3DTransform = sitk.Euler3DTransform()
-    euler_3d_transform.SetCenter(mri_image.TransformContinuousIndexToPhysicalPoint([((dimension - 1) / 2.0) for dimension in mri_image.GetSize()]))
-    euler_3d_transform.SetRotation(degrees_to_radians(theta_x), degrees_to_radians(theta_y), degrees_to_radians(theta_z))
-    return sitk.Resample(mri_image, euler_3d_transform)[:, :, slice_z]
-
-
 # The RV is a np array, not sitk.Image, because we can't actually use a sitk.Image contour in the program, besides for testing purposes
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
@@ -73,7 +51,7 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
 
     contour: sitk.Image = sitk.BinaryContourImageFilter().Execute(largest_component)
 
-    contour_np = sitk.GetArrayFromImage(contour)
+    contour_np: np.ndarray = sitk.GetArrayFromImage(contour)
 
     if retranspose:
         return np.transpose(contour_np)
@@ -85,10 +63,10 @@ def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
     """Remove islands.
 
     Given a binary (0|1) binary slice, return a binary slice containing only the largest connected component."""
-    component_image = sitk.ConnectedComponent(binary_slice)
-    sorted_component_image = sitk.RelabelComponent(
+    component_image: sitk.Image = sitk.ConnectedComponent(binary_slice)
+    sorted_component_image: sitk.Image = sitk.RelabelComponent(
         component_image, sortByObjectSize=True)
-    largest_component_binary_image = sorted_component_image == 1
+    largest_component_binary_image: sitk.Image = sorted_component_image == 1
     return largest_component_binary_image
 
 
@@ -117,8 +95,8 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
     # Most valid brain slices have 2 contours, rarely 3.
     # Assuming there are no islands, contours[0] is always the parent contour.
     # See unit test in test_imgproc.py: test_contours_0_is_always_parent_contour_if_no_islands
-    contour = contours[0]
-    arc_length = cv2.arcLength(contour, True)
+    parent_contour: np.ndarray = contours[0]
+    arc_length = cv2.arcLength(parent_contour, True)
     return arc_length
 
 

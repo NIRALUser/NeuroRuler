@@ -4,17 +4,17 @@ Can run this file as module (python -m src.utils.globs) to test stuff."""
 
 import warnings
 import functools
-from src.utils.mri_image import MRIImageList
+from src.utils.mri_image import MRIImageList, MRIImage
 from pathlib import Path
 
 IMAGE_LIST: MRIImageList = MRIImageList()
-SUPPORTED_EXTENSIONS = ('*.nii.gz', '*.nii', '*.nrrd')
+SUPPORTED_EXTENSIONS: tuple = ('*.nii.gz', '*.nii', '*.nrrd')
 EXAMPLE_DATA_DIR: Path = Path.cwd() / 'ExampleData'
-EXAMPLE_IMAGE_PATHS = []
+EXAMPLE_IMAGES: list[MRIImage] = []
 
 for type in SUPPORTED_EXTENSIONS:
     for path in EXAMPLE_DATA_DIR.glob(type):
-        EXAMPLE_IMAGE_PATHS.append(path)
+        EXAMPLE_IMAGES.append(MRIImage(path))
 
 NUM_CONTOURS_IN_INVALID_SLICE: int = 10
 """If this number of contours or more is detected in a slice after processing (Otsu, largest component, etc.), then the slice is considered invalid."""
@@ -39,9 +39,11 @@ def deprecated(func):
 
 def main():
     """For testing."""
-    for path in EXAMPLE_IMAGE_PATHS:
-        print(path.parent.name + '/' + path.name)
-    print(f'\nNumber of example images in {str(EXAMPLE_DATA_DIR.name)}: {len(EXAMPLE_IMAGE_PATHS)}')
+    print(EXAMPLE_IMAGES)
+    print(f'\nNumber of example images in {str(EXAMPLE_DATA_DIR.name)}/: {len(EXAMPLE_IMAGES)}')
+    print(f'img.get_size(): {EXAMPLE_IMAGES[0].get_size()}')
+    # Errors for some reason, but the return type of sitk.Image.GetSize() is tuple, tested in terminal
+    # print(f'type(img.get_size()): {type(EXAMPLE_IMAGES[0].get_size())}')
 
 if __name__ == "__main__":
     main()

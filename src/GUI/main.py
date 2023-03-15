@@ -2,9 +2,9 @@
 
 Note: This file contains lots of fake syntax errors because PyQt object names don't exist until after `loadUi()`.
 
-A lot of the functions defined here belong in imgproc_helpers. Should refactor later, but need to make sure the global `globs.IMAGE_LIST` is accessible there.
+Lastly, there's a lot of boilerplate here to get current slice. globs.IMAGE_LIST[globs.IMAGE_LIST.index]
 
-Lastly, there's a lot of methods here that get the current slice (not resample). Isn't too inefficient but could be improved. TODO: Make current slice global?"""
+Isn't too inefficient but could be improved. Global variable?"""
 
 import sys
 import pathlib
@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
         self.reset_button.clicked.connect(self.reset_settings)
         self.show()
 
-    def browse_files(self):
+    def browse_files(self) -> None:
         """This needs to be checked for compatibility on Windows.
         
         The return value of `getOpenFileNames` is a tuple `(list[str], str)`, where the left element is a list of paths.
@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         self.render_curr_slice()
         self.render_all_sliders()
 
-    def goto_circumference(self):
+    def goto_circumference(self) -> None:
         """Switch to CircumferenceWindow.
         
         Compute circumference and update slice settings."""
@@ -65,12 +65,12 @@ class MainWindow(QMainWindow):
         stacked_widget.setCurrentWidget(circumference_window)
         circumference_window.render_curr_slice()
         circumference: float = imgproc.length_of_contour(
-            imgproc.contour(curr_mri_image.rotated_slice))
+            imgproc.contour(curr_mri_image.resample()))
         circumference_window.circumference_label.setText(f'Circumference: {circumference}')
         circumference_window.slice_settings_text.setText(
             f'X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_z}')
 
-    def enable_elements(self):
+    def enable_elements(self) -> None:
         """Enable image, buttons, and sliders. Called when Open is pressed."""
         self.image.setEnabled(True)
         self.image_num_label.setEnabled(True)
@@ -92,10 +92,10 @@ class MainWindow(QMainWindow):
         # Usually signed int16, sometimes float32/64 data type
         # See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/4#issuecomment-1468552326
         # But when printed to a file, the actual array has minimum 0. Maximum is usually 500-1000 in a slice.
-        mri_slice: sitk.Image = curr_mri_image.rotated_slice
+        rotated_slice: sitk.Image = curr_mri_image.resample()
 
         # Note: sitk.GetArrayFromImage returns a numpy array that is the transpose of the sitk representation.
-        slice_np: np.ndarray = sitk.GetArrayFromImage(mri_slice)
+        slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
         # Retranspose.
         # TODO: There used to be a .copy() after the transpose because there'd be an error otherwise.
@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
         # No zero-indexing when displaying to user
         self.image_num_label.setText(f'Image {index + 1} of {len(globs.IMAGE_LIST)}')
         # TODO: Can probably truncate the path
-        self.image.setStatusTip(str(curr_mri_image.path))
+        self.image.setStatusTip(str(curr_mri_image.filepath))
 
     def render_all_sliders(self):
         """Sets all slider values to the values stored in the `MRIImage`.
@@ -126,7 +126,7 @@ class MainWindow(QMainWindow):
         self.x_slider.setValue(theta_x)
         self.y_slider.setValue(theta_y)
         self.z_slider.setValue(theta_z)
-        self.slice_slider.setMaximum(curr_mri_image.get_dimensions()[2] - 1)
+        self.slice_slider.setMaximum(curr_mri_image.get_size()[2] - 1)
         self.slice_slider.setValue(slice_num)
         self.x_rotation_label.setText(f'X rotation: {theta_x}°')
         self.y_rotation_label.setText(f'Y rotation: {theta_y}°')
@@ -150,7 +150,6 @@ class MainWindow(QMainWindow):
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         x_slider_val: int = self.x_slider.value()
         curr_mri_image.theta_x = x_slider_val
-        curr_mri_image.resample()
         self.render_curr_slice()
         self.x_rotation_label.setText(f'X rotation: {x_slider_val}°')
 
@@ -159,7 +158,6 @@ class MainWindow(QMainWindow):
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         y_slider_val: int = self.y_slider.value()
         curr_mri_image.theta_y = y_slider_val
-        curr_mri_image.resample()
         self.render_curr_slice()
         self.y_rotation_label.setText(f'Y rotation: {y_slider_val}°')
 
@@ -168,7 +166,6 @@ class MainWindow(QMainWindow):
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         z_slider_val: int = self.z_slider.value()
         curr_mri_image.theta_z = z_slider_val
-        curr_mri_image.resample()
         self.render_curr_slice()
         self.z_rotation_label.setText(f'Z rotation: {z_slider_val}°')
 
@@ -177,7 +174,6 @@ class MainWindow(QMainWindow):
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         slice_slider_val: int = self.slice_slider.value()
         curr_mri_image.slice_z = slice_slider_val
-        curr_mri_image.resample()
         self.render_curr_slice()
         self.slice_num_label.setText(f'Slice: {slice_slider_val}')
 
@@ -188,7 +184,6 @@ class MainWindow(QMainWindow):
         curr_mri_image.theta_y = 0
         curr_mri_image.theta_z = 0
         curr_mri_image.slice_z = 0
-        curr_mri_image.resample()
         self.render_curr_slice()
         self.render_all_sliders()
 
@@ -209,7 +204,7 @@ class CircumferenceWindow(QMainWindow):
         stacked_widget.setCurrentWidget(main_window)
 
     def render_curr_slice(self):
-        """Same as `CircumferenceWindow.render_curr_slice()`.
+        """Same as `MainWindow.render_curr_slice()`.
         
         Also sets text for `image_num_label` and file path in the status bar tooltip."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
@@ -217,10 +212,10 @@ class CircumferenceWindow(QMainWindow):
         # Usually signed int16, sometimes float32/64 data type
         # See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/4#issuecomment-1468552326
         # But when printed to a file, the actual array has minimum 0. Maximum is usually 500-1000 in a slice.
-        mri_slice: sitk.Image = curr_mri_image.rotated_slice
+        rotated_slice: sitk.Image = curr_mri_image.resample()
 
         # Note: sitk.GetArrayFromImage returns a numpy array that is the transpose of the sitk representation.
-        slice_np: np.ndarray = sitk.GetArrayFromImage(mri_slice)
+        slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
         # Retranspose.
         # TODO: There used to be a .copy() after the transpose because there'd be an error otherwise.
@@ -237,7 +232,7 @@ class CircumferenceWindow(QMainWindow):
         # No zero-indexing when displaying to user
         self.image_num_label.setText(f'Image {index + 1} of {len(globs.IMAGE_LIST)}')
         # TODO: Can probably truncate the path
-        self.image.setStatusTip(str(curr_mri_image.path))
+        self.image.setStatusTip(str(curr_mri_image.filepath))
 
 
 def main() -> None:
