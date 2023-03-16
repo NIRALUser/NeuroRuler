@@ -1,6 +1,8 @@
 src.utils package
 =================
 
+:Date: |today|
+
 Submodules
 ----------
 

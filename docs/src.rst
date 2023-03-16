@@ -1,6 +1,8 @@
 src package
 ===========
 
+:Date: |today|
+
 Subpackages
 -----------
 
