@@ -1,6 +1,6 @@
 ![Tests](https://github.com/COMP523TeamD/HeadCircumferenceTool/actions/workflows/tests.yml/badge.svg)
 
-# Head Circumference Tool 
+# Head Circumference Tool
 
 > A program that allows you to calculate head circumference from MRI (`.nii`, `.nii.gz`, `.nrrd`) data.
 
@@ -25,8 +25,10 @@ options:
 
 ## Documentation
 
+- [docs/dependencies.md](docs/dependencies.md)
 - [https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
-- In [docs/](https://github.com/COMP523TeamD/HeadCircumferenceTool/tree/main/docs)
+  - Auto-generated from docs/ on push, pull request, etc.
+  - Works locally, TBD if RTD will build it correctly.
 
 ## Run tests
 
