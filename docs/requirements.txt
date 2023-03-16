@@ -1,11 +1,1 @@
 setuptools>=67.6.0
-SimpleITK
-matplotlib
-numpy
-ipywidgets
-argparse
-opencv-python
-pytest
-autopep8
-PyQt6
-qimage2ndarray

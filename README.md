@@ -25,7 +25,7 @@ options:
 
 ## Documentation
 
-- In [docs/](https://github.com/COMP523TeamD/HeadCircumferenceTool/tree/main/docs).
+- In [docs/](https://github.com/COMP523TeamD/HeadCircumferenceTool/tree/main/docs)
 
 ## Run tests
 
