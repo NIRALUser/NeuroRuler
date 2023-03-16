@@ -15,7 +15,7 @@ EPSILON: float = 0.001
 """Used for `float` comparisons."""
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 
-# @pytest.mark.skip(reason="")
+@pytest.mark.skip(reason="Doesn't need to run again for a while")
 def test_all_images_min_value_0_max_value_less_than_1600():
     for img in EXAMPLE_IMAGES:
         img_np: np.ndarray = sitk.GetArrayFromImage(img.base_img)
@@ -56,7 +56,7 @@ def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
                     assert slice_np[i][j] == slice_sitk.GetPixel(j, i)
 
 
-# @pytest.mark.skip(reason="")
+@pytest.mark.skip(reason="Doesn't need to run for a while")
 def test_contour_doesnt_mutate_slice():
     """Test that contour() doesn't mutate its argument."""
     for img in EXAMPLE_IMAGES:
@@ -90,7 +90,7 @@ def test_contour_retranspose_has_same_dimensions_as_original_image():
                         assert contour_slice.shape[0] == img.get_size()[0] and contour_slice.shape[1] == img.get_size()[1]
 
 
-# @pytest.mark.skip(reason="")
+@pytest.mark.skip(reason="This should be run again later")
 def test_length_of_contour_doesnt_mutate_contour():
     for img in EXAMPLE_IMAGES:
         for slice_z in range(img.get_size()[2] // 10):

@@ -7,6 +7,7 @@ authors = [
     { name="Eric Schneider", email="eric@cs.unc.edu" },
     { name="Jesse Wei", email="jesse@cs.unc.edu" },
 ]
+dynamic = ["version", "description"]
 description = "TODO"
 readme = "README.md"
 requires-python = ">=3.7"
@@ -21,7 +22,7 @@ classifiers = [
 "Bug Tracker" = "https://github.com/COMP523TeamD/HeadCircumferenceTool/issues"
 
 [build-system]
-requires = ["setuptools>=65.5.1", "wheel"]
+requires = ["setuptools>=67.6.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]

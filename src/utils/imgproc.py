@@ -19,26 +19,19 @@ import src.utils.settings as settings
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
 def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
-    """Given a rotated slice, apply smoothing, Otsu threshold, hole filling, and island removal. Return a binary (0|1) numpy
+    """Generate the contour of a rotated slice by applying smoothing, Otsu threshold, hole filling, and island removal. Return a binary (0|1) numpy
     array with only the points on the contour=1.
 
-    Parameter
-    --------
-    mri_slice: sitk.Image
-        2D MRI slice.
+    If settings.SMOOTH_BEFORE_RENDERING is True, this function will not operate on a smoothed version of mri_slice since mri_image is already smoothed.
 
-        If settings.SMOOTH_BEFORE_RENDERING is True, then this function will not apply smoothing to mri_slice.
+    :param mri_slice: 2D MRI slice
+    :type mri_slice: sitk.Image
 
-        Else, it'll operate on a smoothed copy of the slice.
+    :param retranspose: Whether or not to return a re-transposed numpy array that matches the sitk representation. Defaults to True.
+    :type retranspose: bool
+    :return: binary (0|1) numpy array with only the points on the contour = 1
+    :rtype: np.ndarray"""
 
-    retranspose: bool
-        sitk.GetArrayFromImage returns a numpy array that's the transpose of the sitk representation.
-
-        If True (default), this function will return a re-transposed result to match the sitk representation.
-
-    Return value
-    ------------
-    binary (0|1) numpy array with only the points on the contour = 1"""
     # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
     # However, this does throw some weird errors
     # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
@@ -59,6 +52,7 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
 
     contour: sitk.Image = sitk.BinaryContourImageFilter().Execute(largest_component)
 
+    # GetArrayFromImage returns the transpose of the sitk representation
     contour_np: np.ndarray = sitk.GetArrayFromImage(contour)
 
     if retranspose:
@@ -68,9 +62,12 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
 
 # Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
 def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
-    """Remove islands.
+    """Remove islands from a binary (0|1) 2D slice. That is, return a binary slice containing only the largest connected component.
 
-    Given a binary (0|1) binary slice, return a binary slice containing only the largest connected component."""
+    :param binary_slice: Binary (0|1) 2D slice
+    :type binary_slice: sitk.Image
+    :return: Binary (0|1) slice with only the largest connected component
+    :rtype: sitk.Image"""
     component_image: sitk.Image = sitk.ConnectedComponent(binary_slice)
     sorted_component_image: sitk.Image = sitk.RelabelComponent(
         component_image, sortByObjectSize=True)
@@ -80,19 +77,22 @@ def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
 
 # Based on commit a230a6b discussion, may not need to worry about non-square pixels
 def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = True) -> float:
-    """Given a 2D binary slice containing a single contour, return the arc length of the parent contour.
+    """Given a 2D binary slice, return the arc length of the parent contour.
+
+    cv2 will find all contours if there is more than one. Most valid brain slices have 2 or 3.
+
+    The binary slice passed into this function should be processed by contour() to contain just one contour (except in edge cases) to guarantee an accurate result.
 
     This function assumes the contour is a closed curve.
 
-    Parameters
-    ---------
-    binary_contour_slice: np.ndarray
-        This needs to be a 2D binary (0|1 or 0|255) slice containing a contour.
-    
-    raise_exception: bool
-        If True (default), will raise ComputeCircumferenceOfInvalidSlice when too many contours are detected, indicating the slice is invalid.
-        
-        Should be set to False only for unit testing purposes."""
+    :param binary_contour_slice: 2D binary (0|1) slice that should be pre-processed by contour() to contain just a single contour.
+    :type binary_contour_slice: np.ndarray
+    :param raise_exception: Whether or not to raise ComputeCircumferenceOfInvalidSlice. Defaults to True and should be False only for unit testing purposes.
+    :type raise_exception: bool
+    :raise exceptions.ComputeCircumferenceOfInvalidSlice: If >= globs.NUM_CONTOURS_IN_INVALID_SLICE contours are detected.
+    :return: Arc length of parent contour
+    :rtype: float"""
+
     # contours is an array of contours
     # A single contour, contours[0], looks like [[[122  76]] [[121  77]] [[107  77]] ... [[106  78]]], representing boundary points of the contour
     # contours[1] would be another contour, and so on
@@ -115,4 +115,10 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
 
 
 def degrees_to_radians(num: Union[int, float]) -> float:
+    """It's very simple.
+
+    :param num: A degree measure
+    :type num: int or float
+    :return: Equivalent radian measure
+    :rtype: float"""
     return num * np.pi / 180

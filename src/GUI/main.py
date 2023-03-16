@@ -28,7 +28,13 @@ DEFAULT_HEIGHT: int = 700
 
 
 class MainWindow(QMainWindow):
+    """Main window of the application.
+
+    Displays image and rotation & slice sliders, along with a reset button.
+
+    Also displays the index of the current image and previous & next buttons."""
     def __init__(self):
+        """Load main.ui file from QtDesigner and connect GUI events to methods."""
         super(MainWindow, self).__init__()
         loadUi(str(Path.cwd() / 'src' / 'GUI' / 'main.ui'), self)
         self.setWindowTitle('Head Circumference Tool')
@@ -51,9 +57,13 @@ class MainWindow(QMainWindow):
         self.show()
 
     def goto_circumference(self) -> None:
-        """From MainWindow, switch to CircumferenceWindow.
+        """Called when Apply button is clicked.
 
-        Compute circumference and update slice settings."""
+        From MainWindow, switch to CircumferenceWindow.
+
+        Enable and disable CircumferenceWindow GUI elements.
+
+        Compute circumference and update slice settings. Re-render MRI slice (it won't change, but this is still required)."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         CIRCUMFERENCE_WINDOW.enable_and_disable_elements()
         STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
@@ -64,16 +74,19 @@ class MainWindow(QMainWindow):
         CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
             f'X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_z}')
 
+    # TODO: This needs to be checked for compatibility on Windows.
     def browse_files(self) -> None:
-        """This needs to be checked for compatibility on Windows.
-        
-        The return value of `getOpenFileNames` is a tuple (list[str], str), where the left element is a list of paths.
-        
-        So `fnames[0][i]` is the i'th path selected."""
+        """Called after File > Open.
+
+        Opens file menu and enables GUI elements after user selects files.
+
+        Initializes the global IMAGE_LIST."""
         # str(globs.SUPPORTED_EXTENSIONS) returns "('*.nii.gz', '*.nii', '*.nrrd' ... )"
         # getOpenFileNames expects the form "Name (*.nii.gz *.nii *.nrrd)"
         file_filter: str = 'MRI images ' + str(globs.SUPPORTED_EXTENSIONS).replace("'", "").replace(",", "")
         # TODO: Let starting directory be a configurable setting in JSON
+        # The return value of `getOpenFileNames` is a tuple (list[str], str), where the left element is a list of paths.
+        # So `fnames[0][i]` is the i'th path selected.
         files = QFileDialog.getOpenFileNames(self, 'Open files', str(Path.cwd()), file_filter)
         self.enable_and_disable_elements()
         paths = map(Path, files[0])
@@ -83,7 +96,9 @@ class MainWindow(QMainWindow):
         self.render_all_sliders()
 
     def enable_and_disable_elements(self) -> None:
-        """Enable image, buttons, and sliders. Called when Open is pressed."""
+        """Called when File > Open is clicked and when switching from CircumferenceWindow to MainWindow (i.e., when Adjust button is clicked).
+
+        Enable image, menu items, buttons, and sliders."""
         self.image.setEnabled(True)
         self.image_num_label.setEnabled(True)
         self.previous_button.setEnabled(True)
@@ -106,9 +121,15 @@ class MainWindow(QMainWindow):
         self.z_rotation_label.setEnabled(True)
         self.slice_num_label.setEnabled(True)
 
-    def render_curr_slice(self):
-        """Same as `CircumferenceWindow.render_curr_slice()`.
-        
+    def render_curr_slice(self) -> None:
+        """Called after any action that updates the image. Specifically, Previous and Next buttons and any slider.
+
+        Also called after File > Open.
+
+        Same as `CircumferenceWindow.render_curr_slice()`.
+
+        Resamples the currently selected MRIImage using rotation and slice settings, then renders the resulting slice in the GUI.
+
         Also sets text for `image_num_label` and file path in the status bar tooltip."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         index: int = globs.IMAGE_LIST.index
@@ -138,8 +159,8 @@ class MainWindow(QMainWindow):
         # TODO: Can probably truncate the path
         self.image.setStatusTip(str(curr_mri_image.path))
 
-    def render_all_sliders(self):
-        """Sets all slider values to the values stored in the `MRIImage`.
+    def render_all_sliders(self) -> None:
+        """Sets all slider values to the values stored in the current `MRIImage`.
         
         Also updates rotation and slice num labels."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
@@ -158,19 +179,25 @@ class MainWindow(QMainWindow):
         self.slice_num_label.setText(f'Slice: {slice_num}')
 
     def next_img(self):
-        """Advance index and render."""
+        """Called when Next button is clicked.
+
+        Advance index and render image."""
         globs.IMAGE_LIST.next()
         self.render_curr_slice()
         self.render_all_sliders()
 
     def previous_img(self):
-        """Decrement index and render."""
+        """Called when Previous button is clicked.
+
+        Decrement index and render image."""
         globs.IMAGE_LIST.previous()
         self.render_curr_slice()
         self.render_all_sliders()
 
     def rotate_x(self):
-        """Handle x slider movement."""
+        """Called any time the user updates the x slider.
+
+        Handle x slider movement."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         x_slider_val: int = self.x_slider.value()
         curr_mri_image.theta_x = x_slider_val
@@ -178,7 +205,9 @@ class MainWindow(QMainWindow):
         self.x_rotation_label.setText(f'X rotation: {x_slider_val}°')
 
     def rotate_y(self):
-        """Handle y slider movement."""
+        """Called any time the user updates the y slider.
+
+        Handle y slider movement."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         y_slider_val: int = self.y_slider.value()
         curr_mri_image.theta_y = y_slider_val
@@ -186,7 +215,9 @@ class MainWindow(QMainWindow):
         self.y_rotation_label.setText(f'Y rotation: {y_slider_val}°')
 
     def rotate_z(self):
-        """Handle z slider movement."""
+        """Called any time the user updates the z slider.
+
+        Handle z slider movement."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         z_slider_val: int = self.z_slider.value()
         curr_mri_image.theta_z = z_slider_val
@@ -194,7 +225,9 @@ class MainWindow(QMainWindow):
         self.z_rotation_label.setText(f'Z rotation: {z_slider_val}°')
 
     def slice_update(self):
-        """Handle slice slider movement."""
+        """Called any time the user updates the slice slider.
+
+        Handle slice slider movement."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         slice_slider_val: int = self.slice_slider.value()
         curr_mri_image.slice_z = slice_slider_val
@@ -202,7 +235,9 @@ class MainWindow(QMainWindow):
         self.slice_num_label.setText(f'Slice: {slice_slider_val}')
 
     def reset_settings(self):
-        """Reset rotation values and slice num to 0 for the current image."""
+        """Called when Reset is clicked.
+
+        Resets rotation values and slice num to 0 for the current image, then re-renders image and sliders."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         curr_mri_image.theta_x = 0
         curr_mri_image.theta_y = 0
@@ -212,13 +247,13 @@ class MainWindow(QMainWindow):
         self.render_all_sliders()
 
     def export_slice_as_img(self, extension: str):
-        """Exports image currently displayed in GUI to settings.IMG_DIR.
+        """Called when an Export as image menu item is clicked.
+
+        Exports image currently displayed in GUI to settings.IMG_DIR.
 
         Filename has format {file_name}_{theta_x}_{theta_y}_{theta_z}_{slice}.{extension}
 
-        Supported formats in this function are the ones supported by QPixmap, namely BMP, JPG, JPEG, PNG, PPM, XBM, XPM.
-
-        But the GUI may not have buttons for all those options, though they can be easily added."""
+        Supported formats in this function are the ones supported by QPixmap, namely BMP, JPG, JPEG, PNG, PPM, XBM, XPM."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         # This gets the last part of the file name, i.e. what's after the last slash
         # Also add 1 for 1-indexing
@@ -232,7 +267,13 @@ class MainWindow(QMainWindow):
 
 
 class CircumferenceWindow(QMainWindow):
+    """Displayed after pressing Apply in MainWindow.
+
+    Displays the same MRI slice as in MainWindow and the computed circumference.
+
+    No sliders but displays rotation & slice values."""
     def __init__(self):
+        """Load circumference.ui and connect GUI events to methods."""
         super(CircumferenceWindow, self).__init__()
         loadUi(str(Path.cwd() / 'src' / 'GUI' / 'circumference.ui'), self)
         self.setWindowTitle('Circumference')
@@ -248,20 +289,32 @@ class CircumferenceWindow(QMainWindow):
         self.show()
 
     def goto_main_window(self):
-        """From CircumferenceWindow, switch to MainWindow."""
+        """Called when Adjust is clicked.
+
+        From CircumferenceWindow, switch to MainWindow.
+
+        Enables and disables MainWindow GUI elements."""
         MAIN_WINDOW.enable_and_disable_elements()
         STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
 
     def enable_and_disable_elements(self):
-        """Needs only handle the things that are different from MainWindow."""
+        """Called when switching from MainWindow to CircumferenceWindow (i.e., Apply button is clicked).
+
+        Needs only handle the things that are different from MainWindow."""
         print(
             "enabling and disabling circumference window elements, but it's not working. specifically export csv isn't enabled")
         # TODO: Doesn't work
         self.action_export_csv.setEnabled(True)
 
     def render_curr_slice(self):
-        """Same as `MainWindow.render_curr_slice()`.
-        
+        """Called after any action that updates the image. Specifically, Previous and Next buttons and any slider.
+
+        Also called after File > Open.
+
+        Same as `MainWindow.render_curr_slice()`.
+
+        Resamples the currently selected MRIImage using rotation and slice settings, then renders the resulting slice in the GUI.
+
         Also sets text for `image_num_label` and file path in the status bar tooltip."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         index: int = globs.IMAGE_LIST.index
@@ -292,15 +345,15 @@ class CircumferenceWindow(QMainWindow):
         self.image.setStatusTip(str(curr_mri_image.path))
 
     def export_slice_as_img(self, extension: str):
-        """Same as MainWindow.export_slice_as_img.
+        """Called when an Export as image menu item is clicked.
+
+        Same as MainWindow.export_slice_as_img.
 
         Exports image currently displayed in GUI to settings.IMG_DIR.
 
         Filename has format {file_name}_{theta_x}_{theta_y}_{theta_z}_{slice}.{extension}
 
-        Supported formats in this function are the ones supported by QPixmap, namely BMP, JPG, JPEG, PNG, PPM, XBM, XPM.
-
-        But the GUI may not have buttons for all those options, though they can be easily added."""
+        Supported formats in this function are the ones supported by QPixmap, namely BMP, JPG, JPEG, PNG, PPM, XBM, XPM."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         # This gets the last part of the file name, i.e. what's after the last slash
         # Also add 1 for 1-indexing
@@ -314,6 +367,7 @@ class CircumferenceWindow(QMainWindow):
 
 
 def main() -> None:
+    """Main entrypoint of GUI."""
     parse_gui_cli()
 
     if not (Path.cwd() / settings.IMG_DIR).exists():

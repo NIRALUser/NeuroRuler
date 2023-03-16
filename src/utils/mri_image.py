@@ -2,7 +2,9 @@
 
 See https://stackoverflow.com/questions/2627002/whats-the-pythonic-way-to-use-getters-and-setters.
 
-And https://realpython.com/python-property/."""
+And https://realpython.com/python-property/.
+
+See https://peps.python.org/pep-0258/#attribute-docstrings for how to document classes to auto-generate documentation."""
 
 import _collections_abc
 from typing import Union
@@ -40,43 +42,37 @@ def deprecated(func):
     return new_func
 
 
+# Also can't import from globs
+def degrees_to_radians(degrees: Union[int, float]) -> float:
+    return degrees * np.pi / 180
+
+
 class MRIImage:
-    """Fields
-    ------
-    
-    `base_img: sitk.Image`
-        - Get
-        - Never mutate this
+    """Represents an MRI image. Each MRIImage has its own unique sitk.Euler3DTransform, with its own center and rotation values.
 
-    `euler_3d_transform: sitk.Euler3DTransform`
-        - Get
-        - Center of rotation set during initialization
-        - Rotation parameters modified by calling theta setters
+    This allows the GUI to remember settings for different MRI images.
 
-    `path: pathlib.Path`
-        - Get
-
-    `theta_x: int, theta_y: int, theta_z: intt`
-        - In degrees
-        - Get, set
-
-    `slice_z: int`
-        - Get, set
-        
     Don't *have* to encapsulate rotation and slice value, but it allows the GUI to remember settings for MRIImages after clicking Next, Previous."""
 
     def __init__(self, path: pathlib.Path, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_z: int = 0):
         """Sets the `base_img` field to be the result of using `sitk` to read `path`.
         
-        Initializes a unique `Euler3DTransform` with center and rotation fields."""
+        Initializes a unique `Euler3DTransform` with center and rotation values."""
         self._path = path
+        """Path to MRI image. Get, set defined, but set should never be used."""
         self._theta_x = theta_x
+        """X rotation value in degrees. Get, set."""
         self._theta_y = theta_y
+        """Y rotation value in degrees. Get, set."""
         self._theta_z = theta_z
+        """Z rotation value in degrees. Get, set."""
         self._slice_z = slice_z
+        """Slice value. Get, set."""
         READER.SetFileName(str(path))
         self._base_img = READER.Execute()
+        """The base image, which should never be mutated. Get."""
         self._euler_3d_transform = sitk.Euler3DTransform()
+        """Unique sitk.Euler3DTransform with origin and rotation values. Get."""
         # TODO: This could be the wrong center
         self._euler_3d_transform.SetCenter(self._base_img.TransformContinuousIndexToPhysicalPoint(
             [((dimension - 1) / 2.0) for dimension in self._base_img.GetSize()]))
@@ -88,7 +84,10 @@ class MRIImage:
         
         That is, ignores `base_img`, `euler_3d_transform`, and `rotated_slice` since those are determined by `path` and rotation and slice values.
         
-        But also, those fields can't be represented as `str`."""
+        But also, those fields can't be represented as `str`.
+
+        :return: str representation of an MRIImage
+        :rtype: str"""
         return f'MRIImage(\'{self._path}\', {self._theta_x}, {self._theta_y}, {self._theta_z}, {self._slice_z})'
 
     # == and != will check reference equality like normal. Use .equals() for deep equality.
@@ -96,14 +95,24 @@ class MRIImage:
     #     return self.path == other.path and self.theta_x == other.theta_x and self.theta_y == other.theta_y and self.theta_z == other.theta_z and self.slice_z == other.slice_z
 
     def equals(self, other) -> bool:
-        """Ignores `img` field. If the conditions checked are true, then `img` is the same."""
+        """Checks for equality. Ignores `base_img` field. If the conditions checked are true, then `base_img` is the same.
+
+        :param other:
+        :type other: MRIImage
+        :return: True if equal, else False
+        :rtype: bool"""
         return self._path == other.path and self._euler_3d_transform.GetCenter() == other.euler_3d_transform.GetCenter() and self._theta_x == other.theta_x and self._theta_y == other.theta_y and self._theta_z == other.theta_z and self._slice_z == other.slice_z
 
     def deepcopy(self) -> 'MRIImage':
+        """Return a deep copy.
+
+        :return: Deep copy
+        :rtype: MRIImage"""
         return MRIImage(self._path, self._theta_x, self._theta_y, self._theta_z, self._slice_z)
 
     @property
     def base_img(self) -> sitk.Image:
+        """base_img getter"""
         return self._base_img
 
     @property
@@ -112,6 +121,10 @@ class MRIImage:
         return self._euler_3d_transform
 
     def get_size(self) -> tuple:
+        """Returns dimensions of the base image.
+
+        :return: Dimensions
+        :rtype: tuple"""
         return self._base_img.GetSize()
 
     @property
@@ -142,7 +155,9 @@ class MRIImage:
 
         Keeps the same `Euler3DTransform` but sets its center to the center of the new file.
         
-        Sets rotation values and slice num to 0 and `resample`s."""
+        Sets rotation values and slice num to 0 and `resample`s.
+
+        :rtype: None"""
         self._path = path
         READER.SetFileName(str(path))
         self._base_img = READER.Execute()
@@ -185,7 +200,10 @@ class MRIImage:
     def resample(self) -> sitk.Image:
         """Returns the rotated slice that's the result of resampling with this instance's rotation and slice values.
 
-        The slice is also smoothed if settings.SMOOTH_BEFORE_RENDERING is True."""
+        The slice is also smoothed if settings.SMOOTH_BEFORE_RENDERING is True.
+
+        :return: Rotated slice that's also smoothed if settings.SMOOTH_BEFORE_RENDERING
+        :rtype: sitk.Image"""
         rotated_slice: sitk.Image = sitk.Resample(self._base_img, self._euler_3d_transform)[:, :, self._slice_z]
         if settings.SMOOTH_BEFORE_RENDERING:
             smooth_slice: sitk.Image = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
@@ -201,15 +219,17 @@ class MRIImage:
         Changes the instance's Euler3DTransform's rotation values but resets the values back to original values.
 
         The slice is also smoothed if settings.SMOOTH_BEFORE_RENDERING is True.
-        
-        Parameters
-        ----------
-        `theta_x, theta_y, theta_z`
-            - Degrees and ints
-            - Default values 0
-        
-        `slice_z`
-            - Default value 0"""
+
+        :param theta_x: X rotation value in degrees, defaults to 0
+        :type theta_x: int
+        :param theta_y: Y rotation value in degrees, defaults to 0
+        :type theta_y: int
+        :param theta_z: Z rotation value in degrees, defaults to 0
+        :type theta_z: int
+        :param slice_z: Z slice value, defaults to 0
+        :type slice_z: int
+        :return: Rotated slice resulting from resampling the base image with the hardcoded values
+        :rtype: sitk.Image"""
         self._euler_3d_transform.SetRotation(theta_x, theta_y, theta_z)
         rotated_slice: sitk.Image = sitk.Resample(self._base_img, self._euler_3d_transform)[:, :, slice_z]
         self._euler_3d_transform.SetRotation(self._theta_x, self._theta_y, self._theta_z)
@@ -223,24 +243,18 @@ class MRIImage:
 
 # Credit: https://github.com/python/cpython/blob/208a7e957b812ad3b3733791845447677a704f3e/Lib/collections/__init__.py#L1174
 class MRIImageList(_collections_abc.MutableSequence):
-    """There should only be a single instance of `MRIImageList` since there's a global MRIImageList.
-    
-    Not enforced, but don't make more than one instance.
-    
-    Fields
-    ------
-    images: list[MRIImage]
-        - Get, set (but really should never call the setter)
-    
-    index: int
-        - Get, set
+    """Wraps a list[MRIImage] and a single index. Provides methods for moving the index and modifying the list.
 
-        - Index of current MRIImage"""
+    There should only be a single instance of `MRIImageList` since there's a global MRIImageList.
+    
+    Not enforced, but don't make more than one instance."""
 
     _index: int = 0
+    """Current index. Get, set."""
 
     def __init__(self, init_list: Union[list[MRIImage, None]] = None):
         self._images = []
+        """List of MRIImage. Get, set (but really should never set)."""
         if init_list is not None:
             if type(init_list) == type(self._images):
                 self._images[:] = init_list
@@ -266,9 +280,11 @@ class MRIImageList(_collections_abc.MutableSequence):
         self._index = index
 
     def __repr__(self) -> str:
+        """Return str representation of MRIImageList."""
         return repr(self._images)
 
     def __len__(self) -> int:
+        """Return length of images."""
         return len(self._images)
 
     def __getitem__(self, i: Union[int, slice]) -> Union[MRIImage, 'MRIImageList']:
@@ -276,7 +292,12 @@ class MRIImageList(_collections_abc.MutableSequence):
         
         If `i` is `slice`, returns a deep copy of the `ImageList`, but the individual elements are shallow copies (i.e., references are the same).
         
-        This is the [same behavior as in normal Python](https://stackoverflow.com/questions/19068707/does-a-slicing-operation-give-me-a-deep-or-shallow-copy)."""
+        This is the [same behavior as in normal Python](https://stackoverflow.com/questions/19068707/does-a-slicing-operation-give-me-a-deep-or-shallow-copy).
+
+        :param i:
+        :type i: int or slice
+        :return: Single MRIImage or MRIImageList
+        :rtype: MRIImage or MRIImageList"""
         if isinstance(i, slice):
             return self.__class__(self._images[i])
         else:
@@ -285,29 +306,47 @@ class MRIImageList(_collections_abc.MutableSequence):
     # TODO: Make GUI comply with the docstring
     def __delitem__(self, i: int) -> None:
         """If `i == index`, the GUI should re-render the image afterward.
-        
-        TODO: GUI should prevent delete when there's only one image."""
+
+        :param i:
+        :type i: int
+
+        TODO: GUI should prevent delete when there's only one image"""
         if len(self) == 0:
             raise exceptions.RemoveFromEmptyList()
         if len(self) == 1:
             raise exceptions.RemoveFromListOfLengthOne()
         del self._images[i]
 
+    # TODO: If i == index, the GUI should re-render the image
     def __setitem__(self, i: int, image: MRIImage) -> None:
-        """If `i == index`, the GUI should re-render the image."""
+        """:param i: index
+        :type i: int
+
+        TODO: If i == index, the GUI should re-render the image"""
         self._images[i] = image
 
     def __contains__(self, image: MRIImage) -> bool:
+        """:param image:
+        :type image: MRIImage"""
         return image in self._images
 
+    # TODO: If i == index, GUI should re-render the image
     def insert(self, i: int, image: MRIImage) -> None:
-        """If `i == index`, GUI should re-render the image."""
+        """:param i:
+        :type i: MRIImage
+
+        TODO: If i == index, GUI should re-render the image"""
         self._images.insert(i, image)
 
     def append(self, image: MRIImage) -> None:
+        """:param image:
+        :type image: MRIImage"""
         self._images.append(image)
 
     def extend(self, other: Union['MRIImageList', list[MRIImage]]) -> None:
+        """Extend images list.
+        :param other:
+        :type other: list[MRIImage] or MRIImageList"""
         if isinstance(other, MRIImageList):
             self._images.extend(other._images)
         else:
@@ -316,7 +355,9 @@ class MRIImageList(_collections_abc.MutableSequence):
     def clear(self) -> None:
         """If this is called, reset GUI to initial state (i.e., everything disabled).
 
-        Sets _index to 0."""
+        Sets _index to 0.
+
+        TODO: If this is called, then reset GUI to initial state (i.e., everything disabled)"""
         self._images.clear()
         self._index = 0
 
@@ -359,7 +400,3 @@ class MRIImageList(_collections_abc.MutableSequence):
         if len(self) == 1:
             self._index = 0
             print("Calling previous() when the list has one element doesn't do anything.")
-
-
-def degrees_to_radians(degrees: Union[int, float]) -> float:
-    return degrees * np.pi / 180

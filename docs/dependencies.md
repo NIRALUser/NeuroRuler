@@ -53,12 +53,13 @@ See [`contour()`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/mai
 
 ### Setup for Jupyter notebooks and other resources
 
-This is not necessary for anything in `src/`.
+This is not necessary for anything in [`src/`](https://github.com/COMP523TeamD/HeadCircumferenceTool/tree/main/src).
 
 https://simpleitk.org/TUTORIAL/
 
-- This links to a bunch of tutorial Jupyter notebook files.
-- But what's in `src/` should suffice for this project.
+- This links to setup instructions.
+- Also links to a bunch of tutorial Jupyter notebook files.
+- But what's in [`src/`](https://github.com/COMP523TeamD/HeadCircumferenceTool/tree/main/src) should suffice for this project.
 
 ### File formats supported
 
@@ -80,7 +81,7 @@ For arc length calculation from a `np` array representing a binary contour.
 
 First, read through [contours](https://docs.opencv.org/4.x/d4/d73/tutorial_py_contours_begin.html) (easy to understand) and [findContours](https://docs.opencv.org/4.x/d3/dc0/group__imgproc__shape.html#gadf1ad6a0b82947fa1fe3c3d497f260e0) (full documentation).
 
-Then see [`length_of_contour()`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/utils/imgproc.py), which produces a `float` from a binary contour. 
+Then see [`length_of_contour()`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/utils/imgproc.py), which produces a `float` from a binary contour.
 
 ## [PyQt6](https://doc.qt.io/qtforpython/)
 
@@ -154,7 +155,7 @@ class MainWindow(QMainWindow):
     def test(self):
         slice_np: np.ndarray = np.array([[65535, 0, 0, 0], [0, 0, 0, 65535]], dtype='uint16')
         # Note reversed ordering
-        qImg: QImage = QImage(slice_np.data, slice_np.shape[1], slice_np.shape[0], QImage.Format_Grayscale16)
+        qImg: QImage = QImage(slice_np.data, slice_np.shape[1], slice_np.shape[0], QImage.Format.Format_Grayscale16)
         self.image.setPixmap(QPixmap(qImg)) 
 ```
 
@@ -213,6 +214,7 @@ from pathlib import Path
 from src.utils.mri_image import MRIImageList, MRIImage
 
 SUPPORTED_EXTENSIONS: tuple = ('*.nii.gz', '*.nii', '*.nrrd')
+# Use / operator instead of str '/' or '\' (would cause cross-platform inconsistencies)
 EXAMPLE_DATA_DIR: Path = Path.cwd() / 'ExampleData'
 EXAMPLE_IMAGES: list[MRIImage] = []
 

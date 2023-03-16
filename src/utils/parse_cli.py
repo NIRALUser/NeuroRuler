@@ -7,6 +7,7 @@ import src.utils.settings as settings
 
 
 def parse_gui_cli() -> None:
+    """Parse GUI CLI args."""
     parser = argparse.ArgumentParser(usage='python -m [-s] [-e] src.GUI.main')
     parser.add_argument('-s', '--smooth',
                         help='smooth image before rendering (False by default)',

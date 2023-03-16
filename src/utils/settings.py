@@ -1,4 +1,4 @@
-"""Global settings"""
+"""Global settings."""
 
 from pathlib import Path
 

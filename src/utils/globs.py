@@ -8,7 +8,9 @@ from src.utils.mri_image import MRIImageList, MRIImage
 from pathlib import Path
 
 IMAGE_LIST: MRIImageList = MRIImageList()
+"""Global list of MRIImage."""
 SUPPORTED_EXTENSIONS: tuple = ('*.nii.gz', '*.nii', '*.nrrd')
+"""File formats supported. Must be a subset of the file formats supported by SimpleITK."""
 EXAMPLE_DATA_DIR: Path = Path.cwd() / 'ExampleData'
 EXAMPLE_IMAGES: list[MRIImage] = []
 
