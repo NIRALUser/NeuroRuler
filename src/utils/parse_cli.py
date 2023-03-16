@@ -1,6 +1,4 @@
-"""This is temporary code for parsing CLI args when starting the GUI.
-
-We will start the app using python -m src.main or python -m main later (or an executable), not python -m src.GUI.main."""
+"""Parse CLI arguments."""
 
 import argparse
 import src.utils.settings as settings

@@ -12,7 +12,9 @@ IMAGE_LIST: MRIImageList = MRIImageList()
 SUPPORTED_EXTENSIONS: tuple = ('*.nii.gz', '*.nii', '*.nrrd')
 """File formats supported. Must be a subset of the file formats supported by SimpleITK."""
 EXAMPLE_DATA_DIR: Path = Path.cwd() / 'ExampleData'
+"""Directory for storing example data."""
 EXAMPLE_IMAGES: list[MRIImage] = []
+"""`list[MRIImage]` formed from the data in `EXAMPLE_DATA_DIR`."""
 
 for type in SUPPORTED_EXTENSIONS:
     for path in EXAMPLE_DATA_DIR.glob(type):

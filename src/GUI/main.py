@@ -1,10 +1,12 @@
 """Entrypoint of GUI stuff.
 
+Loads `src/GUI/main.ui` and `src/GUI/circumference.ui`, both made in QtDesigner.
+
 Note: This file contains lots of fake syntax errors because PyQt object names don't exist until after `loadUi()`.
 
-Lastly, there's a lot of boilerplate here to get current slice. globs.IMAGE_LIST[globs.IMAGE_LIST.index]
+Lastly, there's a lot of boilerplate here to get current slice, i.e. `globs.IMAGE_LIST[globs.IMAGE_LIST.index]`
 
-Isn't too inefficient but could be improved. Global variable?"""
+Isn't too inefficient but could be improved. Use global variable?"""
 
 import sys
 from pathlib import Path

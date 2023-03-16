@@ -24,12 +24,9 @@ ROTATION_MAX: int = 180
 
 
 # Can't import this from globs due to circular import
+# No docstring because no need to document it
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 def deprecated(func):
-    """This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used."""
-
     @functools.wraps(func)
     def new_func(*args, **kwargs):
         warnings.simplefilter('always', DeprecationWarning)  # turn off filter
@@ -42,7 +39,7 @@ def deprecated(func):
     return new_func
 
 
-# Also can't import from globs
+# Also can't import from globs. No docstring because no need to document.
 def degrees_to_radians(degrees: Union[int, float]) -> float:
     return degrees * np.pi / 180
 
@@ -54,7 +51,7 @@ class MRIImage:
 
     Don't *have* to encapsulate rotation and slice value, but it allows the GUI to remember settings for MRIImages after clicking Next, Previous."""
 
-    def __init__(self, path: pathlib.Path, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_z: int = 0):
+    def __init__(self, path: pathlib.Path, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_z: int = 0) -> None:
         """Sets the `base_img` field to be the result of using `sitk` to read `path`.
         
         Initializes a unique `Euler3DTransform` with center and rotation values."""
@@ -112,12 +109,10 @@ class MRIImage:
 
     @property
     def base_img(self) -> sitk.Image:
-        """base_img getter"""
         return self._base_img
 
     @property
     def euler_3d_transform(self) -> sitk.Euler3DTransform:
-        """No need to ever call this but necessary for equals() method."""
         return self._euler_3d_transform
 
     def get_size(self) -> tuple:
@@ -151,7 +146,7 @@ class MRIImage:
 
     @path.setter
     def path(self, path: pathlib.Path) -> None:
-        """Honestly, this function should never be called. Just delete the old `MRIImage`, and construct a new one.
+        """Honestly, this setter should never be called. Just delete the old `MRIImage`, and construct a new one.
 
         Keeps the same `Euler3DTransform` but sets its center to the center of the new file.
         
@@ -172,35 +167,31 @@ class MRIImage:
 
     @theta_x.setter
     def theta_x(self, theta_x: int) -> None:
-        """Sets `theta_x` field in the `MRIImage` and in the `euler_3d_transform` object."""
         self._theta_x = theta_x
         self._euler_3d_transform.SetRotation(degrees_to_radians(theta_x), degrees_to_radians(self._theta_y),
                                              degrees_to_radians(self._theta_z))
 
     @theta_y.setter
     def theta_y(self, theta_y: int) -> None:
-        """Sets `theta_y` field in the `MRIImage` and in the `euler_3d_transform` object."""
         self._theta_y = theta_y
         self._euler_3d_transform.SetRotation(degrees_to_radians(self._theta_x), degrees_to_radians(theta_y),
                                              degrees_to_radians(self._theta_z))
 
     @theta_z.setter
     def theta_z(self, theta_z: int) -> None:
-        """Sets `theta_z` field in the `MRIImage` and in the `euler_3d_transform` object."""
         self._theta_z = theta_z
         self._euler_3d_transform.SetRotation(degrees_to_radians(self._theta_x), degrees_to_radians(self._theta_y),
                                              degrees_to_radians(theta_z))
 
     @slice_z.setter
     def slice_z(self, slice_z: int) -> None:
-        """Sets `slice_z` field in the `MRIImage`."""
         self._slice_z = slice_z
 
     # TODO: Should this apply smoothing first (and remove it from imgproc.py), then return to GUI for display?
     def resample(self) -> sitk.Image:
         """Returns the rotated slice that's the result of resampling with this instance's rotation and slice values.
 
-        The slice is also smoothed if settings.SMOOTH_BEFORE_RENDERING is True.
+        The slice is also smoothed if `settings.SMOOTH_BEFORE_RENDERING` is True.
 
         :return: Rotated slice that's also smoothed if settings.SMOOTH_BEFORE_RENDERING
         :rtype: sitk.Image"""
@@ -218,7 +209,7 @@ class MRIImage:
 
         Changes the instance's Euler3DTransform's rotation values but resets the values back to original values.
 
-        The slice is also smoothed if settings.SMOOTH_BEFORE_RENDERING is True.
+        The slice is also smoothed if `settings.SMOOTH_BEFORE_RENDERING` is True.
 
         :param theta_x: X rotation value in degrees, defaults to 0
         :type theta_x: int
@@ -252,7 +243,7 @@ class MRIImageList(_collections_abc.MutableSequence):
     _index: int = 0
     """Current index. Get, set."""
 
-    def __init__(self, init_list: Union[list[MRIImage, None]] = None):
+    def __init__(self, init_list: Union[list[MRIImage], None] = None) -> None:
         self._images = []
         """List of MRIImage. Get, set (but really should never set)."""
         if init_list is not None:
@@ -280,7 +271,7 @@ class MRIImageList(_collections_abc.MutableSequence):
         self._index = index
 
     def __repr__(self) -> str:
-        """Return str representation of MRIImageList."""
+        """Return `str` representation of `MRIImageList`."""
         return repr(self._images)
 
     def __len__(self) -> int:
@@ -305,12 +296,12 @@ class MRIImageList(_collections_abc.MutableSequence):
 
     # TODO: Make GUI comply with the docstring
     def __delitem__(self, i: int) -> None:
-        """If `i == index`, the GUI should re-render the image afterward.
+        """TODO: GUI should prevent delete when there's only one image.
+        
+        If `i == index`, the GUI should re-render the image afterward.
 
         :param i:
-        :type i: int
-
-        TODO: GUI should prevent delete when there's only one image"""
+        :type i: int"""
         if len(self) == 0:
             raise exceptions.RemoveFromEmptyList()
         if len(self) == 1:
@@ -319,10 +310,10 @@ class MRIImageList(_collections_abc.MutableSequence):
 
     # TODO: If i == index, the GUI should re-render the image
     def __setitem__(self, i: int, image: MRIImage) -> None:
-        """:param i: index
-        :type i: int
-
-        TODO: If i == index, the GUI should re-render the image"""
+        """TODO: If i == index, the GUI should re-render the image
+        
+        :param i: index
+        :type i: int"""
         self._images[i] = image
 
     def __contains__(self, image: MRIImage) -> bool:
@@ -332,10 +323,10 @@ class MRIImageList(_collections_abc.MutableSequence):
 
     # TODO: If i == index, GUI should re-render the image
     def insert(self, i: int, image: MRIImage) -> None:
-        """:param i:
-        :type i: MRIImage
-
-        TODO: If i == index, GUI should re-render the image"""
+        """if `i == index`, GUI should re-render the image.
+        
+        :param i:
+        :type i: MRIImage"""
         self._images.insert(i, image)
 
     def append(self, image: MRIImage) -> None:
@@ -345,6 +336,7 @@ class MRIImageList(_collections_abc.MutableSequence):
 
     def extend(self, other: Union['MRIImageList', list[MRIImage]]) -> None:
         """Extend images list.
+
         :param other:
         :type other: list[MRIImage] or MRIImageList"""
         if isinstance(other, MRIImageList):
@@ -353,20 +345,21 @@ class MRIImageList(_collections_abc.MutableSequence):
             self._images.extend(other)
 
     def clear(self) -> None:
-        """If this is called, reset GUI to initial state (i.e., everything disabled).
+        """TODO: If this is called, reset GUI to initial state (i.e., everything disabled).
 
-        Sets _index to 0.
-
-        TODO: If this is called, then reset GUI to initial state (i.e., everything disabled)"""
+        Sets _index to 0."""
         self._images.clear()
         self._index = 0
 
-    def pop(self, i=-1) -> MRIImage:
-        """Default parameter -1 (i.e., pop last element).
+    def pop(self, i: int = -1) -> MRIImage:
+        """TODO: GUI should prevent `pop` when there's only one image.
         
         If `i == index`, GUI should re-render image afterward.
-        
-        TODO: GUI should prevent pop when there's only one image."""
+
+        :param i: Defaults to -1 (i.e., pop last element)
+        :type i: int
+        :return: Popped `MRIImage`
+        :rtype: `MRIImage`"""
         if len(self) == 0:
             raise exceptions.RemoveFromEmptyList()
         if len(self) == 1:

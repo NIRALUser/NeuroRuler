@@ -1,4 +1,4 @@
-"""Custom image processing exceptions."""
+"""Custom exceptions."""
 
 
 # TODO: Make __init__ accept theta_x, theta_y, theta_z, slice_num as parameters to display those to the user?
@@ -22,20 +22,21 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
 
 
 class RemoveFromEmptyList(Exception):
+    """Self-explanatory."""
     def __init__(self):
         self.message = f'You attempted to remove an image from an empty list of images.'
         super().__init__(self.message)
 
 
 class RemoveFromListOfLengthOne(Exception):
+    """If the list becomes empty, there's no image to render, which might cause an `IndexError`."""
     def __init__(self):
         self.message = f'You attempted to remove an image from a list of size 1 (i.e., the list would become empty after the delete).'
         super().__init__(self.message)
 
 
 class RemoveAtInvalidIndex(Exception):
-    """This account for the user seeing a 1-indexed list."""
-
+    """The error message accounts for the user seeing a 1-indexed list."""
     def __init__(self, index: int):
         self.message = f'You attempted to remove an image at index {index + 1}, which doesn\'t exist in the list of images.'
         super().__init__(self.message)
