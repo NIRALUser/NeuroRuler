@@ -1,8 +1,6 @@
 src.GUI package
 ===============
 
-:Date: |today|
-
 Submodules
 ----------
 
