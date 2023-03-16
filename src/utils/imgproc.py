@@ -22,7 +22,7 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
     """Generate the contour of a rotated slice by applying smoothing, Otsu threshold, hole filling, and island removal. Return a binary (0|1) numpy
     array with only the points on the contour=1.
 
-    If settings.SMOOTH_BEFORE_RENDERING is True, this function will not operate on a smoothed version of mri_slice since mri_image is already smoothed.
+    If settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice` since it would have been smoothed in :code:`MRIImage.resample()`.
 
     :param mri_slice: 2D MRI slice
     :type mri_slice: sitk.Image
@@ -31,7 +31,6 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
     :type retranspose: bool
     :return: binary (0|1) numpy array with only the points on the contour = 1
     :rtype: np.ndarray"""
-
     # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
     # However, this does throw some weird errors
     # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125

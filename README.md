@@ -26,7 +26,6 @@ options:
 ## Documentation
 
 - [https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
-- [docs/dependencies.md](docs/dependencies.md)
 
 ## Run tests
 

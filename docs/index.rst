@@ -3,13 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Head Circumference Tool's documentation!
-===================================================
+#######################
+Head Circumference Tool
+#######################
+
+.. topic:: Overview
+
+   A program that allows you to calculate head circumference from MRI (:code:`.nii`, :code:`.nii.gz`, :code:`.nrrd`) data.
+
+   :Date: |today|
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   setup
+   dependencies
    modules
 
 
