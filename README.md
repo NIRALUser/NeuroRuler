@@ -20,7 +20,6 @@ options:
   -h, --help          show this help message and exit
   -s, --smooth        smooth image before rendering (False by default)
   -e, --export_index  exported filenames will use the index displayed in the GUI
-
 ```
 
 ## Documentation

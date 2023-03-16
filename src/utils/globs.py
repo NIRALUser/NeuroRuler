@@ -2,6 +2,7 @@
 
 Can run this file as module (python -m src.utils.globs) to test stuff."""
 
+import SimpleITK as sitk
 import warnings
 import functools
 from src.utils.mri_image import MRIImageList, MRIImage
@@ -15,9 +16,11 @@ EXAMPLE_DATA_DIR: Path = Path.cwd() / 'ExampleData'
 """Directory for storing example data."""
 EXAMPLE_IMAGES: list[MRIImage] = []
 """`list[MRIImage]` formed from the data in `EXAMPLE_DATA_DIR`."""
+READER: sitk.ImageFileReader = sitk.ImageFileReader()
+"""Global `sitk.ImageFileReader`."""
 
-for type in SUPPORTED_EXTENSIONS:
-    for path in EXAMPLE_DATA_DIR.glob(type):
+for extension in SUPPORTED_EXTENSIONS:
+    for path in EXAMPLE_DATA_DIR.glob(extension):
         EXAMPLE_IMAGES.append(MRIImage(path))
 
 NUM_CONTOURS_IN_INVALID_SLICE: int = 10

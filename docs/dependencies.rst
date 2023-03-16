@@ -63,7 +63,7 @@ throughout the project though.
     # This returns a view of the array with axes transposed but doesn't modify the internal memory
     slice_np = np.transpose(slice_np)
 
-.. warning:: sitk.GetArrayFromImage() returns the transpose of the sitk representation!
+.. warning:: :code:`sitk.GetArrayFromImage()` returns the transpose of the :code:`sitk` representation!
 
 Filtering
 =========
@@ -119,7 +119,10 @@ QtDesigner
 
 For drag-and-drop GUI design. Generates :code:`.ui` files (pretty much XML) which are then loaded into Python code.
 
-`Install it <https://build-system.fman.io/qt-designer-download>`_. In QtDesigner, open `main.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/main.ui>`_ and `circumference.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/circumference.ui>`_. You'll get the idea.
+`Install it <https://build-system.fman.io/qt-designer-download>`_. In QtDesigner, open
+`main.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/main.ui>`_ and
+`circumference.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/circumference.ui>`_.
+You'll get the idea.
 
 Controller stuff
 ================
@@ -138,20 +141,27 @@ See `rotate_x()` for an example of getting and setting values in the GUI.
 
 `[source] <_modules/src/GUI/main.html#MainWindow.rotate_x>`_
 
-StackedWidget
-=============
+QStackedWidget
+==============
 
 For switching between the two windows :code:`MAIN_WINDOW` and :code:`CIRCUMFERENCE_WINDOW`.
+Though it's not in the :code:`.ui` files, :code:`MAIN_WINDOW` and :code:`CIRCUMFERENCE_WINDOW`
+are inside a top-level :code:`QStackedWidget`.
 
 .. currentmodule:: src.GUI.main
 .. autofunction:: main
 
+`QStackedWidget documentation <https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QStackedWidget.html>`_
+
 Layout
 ======
 
-Laying out elements in horizontal and vertical layouts allows the GUI elements to resize themselves when the user resizes the window.
+Laying out elements in horizontal and vertical layouts allows the GUI elements to
+resize themselves when the user resizes the window.
 
-If you're making a new window, right click outside any element in QtDesigner and click Layout. This will allow you to lay out all elements.
+If you're making a new window,
+right click outside any element in QtDesigner and click Layout.
+This will allow you to lay out all elements.
 
 Image visualization
 ===================
@@ -166,7 +176,7 @@ Other resources
 
 `YouTube playlist <https://www.youtube.com/watch?v=Vde5SH8e1OQ&list=PLzMcBGfZo4-lB8MZfHPLTEHO9zJDDLpYj>`_
 
-* He exports Python code from QtDesigner and edits the raw Python code, which I think is a terrible approach. But the videos are otherwise great.
+* He exports Python code from QtDesigner and edits the raw Python code, which I think is a terrible approach. It's better to load the :code:`.ui` files from within Python. But the videos are otherwise great.
 
 `Official documentation <https://doc.qt.io/qtforpython/>`_
 
@@ -198,11 +208,14 @@ However, switching to PySide6 broke window switching, and I couldn't figure it o
                 slice_np: np.ndarray = np.array([[65535, 0, 0, 0],
                                                  [0, 0, 0, 65535]], dtype='uint16')
                 # Note reversed ordering
-                qImg: QImage = QImage(slice_np.data, slice_np.shape[1], slice_np.shape[0], QImage.Format.Format_Grayscale16)
-                self.image.setPixmap(QPixmap(qImg)) 
+                q_img: QImage = QImage(slice_np.data, slice_np.shape[1], slice_np.shape[0],
+                                      QImage.Format.Format_Grayscale16)
+                self.image.setPixmap(QPixmap(q_img)) 
+
+            # Rest of the code omitted
 
     .. image:: _static/qimage_numpy.png
-        :width: 200px
+        :width: 300px
         :align: center
         :alt: Reversed width and height between QImage and numpy
 
@@ -210,6 +223,9 @@ qimage2ndarray
 ##############
 
 For `image visualization <#image-visualization>`_ in PyQt GUI.
+
+Specifically, qimage2ndarray converts a :code:`np` array to a :code:`QImage` that can be displayed in a PyQt GUI,
+as the name implies.
 
 `GitHub <https://github.com/hmeine/qimage2ndarray>`_ and `Documentation <http://hmeine.github.io/qimage2ndarray/>`_ (very brief).
 
@@ -268,8 +284,8 @@ See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example
         EXAMPLE_DATA_DIR: Path = Path.cwd() / 'ExampleData'
         EXAMPLE_IMAGES: list[MRIImage] = []
         
-        for type in SUPPORTED_EXTENSIONS:
-            for path in EXAMPLE_DATA_DIR.glob(type):
+        for extension in SUPPORTED_EXTENSIONS:
+            for path in EXAMPLE_DATA_DIR.glob(extension):
                 # The MRIImage constructor takes a Path argument
                 # But if it took str, then you would just do str(path) here
                 EXAMPLE_IMAGES.append(MRIImage(path))
@@ -313,14 +329,14 @@ you want to auto-generate documentation for.
     sphinx-apidoc -o . ../src       # Copy files from ../src to . (docs/)
     make html
 
-`docs/_build/html/index.html` should now contain the local version of the documentation pages.
+:code:`docs/_build/html/index.html` should now contain the local version of the documentation pages.
 
 Now follow the Read the Docs tutorial starting from `Sign up for Read the Docs <https://docs.readthedocs.io/en/stable/tutorial/#sign-up-for-read-the-docs>`_.
 You can end at Checking the first build. To set up CDD (continuous documentation deployment), check
 `Permissions for connected accounts <https://docs.readthedocs.io/en/stable/guides/git-integrations.html>`_ and
 follow the `Provider-specific instructions steps <https://docs.readthedocs.io/en/stable/guides/git-integrations.html#provider-specific-instructions>`_.
 
-Lastly, modify `docs/index.rst`, which is the homepage.
+Lastly, modify :code:`docs/index.rst`, which is the homepage.
 
 RST formatting
 ==============
@@ -331,9 +347,7 @@ for this page and `<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.ht
 Other resources
 ===============
 
-`YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx
-
-* Where I got the above steps from
+`YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx where I got a lot of these steps from
 
 .. rubric:: Footnotes
 

@@ -13,6 +13,9 @@ Head Circumference Tool
 
    :Date: |today|
 
+Contents
+########
+
 .. toctree::
    :maxdepth: 2
 
@@ -20,10 +23,8 @@ Head Circumference Tool
    dependencies
    modules
 
-
-
 Indices and tables
-==================
+##################
 
 * :ref:`genindex`
 * :ref:`modindex`
