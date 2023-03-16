@@ -17,6 +17,7 @@ Install dependencies
 
 Install dependencies via pip:
 
+.. code-block:: console
    (.venv) $ pip install -r requirements.txt
 
 .. To retrieve a list of random ingredients,

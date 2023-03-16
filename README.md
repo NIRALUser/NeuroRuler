@@ -25,6 +25,7 @@ options:
 
 ## Documentation
 
+- [https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
 - In [docs/](https://github.com/COMP523TeamD/HeadCircumferenceTool/tree/main/docs)
 
 ## Run tests
