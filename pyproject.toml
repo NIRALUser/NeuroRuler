@@ -7,7 +7,6 @@ authors = [
     { name="Eric Schneider", email="eric@cs.unc.edu" },
     { name="Jesse Wei", email="jesse@cs.unc.edu" },
 ]
-dynamic = ["version", "description"]
 description = "TODO"
 readme = "README.md"
 requires-python = ">=3.7"
@@ -22,8 +21,8 @@ classifiers = [
 "Bug Tracker" = "https://github.com/COMP523TeamD/HeadCircumferenceTool/issues"
 
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["setuptools>=67.6.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 testpaths = [
