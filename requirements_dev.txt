@@ -1,3 +1,4 @@
+setuptools>=67.6.0
 flake8==3.9.2
 tox==3.24.3
 pytest==6.2.5
@@ -13,4 +14,3 @@ argparse==1.4.0
 opencv-python==4.7.0.72
 PyQt6==6.4.2
 qimage2ndarray==1.10.0
-setuptools>=67.6.0
