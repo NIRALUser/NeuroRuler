@@ -9,7 +9,7 @@ We are currently working on the GUI and confirming that our circumference measur
 ## Setup
 
 1. Clone the repository
-2. Run `pip install -r requirements.txt`
+2. `pip install -r requirements.txt`
 
 ## Start GUI
 
@@ -25,10 +25,8 @@ options:
 
 ## Documentation
 
-- [docs/dependencies.md](docs/dependencies.md)
 - [https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
-  - Auto-generated from docs/ on push, pull request, etc.
-  - Works locally, TBD if RTD will build it correctly.
+- [docs/dependencies.md](docs/dependencies.md)
 
 ## Run tests
 

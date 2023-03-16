@@ -13,4 +13,4 @@ ipywidgets==7.7.0
 argparse==1.4.0
 opencv-python==4.7.0.72
 PyQt6==6.4.2
-qimage2ndarray
+qimage2ndarray==1.10.0
