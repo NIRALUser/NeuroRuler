@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1071</width>
-    <height>776</height>
+    <width>1034</width>
+    <height>718</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -253,7 +253,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1071</width>
+     <width>1034</width>
      <height>24</height>
     </rect>
    </property>
@@ -284,7 +284,7 @@
     <addaction name="action_add_image"/>
     <addaction name="action_remove_image"/>
     <addaction name="action_export"/>
-    <addaction name="action_exit"/>
+    <addaction name="action_close_program"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
@@ -304,15 +304,15 @@
     <string>Link to documentation page.</string>
    </property>
   </action>
-  <action name="action_exit">
+  <action name="action_close_program">
    <property name="text">
-    <string>Exit</string>
+    <string>Close Program</string>
    </property>
    <property name="statusTip">
-    <string>Exit.</string>
+    <string>Close program.</string>
    </property>
    <property name="shortcut">
-    <string>Meta+W, Ctrl+W</string>
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="action_open">

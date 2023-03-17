@@ -6,7 +6,8 @@
 class ComputeCircumferenceOfInvalidSlice(Exception):
     """User attempted to compute circumference of an invalid slice.
 
-    We detect this by noticing that the number of contours in the slice >= globs.NUM_CONTOURS_IN_INVALID_SLICE.
+    We detect this by noticing that the number of contours in the slice >= globs.NUM_CONTOURS_IN_INVALID_SLICE
+    AFTER processing (threshold, select largest component, etc.) in src.utils.imgproc.contour().
 
     Most brain slices have only 2 or 3 detectable contours.
     
@@ -16,7 +17,7 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
     See NIFTI file (0, 0, 0, 151) for a valid slice with 9 contours. 9 seems like a good limit."""
 
     def __init__(self, num_contours):
-        self.message = f'You attempted to compute the circumference of an invalid brain slice. Contours detected: {num_contours}\n' \
+        self.message = f'You attempted to compute the circumference of an invalid brain slice. After processing, contours detected: {num_contours}\n' \
                        f'Likely noise or otherwise not a valid brain slice.'
         super().__init__(self.message)
 
@@ -45,4 +46,9 @@ class RemoveAtInvalidIndex(Exception):
 class UnexpectedNegativeNum(Exception):
     def __init__(self):
         self.message = f''
+        super().__init__(self.message)
+
+class ArraysDifferentShape(Exception):
+    def __init__(self):
+        self.message = f'Ran into two arrays of different shape when it was necessary that they be of the same shape.'
         super().__init__(self.message)

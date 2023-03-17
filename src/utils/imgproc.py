@@ -4,6 +4,7 @@ import SimpleITK as sitk
 import numpy as np
 import cv2
 from typing import Union
+from PyQt6.QtGui import QImage, QColor
 
 try:
     # This is for pytest and normal use
@@ -112,6 +113,36 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
     arc_length = cv2.arcLength(parent_contour, True)
     return arc_length
 
+
+def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate:bool=True) -> Union[None, QImage]:
+    """Given 2D `q_img` and 2D `binary_mask` of the same shape, apply `binary_mask` on `q_img` to change `q_img` pixels
+    `corresponding` to `binary_mask`=1 to `color`.
+
+    QImage and numpy use [reversed w,h order](https://stackoverflow.com/a/68220805/18479243).
+    
+    To be clear, this function checks that
+    `q_img.size().width() == binary_mask.shape[0]` and `q_img.size().height() == binary_mask.shape[1]`.
+    
+    :param q_img:
+    :type q_img: QImage
+    :param binary_mask: 0|1 elements
+    :type binary_mask: np.ndarray
+    :param color:
+    :type color: QColor
+    :param mutate: Whether to mutate `q_img` or operate on a clone
+    :type mutate: bool
+    :raise: exceptions.ArraysDifferentShape if the arrays are of different shape
+    :return: None or cloned QImage
+    :rtype: None or QImage"""
+    base: QImage = q_img if mutate else q_img.copy()
+    if base.size().width() != binary_mask.shape[0] or base.size().height() != binary_mask.shape[1]:
+        raise exceptions.ArraysDifferentShape
+    for i in range(binary_mask.shape[0]):
+        for j in range(binary_mask.shape[1]):
+            if binary_mask[i][j]:
+                base.setPixelColor(i, j, color)
+    if not mutate:
+        return base
 
 def degrees_to_radians(num: Union[int, float]) -> float:
     """It's very simple.
