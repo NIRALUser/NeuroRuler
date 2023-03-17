@@ -1,5 +1,6 @@
 """Parse CLI arguments."""
 
+from PyQt6 import QtGui
 import argparse
 import src.utils.settings as settings
 
@@ -8,7 +9,7 @@ def parse_gui_cli() -> None:
     """Parse GUI CLI args.
 
     Sets global settings in `settings.py`."""
-    parser = argparse.ArgumentParser(usage='python -m [-d] [-s] [-e] [-f] src.GUI.main')
+    parser = argparse.ArgumentParser(usage='python -m [-d] [-s] [-e] [-f] [-c COLOR] src.GUI.main')
     parser.add_argument('-d', '--debug',
                         help='print debug info',
                         action='store_true')
@@ -21,6 +22,8 @@ def parse_gui_cli() -> None:
     parser.add_argument('-f', '--fullpath',
                         help='image status bar will show full path',
                         action='store_true')
+    parser.add_argument('-c', '--color',
+                        help='contour color as name or hex rrggbb or rrggbbaa')
     args = parser.parse_args()
 
     if args.debug:
@@ -35,3 +38,5 @@ def parse_gui_cli() -> None:
     if args.fullpath:
         settings.IMAGE_STATUS_BAR_SHOWS_FULL_PATH = True
         print('Image status bar will show full path to image.')
+    if args.color:
+        settings.CONTOUR_COLOR = args.color

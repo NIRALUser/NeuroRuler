@@ -299,7 +299,6 @@ class CircumferenceWindow(QMainWindow):
         """Load circumference.ui and connect GUI events to methods."""
         super(CircumferenceWindow, self).__init__()
         loadUi(str(Path.cwd() / 'src' / 'GUI' / 'circumference.ui'), self)
-        self.setWindowTitle('Circumference')
         self.enable_and_disable_elements()
         self.action_close_program.triggered.connect(exit)
         self.action_export_png.triggered.connect(
@@ -354,7 +353,7 @@ class CircumferenceWindow(QMainWindow):
         q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
 
         imgproc.mask_QImage(q_img, binary_contour_slice,
-                            settings.CONTOUR_COLOR)
+                            imgproc.string_to_QColor(settings.CONTOUR_COLOR))
 
         q_pixmap: QPixmap = QPixmap(q_img)
 
@@ -432,51 +431,20 @@ def main() -> None:
 
     app = QApplication(sys.argv)
     global STACKED_WIDGET
+    global MAIN_WINDOW
+    global CIRCUMFERENCE_WINDOW
     # This holds MainWindow and CircumferenceWindow.
     # Setting the index allows for switching between windows.
     STACKED_WIDGET = QtWidgets.QStackedWidget()
-    global MAIN_WINDOW
     MAIN_WINDOW = MainWindow()
-    global CIRCUMFERENCE_WINDOW
     CIRCUMFERENCE_WINDOW = CircumferenceWindow()
-
 
     STACKED_WIDGET.addWidget(MAIN_WINDOW)
     STACKED_WIDGET.addWidget(CIRCUMFERENCE_WINDOW)
     STACKED_WIDGET.setMinimumWidth(DEFAULT_WIDTH)
     STACKED_WIDGET.setMinimumHeight(DEFAULT_HEIGHT)
-    STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
-
-    if settings.DEBUG:
-        print(f"From within the STACKED_WIDGET,")
-        curr_widget: QtWidgets.QWidget = STACKED_WIDGET.currentWidget()
-        curr_widget_menubar = curr_widget.findChildren(QtWidgets.QMenuBar)[0]
-        curr_widget_menubar_qactions = curr_widget_menubar.findChildren(QtGui.QAction)
-        main_window_menubar_qactions = set(curr_widget_menubar_qactions)
-        print(f"\tMAIN_WINDOW's QMenuBar: {curr_widget_menubar}")
-        print(f"\tNumber of QAction children in MAIN_WINDOW's QMenuBar: {len(curr_widget_menubar_qactions)}")
-        print(f"\tMAIN_WINDOW's QMenuBar's QAction children: {curr_widget_menubar_qactions}")
-
-        STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
-        print("\n\tJust switched to CIRCUMFERENCE_WINDOW")
-
-        curr_widget: QtWidgets.QWidget = STACKED_WIDGET.currentWidget()
-        curr_widget_menubar = curr_widget.findChildren(QtWidgets.QMenuBar)[0]
-        curr_widget_menubar_qactions = curr_widget_menubar.findChildren(QtGui.QAction)
-        print(f"\tCIRCUMFERENCE_WINDOW's QMenuBar: {curr_widget_menubar}")
-        print(f"\tNumber of QAction children in CIRCUMFERENCE_WINDOW's QMenuBar: {len(curr_widget_menubar_qactions)}")
-        print(f"\tCIRCUMFERENCE_WINDOW's QMenuBar's QAction children: {curr_widget_menubar_qactions}")
-
-        for circumference_qaction in curr_widget_menubar_qactions:
-            if circumference_qaction in main_window_menubar_qactions:
-                print("\tDuplicated MenuBar QAction items") 
-        else:
-            print("\tNo duplicated MenuBar QAction items")
-
-        STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
-
-
     STACKED_WIDGET.show()
+
     try:
         sys.exit(app.exec())
     except:

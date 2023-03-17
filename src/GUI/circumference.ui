@@ -160,6 +160,9 @@ Another setting: 89</string>
      <height>24</height>
     </rect>
    </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
    <widget class="QMenu" name="menu_file">
     <property name="title">
      <string>File</string>
@@ -195,14 +198,8 @@ Another setting: 89</string>
     </property>
     <addaction name="action_documentation"/>
    </widget>
-   <widget class="QMenu" name="menuQAction_that_doesn_t_exist_in_main_ui_for_testing">
-    <property name="title">
-     <string>QAction that doesn't exist in main.ui for testing</string>
-    </property>
-   </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
-   <addaction name="menuQAction_that_doesn_t_exist_in_main_ui_for_testing"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_open">

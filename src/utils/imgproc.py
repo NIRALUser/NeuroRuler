@@ -3,6 +3,7 @@
 import SimpleITK as sitk
 import numpy as np
 import cv2
+import string
 from typing import Union
 from PyQt6.QtGui import QImage, QColor
 from src.utils.globs import degrees_to_radians
@@ -117,6 +118,31 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
     # True means we assume the contour is a closed curve.
     arc_length = cv2.arcLength(parent_contour, True)
     return arc_length
+
+
+def string_to_QColor(name_or_hex: str) -> QColor:
+    """Convert a name (e.g. red) or 6-hexit rrggbb or 8-hexit rrggbbaa string to a `QColor`.
+    
+    :param name_or_hex: name of color or rrggbb or rrggbbaa
+    :type name_or_hex: str
+    :return: QColor
+    :rtype: QColor
+    :raise: exceptions.InvalidColor if `name_or_hex` not in specified formats"""
+    if name_or_hex.isalpha():
+        return QColor(name_or_hex)
+    if not all(char in string.hexdigits for char in name_or_hex):
+        raise exceptions.InvalidColor(name_or_hex)
+
+    channels: bytes = bytes.fromhex(name_or_hex)
+    if len(channels) == 3:
+        return QColor(channels[0], channels[1], channels[2])
+    elif len(channels) == 4:
+        color = QColor(channels[0], channels[1], channels[2], alpha=channels[3])
+        if settings.DEBUG:
+            print(f'string_to_QColor received 8-hexit str, alpha = {color.alpha()}')
+        return color
+    else:
+        raise exceptions.InvalidColor(name_or_hex)
 
 
 def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate:bool=True) -> Union[None, QImage]:

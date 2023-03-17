@@ -52,3 +52,8 @@ class ArraysDifferentShape(Exception):
     def __init__(self):
         self.message = f'Ran into two arrays of different shape when it was necessary that they be of the same shape.'
         super().__init__(self.message)
+
+class InvalidColor(Exception):
+    def __init__(self, color: str):
+        self.message = f'Invalid color {color} specified.'
+        super().__init__(self.message)
