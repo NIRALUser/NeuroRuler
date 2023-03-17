@@ -189,7 +189,8 @@ class MRIImage:
         if settings.SMOOTH_BEFORE_RENDERING:
             smooth_slice: sitk.Image = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
                 sitk.Cast(rotated_slice, sitk.sitkFloat64))
-            print('resample() returned a smoothed slice')
+            if settings.DEBUG:
+                print('resample() returned a smoothed slice')
             return smooth_slice
         return rotated_slice
 

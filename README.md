@@ -14,11 +14,12 @@ We are currently working on the GUI and confirming that our circumference measur
 ## Start GUI
 
 ```
-usage: python -m [-s] [-e] [-f] src.GUI.main
+usage: python -m [-d] [-s] [-e] [-f] src.GUI.main
 
 options:
   -h, --help          show this help message and exit
-  -s, --smooth        smooth image before rendering (False by default)
+  -d, --debug         print debug info
+  -s, --smooth        smooth image before rendering
   -e, --export_index  exported filenames will use the index displayed in the GUI
   -f, --fullpath      image status bar will show full path
 ```

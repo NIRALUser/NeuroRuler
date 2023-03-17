@@ -12,10 +12,11 @@ Start GUI
 
 .. code-block:: text
 
-    usage: python -m [-s] [-e] [-f] src.GUI.main
+    usage: python -m [-d] [-s] [-e] [-f] src.GUI.main
     
     options:
       -h, --help          show this help message and exit
+      -d, --debug         print debug info
       -s, --smooth        smooth image before rendering (False by default)
       -e, --export_index  exported filenames will use the index displayed in the GUI
       -f, --fullpath      image status bar will show full path

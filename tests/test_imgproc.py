@@ -172,3 +172,34 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
                         except exceptions.ComputeCircumferenceOfInvalidSlice:
                             f.write(f'{theta_x, theta_y, theta_z, slice_z}\n')
     f.close()
+
+def test_contour_slice_retranspose_same_dimensions_as_original_slice():
+    """Test that the np array generated after contouring has the same dimensions as the original
+    sitk slice.
+
+    The process:
+
+    1. MRI image
+    2. SITK image
+    3. np array
+
+    Our concern is unit conversions between 1 & 2 and 2 & 3.
+
+    Regarding 2, if the dimensions are the same and the aspect ratio looks correct in the GUI,
+    does this mean the arc length of the np array is the same as that of the sitk slice
+    without need for unit conversion? That is, the arc length of the np array is that of the sitk slice.
+
+    Therefore, we need not worry about unit conversion between steps 2 and 3?
+
+    Regarding 1, given that the GUI displays an image with correct aspect ratio, is the arc length of the
+    sitk image the same as that of the physical brain?
+    """
+    for img in EXAMPLE_IMAGES:
+        original_dimensions: tuple = img.get_size()
+        for theta_x in range(0, 31, 15):
+            for theta_y in range(0, 31, 15):
+                for theta_z in range(0, 31, 15):
+                    for slice_z in range(0, original_dimensions[2], original_dimensions[2] // 4):
+                        rotated_slice: sitk.Image = img.resample_hardcoded(theta_x, theta_y, theta_z, slice_z)
+                        binary_contour = contour(rotated_slice, True)
+                        assert original_dimensions[0] == binary_contour.shape[0] and original_dimensions[1] == binary_contour.shape[1]

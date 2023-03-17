@@ -1,6 +1,12 @@
 """Global settings."""
 
 from pathlib import Path
+from PyQt6.QtGui import QColor
+
+DEBUG: bool = False
+"""Whether or not to print debugging information throughout execution.
+
+Defaults to False."""
 
 SMOOTH_BEFORE_RENDERING: bool = False
 """Whether or not to smooth the image before rendering, defaults to False.
@@ -19,3 +25,9 @@ E.g. MicroBiome_1month_T1w_0_0_0_0.png, MicroBiome_1month_T1w_90_180_0_60.csv.""
 
 IMAGE_STATUS_BAR_SHOWS_FULL_PATH: bool = False
 """If False (default), the GUI will display only the file name of the image instead of the full path."""
+
+CONTOUR_COLOR: QColor = QColor('red')
+"""Color of the contour. Defaults to red.
+
+The QColor [constructor](https://doc.qt.io/qtforpython-5/PySide2/QtGui/QColor.html#PySide2.QtGui.PySide2.QtGui.QColor)
+also takes r, g, b[, a=255] and a lot of other things."""

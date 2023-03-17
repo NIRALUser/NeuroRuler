@@ -1,10 +1,12 @@
-"""Global variables.
+"""Global variables and functions.
 
 Can run this file as module (python -m src.utils.globs) to test stuff."""
 
 import SimpleITK as sitk
 import warnings
 import functools
+from typing import Union
+from numpy import pi
 from src.utils.mri_image import MRIImageList, MRIImage
 from pathlib import Path
 
@@ -43,6 +45,14 @@ def deprecated(func):
         return func(*args, **kwargs)
 
     return new_func
+
+
+def degrees_to_radians(angle: Union[int, float]) -> float:
+    """:param num: A degree measure
+    :type num: int or float
+    :return: Equivalent radian measure
+    :rtype: float"""
+    return angle * pi / 180
 
 
 def main():

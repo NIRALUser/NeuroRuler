@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 from typing import Union
 from PyQt6.QtGui import QImage, QColor
+from src.utils.globs import degrees_to_radians
 
 try:
     # This is for pytest and normal use
@@ -23,7 +24,7 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
     """Generate the contour of a rotated slice by applying smoothing, Otsu threshold, hole filling, and island removal. Return a binary (0|1) numpy
     array with only the points on the contour=1.
 
-    If settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice` since it would have been smoothed in :code:`MRIImage.resample()`.
+    If settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice` since it was smoothed in :code:`MRIImage.resample()`.
 
     :param mri_slice: 2D MRI slice
     :type mri_slice: sitk.Image
@@ -36,8 +37,8 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
     # However, this does throw some weird errors
     # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
     # Stable time step for this image must be smaller than 0.0997431
-    if not settings.SMOOTH_BEFORE_RENDERING:
-        print('contour() smoothed the slice provided to it')
+    if settings.DEBUG and not settings.SMOOTH_BEFORE_RENDERING:
+        print('imgproc.contour() smoothed the slice provided to it.')
     smooth_slice: sitk.Image = mri_slice if settings.SMOOTH_BEFORE_RENDERING else sitk.GradientAnisotropicDiffusionImageFilter().Execute(
         sitk.Cast(mri_slice, sitk.sitkFloat64))
 
@@ -81,7 +82,7 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
 
     cv2 will find all contours if there is more than one. Most valid brain slices have 2 or 3.
 
-    The binary slice passed into this function should be processed by contour() to contain just one contour (except in edge cases) to guarantee an accurate result.
+    The binary slice passed into this function should be processed by `contour()` to contain just one contour (except in edge cases) to guarantee an accurate result.
 
     This function assumes the contour is a closed curve.
 
@@ -99,8 +100,12 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
     # hierarchy is a list of the same length as contours that provides information about each contour
     # See the documentation for more detail
     contours, hierarchy = cv2.findContours(binary_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    num_contours: int = len(contours)
 
-    if raise_exception and len(contours) >= NUM_CONTOURS_IN_INVALID_SLICE:
+    if settings.DEBUG:
+        print(f'Number of contours detected after processing: {num_contours}')
+
+    if raise_exception and num_contours >= NUM_CONTOURS_IN_INVALID_SLICE:
         raise exceptions.ComputeCircumferenceOfInvalidSlice(len(contours))
 
     # NOTE: select_largest_component removes all "islands" from the image.
@@ -116,11 +121,11 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
 
 def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate:bool=True) -> Union[None, QImage]:
     """Given 2D `q_img` and 2D `binary_mask` of the same shape, apply `binary_mask` on `q_img` to change `q_img` pixels
-    `corresponding` to `binary_mask`=1 to `color`.
+    corresponding to `binary_mask`=1 to `color`.
 
     QImage and numpy use [reversed w,h order](https://stackoverflow.com/a/68220805/18479243).
     
-    To be clear, this function checks that
+    This function checks that
     `q_img.size().width() == binary_mask.shape[0]` and `q_img.size().height() == binary_mask.shape[1]`.
     
     :param q_img:
@@ -132,7 +137,7 @@ def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate:bo
     :param mutate: Whether to mutate `q_img` or operate on a clone
     :type mutate: bool
     :raise: exceptions.ArraysDifferentShape if the arrays are of different shape
-    :return: None or cloned QImage
+    :return: None (if `mutate`) or cloned QImage (if not `mutate`)
     :rtype: None or QImage"""
     base: QImage = q_img if mutate else q_img.copy()
     if base.size().width() != binary_mask.shape[0] or base.size().height() != binary_mask.shape[1]:
@@ -143,12 +148,3 @@ def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate:bo
                 base.setPixelColor(i, j, color)
     if not mutate:
         return base
-
-def degrees_to_radians(num: Union[int, float]) -> float:
-    """It's very simple.
-
-    :param num: A degree measure
-    :type num: int or float
-    :return: Equivalent radian measure
-    :rtype: float"""
-    return num * np.pi / 180

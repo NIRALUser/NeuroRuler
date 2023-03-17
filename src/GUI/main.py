@@ -32,6 +32,11 @@ DEFAULT_WIDTH: int = 1000
 DEFAULT_HEIGHT: int = 700
 """Startup height of the GUI"""
 
+MAIN_WINDOW_INDEX: int = 0
+"""Index in StackedWidget"""
+CIRCUMFERENCE_WINDOW_INDEX: int = 1
+"""Index in StackedWidget"""
+
 
 class MainWindow(QMainWindow):
     """Main window of the application.
@@ -296,7 +301,7 @@ class CircumferenceWindow(QMainWindow):
         loadUi(str(Path.cwd() / 'src' / 'GUI' / 'circumference.ui'), self)
         self.setWindowTitle('Circumference')
         self.enable_and_disable_elements()
-        self.action_exit.triggered.connect(exit)
+        self.action_close_program.triggered.connect(exit)
         self.action_export_png.triggered.connect(
             lambda: self.export_slice_as_img('png'))
         self.action_export_jpg.triggered.connect(
@@ -316,8 +321,9 @@ class CircumferenceWindow(QMainWindow):
         """Called when switching from MainWindow to CircumferenceWindow (i.e., Apply button is clicked).
 
         Needs only handle the things that are different from MainWindow."""
-        print(
-            "enabling and disabling circumference window elements, but it's not working. specifically export csv isn't enabled")
+        if settings.DEBUG:
+            print(
+                "Just switched to CIRCUMFERENCE_WINDOW.\nEnabling and disabling circumference window elements, but it's not working.\nSpecifically, Export csv isn't enabled. Open is not disabled.")
         # TODO: Doesn't work
         self.action_open.setEnabled(False)
         self.action_export_csv.setEnabled(True)
@@ -347,7 +353,8 @@ class CircumferenceWindow(QMainWindow):
 
         q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
 
-        imgproc.mask_QImage(q_img, binary_contour_slice, QtGui.QColor('red'))
+        imgproc.mask_QImage(q_img, binary_contour_slice,
+                            settings.CONTOUR_COLOR)
 
         q_pixmap: QPixmap = QPixmap(q_img)
 
@@ -433,16 +440,48 @@ def main() -> None:
     global CIRCUMFERENCE_WINDOW
     CIRCUMFERENCE_WINDOW = CircumferenceWindow()
 
+
     STACKED_WIDGET.addWidget(MAIN_WINDOW)
     STACKED_WIDGET.addWidget(CIRCUMFERENCE_WINDOW)
     STACKED_WIDGET.setMinimumWidth(DEFAULT_WIDTH)
     STACKED_WIDGET.setMinimumHeight(DEFAULT_HEIGHT)
     STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
+
+    if settings.DEBUG:
+        print(f"From within the STACKED_WIDGET,")
+        curr_widget: QtWidgets.QWidget = STACKED_WIDGET.currentWidget()
+        curr_widget_menubar = curr_widget.findChildren(QtWidgets.QMenuBar)[0]
+        curr_widget_menubar_qactions = curr_widget_menubar.findChildren(QtGui.QAction)
+        main_window_menubar_qactions = set(curr_widget_menubar_qactions)
+        print(f"\tMAIN_WINDOW's QMenuBar: {curr_widget_menubar}")
+        print(f"\tNumber of QAction children in MAIN_WINDOW's QMenuBar: {len(curr_widget_menubar_qactions)}")
+        print(f"\tMAIN_WINDOW's QMenuBar's QAction children: {curr_widget_menubar_qactions}")
+
+        STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
+        print("\n\tJust switched to CIRCUMFERENCE_WINDOW")
+
+        curr_widget: QtWidgets.QWidget = STACKED_WIDGET.currentWidget()
+        curr_widget_menubar = curr_widget.findChildren(QtWidgets.QMenuBar)[0]
+        curr_widget_menubar_qactions = curr_widget_menubar.findChildren(QtGui.QAction)
+        print(f"\tCIRCUMFERENCE_WINDOW's QMenuBar: {curr_widget_menubar}")
+        print(f"\tNumber of QAction children in CIRCUMFERENCE_WINDOW's QMenuBar: {len(curr_widget_menubar_qactions)}")
+        print(f"\tCIRCUMFERENCE_WINDOW's QMenuBar's QAction children: {curr_widget_menubar_qactions}")
+
+        for circumference_qaction in curr_widget_menubar_qactions:
+            if circumference_qaction in main_window_menubar_qactions:
+                print("\tDuplicated MenuBar QAction items") 
+        else:
+            print("\tNo duplicated MenuBar QAction items")
+
+        STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
+
+
     STACKED_WIDGET.show()
     try:
         sys.exit(app.exec())
     except:
-        print("Exiting")
+        if settings.DEBUG:
+            print("Exiting")
 
 
 if __name__ == "__main__":

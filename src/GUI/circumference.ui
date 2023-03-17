@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1071</width>
-    <height>748</height>
+    <width>1080</width>
+    <height>749</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -156,7 +156,7 @@ Another setting: 89</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1071</width>
+     <width>1080</width>
      <height>24</height>
     </rect>
    </property>
@@ -187,7 +187,7 @@ Another setting: 89</string>
     <addaction name="action_add_image"/>
     <addaction name="action_remove_image"/>
     <addaction name="action_export"/>
-    <addaction name="action_exit"/>
+    <addaction name="action_close_program"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
@@ -195,8 +195,14 @@ Another setting: 89</string>
     </property>
     <addaction name="action_documentation"/>
    </widget>
+   <widget class="QMenu" name="menuQAction_that_doesn_t_exist_in_main_ui_for_testing">
+    <property name="title">
+     <string>QAction that doesn't exist in main.ui for testing</string>
+    </property>
+   </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
+   <addaction name="menuQAction_that_doesn_t_exist_in_main_ui_for_testing"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_open">
@@ -224,15 +230,15 @@ Another setting: 89</string>
     <string>Link to documentation page.</string>
    </property>
   </action>
-  <action name="action_exit">
+  <action name="action_close_program">
    <property name="text">
-    <string>Exit</string>
+    <string>Close Program</string>
    </property>
    <property name="statusTip">
     <string>Exit.</string>
    </property>
    <property name="shortcut">
-    <string>Meta+W, Ctrl+W</string>
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="action_add_image">

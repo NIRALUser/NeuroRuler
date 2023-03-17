@@ -178,7 +178,9 @@ Other resources
 
 * He exports Python code from QtDesigner and edits the raw Python code, which I think is a terrible approach. It's better to load the :code:`.ui` files from within Python. But the videos are otherwise great.
 
-`Official documentation <https://doc.qt.io/qtforpython/>`_
+`Qt for Python <https://doc.qt.io/qtforpython-6/>`_
+
+* This link is "qtforpython-6". It references :code:`PySide6`, but mostly everything is the same, as mentioned below. If you Google a keyword, you'll probably be taken to the "qtforpython-5" site. There are some small (mostly naming) differences, so make sure you're on the the correct site.
 
 Alternatives
 ============
