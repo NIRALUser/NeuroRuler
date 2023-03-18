@@ -49,4 +49,4 @@ def parse_gui_cli() -> None:
         print(f'Theme {args.theme} specified.')
     if args.color:
         settings.CONTOUR_COLOR = args.color
-        print(f'Contour color is {args.color}.')
+        print(f"Contour color is {'#' if not args.color.isalpha() else ''}{args.color}.")

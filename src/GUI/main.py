@@ -37,9 +37,7 @@ import src.utils.imgproc as imgproc
 import src.utils.globs as globs
 import src.utils.settings as settings
 from src.utils.parse_cli import parse_gui_cli
-
-# See MainWindow.test for an example of how to access a resource
-# importlib.import_module(f'src.GUI.themes.{settings.THEME_NAME}.resources')
+from src.GUI.helpers import string_to_QColor, mask_QImage
 
 DEFAULT_WIDTH: int = 1000
 """Startup width of the GUI"""
@@ -73,7 +71,7 @@ class MainWindow(QMainWindow):
             lambda: webbrowser.open(GITHUB_LINK))
         self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK))
-        self.action_test.triggered.connect(self.test)
+        self.action_test_show_resource.triggered.connect(self.test_show_resource)
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img('png'))
         self.action_export_jpg.triggered.connect(
@@ -95,13 +93,6 @@ class MainWindow(QMainWindow):
         self.slice_slider.valueChanged.connect(self.slice_update)
         self.reset_button.clicked.connect(self.reset_settings)
         self.show()
-
-    def test(self) -> None:
-        """Connected to Test > Test. Dummy function for testing stuff.
-        
-        Currently displays help.svg (help.svg not in the repo since it's compiled in resources.py)"""
-        self.image.setPixmap(QPixmap(f':/{settings.THEME_NAME}/help.svg'))
-        self.image.setStatusTip("This is intentional, if it's a question mark then that's good :), means we can display icons")
 
     def enable_and_disable_elements(self) -> None:
         """Called when File > Open is clicked and when switching from CircumferenceWindow to MainWindow (i.e., when Adjust button is clicked).
@@ -209,6 +200,9 @@ class MainWindow(QMainWindow):
         paths = map(Path, files[0])
         images: list[MRIImage] = list(map(MRIImage, paths))
 
+        if not len(images):
+            return
+
         if extend:
             globs.IMAGE_LIST.extend(images)
             # For setting image_num_label
@@ -306,6 +300,12 @@ class MainWindow(QMainWindow):
         render_curr_slice()
         self.render_all_sliders()
 
+    def test_show_resource(self) -> None:
+        """Connected to Test > Test show resource. Dummy function for testing stuff.
+        
+        Currently displays `help.svg` (`help.svg` not in the repo since it's compiled in resources.py)"""
+        self.image.setPixmap(QPixmap(f':/{settings.THEME_NAME}/help.svg'))
+        self.image.setStatusTip("This is intentional, if it's a question mark then that's good :), means we can display icons")
 
 class CircumferenceWindow(QMainWindow):
     """Displayed after pressing Apply in MainWindow.
@@ -378,8 +378,8 @@ def render_curr_slice() -> None:
         # i.e. q_img.size().width() == binary_contour_slice.shape[0]
         binary_contour_slice: np.ndarray = imgproc.contour(
             rotated_slice, False)
-        imgproc.mask_QImage(q_img, binary_contour_slice,
-                            imgproc.string_to_QColor(settings.CONTOUR_COLOR))
+        mask_QImage(q_img, binary_contour_slice,
+                            string_to_QColor(settings.CONTOUR_COLOR))
 
     q_pixmap: QPixmap = QPixmap(q_img)
 

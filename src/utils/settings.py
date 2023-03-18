@@ -43,6 +43,6 @@ THEME_NAME: str = 'dark-hct'
 
 Defaults to 'dark-hct'.
 
-Configurable via -t, --theme.
+Configurable via -t, --theme CLI option.
 
 The full path to the .qss file is {globs.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""

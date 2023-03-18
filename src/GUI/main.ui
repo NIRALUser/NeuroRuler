@@ -300,7 +300,7 @@
     <property name="title">
      <string>Test</string>
     </property>
-    <addaction name="action_test"/>
+    <addaction name="action_test_show_resource"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
@@ -489,12 +489,12 @@
     <string>Ctrl+G</string>
    </property>
   </action>
-  <action name="action_test">
+  <action name="action_test_show_resource">
    <property name="text">
-    <string>Test</string>
+    <string>Test show resource</string>
    </property>
    <property name="statusTip">
-    <string>A menu button for testing stuff.</string>
+    <string>Test displaying a resource (help.svg).</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>

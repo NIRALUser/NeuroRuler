@@ -180,6 +180,11 @@ See this `YouTube video <https://www.youtube.com/watch?v=LG4QgG9AZkE>`_ about wh
 
 BreezeStyleSheets generates QRC files and compiled Python resource files that we can use.
 
+.. currentmodule:: src.GUI.main.MainWindow
+.. autofunction:: test_show_resource
+
+`[source] <_modules/src/GUI/main.html#MainWindow.test_show_resource>`_
+
 .. See the `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
 .. for how to access resources once imported.
 
@@ -192,7 +197,7 @@ Other resources
 
 `Qt for Python <https://doc.qt.io/qtforpython-6/>`_
 
-* This link is "qtforpython-6". It references :code:`PySide6`, but mostly everything is the same, as mentioned below. If you Google a keyword, you'll probably be taken to the "qtforpython-5" site. There are some small (mostly naming) differences, so make sure you're on the the correct site.
+* This link is "qtforpython-6". It references :code:`PySide6`, but mostly everything is the same, as mentioned below. If you Google a keyword, you might get a result on the "qtforpython-5" site. There are some small (mostly naming) differences, so make sure you're on the the correct site.
 
 Alternatives
 ============
@@ -309,13 +314,43 @@ sphinx, setuptools
 
 For automatically generating these documentation pages.
 
+This website is automatically updated on push, PR, etc., so you don't need to follow these steps unless
+you're making changes to the site and want to be able to build the website locally to review changes before pushing.
+
 `Read the Docs tutorial <https://docs.readthedocs.io/en/stable/tutorial/>`_ (some steps caused deployment errors 😔)
 and `YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx.
+
+Build HCT site locally
+======================
+
+Your current working directory should be the HCT repo.
+
+.. code-block:: text
+
+    pip install sphinx
+    pip install python-docs-theme
+    cd docs
+    make html
+
+:code:`docs/_build/html/index.html` will now contain the local version of the documentation pages.
+You can open it in a web browser to check it out before pushing, which will automatically update the
+website. From now on, you can just run :code:`make html` to update the html pages.
+
+However, you will need to run :code:`sphinx-apidoc -o . ../src` from the :code:`docs/` directory
+if a new package is created. Make sure :code:`__init__.py` files exist for any package you want
+to be discovered.
+
+You can edit :code:`docs/index.rst`, which is the homepage, or :code:`docs/documentation.rst`, which
+is this page. Source code documentation is automatically generated.
 
 Steps for building from scratch
 ===============================
 
-.. note:: This won't have to be done again for this project, just here for reference.
+.. note:: This does not have to be done for the HCT repo since setup is already complete.
+    It's mostly here for my reference since there's not a lot of information about this process online and I'd forget
+    how to do it.
+
+Your current working directory should be whatever repo you want to automatically generate documentation for.
 
 .. code-block:: text
 
@@ -330,7 +365,8 @@ Type `n` for the first question, which asks about splitting source and build dir
 Copy over :code:`docs/conf.py` (install another theme with pip and modify :code:`html_theme` if you want),
 :code:`docs/requirements.txt`, :code:`.readthedocs.yaml`, :code:`pyproject.toml`, and :code:`setup.py` from the
 `HCT repo <https://github.com/COMP523TeamD/HeadCircumferenceTool>`_,
-overwriting if necessary. The root :code:`requirements.txt` and :code:`requirements_dev.txt` might also need to include
+overwriting if necessary. Modify the info inside for your purposes.
+The root :code:`requirements.txt` and :code:`requirements_dev.txt` might also need to include
 setuptools, but I'm not certain.
 
 Make sure :code:`src/__init__.py` exists, along with :code:`.../__init__.py` files for any package that
@@ -340,17 +376,20 @@ you want to auto-generate documentation for.
 
 .. code-block:: text
 
-    sphinx-apidoc -o . ../src       # Copy files from ../src to . (docs/)
+    sphinx-apidoc -o . ../src       # Generate files from ../src and put in . (docs/)
     make html
 
-:code:`docs/_build/html/index.html` should now contain the local version of the documentation pages.
+:code:`docs/_build/html/index.html` will now contain the local version of the documentation pages.
+You can open it in a web browser to check it out before pushing, which will automatically update the
+website. From now on, you can just run :code:`make html` to update the html pages. You don't need to run
+:code:`sphinx-apidoc` unless you create a new package.
+
+You can edit :code:`docs/index.rst`, which is the homepage.
 
 Now follow the Read the Docs tutorial starting from `Sign up for Read the Docs <https://docs.readthedocs.io/en/stable/tutorial/#sign-up-for-read-the-docs>`_.
 You can end at Checking the first build. To set up CDD (continuous documentation deployment), check
 `Permissions for connected accounts <https://docs.readthedocs.io/en/stable/guides/git-integrations.html>`_ and
 follow the `Provider-specific instructions steps <https://docs.readthedocs.io/en/stable/guides/git-integrations.html#provider-specific-instructions>`_.
-
-Lastly, modify :code:`docs/index.rst`, which is the homepage.
 
 RST formatting
 ==============
@@ -408,7 +447,7 @@ Configuration instructions
 ==========================
 
 First, copy and paste one of the existing theme JSON's in :code:`theme/`. Rename it, and I'll refer
-to this name as :code:`theme_name`.
+to the new name as :code:`theme_name`.
 
 As mentioned in the README, there's a lot of fields, but we should modify only a few.
 I ran :code:`diff theme/dark.json theme/dark-green.json` [#f5]_, and the only fields that changed were these:
@@ -435,8 +474,11 @@ a new folder :code:`src/GUI/themes/{theme_name}`. Drag in :code:`dist/qrc/{theme
 In :code:`resources.py`, change :code:`from PyQt5 import QtCore` to :code:`from PyQt6 import QtCore`.
 
 Run the HCT GUI with the :code:`-t {theme_name}` option to test.
+Push changes to the BreezeStyleSheets fork if it looks good 😊.
 
-Lastly, push changes to the BreezeStyleSheets fork if it looks good 😊.
+See `QRC file <#qrc-file>` for how to access a resource from within code.
+Since we're using compiled :code:`resource.py` files, we don't have the :code:`.svg` files in our HCT repo.
+Check the BreezeStyleSheets repo for resource names.
 
 importlib
 #########
