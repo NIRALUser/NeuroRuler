@@ -1,5 +1,28 @@
 """Custom exceptions."""
 
+from pathlib import Path
+import warnings
+import functools
+
+
+# Can't import from globs due to circular import
+# Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+    as deprecated. It will result in a warning being emitted
+    when the function is used."""
+
+    @functools.wraps(func)
+    def new_func(*args, **kwargs):
+        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
+        warnings.warn("Call to deprecated function {}.".format(func.__name__),
+                      category=DeprecationWarning,
+                      stacklevel=2)
+        warnings.simplefilter('default', DeprecationWarning)  # reset filter
+        return func(*args, **kwargs)
+
+    return new_func
+
 
 # TODO: Make __init__ accept theta_x, theta_y, theta_z, slice_num as parameters to display those to the user?
 # Probably not necessary because those will be displayed in the GUI.
@@ -10,10 +33,10 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
     AFTER processing (threshold, select largest component, etc.) in src.utils.imgproc.contour().
 
     Most brain slices have only 2 or 3 detectable contours.
-    
+
     Change the number in globs.py, then run `pytest` and examine slices given by settings in
     tests/noise_vals.txt. Some valid slices have 6 or 7 contours.
-    
+
     See NIFTI file (0, 0, 0, 151) for a valid slice with 9 contours. 9 seems like a good limit."""
 
     def __init__(self, num_contours):
@@ -22,22 +45,28 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
         super().__init__(self.message)
 
 
+@deprecated
 class RemoveFromEmptyList(Exception):
     """Self-explanatory."""
+
     def __init__(self):
         self.message = f'You attempted to remove an image from an empty list of images.'
         super().__init__(self.message)
 
 
+@deprecated
 class RemoveFromListOfLengthOne(Exception):
     """If the list becomes empty, there's no image to render, which might cause an `IndexError`."""
+
     def __init__(self):
         self.message = f'You attempted to remove an image from a list of size 1 (i.e., the list would become empty after the delete).'
         super().__init__(self.message)
 
 
+@deprecated
 class RemoveAtInvalidIndex(Exception):
     """The error message accounts for the user seeing a 1-indexed list."""
+
     def __init__(self, index: int):
         self.message = f'You attempted to remove an image at index {index + 1}, which doesn\'t exist in the list of images.'
         super().__init__(self.message)
@@ -48,12 +77,20 @@ class UnexpectedNegativeNum(Exception):
         self.message = f''
         super().__init__(self.message)
 
+
 class ArraysDifferentShape(Exception):
     def __init__(self):
         self.message = f'Ran into two arrays of different shape when it was necessary that they be of the same shape.'
         super().__init__(self.message)
 
+
 class InvalidColor(Exception):
     def __init__(self, color: str):
         self.message = f'Invalid color {color} specified.'
+        super().__init__(self.message)
+
+
+class DuplicateFilepathInMRIImageList(Exception):
+    def __init__(self, path: Path):
+        self.message = f'Duplicate file path {str(path)} was added to the MRIImageList'
         super().__init__(self.message)

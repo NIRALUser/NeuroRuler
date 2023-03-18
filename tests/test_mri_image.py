@@ -108,9 +108,9 @@ ImageList tests
 """
 
 def test_initialize_with_list_of_image():
-    image_list = MRIImageList([MRIImage(NRRD0_PATH, 1, 1, 1, 1), MRIImage(NRRD0_PATH, 1, 1, 1, 1)])
+    image_list = MRIImageList([MRIImage(NRRD0_PATH, 1, 1, 1, 1), MRIImage(NRRD1_PATH, 1, 1, 1, 1)])
     assert len(image_list) == 2
-    image_list.append(MRIImage(NRRD0_PATH, 1, 1, 1, 1))
+    image_list.append(MRIImage(NRRD2_PATH, 1, 1, 1, 1))
     assert len(image_list) == 3
 
 def test_initialize_with_other_ImageList():
@@ -145,14 +145,15 @@ def test_get_item():
 
     # Test that slicing creates a reference to a cloned ImageList (but not the underlying elements)
     clone = IMAGE_LIST[:]
-    clone.append(MRIImage(NRRD2_PATH))
+    del clone[2]
     assert len(IMAGE_LIST) != len(clone)
     assert clone[0] == IMAGE_LIST[0]
     assert clone[1] == IMAGE_LIST[1]
-    assert clone[2] == IMAGE_LIST[2]
+    with pytest.raises(IndexError):
+        clone[2]
 
 def test_del_item():
-    clone = IMAGE_LIST[:]
+    clone: MRIImageList = IMAGE_LIST[:]
     with pytest.raises(IndexError):
         del clone[3]
     del clone[0]
@@ -160,8 +161,8 @@ def test_del_item():
     assert clone[1] == IMAGE_2
     del clone[0]
     assert clone[0] == IMAGE_2
-    with pytest.raises(exceptions.RemoveFromListOfLengthOne):
-        del clone[0]
+    del clone[0]
+    assert not len(clone)
 
 def test_set_item():
     """Syntax error because ImageList.__getitem__ return type can't be Union[Image, ImageList].

@@ -226,19 +226,36 @@ class MRIImageList(_collections_abc.MutableSequence):
 
     There should only be a single instance of `MRIImageList` since there's a global MRIImageList.
     
-    Not enforced, but don't make more than one instance."""
+    Not enforced, but don't make more than one instance.
+    
+    Wraps a set of image paths that is updated on insert & remove operations.
+    Duplicate paths are not allowed.
+    
+    The methods involving `_paths` are not unit tested but work in the GUI.
+    Specifically, the constructor called on `list[MRIImage]` works as expected.
+    Also `.extend()` and `__delitem__()`.
+    
+    Does not handle edge cases such as removing from empty list or list of length 1
+    (no image to display) since that belongs in the GUI."""
 
-    _index: int = 0
-    """Current index. Get, set."""
-
-    def __init__(self, init_list: Union[list[MRIImage], None] = None) -> None:
-        self._images = []
-        """List of MRIImage. Get, set (but really should never set)."""
+    def __init__(self, init_list: Union[list[MRIImage], 'MRIImageList', None] = None) -> None:
+        self._images: list[MRIImage] = []
+        """List of `MRIImage`. Get, set (but really should never set)."""
+        self._index: int = 0
+        """Current index. Get, set."""
+        self._paths: set[Path] = set()
+        """Set of `Path`s of `MRIImage`s. Get."""
         if init_list is not None:
             if type(init_list) == type(self._images):
                 self._images[:] = init_list
+                for image in init_list:
+                    self._paths.add(image.path)
             elif isinstance(init_list, MRIImageList):
+                # See https://stackoverflow.com/questions/36317652/whats-the-meaning-of-x-y
+                # For explanation of x[:] = y
                 self._images[:] = init_list.images[:]
+                for image in init_list.images:
+                    self._paths.add(image.path)
             else:
                 self._images = init_list
 
@@ -250,9 +267,16 @@ class MRIImageList(_collections_abc.MutableSequence):
     def index(self) -> int:
         return self._index
 
+    @property
+    def paths(self) -> set[Path]:
+        return self._paths
+
     @images.setter
     def images(self, images: list[MRIImage]) -> None:
         self._images = images
+        self._paths.clear()
+        for image in images:
+            self._paths.add(image.path)
 
     @index.setter
     def index(self, index: int) -> None:
@@ -290,10 +314,7 @@ class MRIImageList(_collections_abc.MutableSequence):
 
         :param i:
         :type i: int"""
-        if len(self) == 0:
-            raise exceptions.RemoveFromEmptyList()
-        if len(self) == 1:
-            raise exceptions.RemoveFromListOfLengthOne()
+        self._paths.remove(self._images[i].path)
         del self._images[i]
 
     # TODO: If i == index, the GUI should re-render the image
@@ -302,7 +323,9 @@ class MRIImageList(_collections_abc.MutableSequence):
         
         :param i: index
         :type i: int"""
+        self._paths.remove(self._images[i].path)
         self._images[i] = image
+        self._paths.add(image.path)
 
     def __contains__(self, image: MRIImage) -> bool:
         """:param image:
@@ -315,11 +338,17 @@ class MRIImageList(_collections_abc.MutableSequence):
         
         :param i:
         :type i: MRIImage"""
+        if image.path in self._paths:
+            raise exceptions.DuplicateFilepathInMRIImageList(image.path)
+        self._paths.add(image.path)
         self._images.insert(i, image)
 
     def append(self, image: MRIImage) -> None:
         """:param image:
         :type image: MRIImage"""
+        if image.path in self._paths:
+            raise exceptions.DuplicateFilepathInMRIImageList(image.path)
+        self._paths.add(image.path)
         self._images.append(image)
 
     def extend(self, other: Union['MRIImageList', list[MRIImage]]) -> None:
@@ -328,8 +357,15 @@ class MRIImageList(_collections_abc.MutableSequence):
         :param other:
         :type other: list[MRIImage] or MRIImageList"""
         if isinstance(other, MRIImageList):
+            for image in other._images:
+                if image.path in self._paths:
+                    raise exceptions.DuplicateFilepathInMRIImageList(image.path)
+                self._paths.add(image.path)
             self._images.extend(other._images)
         else:
+            for image in other:
+                if image.path in self._paths:
+                    raise exceptions.DuplicateFilepathInMRIImageList(image.path)
             self._images.extend(other)
 
     def clear(self) -> None:
@@ -338,6 +374,7 @@ class MRIImageList(_collections_abc.MutableSequence):
         Sets _index to 0."""
         self._images.clear()
         self._index = 0
+        self._paths.clear()
 
     def pop(self, i: int = -1) -> MRIImage:
         """TODO: GUI should prevent `pop` when there's only one image.
@@ -348,10 +385,7 @@ class MRIImageList(_collections_abc.MutableSequence):
         :type i: int
         :return: Popped `MRIImage`
         :rtype: `MRIImage`"""
-        if len(self) == 0:
-            raise exceptions.RemoveFromEmptyList()
-        if len(self) == 1:
-            raise exceptions.RemoveFromListOfLengthOne()
+        self._paths.remove(self._images[i].path)
         return self._images.pop(i)
 
     def next(self) -> None:

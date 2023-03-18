@@ -23,3 +23,5 @@ pyvenv.cfg
 src/GUI/np_array_slice.txt
 test.txt
 docs/_build
+secret.png
+secret.ipynb

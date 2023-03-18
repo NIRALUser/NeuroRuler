@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1080</width>
-    <height>749</height>
+    <height>721</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -187,15 +187,16 @@ Another setting: 89</string>
      <addaction name="action_export_xpm"/>
     </widget>
     <addaction name="action_open"/>
-    <addaction name="action_add_image"/>
+    <addaction name="action_add_images"/>
     <addaction name="action_remove_image"/>
     <addaction name="action_export"/>
-    <addaction name="action_close_program"/>
+    <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="action_github"/>
     <addaction name="action_documentation"/>
    </widget>
    <addaction name="menu_file"/>
@@ -224,12 +225,15 @@ Another setting: 89</string>
     <string>Documentation</string>
    </property>
    <property name="statusTip">
-    <string>Link to documentation page.</string>
+    <string>Open documentation website in web browser.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="action_close_program">
+  <action name="action_exit">
    <property name="text">
-    <string>Close Program</string>
+    <string>Exit</string>
    </property>
    <property name="statusTip">
     <string>Exit.</string>
@@ -238,7 +242,7 @@ Another setting: 89</string>
     <string>Ctrl+W</string>
    </property>
   </action>
-  <action name="action_add_image">
+  <action name="action_add_images">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -249,7 +253,10 @@ Another setting: 89</string>
     <string extracomment="Add images.">Add images.</string>
    </property>
    <property name="statusTip">
-    <string extracomment="Add images.">Add images.</string>
+    <string>Add image(s) to the end of the list. No duplicates.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="action_remove_image">
@@ -257,13 +264,16 @@ Another setting: 89</string>
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Remove Images</string>
+    <string>Remove Image</string>
    </property>
    <property name="toolTip">
-    <string extracomment="Remove images.">Remove images.</string>
+    <string extracomment="Remove currently loaded image from the list. Does not delete the file from disk.">Remove currently loaded image from the list. Does not delete the file from disk.</string>
    </property>
    <property name="statusTip">
-    <string extracomment="Remove images.">Remove images.</string>
+    <string extracomment="Remove images.">Remove currently loaded image from the list. Does not delete the file from disk.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="action_export_csv">
@@ -275,6 +285,9 @@ Another setting: 89</string>
    </property>
    <property name="statusTip">
     <string extracomment="Export slice data to CSV.">Export slice data to CSV.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="action_export_png">
@@ -350,6 +363,17 @@ Another setting: 89</string>
    </property>
    <property name="statusTip">
     <string extracomment="Export slice as XPM.">Export slice as XPM.</string>
+   </property>
+  </action>
+  <action name="action_github">
+   <property name="text">
+    <string>GitHub</string>
+   </property>
+   <property name="statusTip">
+    <string>Open GitHub page in web browser.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
    </property>
   </action>
  </widget>

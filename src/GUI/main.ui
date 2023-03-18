@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1080</width>
-    <height>749</height>
+    <height>693</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -284,19 +284,27 @@
      <addaction name="action_export_xpm"/>
     </widget>
     <addaction name="action_open"/>
-    <addaction name="action_add_image"/>
+    <addaction name="action_add_images"/>
     <addaction name="action_remove_image"/>
     <addaction name="action_export"/>
-    <addaction name="action_close_program"/>
+    <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="action_github"/>
     <addaction name="action_documentation"/>
+   </widget>
+   <widget class="QMenu" name="menuTest">
+    <property name="title">
+     <string>Test</string>
+    </property>
+    <addaction name="action_test"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
+   <addaction name="menuTest"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_documentation">
@@ -304,15 +312,18 @@
     <string>Documentation</string>
    </property>
    <property name="statusTip">
-    <string>Link to documentation page.</string>
+    <string>Open documentation website in web browser.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="action_close_program">
+  <action name="action_exit">
    <property name="text">
-    <string>Close Program</string>
+    <string>Exit</string>
    </property>
    <property name="statusTip">
-    <string>Close program.</string>
+    <string>Exit.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
@@ -329,20 +340,32 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_add_image">
+  <action name="action_add_images">
    <property name="text">
     <string>Add Images</string>
    </property>
    <property name="statusTip">
-    <string>Add a single image.</string>
+    <string>Add image(s) to the end of the list. No duplicates.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="action_remove_image">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>Remove Images</string>
+    <string>Remove Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove currently loaded image from the list. Does not delete the file from disk.</string>
    </property>
    <property name="statusTip">
-    <string>Remove a single image.</string>
+    <string>Remove currently loaded image from the list. Does not delete the file from disk.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="action_export_png">
@@ -391,6 +414,9 @@
    </property>
    <property name="statusTip">
     <string extracomment="Click Apply to enable this option.">Click Apply to enable this option.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="action_export_bmp">
@@ -450,6 +476,28 @@
    </property>
    <property name="statusTip">
     <string extracomment="Export slice as XPM.">Export slice as XPM.</string>
+   </property>
+  </action>
+  <action name="action_github">
+   <property name="text">
+    <string>GitHub</string>
+   </property>
+   <property name="statusTip">
+    <string>Open GitHub page in web browser.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="action_test">
+   <property name="text">
+    <string>Test</string>
+   </property>
+   <property name="statusTip">
+    <string>A menu button for testing stuff.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

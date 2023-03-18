@@ -1,4 +1,4 @@
-"""Global variables and functions.
+"""Global variables and functions that the user should not be able to modify directly.
 
 Can run this file as module (python -m src.utils.globs) to test stuff."""
 
@@ -20,6 +20,10 @@ EXAMPLE_IMAGES: list[MRIImage] = []
 """`list[MRIImage]` formed from the data in `EXAMPLE_DATA_DIR`."""
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 """Global `sitk.ImageFileReader`."""
+THEME_DIR: Path = Path.cwd() / 'src' / 'GUI' / 'themes'
+THEMES: set[str] = {'dark-hct', 'light-hct', 'dark', 'light'}
+APP_MAIN_COLOR: str = "b55162"
+"""The pink-ish color used in the midterm presentation."""
 
 for extension in SUPPORTED_EXTENSIONS:
     for path in EXAMPLE_DATA_DIR.glob(extension):
@@ -27,6 +31,24 @@ for extension in SUPPORTED_EXTENSIONS:
 
 NUM_CONTOURS_IN_INVALID_SLICE: int = 10
 """If this number of contours or more is detected in a slice after processing (Otsu, largest component, etc.), then the slice is considered invalid."""
+
+NIFTI_UNITS = {
+    '0': 'Unknown',
+    '1': 'Meter (m)',
+    '2': 'Millimeter (mm)',
+    '3': 'Micron (μm)',
+    '8': 'Seconds (s)',
+    '16': 'Milliseconds (ms)',
+    '24': 'Microseconds (μs)',
+    '32': 'Hertz (Hz)',
+    '40': 'Parts-per-million (ppm)',
+    '48': 'Radians per second (rad/s)'
+}
+"""Maps the `xyzt_units` metadata field of a NIfTI file to physical meaning.
+
+Based on https://brainder.org/2012/09/23/the-nifti-file-format/.
+
+See the top of Playground/imgproc/processing.ipynb for `sitk` code to get metadata."""
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically

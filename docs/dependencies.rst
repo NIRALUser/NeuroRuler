@@ -7,7 +7,7 @@ Dependencies
 .. topic:: Overview
 
     This page describes what our dependencies are for and how to use them.
-    Example code and links to related source code are provided.
+    Example code and links to our related source code are provided.
 
     We use pip to manage dependencies. Install them with :code:`pip install -r requirements.txt`.
 
@@ -166,10 +166,22 @@ This will allow you to lay out all elements.
 Image visualization
 ===================
 
-.. currentmodule:: src.GUI.main.MainWindow
+.. currentmodule:: src.GUI.main
 .. autofunction:: render_curr_slice
 
-`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
+`[source] <_modules/src/GUI/main.html#render_curr_slice>`_
+
+QRC file
+========
+
+Used to manage resources (application icons in :code:`.svg`, :code:`.png`, etc. formats).
+
+See this `YouTube video <https://www.youtube.com/watch?v=LG4QgG9AZkE>`_ about what QRC files are.
+
+BreezeStyleSheets generates QRC files and compiled Python resource files that we can use.
+
+.. See the `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
+.. for how to access resources once imported.
 
 Other resources
 ===============
@@ -231,10 +243,10 @@ as the name implies.
 
 `GitHub <https://github.com/hmeine/qimage2ndarray>`_ and `Documentation <http://hmeine.github.io/qimage2ndarray/>`_ (very brief).
 
-.. currentmodule:: src.GUI.main.MainWindow
+.. currentmodule:: src.GUI.main
 .. autofunction:: render_curr_slice
 
-`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
+`[source] <_modules/src/GUI/main.html#render_curr_slice>`_
 
 matplotlib, ipywidgets
 ######################
@@ -351,6 +363,140 @@ Other resources
 
 `YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx where I got a lot of these steps from
 
+BreezeStyleSheets
+#################
+
+Used to generate our GUI's :code:`.qss` stylesheets and corresponding :code:`resources.py` files.
+
+How it works
+============
+
+See the README in the `BreezeStyleSheets repo <https://github.com/Alexhuszagh/BreezeStyleSheets.git>`_.
+
+In a nutshell, we edit a JSON file with hex codes and compile to a :code:`.qss` stylesheet that we can
+use in our program. It also generates `.qrc files <#qrc-file>`_ and compiled :code:`.py` resource files
+for managing resources (icons).
+
+Installation instructions
+=========================
+
+1. Clone our fork of the `repo <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
+2. Try running :code:`python configure.py --styles=all --extensions=all --pyqt6 --resource breeze.qrc --compiled-resource breeze_resources.py`
+
+If you get something that looks like this, then PyQt5 (specifically, the :code:`pyrcc5` command)
+is not installed.
+
+.. code-block:: text
+
+    subprocess.CalledProcessError: Command '['pyrcc5', '/Users/jesse/Documents/GitHub/COMP523/BreezeStyleSheets/dist/qrc/breeze.qrc', '-o', '/Users/jesse/Documents/GitHub/COMP523/BreezeStyleSheets/breeze_resources.py']' returned non-zero exit status 1.
+
+On macOS, :code:`pip install PyQt5` didn't work, so I had to do some extra stuff.
+
+These are the the commands I ran to install PyQt5 on macOS.
+
+.. code-block:: text
+
+    brew install qt5
+    brew link qt5 --force
+    pip3 install pyqt5 --config-settings --confirm-license= --verbose
+
+Took a while to install...
+
+If you get any errors, these are the relevant StackOverflow links: [#f2]_ [#f3]_ [#f4]_.
+
+Configuration instructions
+==========================
+
+First, copy and paste one of the existing theme JSON's in :code:`theme/`. Rename it, and I'll refer
+to this name as :code:`theme_name`.
+
+As mentioned in the README, there's a lot of fields, but we should modify only a few.
+I ran :code:`diff theme/dark.json theme/dark-green.json` [#f5]_, and the only fields that changed were these:
+
+* :code:`"highlight"`
+* :code:`"highlight:dark"`
+* :code:`"highlight:alternate"`
+* :code:`"view:checked"`
+* :code:`"view:hover"`
+* :code:`"slider:foreground"`
+* :code:`"checkbox:light"`
+* :code:`"scrollbar:hover"`
+
+After making edits, run these commands to build the stylesheet, icons, and resource file for a single theme.
+
+.. code-block:: text
+
+    python configure.py --styles=<name of JSON> --resource custom.qrc
+    python configure.py --styles=<name of JSON> --extensions=all --pyqt6 --resource custom.qrc --compiled-resource resources.py
+
+:code:`dist/qrc/{theme_name}` should now exist. In the HCT repo, create
+a new folder :code:`src/GUI/themes/{theme_name}`. Drag in :code:`dist/qrc/{theme_name}/stylesheet.qss` and :code:`resources.py`.
+
+In :code:`resources.py`, change :code:`from PyQt5 import QtCore` to :code:`from PyQt6 import QtCore`.
+
+Run the HCT GUI with the :code:`-t {theme_name}` option to test.
+
+Lastly, push changes to the BreezeStyleSheets fork if it looks good 😊.
+
+importlib
+#########
+
+For importing modules using strings.
+
+Specifically, if supporting multiple themes and stylesheets, then import statements will change depending
+on :code:`src.utils.settings.THEME_NAME`.
+
+For example, in :code:`src.GUI.main()`, if :code:`THEME_NAME` is :code:`'dark'`, then
+the resources import statement would be
+
+.. code-block:: python
+
+    import src.GUI.styles.dark.resources
+
+However, if :code:`THEME_NAME` is :code:`'light'`, then the import statement would be
+
+.. code-block:: python
+
+    import src.GUI.styles.light.resources
+
+Therefore, we use importlib to control the import name there. Alternatively, we could have just one
+resources file for every theme, but I think BreezeStyleSheets might re-compile resource :code:`.svg` files
+based on the theme :code:`.json`.
+
 .. rubric:: Footnotes
 
 .. [#f1] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
+.. [#f2] `macOS PyQt5 install 1 <https://stackoverflow.com/questions/70961915/error-while-installing-pytq5-with-pip-preparing-metadata-pyproject-toml-did-n>`_
+.. [#f3] `macOS PyQt5 install 2 <https://stackoverflow.com/questions/66546886/pip-install-stuck-on-preparing-wheel-metadata-when-trying-to-install-pyqt5>`_
+.. [#f4] `macOS PyQt5 install 3 <https://stackoverflow.com/questions/73714829/pip-install-pyqt5-it-cannot-go-on/74071222#74071222>`_
+.. [#f5]
+
+.. code-block:: bash
+
+    ❯ diff theme/dark.json theme/dark-green.json
+    8,10c8,10
+    <     "highlight": "#3daee9",
+    <     "highlight:dark": "#2a79a3",
+    <     "highlight:alternate": "#2f88b7",
+    ---
+    >     "highlight": "#33b833",
+    >     "highlight:dark": "#2b992b",
+    >     "highlight:alternate": "#1f991f",
+    15,16c15,16
+    <     "view:checked": "#334e5e",
+    <     "view:hover": "rgba(61, 173, 232, 0.1)",
+    ---
+    >     "view:checked": "#325c32",
+    >     "view:hover": "rgba(63, 232, 63, 0.1)",
+    28c28
+    <     "slider:foreground": "#3daee9",
+    ---
+    >     "slider:foreground": "#33b833",
+    31c31
+    <     "checkbox:light": "#58d3ff",
+    ---
+    >     "checkbox:light": "#40e640",
+    33c33
+    <     "scrollbar:hover": "#3daee9",
+    ---
+    >     "scrollbar:hover": "#33b833",
