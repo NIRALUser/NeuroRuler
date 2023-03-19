@@ -9,20 +9,21 @@ import pytest
 import pathlib
 from src.utils.imgproc import contour, length_of_contour
 import src.utils.exceptions as exceptions
-from src.utils.globs import EXAMPLE_IMAGES, EXAMPLE_DATA_DIR, NUM_CONTOURS_IN_INVALID_SLICE
+from src.utils.globs import EXAMPLE_IMAGES
+from src.utils.constants import EXAMPLE_DATA_DIR, NUM_CONTOURS_IN_INVALID_SLICE
 
 EPSILON: float = 0.001
 """Used for `float` comparisons."""
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 
-@pytest.mark.skip(reason="Doesn't need to run again for a while")
+# @pytest.mark.skip(reason="Doesn't need to run again for a while")
 def test_all_images_min_value_0_max_value_less_than_1600():
     for img in EXAMPLE_IMAGES:
         img_np: np.ndarray = sitk.GetArrayFromImage(img.base_img)
         assert img_np.min() == 0 and img_np.max() < 1600
 
 
-@pytest.mark.skip(reason="Doesn't need to run again")
+# @pytest.mark.skip(reason="Doesn't need to run again")
 def test_dimensions_of_np_array_same_as_original_image_but_transposed():
     """Probably not needed but just in case.
     
@@ -41,7 +42,7 @@ def test_dimensions_of_np_array_same_as_original_image_but_transposed():
             assert slice.GetSize()[1] == np_slice.shape[0]
 
 
-@pytest.mark.skip(reason="Doesn't need to run again")
+# @pytest.mark.skip(reason="Doesn't need to run again")
 def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
     """Confirm that the numpy matrix representation of a 2D slice is the transpose of the sitk matrix representation of a slice.
 
@@ -56,7 +57,7 @@ def test_numpy_2D_slice_array_is_transpose_of_sitk_2D_slice_array():
                     assert slice_np[i][j] == slice_sitk.GetPixel(j, i)
 
 
-@pytest.mark.skip(reason="Doesn't need to run for a while")
+# @pytest.mark.skip(reason="Doesn't need to run for a while")
 def test_contour_doesnt_mutate_slice():
     """Test that contour() doesn't mutate its argument."""
     for img in EXAMPLE_IMAGES:
@@ -68,7 +69,7 @@ def test_contour_doesnt_mutate_slice():
                 for j in range(rotated_slice.GetSize()[1]):
                     assert rotated_slice.GetPixel(i, j) == rotated_slice_copy.GetPixel(i, j)
 
-@pytest.mark.skip(reason="Doesn't need to run again")
+# @pytest.mark.skip(reason="Doesn't need to run again")
 def test_contour_returns_binary_slice():
     """Test that the contour function always returns a binary (0|1) slice."""
     for img in EXAMPLE_IMAGES:
@@ -78,7 +79,7 @@ def test_contour_returns_binary_slice():
             assert contour_slice_np.min() <= 1 and contour_slice_np.max() <= 1
 
 
-@pytest.mark.skip(reason="Doesn't need to run again")
+# @pytest.mark.skip(reason="Doesn't need to run again")
 def test_contour_retranspose_has_same_dimensions_as_original_image():
     for img in EXAMPLE_IMAGES:
         for theta_x in range(0, 30, 15):
@@ -90,7 +91,7 @@ def test_contour_retranspose_has_same_dimensions_as_original_image():
                         assert contour_slice.shape[0] == img.get_size()[0] and contour_slice.shape[1] == img.get_size()[1]
 
 
-@pytest.mark.skip(reason="This should be run again later")
+# @pytest.mark.skip(reason="This should be run again later")
 def test_length_of_contour_doesnt_mutate_contour():
     for img in EXAMPLE_IMAGES:
         for slice_z in range(img.get_size()[2] // 10):
@@ -101,7 +102,7 @@ def test_length_of_contour_doesnt_mutate_contour():
             assert np.array_equal(contour_slice, contour_slice_copy)
 
 
-@pytest.mark.skip(reason="Doesn't need to run again")
+# @pytest.mark.skip(reason="Doesn't need to run again")
 def test_contours_0_is_always_parent_contour_if_no_islands():
     """Assuming there are no islands in the image, then contours[0] results in the parent contour.
     
@@ -116,7 +117,7 @@ def test_contours_0_is_always_parent_contour_if_no_islands():
             assert hierarchy[0][0][3] == -1
 
 
-@pytest.mark.skip(reason="Doesn't need to run again")
+# @pytest.mark.skip(reason="Doesn't need to run again")
 def test_arc_length_of_copy_after_transpose_same_as_no_copy_after_transpose():
     """Test arc length of two re-transposed arrays is the same when calling .copy() on one but not the other."""
     for img in EXAMPLE_IMAGES:
@@ -173,7 +174,7 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
                             f.write(f'{theta_x, theta_y, theta_z, slice_z}\n')
     f.close()
 
-def test_contour_slice_retranspose_same_dimensions_as_original_slice():
+# def test_contour_slice_retranspose_same_dimensions_as_original_slice():
     """Test that the np array generated after contouring has the same dimensions as the original
     sitk slice.
 

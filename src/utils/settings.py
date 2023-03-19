@@ -1,4 +1,4 @@
-"""Global settings that the user should be able to modify via JSON or GUI.
+"""Global settings that the user should be able to modify directly, unlike globs.py, via JSON or GUI.
 
 For now, we can modify them using CLI args."""
 
@@ -13,8 +13,14 @@ SMOOTH_BEFORE_RENDERING: bool = False
 """Whether or not to smooth the image before rendering, defaults to False.
 
 Affects MRIImage.resample() and imgproc.contour()."""
-IMG_DIR: Path = Path.cwd() / 'img'
+
+IMG_DIR: Path = Path('img')
 """Directory for storing images. Defaults to `./img/`."""
+FILE_BROWSER_START_DIR: Path = Path('ExampleData')
+"""The starting directory that is opened in the file browser.
+
+Defaults to ExampleData/"""
+
 EXPORTED_FILE_NAMES_USE_INDEX: bool = False
 """If True, then exported files will be named using the index in the program.
 

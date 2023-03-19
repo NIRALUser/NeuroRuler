@@ -14,8 +14,6 @@ Dependencies
     Generally, the commands here should be updated if there's a change. But if some command doesn't work,
     apply the :code:`-h` command line option, and you should be able to figure it out.
 
-    :Date: |today|
-
 .. contents::
     :depth: 3
 
@@ -454,7 +452,7 @@ See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example
     from pathlib import Path
     from src.utils.mri_image import MRIImageList, MRIImage
 
-    THEME_DIR: Path = Path.cwd() / 'src' / 'GUI' / 'themes'
+    THEME_DIR: Path = Path('src') / 'GUI' / 'themes'
     """themes/ directory where .qss stylesheets and resources.py files are stored."""
     THEMES: set[str] = set()
     """List of themes, i.e. the names of the directories in THEME_DIR."""

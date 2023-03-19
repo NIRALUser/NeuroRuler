@@ -11,8 +11,6 @@ Head Circumference Tool
 
    A program that allows you to calculate head circumference from MRI (:code:`.nii`, :code:`.nii.gz`, :code:`.nrrd`) data.
 
-   :Date: |today|
-
 Contents
 ########
 

@@ -2,8 +2,8 @@
 
 import argparse
 
-import src.utils.globs as globs
 import src.utils.settings as settings
+import src.utils.constants as constants
 
 
 def parse_gui_cli() -> None:
@@ -23,7 +23,7 @@ def parse_gui_cli() -> None:
                         help='image status bar will show full path',
                         action='store_true')
     parser.add_argument('-t', '--theme',
-                        help='configure theme, options are ' + (str(globs.THEMES))[1: -1].replace("'", "")
+                        help='configure theme, options are ' + (str(constants.THEMES))[1: -1].replace("'", "")
                         + '; default theme is dark-hct')
     parser.add_argument('-c', '--color',
                         help='contour color as name (e.g. red) or hex color code rrggbb')
@@ -46,8 +46,8 @@ def parse_gui_cli() -> None:
         print('Image status bar will show full path to image.')
 
     if args.theme:
-        if args.theme not in globs.THEMES:
-            print("Invalid theme specified. Options are " + (str(globs.THEMES))[1: -1].replace("'", "") + ".")
+        if args.theme not in constants.THEMES:
+            print("Invalid theme specified. Options are " + (str(constants.THEMES))[1: -1].replace("'", "") + ".")
             exit(1)
         
         settings.THEME_NAME = args.theme

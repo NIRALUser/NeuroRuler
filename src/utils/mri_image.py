@@ -8,48 +8,21 @@ See https://peps.python.org/pep-0258/#attribute-docstrings for how to document c
 to auto-generate documentation."""
 
 import _collections_abc
-import functools
-import warnings
 from pathlib import Path
 from typing import Union
 
 import SimpleITK as sitk
-import numpy as np
 
 import src.utils.exceptions as exceptions
 import src.utils.settings as settings
+from src.utils.constants import degrees_to_radians
 
-# Also can't import this from globs due to circular import
+# Can't import this from globs due to circular import
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 EULER_3D_TRANSFORM: sitk.Euler3DTransform = sitk.Euler3DTransform()
 """Global `sitk.Euler3DTransform` within the mri_image.py file.
 
 Set its center and rotation before resampling."""
-ROTATION_MIN: int = 0
-"""Degrees"""
-ROTATION_MAX: int = 180
-"""Degrees"""
-
-
-# Can't import this from globs due to circular import
-# Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
-def deprecated(func):
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.simplefilter('always', DeprecationWarning)  # turn off filter
-        warnings.warn("Call to deprecated function {}.".format(func.__name__),
-                      category=DeprecationWarning,
-                      stacklevel=2)
-        warnings.simplefilter('default', DeprecationWarning)  # reset filter
-        return func(*args, **kwargs)
-
-    return new_func
-
-
-# Also can't import from globs.
-def degrees_to_radians(degrees: Union[int, float]) -> float:
-    return degrees * np.pi / 180
-
 
 class MRIImage:
     """Represents an MRI image slice.
@@ -59,7 +32,7 @@ class MRIImage:
 
     This allows the GUI to remember settings for different MRI images."""
 
-    def __init__(self, path: Path, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_z: int = 0) -> None:
+    def __init__(self, path: Path, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_num: int = 0) -> None:
         self._path = path
         """Path to MRI image. Get, set defined, but set should never be used."""
         READER.SetFileName(str(path))
@@ -80,7 +53,7 @@ class MRIImage:
         """Y rotation value in degrees. Get, set."""
         self._theta_z = theta_z
         """Z rotation value in degrees. Get, set."""
-        self._slice_z = slice_z
+        self._slice_num = slice_num
         """Slice value. Get, set."""
 
     def __repr__(self) -> str:
@@ -92,7 +65,7 @@ class MRIImage:
         
         :return: str representation of an MRIImage
         :rtype: str"""
-        return f'MRIImage(\'{self._path}\', {self._theta_x}, {self._theta_y}, {self._theta_z}, {self._slice_z})'
+        return f'MRIImage(\'{self._path}\', {self._theta_x}, {self._theta_y}, {self._theta_z}, {self._slice_num})'
 
     @property
     def path(self) -> Path:
@@ -119,8 +92,8 @@ class MRIImage:
         return self._theta_z
 
     @property
-    def slice_z(self) -> int:
-        return self._slice_z
+    def slice_num(self) -> int:
+        return self._slice_num
 
     @path.setter
     def path(self, path: Path) -> None:
@@ -138,7 +111,7 @@ class MRIImage:
         self._theta_x = 0
         self._theta_y = 0
         self._theta_z = 0
-        self._slice_z = 0
+        self._slice_num = 0
 
     @theta_x.setter
     def theta_x(self, theta_x: int) -> None:
@@ -152,9 +125,9 @@ class MRIImage:
     def theta_z(self, theta_z: int) -> None:
         self._theta_z = theta_z
 
-    @slice_z.setter
-    def slice_z(self, slice_z: int) -> None:
-        self._slice_z = slice_z
+    @slice_num.setter
+    def slice_num(self, slice_num: int) -> None:
+        self._slice_num = slice_num
 
     def get_size(self) -> tuple:
         """Returns dimensions of the base image.
@@ -170,14 +143,14 @@ class MRIImage:
         :type other: MRIImage
         :return: True if equal, else False
         :rtype: bool"""
-        return self._path == other.path and self._center == other.center and self._theta_x == other.theta_x and self._theta_y == other.theta_y and self._theta_z == other.theta_z and self._slice_z == other.slice_z
+        return self._path == other.path and self._center == other.center and self._theta_x == other.theta_x and self._theta_y == other.theta_y and self._theta_z == other.theta_z and self._slice_num == other.slice_num
 
     def deepcopy(self) -> 'MRIImage':
         """Return a deep copy.
 
         :return: Deep copy
         :rtype: MRIImage"""
-        return MRIImage(self._path, self._theta_x, self._theta_y, self._theta_z, self._slice_z)
+        return MRIImage(self._path, self._theta_x, self._theta_y, self._theta_z, self._slice_num)
 
     # TODO: Should this apply smoothing first (and remove it from imgproc.py), then return to GUI for display?
     def resample(self) -> sitk.Image:
@@ -190,7 +163,7 @@ class MRIImage:
         EULER_3D_TRANSFORM.SetCenter(self.center)
         EULER_3D_TRANSFORM.SetRotation(degrees_to_radians(self.theta_x), degrees_to_radians(self.theta_y),
                                        degrees_to_radians(self.theta_z))
-        rotated_slice: sitk.Image = sitk.Resample(self._base_img, EULER_3D_TRANSFORM)[:, :, self._slice_z]
+        rotated_slice: sitk.Image = sitk.Resample(self._base_img, EULER_3D_TRANSFORM)[:, :, self._slice_num]
         if settings.SMOOTH_BEFORE_RENDERING:
             smooth_slice: sitk.Image = sitk.GradientAnisotropicDiffusionImageFilter().Execute(
                 sitk.Cast(rotated_slice, sitk.sitkFloat64))
@@ -200,7 +173,7 @@ class MRIImage:
         return rotated_slice
 
     # TODO: Should this apply smoothing first (and remove it from imgproc.py), then return to GUI for display?
-    def resample_hardcoded(self, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_z: int = 0) -> sitk.Image:
+    def resample_hardcoded(self, theta_x: int = 0, theta_y: int = 0, theta_z: int = 0, slice_num: int = 0) -> sitk.Image:
         """Return the rotated slice with hardcoded settings (i.e., not the instance's settings). Mostly used in test functions.
 
         The slice is also smoothed if `settings.SMOOTH_BEFORE_RENDERING` is True.
@@ -214,14 +187,14 @@ class MRIImage:
         :type theta_y: int
         :param theta_z: Z rotation value in degrees, defaults to 0
         :type theta_z: int
-        :param slice_z: Z slice value, defaults to 0
-        :type slice_z: int
+        :param slice_num: Slice value, defaults to 0
+        :type slice_num: int
         :return: Rotated slice resulting from resampling the base image with the hardcoded values
         :rtype: sitk.Image"""
-        theta_x_copy, theta_y_copy, theta_z_copy, slice_z_copy = self._theta_x, self._theta_y, self._theta_z, self._slice_z
-        self._theta_x, self._theta_y, self._theta_z, self._slice_z = theta_x, theta_y, theta_z, slice_z
+        theta_x_copy, theta_y_copy, theta_z_copy, slice_num_copy = self._theta_x, self._theta_y, self._theta_z, self._slice_num
+        self._theta_x, self._theta_y, self._theta_z, self._slice_num = theta_x, theta_y, theta_z, slice_num
         rv: sitk.Image = self.resample()
-        self._theta_x, self._theta_y, self._theta_z, self._slice_z = theta_x_copy, theta_y_copy, theta_z_copy, slice_z_copy
+        self._theta_x, self._theta_y, self._theta_z, self._slice_num = theta_x_copy, theta_y_copy, theta_z_copy, slice_num_copy
         return rv
 
 

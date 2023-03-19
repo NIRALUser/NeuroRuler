@@ -3,6 +3,7 @@
 import functools
 import warnings
 from pathlib import Path
+import src.utils.constants as constants
 
 
 # Can't import from globs due to circular import
@@ -93,4 +94,10 @@ class InvalidColor(Exception):
 class DuplicateFilepathInMRIImageList(Exception):
     def __init__(self, path: Path):
         self.message = f'Duplicate file path {str(path)} was added to the MRIImageList'
+        super().__init__(self.message)
+
+# sitk can handle any rotation, but we should enforce -90 and 90 bounds.
+class RotationOutOfBounds(Exception):
+    def __init__(self, theta: int, axis: str):
+        self.message = f'{axis} rotation value {theta} out of bounds. Min rotation value is {constants.ROTATION_MIN} degrees, and max is {constants.ROTATION_MAX}.'
         super().__init__(self.message)

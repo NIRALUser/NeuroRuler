@@ -37,6 +37,7 @@ from PyQt6.uic.load_ui import loadUi
 # Autoformatter might move qimage2ndarray up
 import qimage2ndarray
 
+import src.utils.constants as constants
 import src.utils.globs as globs
 import src.utils.imgproc as imgproc
 import src.utils.settings as settings
@@ -65,7 +66,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         """Load main.ui file from QtDesigner and connect GUI events to methods/functions."""
         super(MainWindow, self).__init__()
-        loadUi(str(Path.cwd() / 'src' / 'GUI' / 'main.ui'), self)
+        self._enabled: bool = False
+        """Whether the GUI elements are enabled or not."""
+        loadUi(str(Path('src') / 'GUI' / 'main.ui'), self)
         self.setWindowTitle('Head Circumference Tool')
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(
@@ -173,7 +176,7 @@ class MainWindow(QMainWindow):
         theta_x = curr_mri_image.theta_x
         theta_y = curr_mri_image.theta_y
         theta_z = curr_mri_image.theta_z
-        slice_num = curr_mri_image.slice_z
+        slice_num = curr_mri_image.slice_num
         self.x_slider.setValue(theta_x)
         self.y_slider.setValue(theta_y)
         self.z_slider.setValue(theta_z)
@@ -197,13 +200,13 @@ class MainWindow(QMainWindow):
 
         :return: `None`"""
         file_filter: str = 'MRI images ' + \
-                           str(globs.SUPPORTED_EXTENSIONS).replace("'", "").replace(",", "")
+                           str(constants.SUPPORTED_EXTENSIONS).replace("'", "").replace(",", "")
         # TODO: Let starting directory be a configurable setting in JSON
         # The return value of `getOpenFileNames` is a tuple (list[str], str)
         # The left element is a list of paths.
         # So `fnames[0][i]` is the i'th path.
         files = QFileDialog.getOpenFileNames(
-            self, 'Open files', str(Path.cwd()), file_filter)
+            self, 'Open files', str(settings.FILE_BROWSER_START_DIR), file_filter)
         paths = map(Path, files[0])
         images: list[MRIImage] = list(map(MRIImage, paths))
 
@@ -212,7 +215,10 @@ class MainWindow(QMainWindow):
 
         if extend:
             globs.IMAGE_LIST.extend(images)
-            # For setting image_num_label
+            # Handles the edge case of pressing Add images before Open
+            if not self._enabled:
+                self.enable_and_disable_elements()
+            # For refreshing image_num_label
             render_curr_slice()
         else:
             globs.IMAGE_LIST = MRIImageList(images)
@@ -285,7 +291,7 @@ class MainWindow(QMainWindow):
         Handle slice slider movement by rendering image and setting `slice_num_label`."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         slice_slider_val: int = self.slice_slider.value()
-        curr_mri_image.slice_z = slice_slider_val
+        curr_mri_image.slice_num = slice_slider_val
         render_curr_slice()
         self.slice_num_label.setText(f'Slice: {slice_slider_val}')
 
@@ -297,7 +303,7 @@ class MainWindow(QMainWindow):
         curr_mri_image.theta_x = 0
         curr_mri_image.theta_y = 0
         curr_mri_image.theta_z = 0
-        curr_mri_image.slice_z = 0
+        curr_mri_image.slice_num = 0
         self.refresh()
 
     def refresh(self) -> None:
@@ -328,7 +334,7 @@ class CircumferenceWindow(QMainWindow):
     def __init__(self):
         """Load circumference.ui and connect GUI events to methods/functions."""
         super(CircumferenceWindow, self).__init__()
-        loadUi(str(Path.cwd() / 'src' / 'GUI' / 'circumference.ui'), self)
+        loadUi(str(Path('src') / 'GUI' / 'circumference.ui'), self)
         self.enable_and_disable_elements()
         self.action_exit.triggered.connect(exit)
         self.action_github.triggered.connect(
@@ -404,7 +410,7 @@ def export_curr_slice_as_img(extension: str):
 
     Exports `curr_window.image` to `settings.IMG_DIR`.
 
-    Filename has format <file_name>_[contoured_]<theta_x>_<theta_y>_<theta_z>_<slice>.<extension>
+    Filename has format <file_name>_[contoured_]<theta_x>_<theta_y>_<theta_z>_<slice_num>.<extension>
 
     contoured_ will be in the name if `current_window == CIRCUMFERENCE_WINDOW`.
 
@@ -422,9 +428,9 @@ def export_curr_slice_as_img(extension: str):
     theta_x: int = curr_mri_image.theta_x
     theta_y: int = curr_mri_image.theta_y
     theta_z: int = curr_mri_image.theta_z
-    slice_z: int = curr_mri_image.slice_z
+    slice_num: int = curr_mri_image.slice_num
     path: str = str(
-        settings.IMG_DIR / f"{file_name}_{'contoured_' if curr_window == CIRCUMFERENCE_WINDOW else ''}{theta_x}_{theta_y}_{theta_z}_{slice_z}.{extension}")
+        settings.IMG_DIR / f"{file_name}_{'contoured_' if curr_window == CIRCUMFERENCE_WINDOW else ''}{theta_x}_{theta_y}_{theta_z}_{slice_num}.{extension}")
     curr_window.image.pixmap().save(path, extension)
 
 
@@ -451,7 +457,7 @@ def goto_circumference() -> None:
     CIRCUMFERENCE_WINDOW.circumference_label.setText(
         f'Circumference: {circumference}')
     CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
-        f'X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_z}')
+        f'X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_num}')
 
 
 def goto_main() -> None:
@@ -475,14 +481,14 @@ def main() -> None:
     # This import can't go at the top because parse_gui_cli has to get THEME_NAME before the import
     importlib.import_module(f'src.GUI.themes.{settings.THEME_NAME}.resources')
 
-    if not (Path.cwd() / settings.IMG_DIR).exists():
-        (Path.cwd() / settings.IMG_DIR).mkdir()
+    if not settings.IMG_DIR.exists():
+        settings.IMG_DIR.mkdir()
 
     app = QApplication(sys.argv)
     # This puts arrow buttons on the sliders but makes sliding stop early sometimes?
     # app.setStyle('Fusion')
 
-    with open(globs.THEME_DIR / settings.THEME_NAME / f'stylesheet.qss', 'r') as f:
+    with open(constants.THEME_DIR / settings.THEME_NAME / f'stylesheet.qss', 'r') as f:
         app.setStyleSheet(f.read())
 
     global STACKED_WIDGET

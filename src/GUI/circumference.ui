@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1080</width>
-    <height>686</height>
+    <width>1075</width>
+    <height>735</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,7 +73,7 @@
       <item>
        <widget class="QPushButton" name="export_button">
         <property name="cursor">
-         <cursorShape>OpenHandCursor</cursorShape>
+         <cursorShape>ArrowCursor</cursorShape>
         </property>
         <property name="statusTip">
          <string>Export data.</string>
@@ -113,7 +113,7 @@ Slice: 89°</string>
       <item>
        <widget class="QPushButton" name="adjust_slice_button">
         <property name="cursor">
-         <cursorShape>OpenHandCursor</cursorShape>
+         <cursorShape>ArrowCursor</cursorShape>
         </property>
         <property name="statusTip">
          <string>Go back to main window to adjust slice settings.</string>
@@ -146,7 +146,7 @@ Another setting: 89</string>
       <item>
        <widget class="QPushButton" name="adjust_trace_button">
         <property name="cursor">
-         <cursorShape>OpenHandCursor</cursorShape>
+         <cursorShape>ArrowCursor</cursorShape>
         </property>
         <property name="statusTip">
          <string>Adjust trace settings.</string>
@@ -165,7 +165,7 @@ Another setting: 89</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1080</width>
+     <width>1075</width>
      <height>24</height>
     </rect>
    </property>

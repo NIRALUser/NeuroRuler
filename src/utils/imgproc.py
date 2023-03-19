@@ -13,7 +13,7 @@ try:
 except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
-from src.utils.globs import NUM_CONTOURS_IN_INVALID_SLICE
+from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE
 import src.utils.settings as settings
 
 

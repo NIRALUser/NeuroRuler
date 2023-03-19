@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1080</width>
-    <height>686</height>
+    <width>1075</width>
+    <height>735</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
            <bool>false</bool>
           </property>
           <property name="cursor">
-           <cursorShape>OpenHandCursor</cursorShape>
+           <cursorShape>ArrowCursor</cursorShape>
           </property>
           <property name="statusTip">
            <string>Previous image.</string>
@@ -92,7 +92,7 @@
            <bool>false</bool>
           </property>
           <property name="cursor">
-           <cursorShape>OpenHandCursor</cursorShape>
+           <cursorShape>ArrowCursor</cursorShape>
           </property>
           <property name="statusTip">
            <string>Next image.</string>
@@ -110,7 +110,7 @@
          <bool>false</bool>
         </property>
         <property name="cursor">
-         <cursorShape>OpenHandCursor</cursorShape>
+         <cursorShape>ArrowCursor</cursorShape>
         </property>
         <property name="statusTip">
          <string>Compute circumference using current settings.</string>
@@ -148,8 +148,11 @@
         <property name="statusTip">
          <string>Control X rotation value.</string>
         </property>
+        <property name="minimum">
+         <number>-90</number>
+        </property>
         <property name="maximum">
-         <number>180</number>
+         <number>90</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -180,8 +183,11 @@
         <property name="statusTip">
          <string>Control Y rotation value.</string>
         </property>
+        <property name="minimum">
+         <number>-90</number>
+        </property>
         <property name="maximum">
-         <number>180</number>
+         <number>90</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -212,8 +218,11 @@
         <property name="statusTip">
          <string>Control Z rotation value.</string>
         </property>
+        <property name="minimum">
+         <number>-90</number>
+        </property>
         <property name="maximum">
-         <number>180</number>
+         <number>90</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -258,7 +267,7 @@
          <bool>false</bool>
         </property>
         <property name="cursor">
-         <cursorShape>OpenHandCursor</cursorShape>
+         <cursorShape>ArrowCursor</cursorShape>
         </property>
         <property name="statusTip">
          <string>Reset rotation and slice values to 0 (default) for the current image.</string>
@@ -277,7 +286,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1080</width>
+     <width>1075</width>
      <height>24</height>
     </rect>
    </property>

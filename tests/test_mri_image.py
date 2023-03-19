@@ -7,9 +7,8 @@ This file doesn't test equality between `MRIImage.img` fields. I assume if the p
 TODO: Test this later."""
 
 import pytest
-import src.utils.exceptions as exceptions
 from src.utils.mri_image import MRIImage, MRIImageList
-from src.utils.globs import EXAMPLE_DATA_DIR
+from src.utils.constants import EXAMPLE_DATA_DIR
 
 NRRD0_PATH = EXAMPLE_DATA_DIR / 'BCP_Dataset_2month_T1w.nrrd'
 NRRD1_PATH = EXAMPLE_DATA_DIR / 'IBIS_Dataset_12month_T1w.nrrd'
@@ -35,13 +34,13 @@ def test_init_and_getters():
     assert IMAGE_0.theta_x == 0
     assert IMAGE_0.theta_y == 0
     assert IMAGE_0.theta_z == 0
-    assert IMAGE_0.slice_z == 0
+    assert IMAGE_0.slice_num == 0
 
     assert IMAGE_1.path == NRRD1_PATH
     assert IMAGE_1.theta_x == 3
     assert IMAGE_1.theta_y == 2
     assert IMAGE_1.theta_z == 1
-    assert IMAGE_1.slice_z == 0
+    assert IMAGE_1.slice_num == 0
 
 def test_image_repr():
     assert str(IMAGE_0) == f'MRIImage(\'{NRRD0_PATH}\', 0, 0, 0, 0)'
@@ -52,12 +51,12 @@ def test_setters():
     img.theta_x = 1
     img.theta_y = 2
     img.theta_z = 3
-    img.slice_z = 4
+    img.slice_num = 4
     assert img.path == NRRD1_PATH
     assert img.theta_x == 1
     assert img.theta_y == 2
     assert img.theta_z == 3
-    assert img.slice_z == 4
+    assert img.slice_num == 4
 
 def test_eq_and_neq():
     """`==` and `!=` check reference equality."""
@@ -74,26 +73,26 @@ def test_deepcopy():
     assert clone.theta_x == 0
     assert clone.theta_y == 1
     assert clone.theta_z == 2
-    assert clone.slice_z == 3
+    assert clone.slice_num == 3
 
     clone.path = NRRD0_PATH
     clone.theta_x = 1700
     clone.theta_y = 1800
     clone.theta_z = 1900
-    clone.slice_z = 9001
+    clone.slice_num = 9001
 
     assert clone.path == NRRD0_PATH
     assert clone.theta_x == 1700
     assert clone.theta_y == 1800
     assert clone.theta_z == 1900
-    assert clone.slice_z == 9001
+    assert clone.slice_num == 9001
 
     # Check that the original wasn't mutated
     assert IMAGE_2.path == NRRD2_PATH
     assert IMAGE_2.theta_x == 0
     assert IMAGE_2.theta_y == 1
     assert IMAGE_2.theta_z == 2
-    assert IMAGE_2.slice_z == 3
+    assert IMAGE_2.slice_num == 3
 
 def test_equals_method():
     """`.equals()` checks for deep equality."""

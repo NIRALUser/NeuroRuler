@@ -1,8 +1,8 @@
+.. _setup:
+
 #####
 Setup
 #####
-
-:Date: |today|
 
 1. Clone the `repository <https://github.com/COMP523TeamD/HeadCircumferenceTool>`_.
 2. :code:`pip install -r requirements.txt`
