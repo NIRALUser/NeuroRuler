@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1080</width>
-    <height>693</height>
+    <height>686</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,6 +62,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="cursor">
+           <cursorShape>OpenHandCursor</cursorShape>
+          </property>
           <property name="statusTip">
            <string>Previous image.</string>
           </property>
@@ -88,6 +91,9 @@
           <property name="enabled">
            <bool>false</bool>
           </property>
+          <property name="cursor">
+           <cursorShape>OpenHandCursor</cursorShape>
+          </property>
           <property name="statusTip">
            <string>Next image.</string>
           </property>
@@ -102,6 +108,9 @@
        <widget class="QPushButton" name="apply_button">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="cursor">
+         <cursorShape>OpenHandCursor</cursorShape>
         </property>
         <property name="statusTip">
          <string>Compute circumference using current settings.</string>
@@ -133,6 +142,9 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="cursor">
+         <cursorShape>ClosedHandCursor</cursorShape>
+        </property>
         <property name="statusTip">
          <string>Control X rotation value.</string>
         </property>
@@ -161,6 +173,9 @@
        <widget class="QScrollBar" name="y_slider">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="cursor">
+         <cursorShape>ClosedHandCursor</cursorShape>
         </property>
         <property name="statusTip">
          <string>Control Y rotation value.</string>
@@ -191,6 +206,9 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="cursor">
+         <cursorShape>ClosedHandCursor</cursorShape>
+        </property>
         <property name="statusTip">
          <string>Control Z rotation value.</string>
         </property>
@@ -220,11 +238,14 @@
         <property name="enabled">
          <bool>false</bool>
         </property>
+        <property name="cursor">
+         <cursorShape>ClosedHandCursor</cursorShape>
+        </property>
         <property name="statusTip">
          <string>Control slice number.</string>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <number>180</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -235,6 +256,9 @@
        <widget class="QPushButton" name="reset_button">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="cursor">
+         <cursorShape>OpenHandCursor</cursorShape>
         </property>
         <property name="statusTip">
          <string>Reset rotation and slice values to 0 (default) for the current image.</string>

@@ -2,13 +2,15 @@
 
 Can run this file as module (python -m src.utils.globs) to test stuff."""
 
-import SimpleITK as sitk
-import warnings
 import functools
-from typing import Union
-from numpy import pi
-from src.utils.mri_image import MRIImageList, MRIImage
+import warnings
 from pathlib import Path
+from typing import Union
+
+import SimpleITK as sitk
+from numpy import pi
+
+from src.utils.mri_image import MRIImageList, MRIImage
 
 IMAGE_LIST: MRIImageList = MRIImageList()
 """Global list of MRIImage."""
@@ -21,7 +23,17 @@ EXAMPLE_IMAGES: list[MRIImage] = []
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 """Global `sitk.ImageFileReader`."""
 THEME_DIR: Path = Path.cwd() / 'src' / 'GUI' / 'themes'
-THEMES: set[str] = {'dark-hct', 'light-hct', 'dark', 'light'}
+"""themes/ directory where .qss stylesheets and resources.py files are stored."""
+THEMES: set[str] = set()
+"""List of themes, i.e. the names of the directories in THEME_DIR."""
+if len(list(THEME_DIR.glob('*'))) != 0:
+    for path in THEME_DIR.iterdir():
+        if path.is_dir():
+            THEMES.add(path.name)
+else:
+    # TODO: Without this, autodocumentation will crash. Is there a better way around this?
+    print(f'No themes discovered in {str(THEME_DIR)}. Make sure to run from .../HeadCircumferenceTool .')
+
 APP_MAIN_COLOR: str = "b55162"
 """The pink-ish color used in the midterm presentation."""
 
@@ -30,7 +42,8 @@ for extension in SUPPORTED_EXTENSIONS:
         EXAMPLE_IMAGES.append(MRIImage(path))
 
 NUM_CONTOURS_IN_INVALID_SLICE: int = 10
-"""If this number of contours or more is detected in a slice after processing (Otsu, largest component, etc.), then the slice is considered invalid."""
+"""If this number of contours or more is detected in a slice after processing (Otsu, largest component, etc.),
+then the slice is considered invalid."""
 
 NIFTI_UNITS = {
     '0': 'Unknown',

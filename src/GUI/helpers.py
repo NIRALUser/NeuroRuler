@@ -1,12 +1,14 @@
-"""These functions would go into src.utils.imgproc, but from PyQt6.QtGui import QImage, QColor there
-breaks the GitHub automated tox tests...
+"""These functions would go into src.utils.imgproc, but `from PyQt6.QtGui import QImage, QColor` there
+breaks the GitHub automated tox tests (but not the local tox tests)...
 
 See [here](https://stackoverflow.com/questions/75549995/why-do-the-pyside6-qt-modules-cause-tox-to-fail-during-a-github-action)"""
 
-from PyQt6.QtGui import QImage, QColor
-import numpy as np
 import string
 from typing import Union
+
+import numpy as np
+from PyQt6.QtGui import QImage, QColor
+
 import src.utils.exceptions as exceptions
 import src.utils.settings as settings
 
@@ -39,8 +41,8 @@ def string_to_QColor(name_or_hex: str) -> QColor:
 
 
 def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate: bool = True) -> Union[None, QImage]:
-    """Given 2D `q_img` and 2D `binary_mask` of the same shape, apply `binary_mask` on `q_img` to change `q_img` pixels
-    corresponding to `binary_mask`=1 to `color`.
+    """Given 2D `q_img` and 2D `binary_mask` of the same shape, apply `binary_mask` on `q_img`
+    to change `q_img` pixels corresponding to `binary_mask`=1 to `color`.
 
     QImage and numpy use [reversed w,h order](https://stackoverflow.com/a/68220805/18479243).
 

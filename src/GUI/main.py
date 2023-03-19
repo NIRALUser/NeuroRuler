@@ -2,17 +2,19 @@
 
 Loads `src/GUI/main.ui` and `src/GUI/circumference.ui`, both made in QtDesigner.
 
+In addition, also loads `.qss` stylesheets and `resources.py` (application icons) files, generated
+by BreezeStyleSheets. Our fork of the repo is here: https://github.com/COMP523TeamD/BreezeStyleSheets.
+
 There's a lot of boilerplate here to get current slice, i.e. `globs.IMAGE_LIST[globs.IMAGE_LIST.index]`
+Isn't too inefficient but could be improved. Tried more global variables but it was pretty bad.
 
-Isn't too inefficient but could be improved. Global variable?
-
-MainWindow and CircumferenceWindow are in the same file due to the need for shared global variables.
+`MainWindow` and `CircumferenceWindow` are in the same file due to the need for shared global variables.
 
 Functions like `render_curr_slice` and `export_curr_slice_as_img` that are common to both windows
 are made functions instead of methods to avoid duplicated code. They do behave slightly differently
 depending on the window, so the currently active window is computed in these functions.
 
-If a behavior is unique to a window, then it is a method in the class (though it could be a function).
+If a behavior is unique to a window, then it is a method in the class (though it could be made a function).
 
 Native menu bar is currently disabled. See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/9.
 tl;dr on macOS, there can only be one menubar shared between the two classes. Can work around this by
@@ -20,24 +22,27 @@ making MainWindow's QMenuBar global and using that in CircumferenceWindow (i.e.,
 
 Non-native menu bar is a lot simpler but looks worse on macOS."""
 
-
-import sys
-from pathlib import Path
-import numpy as np
-import SimpleITK as sitk
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtGui import QPixmap, QImage
-from PyQt6.QtWidgets import QDialog, QApplication, QMainWindow, QFileDialog
-from PyQt6.uic.load_ui import loadUi
-import qimage2ndarray
-import webbrowser
 import importlib
-from src.utils.mri_image import MRIImage, MRIImageList
-import src.utils.imgproc as imgproc
+import sys
+import webbrowser
+from pathlib import Path
+
+import SimpleITK as sitk
+import numpy as np
+from PyQt6 import QtWidgets
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PyQt6.uic.load_ui import loadUi
+# qimage2ndarray needs to go after PyQt6 imports or there will be a ModuleNotFoundError.
+# Autoformatter might move qimage2ndarray up
+import qimage2ndarray
+
 import src.utils.globs as globs
+import src.utils.imgproc as imgproc
 import src.utils.settings as settings
-from src.utils.parse_cli import parse_gui_cli
 from src.GUI.helpers import string_to_QColor, mask_QImage
+from src.utils.mri_image import MRIImage, MRIImageList
+from src.utils.parse_cli import parse_gui_cli
 
 DEFAULT_WIDTH: int = 1000
 """Startup width of the GUI"""
@@ -95,7 +100,8 @@ class MainWindow(QMainWindow):
         self.show()
 
     def enable_and_disable_elements(self) -> None:
-        """Called when File > Open is clicked and when switching from CircumferenceWindow to MainWindow (i.e., when Adjust button is clicked).
+        """Called when File > Open is clicked and when switching from CircumferenceWindow to MainWindow
+        (i.e., when Adjust button is clicked).
 
         Enable image, menu items, buttons, and sliders."""
         self.action_open.setEnabled(True)
@@ -191,9 +197,10 @@ class MainWindow(QMainWindow):
 
         :return: `None`"""
         file_filter: str = 'MRI images ' + \
-            str(globs.SUPPORTED_EXTENSIONS).replace("'", "").replace(",", "")
+                           str(globs.SUPPORTED_EXTENSIONS).replace("'", "").replace(",", "")
         # TODO: Let starting directory be a configurable setting in JSON
-        # The return value of `getOpenFileNames` is a tuple (list[str], str), where the left element is a list of paths.
+        # The return value of `getOpenFileNames` is a tuple (list[str], str)
+        # The left element is a list of paths.
         # So `fnames[0][i]` is the i'th path.
         files = QFileDialog.getOpenFileNames(
             self, 'Open files', str(Path.cwd()), file_filter)
@@ -305,7 +312,9 @@ class MainWindow(QMainWindow):
         
         Currently displays `help.svg` (`help.svg` not in the repo since it's compiled in resources.py)"""
         self.image.setPixmap(QPixmap(f':/{settings.THEME_NAME}/help.svg'))
-        self.image.setStatusTip("This is intentional, if it's a question mark then that's good :), means we can display icons")
+        self.image.setStatusTip(
+            "This is intentional, if it's a question mark then that's good :), means we can display icons")
+
 
 class CircumferenceWindow(QMainWindow):
     """Displayed after pressing Apply in MainWindow.
@@ -379,7 +388,7 @@ def render_curr_slice() -> None:
         binary_contour_slice: np.ndarray = imgproc.contour(
             rotated_slice, False)
         mask_QImage(q_img, binary_contour_slice,
-                            string_to_QColor(settings.CONTOUR_COLOR))
+                    string_to_QColor(settings.CONTOUR_COLOR))
 
     q_pixmap: QPixmap = QPixmap(q_img)
 
@@ -409,7 +418,7 @@ def export_curr_slice_as_img(extension: str):
     curr_window = STACKED_WIDGET.currentWidget()
     curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
     file_name = globs.IMAGE_LIST.index + \
-        1 if settings.EXPORTED_FILE_NAMES_USE_INDEX else curr_mri_image.path.name
+                1 if settings.EXPORTED_FILE_NAMES_USE_INDEX else curr_mri_image.path.name
     theta_x: int = curr_mri_image.theta_x
     theta_y: int = curr_mri_image.theta_y
     theta_z: int = curr_mri_image.theta_z

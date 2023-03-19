@@ -1,8 +1,8 @@
 """Custom exceptions."""
 
-from pathlib import Path
-import warnings
 import functools
+import warnings
+from pathlib import Path
 
 
 # Can't import from globs due to circular import

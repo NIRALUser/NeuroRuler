@@ -1,12 +1,11 @@
 """Some helper functions for image processing."""
 
 import SimpleITK as sitk
-import numpy as np
 import cv2
-import string
-from typing import Union
-# Test if PyQt6 can be imported. For reference, from PyQt6.QtGui import QImage, QColor breaks tox tests
-import PyQt6
+import numpy as np
+
+# import PyQt6 is fine here but is useless, can't access things from it?
+# from PyQt6.QtGui import QImage, QColor breaks GH automated tox tests
 
 try:
     # This is for pytest and normal use
@@ -14,18 +13,21 @@ try:
 except ModuleNotFoundError:
     # This is for processing.ipynb
     import exceptions
-from src.utils.globs import deprecated, NUM_CONTOURS_IN_INVALID_SLICE
+from src.utils.globs import NUM_CONTOURS_IN_INVALID_SLICE
 import src.utils.settings as settings
 
 
-# The RV is a np array, not sitk.Image, because we can't actually use a sitk.Image contour in the program, besides for testing purposes
+# The RV is a np array, not sitk.Image
+# because we can't actually use a sitk.Image contour in the program
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
 def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
-    """Generate the contour of a rotated slice by applying smoothing, Otsu threshold, hole filling, and island removal. Return a binary (0|1) numpy
+    """Generate the contour of a rotated slice by applying smoothing, Otsu threshold,
+    hole filling, and island removal. Return a binary (0|1) numpy
     array with only the points on the contour=1.
 
-    If settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice` since it was smoothed in :code:`MRIImage.resample()`.
+    If settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice`
+    since it was smoothed in :code:`MRIImage.resample()`.
 
     :param mri_slice: 2D MRI slice
     :type mri_slice: sitk.Image
@@ -64,7 +66,8 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
 
 # Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
 def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
-    """Remove islands from a binary (0|1) 2D slice. That is, return a binary slice containing only the largest connected component.
+    """Remove islands from a binary (0|1) 2D slice. That is, return a binary slice
+    containing only the largest connected component.
 
     :param binary_slice: Binary (0|1) 2D slice
     :type binary_slice: sitk.Image
@@ -83,20 +86,22 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
 
     cv2 will find all contours if there is more than one. Most valid brain slices have 2 or 3.
 
-    The binary slice passed into this function should be processed by `contour()` to contain just one contour (except in edge cases) to guarantee an accurate result.
+    The binary slice passed into this function should be processed by `contour()` to contain
+    just one contour (except in edge cases) to guarantee an accurate result.
 
     This function assumes the contour is a closed curve.
 
     :param binary_contour_slice: 2D binary (0|1) slice that should be pre-processed by contour() to contain just a single contour.
     :type binary_contour_slice: np.ndarray
-    :param raise_exception: Whether or not to raise ComputeCircumferenceOfInvalidSlice. Defaults to True and should be False only for unit testing purposes.
+    :param raise_exception: Whether or not to raise ComputeCircumferenceOfInvalidSlice.  Defaults to True and should be False only for unit testing purposes.
     :type raise_exception: bool
     :raise exceptions.ComputeCircumferenceOfInvalidSlice: If >= globs.NUM_CONTOURS_IN_INVALID_SLICE contours are detected.
     :return: Arc length of parent contour
     :rtype: float"""
 
     # contours is an array of contours
-    # A single contour, contours[0], looks like [[[122  76]] [[121  77]] [[107  77]] ... [[106  78]]], representing boundary points of the contour
+    # A single contour, contours[0], looks like [[[122  76]] [[121  77]] [[107  77]] ... [[106  78]]],
+    # representing boundary points of the contour
     # contours[1] would be another contour, and so on
     # hierarchy is a list of the same length as contours that provides information about each contour
     # See the documentation for more detail

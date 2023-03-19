@@ -519,30 +519,30 @@ QAbstractScrollArea::corner
  */
 QScrollBar:horizontal
 {
-    background-color: #eff0f1;
+    background-color: #bfc0c0;
     height: 0.65em;
     margin: 0.13em 0.65em 0.13em 0.65em;
-    border: 0.04em transparent #eff0f1;
+    border: 0.04em transparent #bfc0c0;
     border-radius: 0.17em;
 }
 
 QScrollBar:horizontal:hover
 {
-    background-color: #c7c7c6;
+    background-color: #9f9f9e;
 }
 
 QScrollBar::handle:horizontal
 {
-    background-color: rgba(51, 164, 223, 0.8);
-    border: 0.04em solid rgba(51, 164, 223, 0.8);
+    background-color: rgba(181, 81, 98, 0.8);
+    border: 0.04em solid rgba(181, 81, 98, 0.8);
     min-width: 0.5em;
     border-radius: 0.17em;
 }
 
 QScrollBar::handle:horizontal:hover
 {
-    background-color: rgba(51, 164, 223, 0.8);
-    border: 0.04em solid rgba(51, 164, 223, 0.8);
+    background-color: rgba(181, 81, 98, 0.8);
+    border: 0.04em solid rgba(181, 81, 98, 0.8);
 }
 
 QScrollBar::add-line:horizontal
@@ -599,30 +599,30 @@ QScrollBar::sub-page:horizontal
 
 QScrollBar:vertical
 {
-    background-color: #eff0f1;
+    background-color: #bfc0c0;
     width: 0.65em;
     margin: 0.65em 0.13em 0.65em 0.13em;
-    border: 0.04em transparent #eff0f1;
+    border: 0.04em transparent #bfc0c0;
     border-radius: 0.17em;
 }
 
 QScrollBar:vertical:hover
 {
-    background-color: #c7c7c6;
+    background-color: #9f9f9e;
 }
 
 QScrollBar::handle:vertical
 {
-    background-color: rgba(51, 164, 223, 0.8);
-    border: 0.04em solid rgba(51, 164, 223, 0.8);
+    background-color: rgba(181, 81, 98, 0.8);
+    border: 0.04em solid rgba(181, 81, 98, 0.8);
     min-height: 0.5em;
     border-radius: 0.17em;
 }
 
 QScrollBar::handle:vertical:hover
 {
-    background-color: rgba(51, 164, 223, 0.8);
-    border: 0.04em solid rgba(51, 164, 223, 0.8);
+    background-color: rgba(181, 81, 98, 0.8);
+    border: 0.04em solid rgba(181, 81, 98, 0.8);
 }
 
 QScrollBar::sub-line:vertical
@@ -1587,7 +1587,7 @@ QTabBar[shape="6"]::tab:only-one,
 QTabBar[shape="7"]::tab:only-one
 {
     /* Need a dark color without alpha channel since it affects the text. */
-    color: #3daef3;
+    color: #b55162;
     background-color: #eff0f1;
     padding: 0.23em;
 }
@@ -1911,7 +1911,7 @@ QSlider::handle:horizontal:focus,
 QSlider::handle:vertical:hover,
 QSlider::handle:vertical:focus
 {
-    border: 0.04em solid #3daef3;
+    border: 0.04em solid #b55162;
 }
 
 QSlider::handle:horizontal:!focus:!hover,
@@ -1923,7 +1923,7 @@ QSlider::handle:vertical:!focus:!hover
 QSlider::sub-page:horizontal,
 QSlider::add-page:vertical
 {
-    background: #3daef3;
+    background: #b55162;
     border-radius: 0.19em;
 }
 
@@ -2397,7 +2397,7 @@ QProgressBar:vertical
 QProgressBar::chunk:horizontal,
 QProgressBar::chunk:vertical
 {
-    background-color: #3daef3;
+    background-color: #b55162;
     border: 0.9em transparent;
     border-radius: 0.08em;
 }

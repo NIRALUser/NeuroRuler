@@ -1,4 +1,6 @@
-"""Global settings that the user should be able to modify via JSON or GUI."""
+"""Global settings that the user should be able to modify via JSON or GUI.
+
+For now, we can modify them using CLI args."""
 
 from pathlib import Path
 
