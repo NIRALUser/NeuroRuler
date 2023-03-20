@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1075</width>
-    <height>735</height>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -334,6 +334,7 @@
      <string>Test</string>
     </property>
     <addaction name="action_test_show_resource"/>
+    <addaction name="action_print_metadata"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
@@ -531,6 +532,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="action_print_metadata">
+   <property name="text">
+    <string>Print metadata</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
    </property>
   </action>
  </widget>

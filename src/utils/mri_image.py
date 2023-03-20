@@ -75,6 +75,10 @@ class MRIImage:
         """Z rotation value in degrees. Get, set."""
         self._slice_num = slice_num
         """Slice value. Get, set."""
+        self._metadata: dict[str, str] = dict()
+        """Metadata from `sitk`."""
+        for key in READER.GetMetaDataKeys():
+            self._metadata[key] = READER.GetMetaData(key)
 
     def __repr__(self) -> str:
         """Prints only the necessary information to identify an `MRIImage`.
@@ -118,6 +122,10 @@ class MRIImage:
     @property
     def slice_num(self) -> int:
         return self._slice_num
+
+    @property
+    def metadata(self) -> dict[str, str]:
+        return self._metadata
 
     @path.setter
     def path(self, path: Path) -> None:
@@ -404,7 +412,6 @@ class MRIImageList(_collections_abc.MutableSequence):
         :type image: MRIImage
         :raise: exceptions.DuplicateFilepathsInMRIImageList if image.path in self._paths
         """
-
         if image.path in self._paths:
             raise exceptions.DuplicateFilepathsInMRIImageList({image.path})
         self._paths.add(image.path)

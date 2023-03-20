@@ -38,6 +38,7 @@ from PyQt6.uic.load_ui import loadUi
 # qimage2ndarray needs to go after PyQt6 imports or there will be a ModuleNotFoundError.
 # Autoformatter might move qimage2ndarray up
 import qimage2ndarray
+import pprint
 
 import src.utils.constants as constants
 import src.utils.globs as globs
@@ -81,6 +82,7 @@ class MainWindow(QMainWindow):
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
         self.action_test_show_resource.triggered.connect(self.test_show_resource)
+        self.action_print_metadata.triggered.connect(self.print_metadata)
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -335,6 +337,11 @@ class MainWindow(QMainWindow):
         self.image.setStatusTip(
             "This is intentional, if it's a question mark then that's good :), means we can display icons"
         )
+
+    def print_metadata(self) -> None:
+        """Print current MRIImage's metadata."""
+        curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
+        pprint.pprint(curr_mri_image.metadata)
 
 
 class CircumferenceWindow(QMainWindow):
