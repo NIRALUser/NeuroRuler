@@ -30,17 +30,17 @@ def string_to_QColor(name_or_hex: str) -> QColor:
     if len(channels) == 3:
         return QColor(channels[0], channels[1], channels[2])
     elif len(channels) == 4:
-        color = QColor(channels[0], channels[1],
-                       channels[2], alpha=channels[3])
+        color = QColor(channels[0], channels[1], channels[2], alpha=channels[3])
         if settings.DEBUG:
-            print(
-                f'string_to_QColor received 8-hexit str, alpha = {color.alpha()}')
+            print(f"string_to_QColor received 8-hexit str, alpha = {color.alpha()}")
         return color
     else:
         raise exceptions.InvalidColor(name_or_hex)
 
 
-def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate: bool = True) -> Union[None, QImage]:
+def mask_QImage(
+    q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate: bool = True
+) -> Union[None, QImage]:
     """Given 2D `q_img` and 2D `binary_mask` of the same shape, apply `binary_mask` on `q_img`
     to change `q_img` pixels corresponding to `binary_mask`=1 to `color`.
 
@@ -61,7 +61,10 @@ def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate: b
     :return: None (if `mutate`) or cloned QImage (if not `mutate`)
     :rtype: None or QImage"""
     base: QImage = q_img if mutate else q_img.copy()
-    if base.size().width() != binary_mask.shape[0] or base.size().height() != binary_mask.shape[1]:
+    if (
+        base.size().width() != binary_mask.shape[0]
+        or base.size().height() != binary_mask.shape[1]
+    ):
         raise exceptions.ArraysDifferentShape
     for i in range(binary_mask.shape[0]):
         for j in range(binary_mask.shape[1]):

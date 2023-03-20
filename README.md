@@ -1,10 +1,12 @@
-![Tests](https://github.com/COMP523TeamD/HeadCircumferenceTool/actions/workflows/tests.yml/badge.svg)
 
 # Head Circumference Tool
 
+![Tests](https://github.com/COMP523TeamD/HeadCircumferenceTool/actions/workflows/tests.yml/badge.svg)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 > A program that allows you to calculate head circumference from MRI (`.nii`, `.nii.gz`, `.nrrd`) data.
 
-We are currently working on the GUI and confirming that our circumference measurement results are correct using pre-computed data.
+We are currently working on the algorithm and confirming that our circumference measurement results are correct.
 
 ## Setup
 
@@ -15,7 +17,7 @@ We are currently working on the GUI and confirming that our circumference measur
 
 Current working directory must be `.../HeadCircumferenceTool`.
 
-```
+```text
 usage: python -m [-h] [-d] [-s] [-e] [-f] [-t THEME] [-c COLOR] src.GUI.main
 
 options:
@@ -33,10 +35,14 @@ options:
                         rrggbb
 ```
 
-## Documentation
-
-- [https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
-
 ## Run tests
 
-- `pytest`
+`pytest`
+
+## Documentation
+
+[https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
+
+## Autoformat
+
+`black .`

@@ -14,9 +14,9 @@ SMOOTH_BEFORE_RENDERING: bool = False
 
 Affects MRIImage.resample() and imgproc.contour()."""
 
-IMG_DIR: Path = Path('img')
+IMG_DIR: Path = Path("img")
 """Directory for storing images. Defaults to `./img/`."""
-FILE_BROWSER_START_DIR: Path = Path('ExampleData')
+FILE_BROWSER_START_DIR: Path = Path("ExampleData")
 """The starting directory that is opened in the file browser.
 
 Defaults to ExampleData/"""
@@ -33,7 +33,7 @@ E.g. MicroBiome_1month_T1w_0_0_0_0.png, MicroBiome_1month_T1w_90_180_0_60.csv.""
 IMAGE_STATUS_BAR_SHOWS_FULL_PATH: bool = False
 """If False (default), the GUI will display only the file name of the image instead of the full path."""
 
-CONTOUR_COLOR: str = 'b55162'
+CONTOUR_COLOR: str = "b55162"
 """Color of the contour. Defaults to globs.APP_MAIN_COLOR = #b55162.
 
 R 181 G 81 B 98
@@ -46,7 +46,7 @@ QColor supports 8-hexit rrggbbaa but doesn't work in our GUI, i.e. aa=00 appears
 
 The problem likely lies in :code:`src.GUI.main.render_curr_slice()`."""
 
-THEME_NAME: str = 'dark-hct'
+THEME_NAME: str = "dark-hct"
 """Name of theme in src/GUI/themes.
 
 Defaults to 'dark-hct'.

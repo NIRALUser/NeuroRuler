@@ -9,11 +9,6 @@ Dependencies
     This page describes what our dependencies are for and how to use them.
     Links to our related source code are provided.
 
-    Install dependencies with :code:`pip install -r requirements.txt`.
-
-    Generally, the commands here should be updated if there's a change. But if some command doesn't work,
-    apply the :code:`-h` command line option, and you should be able to figure it out.
-
 .. contents::
     :depth: 3
 
@@ -41,7 +36,7 @@ throughout the project though.
  
     # Read in a file 
     reader: sitk.ImageFileReader = sitk.ImageFileReader()
-    reader.SetFileName(str(Path.cwd() / 'some' / 'path' / 'to' / '3D image'))
+    reader.SetFileName(str(Path('some') / 'path' / 'to' / '3D image'))
     mri_3d: sitk.Image = reader.Execute()
  
     # Get its dimensions
@@ -225,8 +220,8 @@ this page is very closely related. Read that next if you're working on styling t
 
 .. _PyQt6Resources:
 
-Other resources
-===============
+Resources
+=========
 
 `YouTube playlist <https://www.youtube.com/watch?v=Vde5SH8e1OQ&list=PLzMcBGfZo4-lB8MZfHPLTEHO9zJDDLpYj>`_
 
@@ -284,7 +279,7 @@ qimage2ndarray
 For :ref:`PyQt6ImageVisualization` in PyQt GUI.
 
 Specifically, qimage2ndarray converts a :code:`np` array to a :code:`QImage` that can be displayed in a PyQt GUI,
-as the name implies.
+as the name implies. This circumvented difficulties [#npqimage]_ with converting :code:`np` array to :code:`QImage`.
 
 `GitHub <https://github.com/hmeine/qimage2ndarray>`_ and `Documentation <http://hmeine.github.io/qimage2ndarray/>`_ (very brief).
 
@@ -343,7 +338,7 @@ These are the the commands I ran to install PyQt5 on macOS.
 
 Took a while to install...
 
-If you get any errors, these are the relevant StackOverflow links: [#f1]_ [#f2]_ [#f3]_.
+If you get any errors, these are the relevant StackOverflow links [#macpyqt]_.
 
 .. _BreezeStyleSheetsConfiguration:
 
@@ -354,7 +349,7 @@ First, copy and paste one of the existing theme JSON's in :code:`theme/`. Rename
 to the new name as :code:`theme_name`.
 
 As mentioned in the `README <https://github.com/Alexhuszagh/BreezeStyleSheets#customization>`_, there's a lot of fields, but we should modify only a few.
-I ran :code:`diff theme/dark.json theme/dark-green.json` [#f4]_, and the only fields that changed were these:
+I ran :code:`diff theme/dark.json theme/dark-green.json` [#diff]_, and the only fields that changed were these:
 
 * :code:`"highlight"`
 * :code:`"highlight:dark"`
@@ -397,40 +392,6 @@ See :ref:`QRC file <PyQt6QRC>` for an example of how to access a resource from w
 Since we're using compiled :code:`resource.py` files, we don't have the :code:`.svg` files in our HCT repo.
 Check the BreezeStyleSheets repo for `resource names <https://github.com/Alexhuszagh/BreezeStyleSheets/tree/main/dist/qrc/dark>`_.
 
-.. _matplotlibipywidgets:
-
-matplotlib, ipywidgets
-######################
-
-We used these to render interactive :code:`sitk` images in Jupyter notebooks, but this isn't necessary anymore.
-
-.. _argparse:
-
-argparse
-########
-
-For parsing CLI arguments.
-
-.. currentmodule:: src.utils.parse_cli
-.. autofunction:: parse_gui_cli
-
-.. _pytest:
-
-pytest
-######
-
-For unit testing.
-
-.. _warningsfunctools:
-
-warnings, functools
-###################
-
-Allow us to mark functions :code:`@deprecated`.
-
-.. currentmodule:: src.utils.globs
-.. autofunction:: deprecated
-
 .. _pathlib:
 
 pathlib
@@ -463,6 +424,59 @@ See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example
     else:
         print(f'No themes discovered in {str(THEME_DIR)}. Make sure to run from .../HeadCircumferenceTool .')
 
+.. _argparse:
+
+argparse
+########
+
+For parsing CLI arguments.
+
+.. currentmodule:: src.utils.parse_cli
+.. autofunction:: parse_gui_cli
+
+Virtual environment
+###################
+
+This isn't a dependency, but it's worth noting. See here [#venv]_.
+
+python-black
+############
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
+This autoformatter is awesome 😳
+
+.. code-block:: text
+
+    black .
+
+.. note:: The rest of these aren't too important.
+
+.. _matplotlibipywidgets:
+
+matplotlib, ipywidgets
+######################
+
+We used these to render interactive :code:`sitk` images in Jupyter notebooks, but this isn't necessary anymore.
+
+.. _pytest:
+
+pytest
+######
+
+For unit testing.
+
+.. _warningsfunctools:
+
+warnings, functools
+###################
+
+Allow us to mark functions :code:`@deprecated`.
+
+.. currentmodule:: src.utils.globs
+.. autofunction:: deprecated
+
 .. _sphinxsetuptools:
 
 sphinx, setuptools
@@ -470,15 +484,15 @@ sphinx, setuptools
 
 For automatically generating these documentation pages.
 
-.. note:: This website is automatically updated on push, PR, etc. in the HCT repo, so you don't need to follow these steps unless you're making changes to the site and want to be able to build the website locally to review changes before pushing.
+.. note:: This website is automatically updated on push, PR, etc. in the HCT repo, so you don't need to follow these steps unless you're making a change to a webpage and want to be able to build the website locally to review changes before pushing.
 
-`Read the Docs tutorial <https://docs.readthedocs.io/en/stable/tutorial/>`_ (some steps caused deployment errors 😔)
+`Read the Docs tutorial <https://docs.readthedocs.io/en/stable/tutorial/>`_ (some steps caused deployment errors 💀)
 and `YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx.
 
 .. _sphinxBuildSite:
 
-Build HCT site locally
-======================
+Build HCT docs site locally
+===========================
 
 Your current working directory should be the HCT repo.
 
@@ -523,7 +537,7 @@ Your current working directory should be whatever repo you want to automatically
     cd docs
     sphinx-quickstart
 
-Type `n` for the first question, which asks about splitting source and build directories [#f5]_.
+Type `n` for the first question, which asks about splitting source and build directories [#sphinx]_.
 
 Copy over :code:`docs/conf.py` (install another theme with pip and modify :code:`html_theme` if you want),
 :code:`docs/requirements.txt`, :code:`.readthedocs.yaml`, :code:`pyproject.toml`, and :code:`setup.py` from the
@@ -598,10 +612,9 @@ based on the theme :code:`.json`.
 
 .. rubric:: Footnotes
 
-.. [#f1] `macOS PyQt5 install 1 <https://stackoverflow.com/questions/70961915/error-while-installing-pytq5-with-pip-preparing-metadata-pyproject-toml-did-n>`_
-.. [#f2] `macOS PyQt5 install 2 <https://stackoverflow.com/questions/66546886/pip-install-stuck-on-preparing-wheel-metadata-when-trying-to-install-pyqt5>`_
-.. [#f3] `macOS PyQt5 install 3 <https://stackoverflow.com/questions/73714829/pip-install-pyqt5-it-cannot-go-on/74071222#74071222>`_
-.. [#f4]
+.. [#macpyqt] `macOS PyQt5 install 1 <https://stackoverflow.com/questions/70961915/error-while-installing-pytq5-with-pip-preparing-metadata-pyproject-toml-did-n>`_, `macOS PyQt5 install 2 <https://stackoverflow.com/questions/66546886/pip-install-stuck-on-preparing-wheel-metadata-when-trying-to-install-pyqt5>`_, `macOS PyQt5 install 3 <https://stackoverflow.com/questions/73714829/pip-install-pyqt5-it-cannot-go-on/74071222#74071222>`_
+
+.. [#diff]
 
 .. code-block:: bash
 
@@ -633,4 +646,6 @@ based on the theme :code:`.json`.
     ---
     >     "scrollbar:hover": "#33b833",
 
-.. [#f5] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
+.. [#sphinx] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
+.. [#venv] `venv documentation <https://packaging.python.org/en/latest/tutorials/installing-packages/#creating-and-using-virtual-environments>`_. Thanks to the teammate who suggested this to me!
+.. [#npqimage] https://github.com/COMP523TeamD/HeadCircumferenceTool/pull/3#issuecomment-1468075389

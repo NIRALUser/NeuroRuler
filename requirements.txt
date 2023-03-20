@@ -11,3 +11,5 @@ pytest==6.2.5
 autopep8==2.0.2
 PyQt6==6.4.2
 qimage2ndarray==1.10.0
+black
+black[jupyter]

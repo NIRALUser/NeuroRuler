@@ -41,9 +41,14 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
     # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
     # Stable time step for this image must be smaller than 0.0997431
     if settings.DEBUG and not settings.SMOOTH_BEFORE_RENDERING:
-        print('imgproc.contour() smoothed the slice provided to it.')
-    smooth_slice: sitk.Image = mri_slice if settings.SMOOTH_BEFORE_RENDERING else sitk.GradientAnisotropicDiffusionImageFilter().Execute(
-        sitk.Cast(mri_slice, sitk.sitkFloat64))
+        print("imgproc.contour() smoothed the slice provided to it.")
+    smooth_slice: sitk.Image = (
+        mri_slice
+        if settings.SMOOTH_BEFORE_RENDERING
+        else sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+            sitk.Cast(mri_slice, sitk.sitkFloat64)
+        )
+    )
 
     otsu: sitk.Image = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
 
@@ -75,13 +80,16 @@ def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
     :rtype: sitk.Image"""
     component_image: sitk.Image = sitk.ConnectedComponent(binary_slice)
     sorted_component_image: sitk.Image = sitk.RelabelComponent(
-        component_image, sortByObjectSize=True)
+        component_image, sortByObjectSize=True
+    )
     largest_component_binary_image: sitk.Image = sorted_component_image == 1
     return largest_component_binary_image
 
 
 # Based on commit a230a6b discussion, may not need to worry about non-square pixels
-def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = True) -> float:
+def length_of_contour(
+    binary_contour_slice: np.ndarray, raise_exception: bool = True
+) -> float:
     """Given a 2D binary slice, return the arc length of the parent contour.
 
     cv2 will find all contours if there is more than one. Most valid brain slices have 2 or 3.
@@ -105,11 +113,13 @@ def length_of_contour(binary_contour_slice: np.ndarray, raise_exception: bool = 
     # contours[1] would be another contour, and so on
     # hierarchy is a list of the same length as contours that provides information about each contour
     # See the documentation for more detail
-    contours, hierarchy = cv2.findContours(binary_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv2.findContours(
+        binary_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+    )
     num_contours: int = len(contours)
 
     if settings.DEBUG:
-        print(f'Number of contours detected after processing: {num_contours}')
+        print(f"Number of contours detected after processing: {num_contours}")
 
     if raise_exception and num_contours >= NUM_CONTOURS_IN_INVALID_SLICE:
         raise exceptions.ComputeCircumferenceOfInvalidSlice(len(contours))

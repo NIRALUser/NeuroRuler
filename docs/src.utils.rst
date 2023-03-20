@@ -4,6 +4,14 @@ src.utils package
 Submodules
 ----------
 
+src.utils.constants module
+--------------------------
+
+.. automodule:: src.utils.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 src.utils.exceptions module
 ---------------------------
 
