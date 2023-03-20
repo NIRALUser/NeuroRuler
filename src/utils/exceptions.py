@@ -1,7 +1,5 @@
 """Custom exceptions."""
 
-import functools
-import warnings
 from pathlib import Path
 from src.utils.constants import deprecated, ROTATION_MAX, ROTATION_MIN
 

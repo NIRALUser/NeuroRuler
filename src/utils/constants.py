@@ -1,12 +1,12 @@
-"""Constant values and functions.
+"""Constant values and functions. DO NOT MUTATE ANY VARIABLE IN THIS FILE!
 
 Some of this stuff used to be in `globs.py`. However, globs imports from src.utils.mri_image, which
 creates circular imports.
 
 This file should never import any module in this repo to avoid any circular import problems.
 
-It should hold values that will never change after program setup and during execution, unlike globs.py.
-But things like THEMES can go here. Specifically, THEMES is a mutable set, but it should never
+It should hold values that will never change after program setup (i.e., during execution), unlike globs.py.
+But things like THEMES can go here. Specifically, THEMES is a mutable set, but it will never
 change after initial setup.
 
 No values here should be modifiable by the user, unlike settings.py."""
@@ -41,14 +41,21 @@ else:
         f"No themes discovered in {str(THEME_DIR)}. Make sure to run from .../HeadCircumferenceTool ."
     )
 
-APP_MAIN_COLOR: str = "b55162"
-"""The pink-ish color used in the midterm presentation."""
+HCT_MAIN_COLOR: str = "b55162"
+"""HCT's copyrighted color :P
+
+The pink-ish color used in the midterm presentation. Imperceptibly different from the website logo.
+
+Probably shouldn't use this much if we still use BreezeStyleSheet themes, in which each theme has a unique
+theme color.
+
+This is more here for reference than actual use in the program."""
 
 NUM_CONTOURS_IN_INVALID_SLICE: int = 10
 """If this number of contours or more is detected in a slice after processing (Otsu, largest component, etc.),
 then the slice is considered invalid."""
 
-NIFTI_UNITS: dict[str, str] = {
+NIFTI_METADATA_UNITS_VALUE_TO_PHYSICAL_UNITS : dict[str, str] = {
     "0": "unknown",
     "1": "meters (m)",
     "2": "millimeters (mm)",
@@ -60,14 +67,14 @@ NIFTI_UNITS: dict[str, str] = {
     "40": "parts-per-million (ppm)",
     "48": "radians per second (rad/s)",
 }
-"""Maps the `xyzt_units` metadata field (it's a str) of a NIfTI file to physical meaning.
+"""Maps the value of `xyzt_units` of a the metadata of a NIfTI file to physical meaning.
 
 Based on https://brainder.org/2012/09/23/the-nifti-file-format/.
 
-See the top of Playground/imgproc/processing.ipynb for `sitk` code to get metadata.
+See the top of Playground/imgproc/processing.ipynb for `sitk` code to get metadata."""
 
-The name is `NIFTI_UNITS` because it seems like NRRD images don't have unit information in metadata."""
-
+NIFTI_METADATA_UNITS_KEY: str = "xyzt_units"
+"""In the metadata dictionary, the value attached to this key represents units of the file."""
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 def deprecated(func):

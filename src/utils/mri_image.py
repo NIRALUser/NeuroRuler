@@ -10,24 +10,25 @@ to auto-generate documentation."""
 import _collections_abc
 from pathlib import Path
 from typing import Union
-
 import SimpleITK as sitk
+import warnings
 
 import src.utils.exceptions as exceptions
 import src.utils.settings as settings
-from src.utils.constants import degrees_to_radians, deprecated, NIFTI_UNITS
+from src.utils.constants import degrees_to_radians, deprecated, NIFTI_METADATA_UNITS_KEY, NIFTI_METADATA_UNITS_VALUE_TO_PHYSICAL_UNITS
 
 # Can't import this from globs due to circular import
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 """Global `sitk.ImageFileReader` within the mri_image.py file.
 
-DO NOT use this for a new MRIImage while it's currently being used in __init__ for another MRIImage."""
+DO NOT use this for a new MRIImage while it's currently being used in __init__ for another MRIImage.
+
+Can't import from globs due to circular import."""
+
 EULER_3D_TRANSFORM: sitk.Euler3DTransform = sitk.Euler3DTransform()
 """Global `sitk.Euler3DTransform` within the mri_image.py file.
 
 Set its center and rotation before resampling."""
-MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "units not found in metadata"
-
 
 class MRIImage:
     """Represents an MRI image slice.
@@ -46,11 +47,11 @@ class MRIImage:
         slice_num: int = 0,
     ) -> None:
         self._path = path
-        """Path to MRI image. Get, set defined, but set should never be used."""
+        """Path to MRI image. Get."""
         READER.SetFileName(str(path))
         self._base_img = READER.Execute()
         """The base image, which should never be mutated. Get."""
-        self._center = self._base_img.TransformContinuousIndexToPhysicalPoint(
+        self._center: tuple = self._base_img.TransformContinuousIndexToPhysicalPoint(
             [((dimension - 1) / 2.0) for dimension in self._base_img.GetSize()]
         )
         """Center of rotation.
@@ -59,14 +60,6 @@ class MRIImage:
         
         Doesn't have to be encapsulated since it can be generated from `base_img`, but this prevents
         recalculation of it."""
-        self._units = (
-            NIFTI_UNITS[READER.GetMetaData("xyzt_units")]
-            if "xyzt_units" in READER.GetMetaDataKeys()
-            else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND
-        )
-        """Units of the base image from its metadata.
-        
-        TODO: Doesn't work for NRRD images since it doesn't have a units key. How to get NRRD's units?"""
         self._theta_x = theta_x
         """X rotation value in degrees. Get, set."""
         self._theta_y = theta_y
@@ -76,7 +69,9 @@ class MRIImage:
         self._slice_num = slice_num
         """Slice value. Get, set."""
         self._metadata: dict[str, str] = dict()
-        """Metadata from `sitk`."""
+        """Metadata from `sitk`.
+        
+        Initialized by manually cloning the sitk.ImageFileReader's metadata."""
         for key in READER.GetMetaDataKeys():
             self._metadata[key] = READER.GetMetaData(key)
 
@@ -104,10 +99,6 @@ class MRIImage:
         return self._center
 
     @property
-    def units(self) -> str:
-        return self._units
-
-    @property
     def theta_x(self) -> int:
         return self._theta_x
 
@@ -127,23 +118,7 @@ class MRIImage:
     def metadata(self) -> dict[str, str]:
         return self._metadata
 
-    @path.setter
-    def path(self, path: Path) -> None:
-        """Honestly, this setter should never be called. Just delete the old `MRIImage`, and construct a new one.
-
-        Sets center. Sets rotation values and slice num to 0.
-
-        :rtype: None"""
-        self._path = path
-        READER.SetFileName(str(path))
-        self._base_img = READER.Execute()
-        self._center = self._base_img.TransformContinuousIndexToPhysicalPoint(
-            [((dimension - 1) / 2.0) for dimension in self._base_img.GetSize()]
-        )
-        self._theta_x = 0
-        self._theta_y = 0
-        self._theta_z = 0
-        self._slice_num = 0
+    # No path setter since a path setter would necessarily just be a new MRIImage.
 
     @theta_x.setter
     def theta_x(self, theta_x: int) -> None:
@@ -161,6 +136,17 @@ class MRIImage:
     def slice_num(self, slice_num: int) -> None:
         self._slice_num = slice_num
 
+    # Not an attribute because it's stored in _metadata
+    def get_physical_units(self) -> Union[str, None]:
+        """TODO: Not a complete implmentation. We don't yet know how to get units from any of the example
+        NRRD files. Works only for NIfTI.
+        
+        :return: units as str or None if no units detected
+        :rtype: str or None"""
+        if NIFTI_METADATA_UNITS_KEY in self._metadata:
+            return NIFTI_METADATA_UNITS_VALUE_TO_PHYSICAL_UNITS[self._metadata[NIFTI_METADATA_UNITS_KEY]]
+        return None
+
     def get_size(self) -> tuple:
         """Returns dimensions of the base image.
 
@@ -169,8 +155,8 @@ class MRIImage:
         return self._base_img.GetSize()
 
     def equals(self, other) -> bool:
-        """Checks for deep equality. Ignores `base_img` field.
-        If the conditions checked are true, then `base_img` is the same.
+        """Checks for deep equality. Ignores `base_img` and `metadata` attributes.
+        If the conditions checked are true, then `base_img` and `metadata` attributes are the same.
 
         :param other:
         :type other: MRIImage
@@ -185,7 +171,8 @@ class MRIImage:
             and self._slice_num == other.slice_num
         )
 
-    # TODO: deprecated because deepcopy creates a file with the same path, which shouldn't happen.
+    # TODO: deprecated and warns because deepcopy creates an MRIImage with the same path, which shouldn't happen.
+    # Should NOT be used in GUI.
     # However, some unit tests use deepcopy
     @deprecated
     def deepcopy(self) -> "MRIImage":
@@ -195,6 +182,7 @@ class MRIImage:
 
         :return: Deep copy
         :rtype: MRIImage"""
+        warnings.warn("Should not use mri_image.deep_copy() except in unit tests!!")
         return MRIImage(
             self._path, self._theta_x, self._theta_y, self._theta_z, self._slice_num
         )

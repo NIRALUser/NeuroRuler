@@ -57,6 +57,7 @@ DOCUMENTATION_LINK: str = "https://headcircumferencetool.readthedocs.io/en/lates
 DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
+MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "units not found in metadata"
 
 
 class MainWindow(QMainWindow):
@@ -140,7 +141,7 @@ class MainWindow(QMainWindow):
         self.z_rotation_label.setEnabled(True)
         self.slice_num_label.setEnabled(True)
 
-    # TODO: Could just construct a new MainWindow()...
+    # TODO: Could just construct a new MainWindow()? Maybe might not work?
     def disable_elements(self) -> None:
         """Called when the list is now empty, i.e. just removed from list of length 1.
 
@@ -213,7 +214,7 @@ class MainWindow(QMainWindow):
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
             "'", ""
         ).replace(",", "")
-        # TODO: Let starting directory be a configurable setting in JSON
+        # TODO: Should starting directory for file search be a configurable setting in JSON?
         # The return value of `getOpenFileNames` is a tuple (list[str], str)
         # The left element is a list of paths.
         # So `fnames[0][i]` is the i'th path.
@@ -501,9 +502,12 @@ def goto_circumference() -> None:
     :return: `None`"""
     STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
     curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-    units: str = curr_mri_image.units
+    units: Union[str, None] = curr_mri_image.get_physical_units()
     CIRCUMFERENCE_WINDOW.enable_and_disable_elements()
-    # Ignore the error message. curr_window must be CIRCUMFERENCE_WINDOW here
+
+    # Ignore the error message. render_curr_slice() always returns np.ndarray here
+    # sincecurr_window must be CIRCUMFERENCE_WINDOW here.
+
     binary_contour_slice: np.ndarray = render_curr_slice()
 
     # Use this to compare to previous results and make sure nothing changed
@@ -513,7 +517,7 @@ def goto_circumference() -> None:
 
     circumference: float = imgproc.length_of_contour(binary_contour_slice)
     CIRCUMFERENCE_WINDOW.circumference_label.setText(
-        f"Circumference: {circumference} {units}"
+        f"Circumference: {circumference} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
     )
     CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
         f"X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_num}"

@@ -54,12 +54,12 @@ def test_image_repr():
 
 def test_setters():
     img = MRIImage(NRRD0_PATH)
-    img.path = NRRD1_PATH
+    # No path setter. Setting path would necessarily just be the same as making a new MRIImage.
     img.theta_x = 1
     img.theta_y = 2
     img.theta_z = 3
     img.slice_num = 4
-    assert img.path == NRRD1_PATH
+    assert img.path == NRRD0_PATH
     assert img.theta_x == 1
     assert img.theta_y == 2
     assert img.theta_z == 3
@@ -84,13 +84,14 @@ def test_deepcopy():
     assert clone.theta_z == 2
     assert clone.slice_num == 3
 
-    clone.path = NRRD0_PATH
+    # No path setter. Does not make sense. Path setter would necessarily just be a new MRIImage.
     clone.theta_x = 1700
     clone.theta_y = 1800
     clone.theta_z = 1900
     clone.slice_num = 9001
 
-    assert clone.path == NRRD0_PATH
+    # Path shouldn't change though.
+    assert clone.path == NRRD2_PATH
     assert clone.theta_x == 1700
     assert clone.theta_y == 1800
     assert clone.theta_z == 1900
