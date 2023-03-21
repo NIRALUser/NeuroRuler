@@ -1,18 +1,10 @@
-"""Some helper functions for image processing."""
+"""Helper functions for image processing. Essentially, the main algorithm."""
 
 import SimpleITK as sitk
 import cv2
 import numpy as np
 
-# import PyQt6 is fine here but is useless, can't access things from it?
-# from PyQt6.QtGui import QImage, QColor breaks GH automated tox tests
-
-try:
-    # This is for pytest and normal use
-    import src.utils.exceptions as exceptions
-except ModuleNotFoundError:
-    # This is for processing.ipynb
-    import exceptions
+import src.utils.exceptions as exceptions
 from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE
 import src.utils.settings as settings
 
@@ -22,9 +14,11 @@ import src.utils.settings as settings
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
 def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
-    """Generate the contour of a rotated slice by applying smoothing, Otsu threshold,
+    """Generate the contour of a 2D slice by applying smoothing, Otsu threshold,
     hole filling, and island removal. Return a binary (0|1) numpy
     array with only the points on the contour=1.
+
+    `mri_slice` will likely be the result of MRIImage.resample().
 
     If settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice`
     since it was smoothed in :code:`MRIImage.resample()`.
@@ -32,7 +26,7 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
     :param mri_slice: 2D MRI slice
     :type mri_slice: sitk.Image
 
-    :param retranspose: Whether or not to return a re-transposed numpy array that matches the sitk representation. Defaults to True.
+    :param retranspose: Whether to return a re-transposed numpy array. Defaults to False.
     :type retranspose: bool
     :return: binary (0|1) numpy array with only the points on the contour = 1
     :rtype: np.ndarray"""
@@ -71,7 +65,7 @@ def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
 
 # Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
 def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
-    """Remove islands from a binary (0|1) 2D slice. That is, return a binary slice
+    """Remove islands from a binary (0|1) 2D slice. Return a binary slice
     containing only the largest connected component.
 
     :param binary_slice: Binary (0|1) 2D slice
@@ -95,7 +89,7 @@ def length_of_contour(
     cv2 will find all contours if there is more than one. Most valid brain slices have 2 or 3.
 
     The binary slice passed into this function should be processed by `contour()` to contain
-    just one contour (except in edge cases) to guarantee an accurate result.
+    just one contour (except in edge cases that we don't need to worry about) to guarantee an accurate result.
 
     This function assumes the contour is a closed curve.
 

@@ -49,7 +49,7 @@ def test_init_and_getters():
 
 
 def test_image_repr():
-    assert str(IMAGE_0) == f"MRIImage('{NRRD0_PATH}', 0, 0, 0, 0)"
+    assert str(IMAGE_0) == f"MRIImage({NRRD0_PATH}, 0, 0, 0, 0)"
 
 
 def test_setters():
@@ -145,7 +145,7 @@ def test_initialize_with_no_arg():
 def test_repr():
     assert (
         str(IMAGE_LIST)
-        == f"[MRIImage('{NRRD0_PATH}', 0, 0, 0, 0), MRIImage('{NRRD1_PATH}', 3, 2, 1, 0), MRIImage('{NRRD2_PATH}', 0, 1, 2, 3), MRIImage('{NIFTI_PATH}', 0, 0, 0, 0)]"
+        == f"[MRIImage({NRRD0_PATH}, 0, 0, 0, 0), MRIImage({NRRD1_PATH}, 3, 2, 1, 0), MRIImage({NRRD2_PATH}, 0, 1, 2, 3), MRIImage({NIFTI_PATH}, 0, 0, 0, {int((IMAGE_3.get_size()[2] - 1) / 2)})]"
     )
 
 

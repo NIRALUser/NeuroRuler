@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1075</width>
-    <height>735</height>
+    <width>809</width>
+    <height>686</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -75,8 +75,11 @@
         <property name="cursor">
          <cursorShape>ArrowCursor</cursorShape>
         </property>
+        <property name="toolTip">
+         <string>Export data as CSV.</string>
+        </property>
         <property name="statusTip">
-         <string>Export data.</string>
+         <string>Export data as CSV.</string>
         </property>
         <property name="text">
          <string>Export</string>
@@ -115,8 +118,11 @@ Slice: 89°</string>
         <property name="cursor">
          <cursorShape>ArrowCursor</cursorShape>
         </property>
+        <property name="toolTip">
+         <string>Go back to main window to adjust image settings.</string>
+        </property>
         <property name="statusTip">
-         <string>Go back to main window to adjust slice settings.</string>
+         <string>Go back to main window to adjust image settings.</string>
         </property>
         <property name="text">
          <string>Adjust</string>
@@ -148,6 +154,9 @@ Another setting: 89</string>
         <property name="cursor">
          <cursorShape>ArrowCursor</cursorShape>
         </property>
+        <property name="toolTip">
+         <string>Adjust trace settings.</string>
+        </property>
         <property name="statusTip">
          <string>Adjust trace settings.</string>
         </property>
@@ -165,7 +174,7 @@ Another setting: 89</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1075</width>
+     <width>809</width>
      <height>24</height>
     </rect>
    </property>
@@ -178,10 +187,10 @@ Another setting: 89</string>
     </property>
     <widget class="QMenu" name="action_export">
      <property name="toolTip">
-      <string extracomment="Export slice data to CSV or to image format.">Export slice data to CSV or to image format.</string>
+      <string extracomment="Export slice data to CSV or to image format.">Export image data as CSV or export the image.</string>
      </property>
      <property name="statusTip">
-      <string extracomment="Export slice data to CSV or to image format.">Export slice data to CSV or to image format.</string>
+      <string extracomment="Export slice data to CSV or to image format.">Export image data as CSV or export the image.</string>
      </property>
      <property name="title">
       <string>Export</string>
@@ -208,8 +217,22 @@ Another setting: 89</string>
     <addaction name="action_github"/>
     <addaction name="action_documentation"/>
    </widget>
+   <widget class="QMenu" name="menu_debug">
+    <property name="toolTip">
+     <string>Tools for debugging.</string>
+    </property>
+    <property name="statusTip">
+     <string>Tools for debugging.</string>
+    </property>
+    <property name="title">
+     <string>Debug</string>
+    </property>
+    <addaction name="action_print_metadata"/>
+    <addaction name="action_print_dimensions"/>
+   </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
+   <addaction name="menu_debug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_open">
@@ -220,10 +243,10 @@ Another setting: 89</string>
     <string>Open</string>
    </property>
    <property name="toolTip">
-    <string extracomment="Select file(s) to be opened in .nrrd, .nii.gz, or .nii.gz formats.">Select file(s) to be opened in .nrrd, .nii.gz, or .nii.gz formats.</string>
+    <string extracomment="Select image(s) to be opened.">Select image(s) to be opened.</string>
    </property>
    <property name="statusTip">
-    <string>Select file(s) to be opened in .nrrd, .nii.gz, or .nii.gz formats.</string>
+    <string>Select image(s) to be opened.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -232,6 +255,9 @@ Another setting: 89</string>
   <action name="action_documentation">
    <property name="text">
     <string>Documentation</string>
+   </property>
+   <property name="toolTip">
+    <string>Open documentation website in web browser.</string>
    </property>
    <property name="statusTip">
     <string>Open documentation website in web browser.</string>
@@ -259,7 +285,7 @@ Another setting: 89</string>
     <string>Add Images</string>
    </property>
    <property name="toolTip">
-    <string extracomment="Add images.">Add images.</string>
+    <string extracomment="Add images.">Add image(s) to the end of the list. No duplicates.</string>
    </property>
    <property name="statusTip">
     <string>Add image(s) to the end of the list. No duplicates.</string>
@@ -276,10 +302,10 @@ Another setting: 89</string>
     <string>Remove Image</string>
    </property>
    <property name="toolTip">
-    <string extracomment="Remove currently loaded image from the list. Does not delete the file from disk.">Remove currently loaded image from the list. Does not delete the file from disk.</string>
+    <string extracomment="Remove currently loaded image from the list. Does not delete the file from disk.">Remove currently displayed image from the list. Does not delete the file from disk.</string>
    </property>
    <property name="statusTip">
-    <string extracomment="Remove images.">Remove currently loaded image from the list. Does not delete the file from disk.</string>
+    <string extracomment="Remove images.">Remove currently displayed image from the list. Does not delete the file from disk.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
@@ -290,13 +316,13 @@ Another setting: 89</string>
     <string>CSV</string>
    </property>
    <property name="toolTip">
-    <string extracomment="Export slice data to CSV.">Export slice data to CSV.</string>
+    <string extracomment="Export slice data to CSV.">Export image data as CSV.</string>
    </property>
    <property name="statusTip">
-    <string extracomment="Export slice data to CSV.">Export slice data to CSV.</string>
+    <string extracomment="Export slice data to CSV.">Export image data as CSV.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E</string>
+    <string>Ctrl+E, Ctrl+C</string>
    </property>
   </action>
   <action name="action_export_png">
@@ -310,7 +336,7 @@ Another setting: 89</string>
     <string extracomment="Export slice as PNG.">Export slice as PNG.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+P</string>
+    <string>Ctrl+E, Ctrl+P</string>
    </property>
   </action>
   <action name="action_export_jpg">
@@ -324,7 +350,7 @@ Another setting: 89</string>
     <string extracomment="Export slice as JPG.">Export slice as JPG.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+J</string>
+    <string>Ctrl+E, Ctrl+J</string>
    </property>
   </action>
   <action name="action_export_bmp">
@@ -338,7 +364,7 @@ Another setting: 89</string>
     <string extracomment="Export slice as BMP.">Export slice as BMP.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+B</string>
+    <string>Ctrl+E, Ctrl+B</string>
    </property>
   </action>
   <action name="action_export_ppm">
@@ -378,11 +404,42 @@ Another setting: 89</string>
    <property name="text">
     <string>GitHub</string>
    </property>
+   <property name="toolTip">
+    <string>Open GitHub website in web browser.</string>
+   </property>
    <property name="statusTip">
-    <string>Open GitHub page in web browser.</string>
+    <string>Open GitHub website in web browser.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="action_print_metadata">
+   <property name="text">
+    <string>Print metadata</string>
+   </property>
+   <property name="toolTip">
+    <string>Print metadata to terminal.</string>
+   </property>
+   <property name="statusTip">
+    <string>Print metadata to terminal.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P, Ctrl+M</string>
+   </property>
+  </action>
+  <action name="action_print_dimensions">
+   <property name="text">
+    <string>Print dimensions</string>
+   </property>
+   <property name="toolTip">
+    <string>Print dimensions of image to terminal.</string>
+   </property>
+   <property name="statusTip">
+    <string>Print dimensions of image to terminal.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P, Ctrl+S</string>
    </property>
   </action>
  </widget>

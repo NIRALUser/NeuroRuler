@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1075</width>
-    <height>651</height>
+    <width>809</width>
+    <height>662</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,12 +20,18 @@
       <item>
        <widget class="QLabel" name="image">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
           <height>500</height>
+         </size>
+        </property>
+        <property name="sizeIncrement">
+         <size>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
         <property name="statusTip">
@@ -65,6 +71,9 @@
           <property name="cursor">
            <cursorShape>ArrowCursor</cursorShape>
           </property>
+          <property name="toolTip">
+           <string>Previous image.</string>
+          </property>
           <property name="statusTip">
            <string>Previous image.</string>
           </property>
@@ -94,6 +103,9 @@
           <property name="cursor">
            <cursorShape>ArrowCursor</cursorShape>
           </property>
+          <property name="toolTip">
+           <string>Next image.</string>
+          </property>
           <property name="statusTip">
            <string>Next image.</string>
           </property>
@@ -111,6 +123,9 @@
         </property>
         <property name="cursor">
          <cursorShape>ArrowCursor</cursorShape>
+        </property>
+        <property name="toolTip">
+         <string>Compute circumference using current settings.</string>
         </property>
         <property name="statusTip">
          <string>Compute circumference using current settings.</string>
@@ -145,8 +160,11 @@
         <property name="cursor">
          <cursorShape>ClosedHandCursor</cursorShape>
         </property>
+        <property name="toolTip">
+         <string>Control X rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
+        </property>
         <property name="statusTip">
-         <string>Control X rotation value.</string>
+         <string>Control X rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
         </property>
         <property name="minimum">
          <number>-90</number>
@@ -180,8 +198,11 @@
         <property name="cursor">
          <cursorShape>ClosedHandCursor</cursorShape>
         </property>
+        <property name="toolTip">
+         <string>Control Y rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
+        </property>
         <property name="statusTip">
-         <string>Control Y rotation value.</string>
+         <string>Control Y rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
         </property>
         <property name="minimum">
          <number>-90</number>
@@ -215,8 +236,11 @@
         <property name="cursor">
          <cursorShape>ClosedHandCursor</cursorShape>
         </property>
+        <property name="toolTip">
+         <string>Control Z rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
+        </property>
         <property name="statusTip">
-         <string>Control Z rotation value.</string>
+         <string>Control Z rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
         </property>
         <property name="minimum">
          <number>-90</number>
@@ -250,11 +274,17 @@
         <property name="cursor">
          <cursorShape>ClosedHandCursor</cursorShape>
         </property>
+        <property name="toolTip">
+         <string>Control slice value. Left click on the left end or right end to decrease or increase by 1.</string>
+        </property>
         <property name="statusTip">
-         <string>Control slice number.</string>
+         <string>Control slice value. Left click on the left end or right end to decrease or increase by 1.</string>
         </property>
         <property name="maximum">
          <number>180</number>
+        </property>
+        <property name="value">
+         <number>90</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -269,8 +299,11 @@
         <property name="cursor">
          <cursorShape>ArrowCursor</cursorShape>
         </property>
+        <property name="toolTip">
+         <string>Reset rotation and slice values for the current image.</string>
+        </property>
         <property name="statusTip">
-         <string>Reset rotation and slice values to 0 (default) for the current image.</string>
+         <string>Reset rotation and slice values for the current image.</string>
         </property>
         <property name="text">
          <string>Reset</string>
@@ -286,7 +319,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1075</width>
+     <width>809</width>
      <height>24</height>
     </rect>
    </property>
@@ -299,10 +332,10 @@
     </property>
     <widget class="QMenu" name="action_export">
      <property name="toolTip">
-      <string extracomment="Export slice data to CSV or to image format.">Export slice data to CSV or to image format.</string>
+      <string extracomment="Export image data as CSV or export the image.">Export image data as CSV or export the image.</string>
      </property>
      <property name="statusTip">
-      <string extracomment="Export slice data to CSV or to image format.">Export slice data to CSV or to image format.</string>
+      <string extracomment="Export slice data to CSV or to image format.">Export image data as CSV or export the image.</string>
      </property>
      <property name="title">
       <string>Export</string>
@@ -329,21 +362,31 @@
     <addaction name="action_github"/>
     <addaction name="action_documentation"/>
    </widget>
-   <widget class="QMenu" name="menuTest">
+   <widget class="QMenu" name="menu_debug">
+    <property name="toolTip">
+     <string>Tools for debugging.</string>
+    </property>
+    <property name="statusTip">
+     <string>Tools for debugging.</string>
+    </property>
     <property name="title">
-     <string>Test</string>
+     <string>Debug</string>
     </property>
     <addaction name="action_test_show_resource"/>
     <addaction name="action_print_metadata"/>
+    <addaction name="action_print_dimensions"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
-   <addaction name="menuTest"/>
+   <addaction name="menu_debug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_documentation">
    <property name="text">
     <string>Documentation</string>
+   </property>
+   <property name="toolTip">
+    <string>Open documentation website in web browser.</string>
    </property>
    <property name="statusTip">
     <string>Open documentation website in web browser.</string>
@@ -356,6 +399,9 @@
    <property name="text">
     <string>Exit</string>
    </property>
+   <property name="toolTip">
+    <string>Exit.</string>
+   </property>
    <property name="statusTip">
     <string>Exit.</string>
    </property>
@@ -367,8 +413,11 @@
    <property name="text">
     <string>Open</string>
    </property>
+   <property name="toolTip">
+    <string>Select image(s) to be opened.</string>
+   </property>
    <property name="statusTip">
-    <string>Select file(s) to be opened in .nrrd, .nii.gz, or .nii.gz formats.</string>
+    <string>Select image(s) to be opened.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -377,6 +426,9 @@
   <action name="action_add_images">
    <property name="text">
     <string>Add Images</string>
+   </property>
+   <property name="toolTip">
+    <string>Add image(s) to the end of the list. No duplicates.</string>
    </property>
    <property name="statusTip">
     <string>Add image(s) to the end of the list. No duplicates.</string>
@@ -393,10 +445,10 @@
     <string>Remove Image</string>
    </property>
    <property name="toolTip">
-    <string>Remove currently loaded image from the list. Does not delete the file from disk.</string>
+    <string>Remove currently displayed image from the list. Does not delete the file from disk.</string>
    </property>
    <property name="statusTip">
-    <string>Remove currently loaded image from the list. Does not delete the file from disk.</string>
+    <string>Remove currently displayed image from the list. Does not delete the file from disk.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
@@ -416,7 +468,7 @@
     <string extracomment="Export slice as PNG.">Export slice as PNG.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+P</string>
+    <string>Ctrl+E, Ctrl+P</string>
    </property>
   </action>
   <action name="action_export_jpg">
@@ -433,7 +485,7 @@
     <string extracomment="Export slice as JPG.">Export slice as JPG.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+J</string>
+    <string>Ctrl+E, Ctrl+J</string>
    </property>
   </action>
   <action name="action_export_csv">
@@ -444,13 +496,13 @@
     <string>CSV</string>
    </property>
    <property name="toolTip">
-    <string extracomment="Click Apply to enable this option.">Click Apply to enable this option.</string>
+    <string extracomment="Click Apply to enable this option.">Export image data as CSV.</string>
    </property>
    <property name="statusTip">
-    <string extracomment="Click Apply to enable this option.">Click Apply to enable this option.</string>
+    <string extracomment="Click Apply to enable this option.">Export image data as CSV.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E</string>
+    <string>Ctrl+E, Ctrl+C</string>
    </property>
   </action>
   <action name="action_export_bmp">
@@ -467,7 +519,7 @@
     <string extracomment="Export slice as BMP.">Export slice as BMP.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+B</string>
+    <string>Ctrl+E, Ctrl+B</string>
    </property>
   </action>
   <action name="action_export_ppm">
@@ -516,8 +568,11 @@
    <property name="text">
     <string>GitHub</string>
    </property>
+   <property name="toolTip">
+    <string>Open GitHub website in web browser.</string>
+   </property>
    <property name="statusTip">
-    <string>Open GitHub page in web browser.</string>
+    <string>Open GitHub website in web browser.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
@@ -526,6 +581,9 @@
   <action name="action_test_show_resource">
    <property name="text">
     <string>Test show resource</string>
+   </property>
+   <property name="toolTip">
+    <string>Test displaying a resource (help.svg).</string>
    </property>
    <property name="statusTip">
     <string>Test displaying a resource (help.svg).</string>
@@ -538,8 +596,28 @@
    <property name="text">
     <string>Print metadata</string>
    </property>
+   <property name="toolTip">
+    <string>Print metadata to terminal.</string>
+   </property>
+   <property name="statusTip">
+    <string>Print metadata to terminal.</string>
+   </property>
    <property name="shortcut">
-    <string>Ctrl+M</string>
+    <string>Ctrl+P, Ctrl+M</string>
+   </property>
+  </action>
+  <action name="action_print_dimensions">
+   <property name="text">
+    <string>Print dimensions</string>
+   </property>
+   <property name="toolTip">
+    <string>Print dimensions to terminal.</string>
+   </property>
+   <property name="statusTip">
+    <string>Print dimensions to terminal.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P, Ctrl+S</string>
    </property>
   </action>
  </widget>

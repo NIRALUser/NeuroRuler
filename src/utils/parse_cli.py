@@ -1,4 +1,4 @@
-"""Parse CLI arguments."""
+"""Parse CLI arguments and set global settings."""
 
 import argparse
 
@@ -69,14 +69,13 @@ def parse_gui_cli() -> None:
 
         settings.THEME_NAME = args.theme
         if args.theme == "dark":
-            # From dark.json
+            # Theme color from dark.json
             settings.CONTOUR_COLOR = "3daee9"
         elif args.theme == "light":
-            # From light.json
+            # Theme color from light.json
             settings.CONTOUR_COLOR = "3daef3"
         print(f"Theme {args.theme} specified.")
 
-    # args.color will override theme color above if specified
     if args.color:
         settings.CONTOUR_COLOR = args.color
         print(

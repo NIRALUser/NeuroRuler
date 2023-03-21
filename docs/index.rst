@@ -18,7 +18,7 @@ Contents
    :maxdepth: 2
 
    setup
-   dependencies
+   libraries
    modules
 
 Indices and tables

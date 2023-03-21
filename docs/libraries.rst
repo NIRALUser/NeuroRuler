@@ -1,12 +1,12 @@
-.. _dependencies:
+.. _libraries:
 
-############
-Dependencies
-############
+#########
+Libraries
+#########
 
 .. topic:: Overview
 
-    This page describes what our dependencies are for and how to use them.
+    This page describes what the libraries we use are for and how to use them.
     Links to our related source code are provided.
 
 .. contents::
@@ -303,13 +303,12 @@ Used to generate our GUI's :code:`.qss` stylesheets and corresponding :code:`res
 How it works
 ============
 
-.. note:: You can skip down to :ref:`BreezeStyleSheetsInstallation` if you want. 
-
 Skim the README in the `BreezeStyleSheets repo <https://github.com/Alexhuszagh/BreezeStyleSheets.git>`_.
 
-In a nutshell, we edit a JSON file with hex codes and compile to a :code:`.qss` stylesheet that we can
-use in our program. It also generates :ref:`QRC files <PyQt6QRC>` and compiled :code:`.py` resource files
-for managing resources (icons).
+In a nutshell, we edit a JSON file with hex color codes (the JSON controls only the colors of elements) 
+and compile to a :code:`.qss` stylesheet that we can
+use in our program. BSS also generates a :ref:`QRC <PyQt6QRC>` resource file
+for managing resources (icons), which is then converted to a compiled and importable :code:`resources.py` file.
 
 .. _BreezeStyleSheetsInstallation:
 
@@ -317,28 +316,12 @@ Installation instructions
 =========================
 
 1. Clone our fork of the `repo <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
-2. Try running :code:`python configure.py --styles=all --extensions=all --pyqt6 --resource breeze.qrc --compiled-resource breeze_resources.py`
+2. Run :code:`pip install PyQt5`.
 
-If you get something that looks like this, then PyQt5 (specifically, the :code:`pyrcc5` command)
-is not installed.
+.. note:: If you successfully installed PyQt5, then move on to :ref:`BreezeStyleSheetsConfiguration`.
 
-.. code-block:: text
-
-    subprocess.CalledProcessError: Command '['pyrcc5', '/Users/jesse/Documents/GitHub/COMP523/BreezeStyleSheets/dist/qrc/breeze.qrc', '-o', '/Users/jesse/Documents/GitHub/COMP523/BreezeStyleSheets/breeze_resources.py']' returned non-zero exit status 1.
-
-On macOS, :code:`pip install PyQt5` didn't work, so I had to do some extra stuff.
-
-These are the the commands I ran to install PyQt5 on macOS.
-
-.. code-block:: text
-
-    brew install qt5
-    brew link qt5 --force
-    pip3 install pyqt5 --config-settings --confirm-license= --verbose
-
-Took a while to install...
-
-If you get any errors, these are the relevant StackOverflow links [#macpyqt]_.
+    Otherwise, see these instructions [#macpyqt]_. Pretty sure the PyQt5 installation is bugged on
+    macOS but not Windows.
 
 .. _BreezeStyleSheetsConfiguration:
 
@@ -348,7 +331,7 @@ Configuration instructions
 First, copy and paste one of the existing theme JSON's in :code:`theme/`. Rename it, and I'll refer
 to the new name as :code:`theme_name`.
 
-As mentioned in the `README <https://github.com/Alexhuszagh/BreezeStyleSheets#customization>`_, there's a lot of fields, but we should modify only a few.
+As mentioned in the BSS `README <https://github.com/Alexhuszagh/BreezeStyleSheets#customization>`_, there's a lot of fields, but we should modify only a few.
 I ran :code:`diff theme/dark.json theme/dark-green.json` [#diff]_, and the only fields that changed were these:
 
 * :code:`"highlight"`
@@ -360,13 +343,19 @@ I ran :code:`diff theme/dark.json theme/dark-green.json` [#diff]_, and the only 
 * :code:`"checkbox:light"`
 * :code:`"scrollbar:hover"`
 
+.. note:: In the repo, there are scripts :code:`hex-convert.py` and :code:`dec-convert.py` that multiply hex or decimal
+    color codes by a ratio to assist with modifying colors. The code is shoddy but functional because I just needed
+    something working.
+
 .. note:: You can skip a lot of the rest of this section. In our BreezeStyleSheets fork, there's a script
     `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ that does the rest of this.
     
     First, open `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ and modify
-    :code:`PATH_TO_HCT_REPO_THEMES_DIR` to be :code:`.../themes` directory in your computer's HCT directory.
+    :code:`PATH_TO_HCT_REPO_THEMES_DIR` to be the :code:`.../themes` directory in your local HCT directory.
     
-    Then run :code:`python hct.py <theme_name>`, where :code:`theme_name` is the name of the new JSON file.
+    Then run :code:`python hct.py <theme_name>`.
+    This will run the BSS commands that compile the JSON and then move the compiled files to the HCT repo.
+
     You should now be able to run the HCT GUI with the new theme.
     For now, you would just do :code:`python -m src.GUI.main -t <theme_name>`.
     
@@ -437,7 +426,7 @@ For parsing CLI arguments.
 Virtual environment
 ###################
 
-This isn't a dependency, but it's worth noting. See here [#venv]_.
+This isn't a library, but it's worth noting. See the `virtual environment documentation <https://packaging.python.org/en/latest/tutorials/installing-packages/#creating-and-using-virtual-environments>`_ [#venv]_.
 
 python-black
 ############
@@ -515,7 +504,7 @@ if a new package is created. Make sure :code:`__init__.py` files exist for any p
 to be discovered.
 
 You can edit `docs/index.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/index.rst>`_,
-which is the homepage, or `docs/dependencies.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/dependencies.rst>`_, which
+which is the homepage, or `docs/libraries.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/libraries.rst>`_, which
 is this page. `Documentation <modules.html>`_ for `source code <_modules/index.html>`_ is automatically generated.
 
 .. _sphinxBuildFromScratch:
@@ -573,7 +562,7 @@ follow the `Provider-specific instructions steps <https://docs.readthedocs.io/en
 RST formatting
 ==============
 
-See the `source code <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/dependencies.rst>`_
+See the `source code <_sources/libraries.rst.txt>`_
 for this page and `<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_.
 
 .. _sphinxResources:
@@ -612,7 +601,15 @@ based on the theme :code:`.json`.
 
 .. rubric:: Footnotes
 
-.. [#macpyqt] `macOS PyQt5 install 1 <https://stackoverflow.com/questions/70961915/error-while-installing-pytq5-with-pip-preparing-metadata-pyproject-toml-did-n>`_, `macOS PyQt5 install 2 <https://stackoverflow.com/questions/66546886/pip-install-stuck-on-preparing-wheel-metadata-when-trying-to-install-pyqt5>`_, `macOS PyQt5 install 3 <https://stackoverflow.com/questions/73714829/pip-install-pyqt5-it-cannot-go-on/74071222#74071222>`_
+.. [#macpyqt] These are the the commands I ran to install PyQt5 on macOS.
+
+.. code-block:: text
+
+    brew install qt5
+    brew link qt5 --force
+    pip3 install pyqt5 --config-settings --confirm-license= --verbose
+
+Took a while to install...
 
 .. [#diff]
 
@@ -647,5 +644,5 @@ based on the theme :code:`.json`.
     >     "scrollbar:hover": "#33b833",
 
 .. [#sphinx] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
-.. [#venv] `venv documentation <https://packaging.python.org/en/latest/tutorials/installing-packages/#creating-and-using-virtual-environments>`_. Thanks to the teammate who suggested this to me!
+.. [#venv] Thanks to the teammate who suggested this to me!
 .. [#npqimage] https://github.com/COMP523TeamD/HeadCircumferenceTool/pull/3#issuecomment-1468075389

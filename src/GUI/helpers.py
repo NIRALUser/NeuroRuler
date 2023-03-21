@@ -1,7 +1,4 @@
-"""These functions would go into src.utils.imgproc, but `from PyQt6.QtGui import QImage, QColor` there
-breaks the GitHub automated tox tests (but not the local tox tests)...
-
-See [here](https://stackoverflow.com/questions/75549995/why-do-the-pyside6-qt-modules-cause-tox-to-fail-during-a-github-action)"""
+"""GUI helper functions."""
 
 import string
 from typing import Union
@@ -46,7 +43,7 @@ def mask_QImage(
 
     QImage and numpy use [reversed w,h order](https://stackoverflow.com/a/68220805/18479243).
 
-    This function checks that
+    To be clear, this function checks that
     `q_img.size().width() == binary_mask.shape[0]` and `q_img.size().height() == binary_mask.shape[1]`.
 
     :param q_img:

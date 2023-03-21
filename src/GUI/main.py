@@ -1,8 +1,8 @@
-"""Entrypoint of GUI stuff.
+"""Defines MainWindow and CircumferenceWindow and main(), the entrypoint of the GUI.
 
 Loads `src/GUI/main.ui` and `src/GUI/circumference.ui`, both made in QtDesigner.
 
-In addition, also loads `.qss` stylesheets and `resources.py` (application icons) files, generated
+In addition, also loads `.qss` stylesheets and `resources.py` (icons) files, generated
 by BreezeStyleSheets. Our fork of the repo is here: https://github.com/COMP523TeamD/BreezeStyleSheets.
 
 There's a lot of boilerplate here to get current slice, i.e. `globs.IMAGE_LIST[globs.IMAGE_LIST.index]`
@@ -19,6 +19,7 @@ If a behavior is unique to a window, then it is a method in the class (though it
 Native menu bar is currently disabled. See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/9.
 tl;dr on macOS, there can only be one menubar shared between the two classes. Can work around this by
 making MainWindow's QMenuBar global and using that in CircumferenceWindow (i.e., when switching).
+However, I got segmentation fault when attempting to modify the menubar?
 
 Non-native menu bar is a lot simpler but looks worse on macOS."""
 
@@ -36,7 +37,6 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PyQt6.uic.load_ui import loadUi
 
 # qimage2ndarray needs to go after PyQt6 imports or there will be a ModuleNotFoundError.
-# Autoformatter might move qimage2ndarray up
 import qimage2ndarray
 import pprint
 
@@ -48,10 +48,6 @@ from src.GUI.helpers import string_to_QColor, mask_QImage
 from src.utils.mri_image import MRIImage, MRIImageList
 from src.utils.parse_cli import parse_gui_cli
 
-DEFAULT_WIDTH: int = 1000
-"""Startup width of the GUI"""
-DEFAULT_HEIGHT: int = 700
-"""Startup height of the GUI"""
 GITHUB_LINK: str = "https://github.com/COMP523TeamD/HeadCircumferenceTool"
 DOCUMENTATION_LINK: str = "https://headcircumferencetool.readthedocs.io/en/latest/"
 DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
@@ -72,6 +68,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self._enabled: bool = False
         """Whether the GUI elements are enabled or not."""
+
         loadUi(str(Path("src") / "GUI" / "main.ui"), self)
         self.setWindowTitle("Head Circumference Tool")
         self.action_open.triggered.connect(lambda: self.browse_files(False))
@@ -83,7 +80,8 @@ class MainWindow(QMainWindow):
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
         self.action_test_show_resource.triggered.connect(self.test_show_resource)
-        self.action_print_metadata.triggered.connect(self.print_metadata)
+        self.action_print_metadata.triggered.connect(print_metadata)
+        self.action_print_dimensions.triggered.connect(print_dimensions)
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -116,7 +114,7 @@ class MainWindow(QMainWindow):
         """Called when File > Open is clicked and when switching from CircumferenceWindow to MainWindow
         (i.e., when Adjust button is clicked).
 
-        Enable image, menu items, buttons, and sliders."""
+        Enable image, menu items, buttons, and sliders. Disable Export > CSV."""
         self.action_open.setEnabled(True)
         self.action_remove_image.setEnabled(True)
         self.image.setEnabled(True)
@@ -177,9 +175,9 @@ class MainWindow(QMainWindow):
     def render_all_sliders(self) -> None:
         """Sets all slider values to the values stored in the current `MRIImage`.
 
-        Does not need to be called when the user updates a slider.
-
         Called on reset and image switch.
+
+        Not called when the user updates a slider.
 
         Also updates rotation and slice num labels."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
@@ -214,13 +212,14 @@ class MainWindow(QMainWindow):
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
             "'", ""
         ).replace(",", "")
-        # TODO: Should starting directory for file search be a configurable setting in JSON?
+
         # The return value of `getOpenFileNames` is a tuple (list[str], str)
         # The left element is a list of paths.
         # So `fnames[0][i]` is the i'th path.
         files = QFileDialog.getOpenFileNames(
             self, "Open files", str(settings.FILE_BROWSER_START_DIR), file_filter
         )
+
         paths = map(Path, files[0])
         images: list[MRIImage] = list(map(MRIImage, paths))
 
@@ -250,7 +249,6 @@ class MainWindow(QMainWindow):
             return
         del globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         if len(globs.IMAGE_LIST) == 0:
-            # TODO: Could remove and then disable GUI elements
             self.disable_elements()
             return
         self.refresh()
@@ -258,21 +256,21 @@ class MainWindow(QMainWindow):
     def next_img(self):
         """Called when Next button is clicked.
 
-        Advance index and render image and sliders."""
+        Advance index and refresh."""
         globs.IMAGE_LIST.next()
         self.refresh()
 
     def previous_img(self):
         """Called when Previous button is clicked.
 
-        Decrement index and render image and sliders."""
+        Decrement index and refresh."""
         globs.IMAGE_LIST.previous()
         self.refresh()
 
     def rotate_x(self):
         """Called any time the user updates the x slider.
 
-        Handle x slider movement by rendering image and setting `x_rotation_label`."""
+        Render image and set `x_rotation_label`."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         x_slider_val: int = self.x_slider.value()
         curr_mri_image.theta_x = x_slider_val
@@ -282,7 +280,7 @@ class MainWindow(QMainWindow):
     def rotate_y(self):
         """Called any time the user updates the y slider.
 
-        Handle y slider movement by rendering image and setting `y_rotation_label`."""
+        Render image and set `y_rotation_label`."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         y_slider_val: int = self.y_slider.value()
         curr_mri_image.theta_y = y_slider_val
@@ -292,7 +290,7 @@ class MainWindow(QMainWindow):
     def rotate_z(self):
         """Called any time the user updates the z slider.
 
-        Handle z slider movement by rendering image and setting `z_rotation_label`."""
+        Render image and set `z_rotation_label`."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         z_slider_val: int = self.z_slider.value()
         curr_mri_image.theta_z = z_slider_val
@@ -302,8 +300,7 @@ class MainWindow(QMainWindow):
     def slice_update(self):
         """Called any time the user updates the slice slider.
 
-        Handle slice slider movement by rendering image and setting `slice_num_label`.
-        """
+        Render image and set `slice_num_label`."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         slice_slider_val: int = self.slice_slider.value()
         curr_mri_image.slice_num = slice_slider_val
@@ -313,17 +310,17 @@ class MainWindow(QMainWindow):
     def reset_settings(self):
         """Called when Reset is clicked.
 
-        Resets rotation values and slice num to 0 for the current image, then re-renders image and sliders.
-        """
+        Resets rotation values to 0 and slice num to the default `int((z-1)/2)`
+        for the current image, then `refresh`es."""
         curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         curr_mri_image.theta_x = 0
         curr_mri_image.theta_y = 0
         curr_mri_image.theta_z = 0
-        curr_mri_image.slice_num = 0
+        curr_mri_image.slice_num = int((curr_mri_image.get_size()[2] - 1) / 2)
         self.refresh()
 
     def refresh(self) -> None:
-        """Refresh everything (i.e., image and sliders).
+        """Refresh everything (i.e., image, sliders, and labels).
 
         Called on window switch and image switch."""
         render_curr_slice()
@@ -332,25 +329,22 @@ class MainWindow(QMainWindow):
     def test_show_resource(self) -> None:
         """Connected to Test > Test show resource. Dummy function for testing stuff.
 
-        Currently displays `help.svg` (`help.svg` not in the repo since it's compiled in resources.py)
+        Currently displays `help.svg` (`help.svg` not in the repo since it's compiled in resources.py).
         """
         self.image.setPixmap(QPixmap(f":/{settings.THEME_NAME}/help.svg"))
         self.image.setStatusTip(
             "This is intentional, if it's a question mark then that's good :), means we can display icons"
         )
 
-    def print_metadata(self) -> None:
-        """Print current MRIImage's metadata."""
-        curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-        pprint.pprint(curr_mri_image.metadata)
-
 
 class CircumferenceWindow(QMainWindow):
     """Displayed after pressing Apply in MainWindow.
 
-    Displays the same MRI slice as in MainWindow and the computed circumference.
+    Displays the same MRI slice as in MainWindow previously but overlays contour on top.
+    Also displays the computed circumference.
 
-    No sliders but displays rotation & slice values.
+    No sliders (yet) but displays rotation & slice values.
+    CircumferenceWindow is NOT finished.
 
     There should be only one instance of this class."""
 
@@ -364,6 +358,8 @@ class CircumferenceWindow(QMainWindow):
         self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
+        self.action_print_metadata.triggered.connect(print_metadata)
+        self.action_print_dimensions.triggered.connect(print_dimensions)
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -394,18 +390,18 @@ class CircumferenceWindow(QMainWindow):
 
 
 def render_curr_slice() -> Union[np.ndarray, None]:
-    """Resamples the currently selected MRIImage using rotation and slice settings,
+    """Resamples the currently selected MRIImage using its rotation and slice settings,
     then renders the resulting slice in the GUI.
 
     Also sets text for `image_num_label` and file path in the status bar tooltip.
 
-    If `curr_window == CIRCUMFERENCE_WINDOW`, also calls `imgproc.contour()` and overlays
+    If `curr_window == CIRCUMFERENCE_WINDOW`, also calls `imgproc.contour()` to display
     the contour on top of the image. Note `==`, not `isinstance()`, because there should
     be only one global instance of `CircumferenceWindow`.
 
-    Additionally, also returns a view of the contoured slice if `curr_window == CIRCUMFERENCE_WINDOW`
-    since rendering in CIRCUMFERENCE_WINDOW requires contouring anyway.
-    This saves work in the `goto_circumference` function.
+    Additionally, also returns a view of the contoured slice if `curr_window == CIRCUMFERENCE_WINDOW`.
+    This saves work in the `goto_circumference` function since it avoids calling `contour()` and `resample()`
+    again.
 
     NOTE: This function relies on the object names `image` and `image_num_label` being
     the same for `MainWindow` and `CircumferenceWindow` in the `.ui` files.
@@ -418,20 +414,15 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     rotated_slice: sitk.Image = curr_mri_image.resample()
 
     slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
-    slice_np = np.ndarray.transpose(slice_np)
+    # slice_np = np.transpose(slice_np)
     q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
 
     rv_dummy_var: np.ndarray = np.zeros(0)
 
     if curr_window == CIRCUMFERENCE_WINDOW:
-        # Don't retranspose here even though QImage and np treat w and h differently
-        # This keeps the shape of the QImage and np array the same,
-        # i.e. q_img.size().width() == binary_contour_slice.shape[0]
-        binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, True)
+        binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
         rv_dummy_var = binary_contour_slice
         # Re-retranspose here to make the dimensions of q_img and the mask the same
-        # Alternatively could use retranspose=False for contour but then rv_dummy_var would need to be transposed
-        # Could modify mask_QImage as well...
         mask_QImage(
             q_img,
             np.transpose(binary_contour_slice),
@@ -457,7 +448,8 @@ def render_curr_slice() -> Union[np.ndarray, None]:
 def export_curr_slice_as_img(extension: str):
     """Called when an Export as image menu item is clicked.
 
-    Exports `curr_window.image` to `settings.IMG_DIR`.
+    Exports `curr_window.image` to `settings.IMG_DIR`. So, calling this in CircumferenceWindow will
+    save an image with its contour outlined.
 
     Filename has format <file_name>_[contoured_]<theta_x>_<theta_y>_<theta_z>_<slice_num>.<extension>
 
@@ -506,7 +498,7 @@ def goto_circumference() -> None:
     CIRCUMFERENCE_WINDOW.enable_and_disable_elements()
 
     # Ignore the error message. render_curr_slice() always returns np.ndarray here
-    # sincecurr_window must be CIRCUMFERENCE_WINDOW here.
+    # since curr_window must be CIRCUMFERENCE_WINDOW here.
 
     binary_contour_slice: np.ndarray = render_curr_slice()
 
@@ -522,6 +514,26 @@ def goto_circumference() -> None:
     CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
         f"X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_num}"
     )
+
+
+def print_metadata() -> None:
+    """Print current MRIImage's metadata to terminal.
+
+    NRRD files typically don't have a lot of metadata compared to the NIfTI..."""
+    if not len(globs.IMAGE_LIST):
+        print("Can't print metadata when there's no image!")
+        return
+    curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
+    pprint.pprint(curr_mri_image.metadata)
+
+
+def print_dimensions() -> None:
+    """Print current MRIImage's dimensions to terminal."""
+    if not len(globs.IMAGE_LIST):
+        print("Can't print dimensions when there's no image!")
+        return
+    curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
+    print(curr_mri_image.get_size())
 
 
 def goto_main() -> None:
@@ -566,8 +578,8 @@ def main() -> None:
 
     STACKED_WIDGET.addWidget(MAIN_WINDOW)
     STACKED_WIDGET.addWidget(CIRCUMFERENCE_WINDOW)
-    STACKED_WIDGET.setMinimumWidth(DEFAULT_WIDTH)
-    STACKED_WIDGET.setMinimumHeight(DEFAULT_HEIGHT)
+    STACKED_WIDGET.setMinimumWidth(settings.MIN_WIDTH)
+    STACKED_WIDGET.setMinimumHeight(settings.MIN_HEIGHT)
     STACKED_WIDGET.show()
 
     try:

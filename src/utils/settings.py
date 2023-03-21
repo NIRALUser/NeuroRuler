@@ -1,8 +1,10 @@
-"""Global settings that the user should be able to modify directly, unlike globs.py, via JSON, GUI, CLI, etc.
+"""Global settings that the user should be able to modify directly, unlike globs.py and constants.py, via
+JSON, GUI, CLI, etc.
 
-For now, we modify most of these using CLI args."""
+For now, we modify these by using CLI args and hardcoding."""
 
 from pathlib import Path
+from screeninfo import get_monitors
 import src.utils.constants as constants
 
 DEBUG: bool = False
@@ -33,7 +35,8 @@ Should be configurable via JSON later."""
 EXPORTED_FILE_NAMES_USE_INDEX: bool = False
 """If True, then exported files will be named using the index in the program.
 
-E.g. 1_0_0_0_0.png, 2_90_180_0_60.csv, etc., where the first part is the file name and the other parts are settings.
+E.g. 1_0_0_0_0.png, 2_90_180_0_60.csv, etc., where the first part is the file name and
+the other parts are image settings.
 
 If False (default), then exported files will be named using the file name of the original file.
 
@@ -67,3 +70,15 @@ Defaults to 'dark-hct'.
 Configurable via -t, --theme CLI option.
 
 The full path to the .qss file is {globs.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
+
+PRIMARY_MONITOR_DIMENSIONS: list[int] = []
+
+for m in get_monitors():
+    if m.is_primary:
+        PRIMARY_MONITOR_DIMENSIONS.append(m.width)
+        PRIMARY_MONITOR_DIMENSIONS.append(m.height)
+
+MIN_WIDTH: int = int(PRIMARY_MONITOR_DIMENSIONS[0] * 0.8)
+"""Min width of the GUI. Defaults to width of primary monitor * .75."""
+MIN_HEIGHT: int = int(PRIMARY_MONITOR_DIMENSIONS[1] * 0.8)
+"""Min height of the GUI. Defaults to height of primary monitor * .5."""
