@@ -7,7 +7,7 @@ from typing import Union
 
 import src.utils.exceptions as exceptions
 from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE
-import src.utils.settings as settings
+import src.utils.user_settings as settings
 
 
 # The RV is a np array, not sitk.Image
@@ -19,9 +19,8 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
     hole filling, and island removal. Return a binary (0|1) numpy
     array with only the points on the contour=1.
 
-    Calls sitk.GetArrayFromImage() at the end, which will return the "transpose" of the sitk.Image.
-    Consider whether to re-transpose or not. Test carefully. In src/GUI/main.py, not re-transposing
-    makes our image oriented the same as in Fiji.
+    Calls sitk.GetArrayFromImage() at the end, which will return the transpose of the sitk.Image.
+    retranspose defaults to False to match images viwed in ITK-SNAP.
 
     If settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice`
     since it was smoothed in :code:`MRIImage.resample()`.

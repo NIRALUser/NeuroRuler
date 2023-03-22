@@ -1,5 +1,5 @@
 """Global variables and functions that change throughout program execution, unlike constants.py,
-that the user should not be able to modify directly, unlike settings.py.
+that the user should not be able to modify directly, unlike user_settings.py.
 
 Can run this file as module (python -m src.utils.globs) to test stuff."""
 

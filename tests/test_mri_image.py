@@ -10,7 +10,7 @@ import pytest
 from src.utils.mri_image import MRIImage, MRIImageList
 from src.utils.constants import EXAMPLE_DATA_DIR
 import src.utils.exceptions as exceptions
-from src.utils.globs import EXAMPLE_IMAGES
+from src.utils.global_vars import EXAMPLE_IMAGES
 
 NRRD0_PATH = EXAMPLE_DATA_DIR / "BCP_Dataset_2month_T1w.nrrd"
 NRRD1_PATH = EXAMPLE_DATA_DIR / "IBIS_Dataset_12month_T1w.nrrd"

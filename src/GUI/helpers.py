@@ -7,7 +7,7 @@ import numpy as np
 from PyQt6.QtGui import QImage, QColor
 
 import src.utils.exceptions as exceptions
-import src.utils.settings as settings
+import src.utils.user_settings as settings
 
 
 def string_to_QColor(name_or_hex: str) -> QColor:

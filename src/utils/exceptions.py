@@ -14,7 +14,7 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
 
     Most valid brain slices have only 2 or 3 detectable contours.
 
-    Change the number in globs.py, then run `pytest` and examine slices given by settings in
+    Change the number in global_vars.py, then run `pytest` and examine slices given by settings in
     tests/noise_vals.txt. Some valid slices have 6 or 7 contours.
 
     See NIFTI file (0, 0, 0, 151) for a valid slice with 9 contours. 9 seems like a good limit.

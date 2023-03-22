@@ -41,9 +41,9 @@ import qimage2ndarray
 import pprint
 
 import src.utils.constants as constants
-import src.utils.globs as globs
+import src.utils.global_vars as globs
 import src.utils.imgproc as imgproc
-import src.utils.settings as settings
+import src.utils.user_settings as settings
 from src.GUI.helpers import string_to_QColor, mask_QImage
 from src.utils.mri_image import MRIImage, MRIImageList
 from src.utils.parse_cli import parse_gui_cli
@@ -395,11 +395,11 @@ def render_curr_slice() -> Union[np.ndarray, None]:
 
     Also sets text for `image_num_label` and file path in the status bar tooltip.
 
-    If `curr_window == CIRCUMFERENCE_WINDOW`, also calls `imgproc.contour()` to display
-    the contour on top of the image. Note `==`, not `isinstance()`, because there should
+    If `curr_window == CIRCUMFERENCE_WINDOW`, also calls `imgproc.contour()` to outline
+    the contour of the image. Note `==`, not `isinstance()`, because there should
     be only one global instance of `CircumferenceWindow`.
 
-    Additionally, also returns a view of the contoured slice if `curr_window == CIRCUMFERENCE_WINDOW`.
+    Additionally, also returns a view of the binary contoured slice if `curr_window == CIRCUMFERENCE_WINDOW`.
     This saves work in `goto_circumference`.
 
     NOTE: This function relies on the object names `image` and `image_num_label` being
@@ -413,10 +413,6 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     rotated_slice: sitk.Image = curr_mri_image.resample()
 
     slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
-
-    # Used to re-transpose since GetArrayFromImage returns the "transpose" of the sitk.Image
-    # However, not re-transposing causes our image to be oriented the same as in Fiji.
-    # slice_np = np.transpose(slice_np)
 
     q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
 

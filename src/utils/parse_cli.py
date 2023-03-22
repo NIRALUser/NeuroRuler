@@ -2,12 +2,12 @@
 
 import argparse
 
-import src.utils.settings as settings
+import src.utils.user_settings as settings
 import src.utils.constants as constants
 
 
 def parse_gui_cli() -> None:
-    """Parse GUI CLI args and set global settings in `settings.py`."""
+    """Parse GUI CLI args and set global settings in `user_settings.py`."""
     parser = argparse.ArgumentParser(
         usage="python -m [-h] [-d] [-s] [-e] [-f] [-t THEME] [-c COLOR] src.GUI.main"
     )

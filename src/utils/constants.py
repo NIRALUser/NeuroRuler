@@ -2,11 +2,11 @@
 
 This file should never import any module in this repo to avoid any circular import problems.
 
-It holds values that will never change after program setup (i.e., during execution), unlike globs.py.
+It holds values that will never change after program setup (i.e., during execution), unlike global_vars.py.
 But things like THEMES can go here. Specifically, THEMES is a mutable set, but it will never
 change after initial setup.
 
-No values here should be modifiable by the user, unlike settings.py."""
+No values here should be modifiable by the user, unlike user_settings.py."""
 
 from pathlib import Path
 import warnings

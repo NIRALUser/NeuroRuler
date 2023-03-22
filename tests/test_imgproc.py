@@ -9,7 +9,7 @@ import pytest
 import pathlib
 from src.utils.imgproc import contour, length_of_contour
 import src.utils.exceptions as exceptions
-from src.utils.globs import EXAMPLE_IMAGES
+from src.utils.global_vars import EXAMPLE_IMAGES
 from src.utils.constants import EXAMPLE_DATA_DIR, NUM_CONTOURS_IN_INVALID_SLICE
 
 EPSILON: float = 0.001

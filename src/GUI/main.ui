@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>809</width>
-    <height>662</height>
+    <height>658</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -243,10 +243,10 @@
          <string>Control Z rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
         </property>
         <property name="minimum">
-         <number>-90</number>
+         <number>-180</number>
         </property>
         <property name="maximum">
-         <number>90</number>
+         <number>180</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

@@ -15,7 +15,7 @@ import SimpleITK as sitk
 import warnings
 
 import src.utils.exceptions as exceptions
-import src.utils.settings as settings
+import src.utils.user_settings as settings
 from src.utils.constants import (
     degrees_to_radians,
     deprecated,
@@ -298,7 +298,7 @@ class MRIImageList(_collections_abc.MutableSequence):
     An instance can be used the same as you would use a Python `list` [ ]. Subscription notation, slicing,
     len(), del, .append(), .extend(), `in` operator, etc.
 
-    There should only be a single instance of `MRIImageList`. There's a global `MRIImageList` in globs.py.
+    There should only be a single instance of `MRIImageList`. There's a global `MRIImageList` in global_vars.py.
     Not enforced, but don't make more than one instance.
 
     Wraps a set[Path] that is updated on insert & remove operations.

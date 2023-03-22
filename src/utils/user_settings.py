@@ -1,4 +1,4 @@
-"""Global settings that the user should be able to modify directly, unlike globs.py and constants.py, via
+"""Global settings that the user should be able to modify directly, unlike global_vars.py and constants.py, via
 JSON, GUI, CLI, etc.
 
 For now, we modify these by using CLI args and hardcoding."""
