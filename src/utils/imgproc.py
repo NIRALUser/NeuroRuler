@@ -3,6 +3,7 @@
 import SimpleITK as sitk
 import cv2
 import numpy as np
+from typing import Union
 
 import src.utils.exceptions as exceptions
 from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE
@@ -13,29 +14,30 @@ import src.utils.settings as settings
 # because we can't actually use a sitk.Image contour in the program
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
-def contour(mri_slice: sitk.Image, retranspose: bool = True) -> np.ndarray:
+def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
     """Generate the contour of a 2D slice by applying smoothing, Otsu threshold,
     hole filling, and island removal. Return a binary (0|1) numpy
     array with only the points on the contour=1.
 
-    `mri_slice` will likely be the result of MRIImage.resample().
+    Calls sitk.GetArrayFromImage() at the end, which will return the "transpose" of the sitk.Image.
+    Consider whether to re-transpose or not. Test carefully. In src/GUI/main.py, not re-transposing
+    makes our image oriented the same as in Fiji.
 
     If settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice`
     since it was smoothed in :code:`MRIImage.resample()`.
 
     :param mri_slice: 2D MRI slice
     :type mri_slice: sitk.Image
-
-    :param retranspose: Whether to return a re-transposed numpy array. Defaults to False.
+    :param retranspose: Whether to return a re-transposed ndarray. Defaults to False.
     :type retranspose: bool
     :return: binary (0|1) numpy array with only the points on the contour = 1
     :rtype: np.ndarray"""
+    if settings.DEBUG and not settings.SMOOTH_BEFORE_RENDERING:
+        print("imgproc.contour() smoothed the slice provided to it.")
     # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
     # However, this does throw some weird errors
     # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
     # Stable time step for this image must be smaller than 0.0997431
-    if settings.DEBUG and not settings.SMOOTH_BEFORE_RENDERING:
-        print("imgproc.contour() smoothed the slice provided to it.")
     smooth_slice: sitk.Image = (
         mri_slice
         if settings.SMOOTH_BEFORE_RENDERING

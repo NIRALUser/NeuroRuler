@@ -400,8 +400,7 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     be only one global instance of `CircumferenceWindow`.
 
     Additionally, also returns a view of the contoured slice if `curr_window == CIRCUMFERENCE_WINDOW`.
-    This saves work in the `goto_circumference` function since it avoids calling `contour()` and `resample()`
-    again.
+    This saves work in `goto_circumference`.
 
     NOTE: This function relies on the object names `image` and `image_num_label` being
     the same for `MainWindow` and `CircumferenceWindow` in the `.ui` files.
@@ -414,7 +413,11 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     rotated_slice: sitk.Image = curr_mri_image.resample()
 
     slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
+
+    # Used to re-transpose since GetArrayFromImage returns the "transpose" of the sitk.Image
+    # However, not re-transposing causes our image to be oriented the same as in Fiji.
     # slice_np = np.transpose(slice_np)
+
     q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
 
     rv_dummy_var: np.ndarray = np.zeros(0)
@@ -422,7 +425,6 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     if curr_window == CIRCUMFERENCE_WINDOW:
         binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
         rv_dummy_var = binary_contour_slice
-        # Re-retranspose here to make the dimensions of q_img and the mask the same
         mask_QImage(
             q_img,
             np.transpose(binary_contour_slice),
@@ -501,11 +503,6 @@ def goto_circumference() -> None:
     # since curr_window must be CIRCUMFERENCE_WINDOW here.
 
     binary_contour_slice: np.ndarray = render_curr_slice()
-
-    # Use this to compare to previous results and make sure nothing changed
-    # circumference: float = imgproc.length_of_contour(
-    #     imgproc.contour(curr_mri_image.resample())
-    # )
 
     circumference: float = imgproc.length_of_contour(binary_contour_slice)
     CIRCUMFERENCE_WINDOW.circumference_label.setText(
