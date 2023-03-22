@@ -4,7 +4,7 @@ JSON, GUI, CLI, etc.
 For now, we modify these by using CLI args and hardcoding."""
 
 from pathlib import Path
-from screeninfo import get_monitors
+from screeninfo import get_monitors, ScreenInfoError
 import src.utils.constants as constants
 
 DEBUG: bool = False
@@ -71,14 +71,20 @@ Configurable via -t, --theme CLI option.
 
 The full path to the .qss file is {globs.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
 
-PRIMARY_MONITOR_DIMENSIONS: list[int] = []
+PRIMARY_MONITOR_DIMENSIONS: list[int] = [500, 500]
+"""Will be set to user's primary monitor's dimensions. 500, 500 are dummy values"""
 
-for m in get_monitors():
-    if m.is_primary:
-        PRIMARY_MONITOR_DIMENSIONS.append(m.width)
-        PRIMARY_MONITOR_DIMENSIONS.append(m.height)
+try:
+    for m in get_monitors():
+        if m.is_primary:
+            PRIMARY_MONITOR_DIMENSIONS[0] = m.width
+            PRIMARY_MONITOR_DIMENSIONS[1] = m.height
+except ScreenInfoError:
+    # This will occur on GH automated tests.
+    pass
 
-MIN_WIDTH: int = int(PRIMARY_MONITOR_DIMENSIONS[0] * 0.8)
-"""Min width of the GUI. Defaults to width of primary monitor * .75."""
-MIN_HEIGHT: int = int(PRIMARY_MONITOR_DIMENSIONS[1] * 0.8)
-"""Min height of the GUI. Defaults to height of primary monitor * .5."""
+
+MIN_WIDTH: int = int(PRIMARY_MONITOR_DIMENSIONS[0] * 0.55)
+"""Min width of the GUI. Defaults to width of primary monitor * .55"""
+MIN_HEIGHT: int = int(PRIMARY_MONITOR_DIMENSIONS[1] * 0.75)
+"""Min height of the GUI. Defaults to height of primary monitor * .75"""

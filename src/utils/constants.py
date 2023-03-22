@@ -73,6 +73,8 @@ See mri_image.py MRIImage for code to get metadata using sitk."""
 NIFTI_METADATA_UNITS_KEY: str = "xyzt_units"
 """In the NIfTI metadata dictionary, the numerical str value attached to this key represents units of the file."""
 
+NUM_DIGITS_TO_ROUND_TO: int = 3
+"""For floats, number of digits n to round to, i.e. round(float, n)."""
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 def deprecated(func):

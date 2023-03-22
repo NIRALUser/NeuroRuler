@@ -506,7 +506,7 @@ def goto_circumference() -> None:
 
     circumference: float = imgproc.length_of_contour(binary_contour_slice)
     CIRCUMFERENCE_WINDOW.circumference_label.setText(
-        f"Circumference: {circumference} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
+        f"Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
     )
     CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
         f"X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_num}"
