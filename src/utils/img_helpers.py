@@ -23,11 +23,15 @@ def update_image_groups(path_list: list[Path]) -> None:
         for group in global_vars.IMAGE_GROUPS:
             group_properties: tuple = group[0]
             group_image_dict: dict[Path, sitk.Image] = group[1]
-            if new_img_properties == group_properties and path not in group_image_dict:
+            if new_img_properties == group_properties:
+                # A duplicate path will get here but we reassign the sitk.Image anyway
+                # Because maybe the path stayed the same but the image file changed
+                # No harm in reassigning. Already needed to do READER.Execute() to get properties anyway.
                 group_image_dict[path] = new_img
-        # TODO: Test this for else exhaustion behavior
+                break
         else:
             global_vars.IMAGE_GROUPS.append((new_img_properties, {path: new_img}))
+    global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[0][1]
 
 
 def initialize_globals(path_list: list[Path]) -> None:
@@ -42,7 +46,7 @@ def initialize_globals(path_list: list[Path]) -> None:
     :type path_list: list[Path]"""
     global_vars.IMAGE_GROUPS.clear()
     update_image_groups(path_list)
-    global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[0][1]
+    # IMAGE_DICT was updated by update_image_groups
     global_vars.CURR_IMAGE_INDEX = 0
     global_vars.THETA_X = 0
     global_vars.THETA_Y = 0
@@ -54,6 +58,19 @@ def initialize_globals(path_list: list[Path]) -> None:
             [((dimension - 1) / 2.0) for dimension in model_image.GetSize()]
         )
     )
+    global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
+
+def clear_globals():
+    """Clear global variables for unit testing in test_img_helpers.
+    
+    Don't need to reset Euler3DTransform since that's not used in the tests there."""
+    global_vars.IMAGE_GROUPS.clear()
+    global_vars.IMAGE_DICT.clear()
+    global_vars.CURR_IMAGE_INDEX = 0
+    global_vars.THETA_X = 0
+    global_vars.THETA_Y = 0
+    global_vars.THETA_Z = 0
+    global_vars.SLICE = 0
 
 
 # TODO: Add more properties
@@ -188,3 +205,41 @@ def model_image_path() -> Path:
 
 def get_model_image() -> sitk.Image:
     return global_vars.IMAGE_DICT[list(global_vars.IMAGE_DICT.keys())[0]]
+
+def get_middle_of_2nd_dimension(img: sitk.Image) -> int:
+    """Used to get the middle of the z dimension (i.e., 2nd dimension, 0-indexed) of a sitk.Image
+
+    :param img:
+    :type img: sitk.Image
+    :return: Middle of the z dimension (2nd dimension, 0-indexed)
+    :rtype: int"""
+    return int((img.GetSize()[2] - 1) / 2)
+
+
+def del_curr_img() -> None:
+    """Won't remove if IMAGE_DICT is empty. Will print message and return early.
+
+    Will decrement CURR_IMAGE_INDEX if removing the last element.
+
+    Will not check for IMAGE_DICT being empty after the deletion. This happens in the GUI."""
+    if len(global_vars.IMAGE_DICT) == 0:
+        print("Can't remove from empty list!")
+        return
+
+    del global_vars.IMAGE_DICT[
+        list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
+    ]
+
+    # Just deleted the last image. Index must decrease by 1
+    if global_vars.CURR_IMAGE_INDEX == len(global_vars.IMAGE_DICT):
+        global_vars.CURR_IMAGE_INDEX -= 1
+
+def next_img() -> None:
+    global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX + 1) % len(
+        global_vars.IMAGE_DICT
+    )
+
+def previous_img() -> None:
+    global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX - 1) % len(
+        global_vars.IMAGE_DICT
+    )

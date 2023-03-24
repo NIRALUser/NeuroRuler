@@ -61,6 +61,7 @@ from src.utils.img_helpers import (
     model_image_path,
     get_model_image,
 )
+import src.utils.img_helpers as img_helpers
 
 from src.utils.parse_cli import parse_gui_cli
 
@@ -266,23 +267,13 @@ class MainWindow(QMainWindow):
         Removes current image from `IMAGE_DICT`.
 
         :returns: None"""
-        if len(global_vars.IMAGE_DICT) == 0:
-            print("Can't remove from empty list!")
-            return
-
-        del global_vars.IMAGE_DICT[
-            list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
-        ]
+        img_helpers.del_curr_img()
 
         if len(global_vars.IMAGE_DICT) == 0:
             self.disable_elements()
             return
 
-        # Just deleted the last image. Index must decrease by 1
-        if global_vars.CURR_IMAGE_INDEX == len(global_vars.IMAGE_DICT):
-            global_vars.CURR_IMAGE_INDEX -= 1
-
-        # TODO: Also unit test that when deleting the first image, then the model image is the new first image
+        # TODO: Unit test that when deleting the first image, then the model image is the new first image
 
         render_curr_slice()
 
@@ -290,18 +281,14 @@ class MainWindow(QMainWindow):
         """Called when Next button is clicked.
 
         Advance index and refresh."""
-        global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX + 1) % len(
-            global_vars.IMAGE_DICT
-        )
+        img_helpers.next_img()
         render_curr_slice()
 
     def previous_img(self):
         """Called when Previous button is clicked.
 
         Decrement index and refresh."""
-        global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX - 1) % len(
-            global_vars.IMAGE_DICT
-        )
+        img_helpers.previous_img()
         render_curr_slice()
 
     def rotate_x(self):
@@ -348,7 +335,7 @@ class MainWindow(QMainWindow):
         global_vars.THETA_X = 0
         global_vars.THETA_Y = 0
         global_vars.THETA_Z = 0
-        global_vars.SLICE = int((get_model_image().GetSize()[2] - 1) / 2)
+        global_vars.SLICE = img_helpers.get_middle_of_2nd_dimension(get_model_image())
         render_curr_slice()
         self.render_all_sliders()
 
