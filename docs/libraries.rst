@@ -394,7 +394,7 @@ whereas Windows paths look like :code:`C:\\idk\\how\\Windows\\works\\...`.
 Always build up a :code:`Path` using the :code:`Path` capabilities (:code:`/` operator).
 Then when a :code:`str` is needed, apply :code:`str()` to convert at the end.
 
-See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example code. Also see this code from `src/utils/globs.py <_modules/src/utils/globs.html>`_.
+See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example code. Also see this code from `src/utils/global_vars.py <_modules/src/utils/global_vars.html>`_.
 
 .. code-block:: python
     :linenos:
@@ -463,7 +463,7 @@ warnings, functools
 
 Allow us to mark functions :code:`@deprecated`.
 
-.. currentmodule:: src.utils.globs
+.. currentmodule:: src.utils.global_vars
 .. autofunction:: deprecated
 
 .. _sphinxsetuptools:

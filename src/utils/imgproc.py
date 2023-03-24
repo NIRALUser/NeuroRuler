@@ -15,7 +15,7 @@ import src.utils.user_settings as settings
 # To overlay the contour on top of the base image in the GUI, we need a np array
 def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
     """Generate the contour of a 2D slice by applying smoothing, Otsu threshold,
-    hole filling, and island removal. Return a binary (0|1) numpy
+    hole filling, and island removal (remove largest component). Return a binary (0|1) numpy
     array with only the points on the contour=1.
 
     Calls sitk.GetArrayFromImage() at the end, which will return the transpose of the sitk.Image.
@@ -97,7 +97,7 @@ def length_of_contour(
     :type binary_contour_slice: np.ndarray
     :param raise_exception: Whether or not to raise ComputeCircumferenceOfInvalidSlice.  Defaults to True and should be False only for unit testing purposes.
     :type raise_exception: bool
-    :raise exceptions.ComputeCircumferenceOfInvalidSlice: If >= globs.NUM_CONTOURS_IN_INVALID_SLICE contours are detected.
+    :raise exceptions.ComputeCircumferenceOfInvalidSlice: If >= constants.NUM_CONTOURS_IN_INVALID_SLICE contours are detected.
     :return: Arc length of parent contour
     :rtype: float"""
 

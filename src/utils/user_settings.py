@@ -69,7 +69,7 @@ Defaults to 'dark-hct'.
 
 Configurable via -t, --theme CLI option.
 
-The full path to the .qss file is {globs.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
+The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
 
 PRIMARY_MONITOR_DIMENSIONS: list[int] = [500, 500]
 """Will be set to user's primary monitor's dimensions. 500, 500 are dummy values"""

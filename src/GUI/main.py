@@ -53,12 +53,12 @@ from src.GUI.helpers import (
 
 from src.utils.mri_image import (
     validate_image,
-    get_curr_image,
-    get_rotated_slice,
-    get_metadata,
-    get_physical_units,
-    get_curr_path,
-    get_model_image_path,
+    curr_image,
+    curr_rotated_slice,
+    curr_metadata,
+    curr_physical_units,
+    curr_path,
+    model_image_path,
 )
 
 from src.utils.parse_cli import parse_gui_cli
@@ -446,7 +446,7 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     :return: np.ndarray if `curr_window == CIRCUMFERENCE_WINDOW` else None
     :rtype: np.ndarray or None"""
     curr_window = STACKED_WIDGET.currentWidget()
-    rotated_slice: sitk.Image = get_rotated_slice()
+    rotated_slice: sitk.Image = curr_rotated_slice()
 
     slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
@@ -470,13 +470,13 @@ def render_curr_slice() -> Union[np.ndarray, None]:
         f"Image {global_vars.INDEX + 1} of {len(global_vars.IMAGE_DICT)}"
     )
     if curr_window == MAIN_WINDOW:
-        curr_window.image_path_label.setText(str(get_curr_path().name))
-        curr_window.image_path_label.setStatusTip(str(get_curr_path()))
+        curr_window.image_path_label.setText(str(curr_path().name))
+        curr_window.image_path_label.setStatusTip(str(curr_path()))
     curr_window.image.setStatusTip(
         str(
-            get_curr_path()
+            curr_path()
             if settings.IMAGE_STATUS_BAR_SHOWS_FULL_PATH
-            else get_curr_path().name
+            else curr_path().name
         )
     )
 
@@ -505,7 +505,7 @@ def export_curr_slice_as_img(extension: str):
     file_name = (
         global_vars.INDEX + 1
         if settings.EXPORTED_FILE_NAMES_USE_INDEX
-        else get_curr_path().name
+        else curr_path().name
     )
     path: str = str(
         settings.IMG_DIR
@@ -527,7 +527,7 @@ def goto_circumference() -> None:
 
     :return: `None`"""
     STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
-    units: Union[str, None] = get_physical_units()
+    units: Union[str, None] = curr_physical_units()
     CIRCUMFERENCE_WINDOW.enable_and_disable_elements()
 
     # Ignore the error message. render_curr_slice() always returns np.ndarray here
@@ -551,7 +551,7 @@ def print_metadata() -> None:
     if not len(global_vars.IMAGE_DICT):
         print("Can't print metadata when there's no image!")
         return
-    pprint.pprint(get_metadata())
+    pprint.pprint(curr_metadata())
 
 
 def print_dimensions() -> None:
@@ -559,14 +559,14 @@ def print_dimensions() -> None:
     if not len(global_vars.IMAGE_DICT):
         print("Can't print dimensions when there's no image!")
         return
-    print(get_curr_image().GetSize())
+    print(curr_image().GetSize())
 
 
 def print_model_image_path() -> None:
     """Print the model image's path to terminal.
 
     Currently used to test that the model image is set correct on deletion, etc."""
-    print(get_model_image_path())
+    print(model_image_path())
 
 
 def goto_main() -> None:

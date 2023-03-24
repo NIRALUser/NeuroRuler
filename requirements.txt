@@ -13,6 +13,7 @@ pytest==6.2.5
 PyQt6==6.4.2
 qimage2ndarray==1.10.0
 screeninfo
+sortedcontainers
 ##############
 # Autoformatting. User does not need, remove later
 black
