@@ -52,7 +52,8 @@ from src.GUI.helpers import (
 )
 
 from src.utils.mri_image import (
-    validate_image,
+    initialize_globals,
+    put_paths_in_image_groups,
     curr_image,
     curr_rotated_slice,
     curr_metadata,
@@ -218,19 +219,18 @@ class MainWindow(QMainWindow):
         self.z_rotation_label.setText(f"Z rotation: {global_vars.THETA_Z}°")
         self.slice_num_label.setText(f"Slice: {global_vars.SLICE}")
 
-    # TODO: simplify this function. Remove duplicated code
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
 
         If `extend`, then `IMAGE_DICT` will be extended with new files. Else, `IMAGE_DICT` will be
-        initialized (e.g. when choosing files for the first time) and all currently loaded images, if any,
-        will be cleared. `MODEL_IMAGE` will also be initialized.
+        initialized (e.g. when choosing files for the first time or just re-opening)
+        and all currently loaded images, if any, will be cleared. `MODEL_IMAGE` will also be initialized.
 
         Opens file menu and calls `enable_and_disable_elements()` if not `extend`.
 
         Lastly, calls `render_curr_slice()` or `refresh()`.
 
-        :param extend: Whether to extend the MRIImageList (Add images) or create a new MRIImageList (Open).
+        :param extend: Whether to add to IMAGE_DICT (Add images) or clear and re-populate IMAGE_DICT (Open)
         :type extend: bool
         :return: None"""
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
@@ -241,37 +241,21 @@ class MainWindow(QMainWindow):
             self, "Open files", str(settings.FILE_BROWSER_START_DIR), file_filter
         )
 
-        path_list: list[str] = files[0]
+        # list[str]
+        path_list = files[0]
         if len(path_list) == 0:
             return
+        # Convert to list[Path]. Slight inefficiency but worth.
+        path_list = list(map(Path, path_list))
 
         if not extend:
-            # TODO: Put this in a helper function initialize()
-            global_vars.IMAGE_DICT.clear()
-            global_vars.INDEX = 0
-            model_image_path: str = path_list[0]
-            global_vars.READER.SetFileName(model_image_path)
-            model_image: sitk.Image = global_vars.READER.Execute()
-            global_vars.MODEL_IMAGE = model_image
-            global_vars.IMAGE_DICT[Path(model_image_path)] = model_image
-            global_vars.THETA_X = 0
-            global_vars.THETA_Y = 0
-            global_vars.THETA_Z = 0
-            global_vars.SLICE = int((model_image.GetSize()[2] - 1) / 2)
-            global_vars.EULER_3D_TRANSFORM.SetCenter(
-                model_image.TransformContinuousIndexToPhysicalPoint(
-                    [((dimension - 1) / 2.0) for dimension in model_image.GetSize()]
-                )
-            )
+            path_to_model_image: Path = Path(path_list[0])
+            initialize_globals(path_to_model_image)
+
             # If Opening, then the 0'th image was just inserted. Don't need to look at it again
             path_list = path_list[1:]
 
-        for path in path_list:
-            global_vars.READER.SetFileName(path)
-            new_img: sitk.Image = global_vars.READER.Execute()
-            if not validate_image(new_img):
-                raise exceptions.DoesNotMatchModelImage(Path(path))
-            global_vars.IMAGE_DICT[Path(path)] = new_img
+        put_paths_in_image_groups(path_list)
 
         render_curr_slice()
 
@@ -289,11 +273,19 @@ class MainWindow(QMainWindow):
         if len(global_vars.IMAGE_DICT) == 0:
             print("Can't remove from empty list!")
             return
+
         del global_vars.IMAGE_DICT[global_vars.IMAGE_DICT.keys()[global_vars.INDEX]]
+
         if len(global_vars.IMAGE_DICT) == 0:
             self.disable_elements()
+            print(global_vars.INDEX)
             return
-        # If just removed the 0'th image, make new 0'th image the model.
+
+        # Just deleted the the last image. Index must decrease by 1
+        if global_vars.INDEX == len(global_vars.IMAGE_DICT):
+            global_vars.INDEX -= 1
+
+        # If just removed the 0'th image and list isn't empty, make new 0'th image the model.
         # Not absolutely necessary since we assume all loaded images have the same properties, but good to have.
         if global_vars.INDEX == 0:
             global_vars.MODEL_IMAGE = global_vars.IMAGE_DICT[

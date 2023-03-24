@@ -75,9 +75,7 @@ def test_contour_doesnt_mutate_slice():
     """Test that contour() doesn't mutate its argument."""
     for img in EXAMPLE_IMAGES.values():
         for slice_num in range(img.GetSize()[2] // 3):
-            rotated_slice: sitk.Image = rotated_slice_hardcoded(
-                img, 0, 0, 0, slice_num
-            )
+            rotated_slice: sitk.Image = rotated_slice_hardcoded(img, 0, 0, 0, slice_num)
             rotated_slice_copy: sitk.Image = rotated_slice_hardcoded(
                 img, 0, 0, 0, slice_num
             )
@@ -120,9 +118,7 @@ def test_contour_retranspose_has_same_dimensions_as_original_image():
 def test_length_of_contour_doesnt_mutate_contour():
     for img in EXAMPLE_IMAGES.values():
         for slice_num in range(img.GetSize()[2] // 10):
-            rotated_slice: sitk.Image = rotated_slice_hardcoded(
-                img, 0, 0, 0, slice_num
-            )
+            rotated_slice: sitk.Image = rotated_slice_hardcoded(img, 0, 0, 0, slice_num)
             contour_slice: np.ndarray = contour(rotated_slice)
             contour_slice_copy: np.ndarray = contour_slice.copy()
             length_of_contour(contour_slice, False)
@@ -138,9 +134,7 @@ def test_contours_0_is_always_parent_contour_if_no_islands():
     """
     for img in EXAMPLE_IMAGES.values():
         for slice_num in range(img.GetSize()[2] // 7):
-            rotated_slice: sitk.Image = rotated_slice_hardcoded(
-                img, 0, 0, 0, slice_num
-            )
+            rotated_slice: sitk.Image = rotated_slice_hardcoded(img, 0, 0, 0, slice_num)
             # contour removes islands
             contour_slice: np.ndarray = contour(rotated_slice)
             contours, hierarchy = cv2.findContours(
