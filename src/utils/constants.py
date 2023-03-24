@@ -68,7 +68,7 @@ NIFTI_METADATA_UNITS_VALUE_TO_PHYSICAL_UNITS: dict[str, str] = {
 
 Based on https://brainder.org/2012/09/23/the-nifti-file-format/.
 
-See mri_image.py MRIImage for code to get metadata using sitk."""
+See img_helpers.py MRIImage for code to get metadata using sitk."""
 
 NIFTI_METADATA_UNITS_KEY: str = "xyzt_units"
 """In the NIfTI metadata dictionary, the numerical str value attached to this key represents units of the file."""
