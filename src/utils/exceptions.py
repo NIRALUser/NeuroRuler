@@ -85,3 +85,9 @@ class RotationOutOfBounds(Exception):
     def __init__(self, theta: int, axis: str):
         self.message = f"{axis} rotation value {theta} out of bounds. Min rotation value is {ROTATION_MIN} degrees, and max is {ROTATION_MAX}."
         super().__init__(self.message)
+
+
+class DoesNotMatchModelImage(Exception):
+    def __init__(self, path: Path):
+        self.message = f"Newly added image with path {path} has properties (e.g., dimensions, pixel spacing, etc.) that do not match the first image in the list."
+        super().__init__

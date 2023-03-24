@@ -5,23 +5,30 @@ Can run this file as module (python -m src.utils.globs) to test stuff."""
 
 import warnings
 import functools
+from sortedcontainers import SortedDict
 import SimpleITK as sitk
-import src.utils.constants as constants
-from src.utils.mri_image import MRIImageList, MRIImage
 
-IMAGE_LIST: MRIImageList = MRIImageList()
-"""Global list of MRIImage."""
+IMAGE_DICT: SortedDict = SortedDict()
+"""Global mapping of unique and sorted Path to sitk.Image"""
+
+INDEX: int = 0
+"""Image of the current image in global IMAGE_DICT"""
 
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 """Global `sitk.ImageFileReader`."""
 
-EXAMPLE_IMAGES: list[MRIImage] = []
-"""`list[MRIImage]` formed from the data in `EXAMPLE_DATA_DIR`.
+MODEL_IMAGE: sitk.Image = sitk.Image()
 
-Would go in constants.py but the type annotation requires MRIImage to be imported."""
-for extension in constants.SUPPORTED_EXTENSIONS:
-    for path in constants.EXAMPLE_DATA_DIR.glob(extension):
-        EXAMPLE_IMAGES.append(MRIImage(path))
+EULER_3D_TRANSFORM: sitk.Euler3DTransform = sitk.Euler3DTransform()
+
+THETA_X: int = 0
+"""In degrees"""
+THETA_Y: int = 0
+"""In degrees"""
+THETA_Z: int = 0
+"""In degrees"""
+SLICE: int = 0
+"""0-indexed"""
 
 
 # Autodocumentation throws an error when this isn't here... which file still imports deprecated from globs???
@@ -47,13 +54,7 @@ def deprecated(func):
 
 def main():
     """For testing."""
-    print(EXAMPLE_IMAGES)
-    print(
-        f"\nNumber of example images in {str(constants.EXAMPLE_DATA_DIR.name)}/: {len(EXAMPLE_IMAGES)}"
-    )
-    print(f"img.get_size(): {EXAMPLE_IMAGES[0].get_size()}")
-    # Errors for some reason, but the return type of sitk.Image.GetSize() is tuple, tested in terminal
-    # print(f'type(img.get_size()): {type(EXAMPLE_IMAGES[0].get_size())}')
+    pass
 
 
 if __name__ == "__main__":
