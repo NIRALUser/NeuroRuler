@@ -116,7 +116,7 @@
           <item>
            <widget class="QLabel" name="x_rotation_label">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="text">
              <string>X rotation</string>
@@ -167,7 +167,7 @@
           <item>
            <widget class="QLabel" name="y_rotation_label">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="text">
              <string>Y rotation</string>
@@ -218,7 +218,7 @@
           <item>
            <widget class="QLabel" name="z_rotation_label">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="text">
              <string>Z rotation</string>
@@ -269,7 +269,7 @@
           <item>
            <widget class="QLabel" name="slice_num_label">
             <property name="enabled">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="text">
              <string>Slice</string>
@@ -395,7 +395,7 @@
                 <item>
                  <widget class="QLabel" name="parameter">
                   <property name="enabled">
-                   <bool>true</bool>
+                   <bool>false</bool>
                   </property>
                   <property name="text">
                    <string>Parameter X:</string>
@@ -441,7 +441,7 @@
                 <item>
                  <widget class="QLabel" name="label_5">
                   <property name="enabled">
-                   <bool>true</bool>
+                   <bool>false</bool>
                   </property>
                   <property name="text">
                    <string>Parameter Y:</string>
@@ -486,6 +486,9 @@
                <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
                  <widget class="QLabel" name="label_6">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Parameter Z:</string>
                   </property>
@@ -531,7 +534,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton">
+             <widget class="QPushButton" name="smoothing_preview_button">
               <property name="enabled">
                <bool>false</bool>
               </property>
@@ -619,9 +622,15 @@
                </spacer>
               </item>
               <item>
-               <widget class="QRadioButton" name="radioButton_2">
+               <widget class="QRadioButton" name="otsu_radio_button">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
-                 <string>Binary Threshold</string>
+                 <string>Otsu Threshold</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -639,12 +648,12 @@
                </spacer>
               </item>
               <item>
-               <widget class="QRadioButton" name="radioButton">
-                <property name="text">
-                 <string>Otsu Threshold</string>
+               <widget class="QRadioButton" name="binary_radio_button">
+                <property name="enabled">
+                 <bool>false</bool>
                 </property>
-                <property name="checked">
-                 <bool>true</bool>
+                <property name="text">
+                 <string>Binary Threshold</string>
                 </property>
                </widget>
               </item>
@@ -750,7 +759,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_2">
+             <widget class="QPushButton" name="threshold_preview_button">
               <property name="enabled">
                <bool>false</bool>
               </property>

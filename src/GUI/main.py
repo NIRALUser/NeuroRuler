@@ -137,7 +137,6 @@ class MainWindow(QMainWindow):
         self.action_open.setEnabled(True)
         self.action_add_images.setEnabled(True)
         self.action_remove_image.setEnabled(True)
-        self.circumference_label.setEnabled(True)
         self.image.setEnabled(True)
         self.image_path_label.setEnabled(True)
         self.image_num_label.setEnabled(True)
@@ -160,6 +159,10 @@ class MainWindow(QMainWindow):
         self.y_rotation_label.setEnabled(True)
         self.z_rotation_label.setEnabled(True)
         self.slice_num_label.setEnabled(True)
+        self.smoothing_preview_button.setEnabled(True)
+        self.otsu_radio_button.setEnabled(True)
+        self.binary_radio_button.setEnabled(True)
+        self.threshold_preview_button.setEnabled(True)
 
     # TODO: Could just construct a new MainWindow()? Maybe might not work?
     def disable_elements(self) -> None:
