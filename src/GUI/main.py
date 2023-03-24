@@ -5,7 +5,7 @@ Loads `src/GUI/main.ui` and `src/GUI/circumference.ui`, both made in QtDesigner.
 In addition, also loads `.qss` stylesheets and `resources.py` (icons) files, generated
 by BreezeStyleSheets. Our fork of the repo is here: https://github.com/COMP523TeamD/BreezeStyleSheets.
 
-There's a lot of boilerplate here to get current slice, i.e. `globs.IMAGE_LIST[globs.IMAGE_LIST.index]`
+There's a lot of boilerplate here to get current slice, i.e. `global_vars.IMAGE_DICT[global_vars.IMAGE_DICT.index]`
 Isn't too inefficient but could be improved. Tried more global variables but it was pretty bad.
 
 `MainWindow` and `CircumferenceWindow` are in the same file due to the need for shared global variables.
@@ -41,13 +41,31 @@ import qimage2ndarray
 import pprint
 
 import src.utils.constants as constants
-import src.utils.global_vars as globs
+
+# Note, do not import like from src.utils.global_vars import IMAGE_DICT. Then the global variables won't work
+import src.utils.global_vars as global_vars
 import src.utils.imgproc as imgproc
 import src.utils.user_settings as settings
-from src.GUI.helpers import string_to_QColor, mask_QImage
-from src.utils.mri_image import MRIImage, MRIImageList
-from src.utils.parse_cli import parse_gui_cli
+from src.GUI.helpers import (
+    string_to_QColor,
+    mask_QImage,
+)
 
+from src.utils.mri_image import (
+    validate_image,
+    get_curr_image,
+    get_rotated_slice,
+    get_metadata,
+    get_physical_units,
+    get_curr_path,
+    get_model_image_path,
+)
+
+from src.utils.parse_cli import parse_gui_cli
+import src.utils.exceptions as exceptions
+
+DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
+DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
 GITHUB_LINK: str = "https://github.com/COMP523TeamD/HeadCircumferenceTool"
 DOCUMENTATION_LINK: str = "https://headcircumferencetool.readthedocs.io/en/latest/"
 DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
@@ -66,11 +84,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         """Load main.ui file from QtDesigner and connect GUI events to methods/functions."""
         super(MainWindow, self).__init__()
-        self._enabled: bool = False
-        """Whether the GUI elements are enabled or not."""
-
         loadUi(str(Path("src") / "GUI" / "main.ui"), self)
         self.setWindowTitle("Head Circumference Tool")
+        self._enabled = False
+        """Set to True on first call to enable_elements."""
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(lambda: self.browse_files(True))
         self.action_remove_image.triggered.connect(self.remove_curr_img)
@@ -82,6 +99,7 @@ class MainWindow(QMainWindow):
         self.action_test_show_resource.triggered.connect(self.test_show_resource)
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
+        self.action_print_model_image_path.triggered.connect(print_model_image_path)
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -110,14 +128,18 @@ class MainWindow(QMainWindow):
         self.reset_button.clicked.connect(self.reset_settings)
         self.show()
 
-    def enable_and_disable_elements(self) -> None:
+    def enable_elements(self) -> None:
         """Called when File > Open is clicked and when switching from CircumferenceWindow to MainWindow
         (i.e., when Adjust button is clicked).
 
         Enable image, menu items, buttons, and sliders. Disable Export > CSV."""
+        self._enabled = True
         self.action_open.setEnabled(True)
+        self.action_add_images.setEnabled(True)
         self.action_remove_image.setEnabled(True)
+        self.circumference_label.setEnabled(True)
         self.image.setEnabled(True)
+        self.image_path_label.setEnabled(True)
         self.image_num_label.setEnabled(True)
         self.previous_button.setEnabled(True)
         self.next_button.setEnabled(True)
@@ -145,11 +167,16 @@ class MainWindow(QMainWindow):
 
         Needs only handle the items that will be different from the usual state."""
         # self.action_open.setEnabled(True)
+        self.action_add_images.setEnabled(False)
         self.action_remove_image.setEnabled(False)
+        self.circumference_label.setEnabled(False)
+        self.circumference_label.setText(DEFAULT_CIRCUMFERENCE_LABEL_TEXT)
         self.image.setEnabled(False)
         self.image.clear()
         self.image.setText(DEFAULT_IMAGE_TEXT)
         self.image.setStatusTip(DEFAULT_IMAGE_STATUS_TEXT)
+        self.image_path_label.setEnabled(False)
+        self.image_path_label.setText(DEFAULT_IMAGE_PATH_LABEL_TEXT)
         self.image_num_label.setEnabled(False)
         self.image_num_label.setText(DEFAULT_IMAGE_NUM_LABEL_TEXT)
         self.previous_button.setEnabled(False)
@@ -173,34 +200,31 @@ class MainWindow(QMainWindow):
         self.slice_num_label.setEnabled(False)
 
     def render_all_sliders(self) -> None:
-        """Sets all slider values to the values stored in the current `MRIImage`.
+        """Sets all slider values to the global rotation and slice values.
 
-        Called on reset and image switch.
+        Called on reset.
 
         Not called when the user updates a slider.
 
         Also updates rotation and slice num labels."""
-        curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-        theta_x = curr_mri_image.theta_x
-        theta_y = curr_mri_image.theta_y
-        theta_z = curr_mri_image.theta_z
-        slice_num = curr_mri_image.slice_num
-        self.x_slider.setValue(theta_x)
-        self.y_slider.setValue(theta_y)
-        self.z_slider.setValue(theta_z)
-        self.slice_slider.setMaximum(curr_mri_image.get_size()[2] - 1)
-        self.slice_slider.setValue(slice_num)
-        self.x_rotation_label.setText(f"X rotation: {theta_x}°")
-        self.y_rotation_label.setText(f"Y rotation: {theta_y}°")
-        self.z_rotation_label.setText(f"Z rotation: {theta_z}°")
-        self.slice_num_label.setText(f"Slice: {slice_num}")
+        self.x_slider.setValue(global_vars.THETA_X)
+        self.y_slider.setValue(global_vars.THETA_Y)
+        self.z_slider.setValue(global_vars.THETA_Z)
+        # Probably not necessary. Just in case.
+        self.slice_slider.setMaximum(global_vars.MODEL_IMAGE.GetSize()[2] - 1)
+        self.slice_slider.setValue(global_vars.SLICE)
+        self.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
+        self.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
+        self.z_rotation_label.setText(f"Z rotation: {global_vars.THETA_Z}°")
+        self.slice_num_label.setText(f"Slice: {global_vars.SLICE}")
 
+    # TODO: simplify this function. Remove duplicated code
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
 
-        If `extend`, then `IMAGE_LIST` will be extended with new files. Else, `IMAGE_LIST` will be
+        If `extend`, then `IMAGE_DICT` will be extended with new files. Else, `IMAGE_DICT` will be
         initialized (e.g. when choosing files for the first time) and all currently loaded images, if any,
-        will be cleared.
+        will be cleared. `MODEL_IMAGE` will also be initialized.
 
         Opens file menu and calls `enable_and_disable_elements()` if not `extend`.
 
@@ -213,67 +237,90 @@ class MainWindow(QMainWindow):
             "'", ""
         ).replace(",", "")
 
-        # The return value of `getOpenFileNames` is a tuple (list[str], str)
-        # The left element is a list of paths.
-        # So `fnames[0][i]` is the i'th path.
         files = QFileDialog.getOpenFileNames(
             self, "Open files", str(settings.FILE_BROWSER_START_DIR), file_filter
         )
 
-        paths = map(Path, files[0])
-        images: list[MRIImage] = list(map(MRIImage, paths))
-
-        if not len(images):
+        path_list: list[str] = files[0]
+        if len(path_list) == 0:
             return
 
-        if extend:
-            globs.IMAGE_LIST.extend(images)
-            # Handles the edge case of pressing Add images before Open
-            if not self._enabled:
-                self.enable_and_disable_elements()
-            # For refreshing image_num_label
-            render_curr_slice()
-        else:
-            globs.IMAGE_LIST = MRIImageList(images)
-            self.enable_and_disable_elements()
-            self.refresh()
+        if not extend:
+            # TODO: Put this in a helper function initialize()
+            global_vars.IMAGE_DICT.clear()
+            global_vars.INDEX = 0
+            model_image_path: str = path_list[0]
+            global_vars.READER.SetFileName(model_image_path)
+            model_image: sitk.Image = global_vars.READER.Execute()
+            global_vars.MODEL_IMAGE = model_image
+            global_vars.IMAGE_DICT[Path(model_image_path)] = model_image
+            global_vars.THETA_X = 0
+            global_vars.THETA_Y = 0
+            global_vars.THETA_Z = 0
+            global_vars.SLICE = int((model_image.GetSize()[2] - 1) / 2)
+            global_vars.EULER_3D_TRANSFORM.SetCenter(
+                model_image.TransformContinuousIndexToPhysicalPoint(
+                    [((dimension - 1) / 2.0) for dimension in model_image.GetSize()]
+                )
+            )
+            # If Opening, then the 0'th image was just inserted. Don't need to look at it again
+            path_list = path_list[1:]
 
+        for path in path_list:
+            global_vars.READER.SetFileName(path)
+            new_img: sitk.Image = global_vars.READER.Execute()
+            if not validate_image(new_img):
+                raise exceptions.DoesNotMatchModelImage(Path(path))
+            global_vars.IMAGE_DICT[Path(path)] = new_img
+
+        render_curr_slice()
+
+        if not extend:
+            self.render_all_sliders()
+            self.enable_elements()
+
+    # TODO: Due to the images now being a SortedDict, we can now easily remove a bunch of images, not just one
     def remove_curr_img(self) -> None:
         """Called after File > Remove File.
 
-        Removes current image from `IMAGE_LIST`.
+        Removes current image from `IMAGE_DICT`.
 
         :returns: None"""
-        if len(globs.IMAGE_LIST) == 0:
+        if len(global_vars.IMAGE_DICT) == 0:
             print("Can't remove from empty list!")
             return
-        del globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-        if len(globs.IMAGE_LIST) == 0:
+        del global_vars.IMAGE_DICT[global_vars.IMAGE_DICT.keys()[global_vars.INDEX]]
+        if len(global_vars.IMAGE_DICT) == 0:
             self.disable_elements()
             return
-        self.refresh()
+        # If just removed the 0'th image, make new 0'th image the model.
+        # Not absolutely necessary since we assume all loaded images have the same properties, but good to have.
+        if global_vars.INDEX == 0:
+            global_vars.MODEL_IMAGE = global_vars.IMAGE_DICT[
+                global_vars.IMAGE_DICT.keys()[0]
+            ]
+        render_curr_slice()
 
     def next_img(self):
         """Called when Next button is clicked.
 
         Advance index and refresh."""
-        globs.IMAGE_LIST.next()
-        self.refresh()
+        global_vars.INDEX = (global_vars.INDEX + 1) % len(global_vars.IMAGE_DICT)
+        render_curr_slice()
 
     def previous_img(self):
         """Called when Previous button is clicked.
 
         Decrement index and refresh."""
-        globs.IMAGE_LIST.previous()
-        self.refresh()
+        global_vars.INDEX = (global_vars.INDEX - 1) % len(global_vars.IMAGE_DICT)
+        render_curr_slice()
 
     def rotate_x(self):
         """Called any time the user updates the x slider.
 
         Render image and set `x_rotation_label`."""
-        curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         x_slider_val: int = self.x_slider.value()
-        curr_mri_image.theta_x = x_slider_val
+        global_vars.THETA_X = x_slider_val
         render_curr_slice()
         self.x_rotation_label.setText(f"X rotation: {x_slider_val}°")
 
@@ -281,9 +328,8 @@ class MainWindow(QMainWindow):
         """Called any time the user updates the y slider.
 
         Render image and set `y_rotation_label`."""
-        curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         y_slider_val: int = self.y_slider.value()
-        curr_mri_image.theta_y = y_slider_val
+        global_vars.THETA_Y = y_slider_val
         render_curr_slice()
         self.y_rotation_label.setText(f"Y rotation: {y_slider_val}°")
 
@@ -291,9 +337,8 @@ class MainWindow(QMainWindow):
         """Called any time the user updates the z slider.
 
         Render image and set `z_rotation_label`."""
-        curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         z_slider_val: int = self.z_slider.value()
-        curr_mri_image.theta_z = z_slider_val
+        global_vars.THETA_Z = z_slider_val
         render_curr_slice()
         self.z_rotation_label.setText(f"Z rotation: {z_slider_val}°")
 
@@ -301,9 +346,8 @@ class MainWindow(QMainWindow):
         """Called any time the user updates the slice slider.
 
         Render image and set `slice_num_label`."""
-        curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
         slice_slider_val: int = self.slice_slider.value()
-        curr_mri_image.slice_num = slice_slider_val
+        global_vars.SLICE = slice_slider_val
         render_curr_slice()
         self.slice_num_label.setText(f"Slice: {slice_slider_val}")
 
@@ -312,17 +356,10 @@ class MainWindow(QMainWindow):
 
         Resets rotation values to 0 and slice num to the default `int((z-1)/2)`
         for the current image, then `refresh`es."""
-        curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-        curr_mri_image.theta_x = 0
-        curr_mri_image.theta_y = 0
-        curr_mri_image.theta_z = 0
-        curr_mri_image.slice_num = int((curr_mri_image.get_size()[2] - 1) / 2)
-        self.refresh()
-
-    def refresh(self) -> None:
-        """Refresh everything (i.e., image, sliders, and labels).
-
-        Called on window switch and image switch."""
+        global_vars.THETA_X = 0
+        global_vars.THETA_Y = 0
+        global_vars.THETA_Z = 0
+        global_vars.SLICE = int((global_vars.MODEL_IMAGE.GetSize()[2] - 1) / 2)
         render_curr_slice()
         self.render_all_sliders()
 
@@ -360,6 +397,7 @@ class CircumferenceWindow(QMainWindow):
         )
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
+        self.action_print_model_image_path.triggered.connect(print_model_image_path)
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -408,9 +446,7 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     :return: np.ndarray if `curr_window == CIRCUMFERENCE_WINDOW` else None
     :rtype: np.ndarray or None"""
     curr_window = STACKED_WIDGET.currentWidget()
-    curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-    index: int = globs.IMAGE_LIST.index
-    rotated_slice: sitk.Image = curr_mri_image.resample()
+    rotated_slice: sitk.Image = get_rotated_slice()
 
     slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
@@ -430,12 +466,17 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     q_pixmap: QPixmap = QPixmap(q_img)
 
     curr_window.image.setPixmap(q_pixmap)
-    curr_window.image_num_label.setText(f"Image {index + 1} of {len(globs.IMAGE_LIST)}")
+    curr_window.image_num_label.setText(
+        f"Image {global_vars.INDEX + 1} of {len(global_vars.IMAGE_DICT)}"
+    )
+    if curr_window == MAIN_WINDOW:
+        curr_window.image_path_label.setText(str(get_curr_path().name))
+        curr_window.image_path_label.setStatusTip(str(get_curr_path()))
     curr_window.image.setStatusTip(
         str(
-            curr_mri_image.path
+            get_curr_path()
             if settings.IMAGE_STATUS_BAR_SHOWS_FULL_PATH
-            else curr_mri_image.path.name
+            else get_curr_path().name
         )
     )
 
@@ -461,19 +502,14 @@ def export_curr_slice_as_img(extension: str):
 
     :return: `None`"""
     curr_window = STACKED_WIDGET.currentWidget()
-    curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
     file_name = (
-        globs.IMAGE_LIST.index + 1
+        global_vars.INDEX + 1
         if settings.EXPORTED_FILE_NAMES_USE_INDEX
-        else curr_mri_image.path.name
+        else get_curr_path().name
     )
-    theta_x: int = curr_mri_image.theta_x
-    theta_y: int = curr_mri_image.theta_y
-    theta_z: int = curr_mri_image.theta_z
-    slice_num: int = curr_mri_image.slice_num
     path: str = str(
         settings.IMG_DIR
-        / f"{file_name}_{'contoured_' if curr_window == CIRCUMFERENCE_WINDOW else ''}{theta_x}_{theta_y}_{theta_z}_{slice_num}.{extension}"
+        / f"{file_name}_{'contoured_' if curr_window == CIRCUMFERENCE_WINDOW else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
     )
     curr_window.image.pixmap().save(path, extension)
 
@@ -491,8 +527,7 @@ def goto_circumference() -> None:
 
     :return: `None`"""
     STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
-    curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-    units: Union[str, None] = curr_mri_image.get_physical_units()
+    units: Union[str, None] = get_physical_units()
     CIRCUMFERENCE_WINDOW.enable_and_disable_elements()
 
     # Ignore the error message. render_curr_slice() always returns np.ndarray here
@@ -505,7 +540,7 @@ def goto_circumference() -> None:
         f"Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
     )
     CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
-        f"X rotation: {curr_mri_image.theta_x}°\nY rotation: {curr_mri_image.theta_y}°\nZ rotation: {curr_mri_image.theta_z}°\nSlice: {curr_mri_image.slice_num}"
+        f"X rotation: {global_vars.THETA_X}°\nY rotation: {global_vars.THETA_Y}°\nZ rotation: {global_vars.THETA_Z}°\nSlice: {global_vars.SLICE}"
     )
 
 
@@ -513,20 +548,25 @@ def print_metadata() -> None:
     """Print current MRIImage's metadata to terminal.
 
     NRRD files typically don't have a lot of metadata compared to the NIfTI..."""
-    if not len(globs.IMAGE_LIST):
+    if not len(global_vars.IMAGE_DICT):
         print("Can't print metadata when there's no image!")
         return
-    curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-    pprint.pprint(curr_mri_image.metadata)
+    pprint.pprint(get_metadata())
 
 
 def print_dimensions() -> None:
     """Print current MRIImage's dimensions to terminal."""
-    if not len(globs.IMAGE_LIST):
+    if not len(global_vars.IMAGE_DICT):
         print("Can't print dimensions when there's no image!")
         return
-    curr_mri_image: MRIImage = globs.IMAGE_LIST[globs.IMAGE_LIST.index]
-    print(curr_mri_image.get_size())
+    print(get_curr_image().GetSize())
+
+
+def print_model_image_path() -> None:
+    """Print the model image's path to terminal.
+
+    Currently used to test that the model image is set correct on deletion, etc."""
+    print(get_model_image_path())
 
 
 def goto_main() -> None:
@@ -539,7 +579,7 @@ def goto_main() -> None:
     :return: `None`"""
     STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
     render_curr_slice()
-    MAIN_WINDOW.enable_and_disable_elements()
+    MAIN_WINDOW.enable_elements()
 
 
 def main() -> None:
