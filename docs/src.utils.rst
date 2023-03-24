@@ -20,10 +20,10 @@ src.utils.exceptions module
    :undoc-members:
    :show-inheritance:
 
-src.utils.globs module
-----------------------
+src.utils.global\_vars module
+-----------------------------
 
-.. automodule:: src.utils.globs
+.. automodule:: src.utils.global_vars
    :members:
    :undoc-members:
    :show-inheritance:
@@ -52,10 +52,10 @@ src.utils.parse\_cli module
    :undoc-members:
    :show-inheritance:
 
-src.utils.settings module
--------------------------
+src.utils.user\_settings module
+-------------------------------
 
-.. automodule:: src.utils.settings
+.. automodule:: src.utils.user_settings
    :members:
    :undoc-members:
    :show-inheritance:

@@ -34,7 +34,7 @@ def validate_image(img: sitk.Image) -> bool:
     )
 
 
-def get_curr_path() -> Path:
+def curr_path() -> Path:
     """Return the Path of the current image, i.e. global_vars.IMAGE_DICT.keys()[global_vars.INDEX]
 
     :return: Path of current image
@@ -42,7 +42,7 @@ def get_curr_path() -> Path:
     return global_vars.IMAGE_DICT.keys()[global_vars.INDEX]
 
 
-def get_curr_image() -> sitk.Image:
+def curr_image() -> sitk.Image:
     """Return the image at the current index in global_vars.IMAGE_DICT.
 
     :return: current image
@@ -50,8 +50,8 @@ def get_curr_image() -> sitk.Image:
     return global_vars.IMAGE_DICT[global_vars.IMAGE_DICT.keys()[global_vars.INDEX]]
 
 
-def get_rotated_slice() -> sitk.Image:
-    """Return 2D rotated slice of the image at the current index determined by rotation and slice settings in global_vars.py
+def curr_rotated_slice() -> sitk.Image:
+    """Return 2D rotated slice of the current image determined by rotation and slice settings in global_vars.py
 
     Sets global_vars.EULER_3D_TRANSFORM's rotation values but not its center since all loaded images should
     have the same center. TODO: Check this in `validate()`
@@ -63,12 +63,12 @@ def get_rotated_slice() -> sitk.Image:
         degrees_to_radians(global_vars.THETA_Y),
         degrees_to_radians(global_vars.THETA_Z),
     )
-    return sitk.Resample(get_curr_image(), global_vars.EULER_3D_TRANSFORM)[
+    return sitk.Resample(curr_image(), global_vars.EULER_3D_TRANSFORM)[
         :, :, global_vars.SLICE
     ]
 
 
-def get_rotated_slice_hardcoded(
+def rotated_slice_hardcoded(
     mri_img_3d: sitk.Image,
     theta_x: int = 0,
     theta_y: int = 0,
@@ -102,7 +102,7 @@ def get_rotated_slice_hardcoded(
     return sitk.Resample(mri_img_3d, global_vars.EULER_3D_TRANSFORM)[:, :, slice_num]
 
 
-def get_metadata() -> dict[str, str]:
+def curr_metadata() -> dict[str, str]:
     """Computes and returns current image's metadata.
 
     Note: Does not return all metadata stored in the file, just the metadata stored in sitk.Image.GetMetaDataKeys()
@@ -111,7 +111,7 @@ def get_metadata() -> dict[str, str]:
 
     :return: metadata
     :rtype: dict[str, str]"""
-    curr_img: sitk.Image = get_curr_image()
+    curr_img: sitk.Image = curr_image()
     rv: dict[str, str] = dict()
     for key in curr_img.GetMetaDataKeys():
         rv[key] = curr_img.GetMetaData(key)
@@ -119,11 +119,14 @@ def get_metadata() -> dict[str, str]:
 
 
 # TODO: works only for NIFTI, not NRRD
-def get_physical_units() -> Union[str, None]:
+def curr_physical_units() -> Union[str, None]:
     """Return current image's physical units from sitk.GetMetaData if it exists, else None.
 
-    TODO: works only for NIFTI, not NRRD"""
-    curr_img: sitk.Image = get_curr_image()
+    TODO: works only for NIFTI, not NRRD.
+
+    :return: units or None
+    :rtype: str or None"""
+    curr_img: sitk.Image = curr_image()
     if constants.NIFTI_METADATA_UNITS_KEY in curr_img.GetMetaDataKeys():
         return constants.NIFTI_METADATA_UNITS_VALUE_TO_PHYSICAL_UNITS[
             curr_img.GetMetaData(constants.NIFTI_METADATA_UNITS_KEY)
@@ -131,8 +134,14 @@ def get_physical_units() -> Union[str, None]:
     return None
 
 
-def get_model_image_path() -> Path:
-    """Get path of the model image. Internally, traverses the dictionary keys until the value is the MODEL_IMAGE."""
+def model_image_path() -> Path:
+    """Get path of the model image. Internally, traverses keys of global_vars.IMAGE_DICT
+    until the value is the MODEL_IMAGE.
+
+    Since MODEL_IMAGE should always be the first image, should require only one iteration.
+
+    :return: MODEL_IMAGE's Path
+    :rtype: Path"""
     for path in global_vars.IMAGE_DICT.keys():
         if global_vars.IMAGE_DICT[path] == global_vars.MODEL_IMAGE:
             return path
