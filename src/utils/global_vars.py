@@ -3,48 +3,54 @@ that the user should not be able to modify directly, unlike user_settings.py.
 
 Can run this file as module (python -m src.utils.global_vars) to debug stuff."""
 
-from sortedcontainers import SortedDict
 import SimpleITK as sitk
 from pathlib import Path
 
-IMAGE_DICT: SortedDict = SortedDict()
-"""Global mapping of unique and sorted (i.e., the dictionary can be indexed by indices 0, 1, 2, ...) Path to
-sitk.Image.
-
-The first element is always the MODEL_IMAGE. All images in IMAGE_DICT.values() much match the properties
-of MODEL_IMAGE, as defined by mri_image.validate_image."""
-
-INDEX: int = 0
-"""Image of the current image in global IMAGE_DICT"""
-
-MODEL_IMAGE: sitk.Image = sitk.Image()
-"""The prototypical image that all other images to be loaded in the GUI are compared to. All loaded images must have
-the same properties (defined in mri_image.validate_image) as the model image.
-
-Should always be the first loaded image (i.e., reset on deletions)."""
-
-# TODO: Can optimize speed if this changes to list[tuple[tuple, list[tuple[Path, sitk.Image]]]]
-IMAGE_GROUPS: list[tuple[tuple, list[Path]]] = []
+IMAGE_GROUPS: list[tuple[tuple, dict[Path, sitk.Image]]] = list()
 """List of groups of Paths of images. Each group has the same properties,
 as defined by mri_image.validate_image.
 
-Here is the meaning of the type:
-
 [
-    (properties tuple, [path1, path2, path3...])
-    (properties tuple, [path1, path2, path3...])
+    (properties tuple, dict[Path, sitk.Image])
+    (properties tuple, dict[Path, sitk.Image])
+    ...
 ]
 
-A single group is ((properties), list[Path]), where (properties) is the tuple of properties
-for the sitk.Images given by that list of Paths.
+A single group is
+    (properties tuple, dict[Path, sitk.Image])
+and all sitk.Image in that tuple have the same properties, as defined by mri_image.get_properties
 
-Includes the IMAGE_DICT group as its first group.
+dict[Path, sitk.Image] is an images dict.
+We could instead store (properties tuple, list[sitk.Image]), but dict allows us to avoid duplicate Paths.
+Also, I don't think sitk.Image stores path.
 
-IMAGE_GROUPS[i] gets (properties of group i, list[Path])
+The IMAGE_DICT group is by default the first group in this list. If we want to be able to change batches in the GUI,
+we can modify mutate IMAGE_DICT to point to a different group's dict.
 
-IMAGE_GROUPS[i][0] gets (properties of group)
+IMAGE_GROUPS[i] gets (properties of group i, images dict)
 
-IMAGE_GROUPS[i][1] gets list[Path]."""
+IMAGE_GROUPS[i][0] gets (properties of group i)
+
+IMAGE_GROUPS[i][1] gets group i's images dict."""
+
+IMAGE_DICT: dict[Path, sitk.Image] = dict()
+"""Global mapping of unique Path to sitk.Image. The current (i.e., loaded in GUI) group of images in IMAGE_GROUPS.
+
+The model image is always the first sitk.Image in the dictionary.
+
+Since Python 3.7+, dicts maintain insertion order. Therefore, we can use INDEX for retrieval and deletion.
+
+Use list(IMAGE_DICT.keys())[i] to return the i'th key in the dict. This may be slow but will be used only
+in the GUI for insertion and deletion operations, which are uncommon, so should be okay.
+
+All images in the dictionary always have matching properties, as defined by mri_image.get_properties.
+This is due to the setup of IMAGE_GROUPS."""
+
+CURR_IMAGE_INDEX: int = 0
+"""Image of the current image in the current batch."""
+
+CURR_BATCH_INDEX: int = 0
+"""Index of the current group/batch in IMAGE_GROUPS."""
 
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
 """Global `sitk.ImageFileReader`."""

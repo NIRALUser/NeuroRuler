@@ -16,7 +16,7 @@ from src.utils.constants import (
     SUPPORTED_EXTENSIONS,
 )
 from src.utils.global_vars import READER
-from src.utils.mri_image import rotated_slice_hardcoded
+from src.utils.img_helpers import rotated_slice_hardcoded
 
 EPSILON: float = 0.001
 """Used for `float` comparisons."""

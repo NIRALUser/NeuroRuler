@@ -28,18 +28,18 @@ src.utils.global\_vars module
    :undoc-members:
    :show-inheritance:
 
-src.utils.imgproc module
-------------------------
+src.utils.img\_helpers module
+-----------------------------
 
-.. automodule:: src.utils.imgproc
+.. automodule:: src.utils.img_helpers
    :members:
    :undoc-members:
    :show-inheritance:
 
-src.utils.mri\_image module
----------------------------
+src.utils.imgproc module
+------------------------
 
-.. automodule:: src.utils.mri_image
+.. automodule:: src.utils.imgproc
    :members:
    :undoc-members:
    :show-inheritance:

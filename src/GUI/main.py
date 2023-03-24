@@ -17,11 +17,8 @@ depending on the window, so the currently active window is computed in these fun
 If a behavior is unique to a window, then it is a method in the class (though it could be made a function).
 
 Native menu bar is currently disabled. See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/9.
-tl;dr on macOS, there can only be one menubar shared between the two classes. Can work around this by
-making MainWindow's QMenuBar global and using that in CircumferenceWindow (i.e., when switching).
-However, I got segmentation fault when attempting to modify the menubar?
-
-Non-native menu bar is a lot simpler but looks worse on macOS."""
+tl;dr on macOS, there can only be one menubar shared between the two classes. Now that we want only one window,
+we can easily have a native menu bar (just check native menu bar checkbox in QtDesigner)."""
 
 import importlib
 import sys
@@ -42,7 +39,9 @@ import pprint
 
 import src.utils.constants as constants
 
-# Note, do not import like from src.utils.global_vars import IMAGE_DICT. Then the global variables won't work
+# Note, do not use imports like
+# from src.utils.global_vars import IMAGE_DICT.
+# This would make the global variables not work
 import src.utils.global_vars as global_vars
 import src.utils.imgproc as imgproc
 import src.utils.user_settings as settings
@@ -51,19 +50,19 @@ from src.GUI.helpers import (
     mask_QImage,
 )
 
-from src.utils.mri_image import (
+from src.utils.img_helpers import (
     initialize_globals,
-    put_paths_in_image_groups,
+    update_image_groups,
     curr_image,
     curr_rotated_slice,
     curr_metadata,
     curr_physical_units,
     curr_path,
     model_image_path,
+    get_model_image,
 )
 
 from src.utils.parse_cli import parse_gui_cli
-import src.utils.exceptions as exceptions
 
 DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
 DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
@@ -212,7 +211,7 @@ class MainWindow(QMainWindow):
         self.y_slider.setValue(global_vars.THETA_Y)
         self.z_slider.setValue(global_vars.THETA_Z)
         # Probably not necessary. Just in case.
-        self.slice_slider.setMaximum(global_vars.MODEL_IMAGE.GetSize()[2] - 1)
+        self.slice_slider.setMaximum(get_model_image().GetSize()[2] - 1)
         self.slice_slider.setValue(global_vars.SLICE)
         self.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
         self.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
@@ -222,15 +221,17 @@ class MainWindow(QMainWindow):
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
 
-        If `extend`, then `IMAGE_DICT` will be extended with new files. Else, `IMAGE_DICT` will be
-        initialized (e.g. when choosing files for the first time or just re-opening)
-        and all currently loaded images, if any, will be cleared. `MODEL_IMAGE` will also be initialized.
+        If `extend`, then `IMAGE_GROUPS` will be extended with new files. Else, `IMAGE_GROUPS` will be cleared and
+        (re)initialized (e.g. when choosing files for the first time or just re-opening).
+
+        Since IMAGE_DICT is a reference to the first image dict in IMAGE_GROUPS, IMAGE_DICT is also cleared and
+        (re)initialized, by extension.
 
         Opens file menu and calls `enable_and_disable_elements()` if not `extend`.
 
         Lastly, calls `render_curr_slice()` or `refresh()`.
 
-        :param extend: Whether to add to IMAGE_DICT (Add images) or clear and re-populate IMAGE_DICT (Open)
+        :param extend: Whether to clear IMAGE_GROUPS and (re)initialize or extend on it
         :type extend: bool
         :return: None"""
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
@@ -245,25 +246,20 @@ class MainWindow(QMainWindow):
         path_list = files[0]
         if len(path_list) == 0:
             return
+
         # Convert to list[Path]. Slight inefficiency but worth.
         path_list = list(map(Path, path_list))
 
         if not extend:
-            path_to_model_image: Path = Path(path_list[0])
-            initialize_globals(path_to_model_image)
-
-            # If Opening, then the 0'th image was just inserted. Don't need to look at it again
-            path_list = path_list[1:]
-
-        put_paths_in_image_groups(path_list)
+            initialize_globals(path_list)
+            self.render_all_sliders()
+            self.enable_elements()
+        else:
+            update_image_groups(path_list)
 
         render_curr_slice()
 
-        if not extend:
-            self.render_all_sliders()
-            self.enable_elements()
-
-    # TODO: Due to the images now being a SortedDict, we can now easily remove a bunch of images, not just one
+    # TODO: Due to the images now being a dict, we can easily let the user remove a range of images if they want
     def remove_curr_img(self) -> None:
         """Called after File > Remove File.
 
@@ -274,37 +270,38 @@ class MainWindow(QMainWindow):
             print("Can't remove from empty list!")
             return
 
-        del global_vars.IMAGE_DICT[global_vars.IMAGE_DICT.keys()[global_vars.INDEX]]
+        del global_vars.IMAGE_DICT[
+            list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
+        ]
 
         if len(global_vars.IMAGE_DICT) == 0:
             self.disable_elements()
-            print(global_vars.INDEX)
             return
 
-        # Just deleted the the last image. Index must decrease by 1
-        if global_vars.INDEX == len(global_vars.IMAGE_DICT):
-            global_vars.INDEX -= 1
+        # Just deleted the last image. Index must decrease by 1
+        if global_vars.CURR_IMAGE_INDEX == len(global_vars.IMAGE_DICT):
+            global_vars.CURR_IMAGE_INDEX -= 1
 
-        # If just removed the 0'th image and list isn't empty, make new 0'th image the model.
-        # Not absolutely necessary since we assume all loaded images have the same properties, but good to have.
-        if global_vars.INDEX == 0:
-            global_vars.MODEL_IMAGE = global_vars.IMAGE_DICT[
-                global_vars.IMAGE_DICT.keys()[0]
-            ]
+        # TODO: Also unit test that when deleting the first image, then the model image is the new first image
+
         render_curr_slice()
 
     def next_img(self):
         """Called when Next button is clicked.
 
         Advance index and refresh."""
-        global_vars.INDEX = (global_vars.INDEX + 1) % len(global_vars.IMAGE_DICT)
+        global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX + 1) % len(
+            global_vars.IMAGE_DICT
+        )
         render_curr_slice()
 
     def previous_img(self):
         """Called when Previous button is clicked.
 
         Decrement index and refresh."""
-        global_vars.INDEX = (global_vars.INDEX - 1) % len(global_vars.IMAGE_DICT)
+        global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX - 1) % len(
+            global_vars.IMAGE_DICT
+        )
         render_curr_slice()
 
     def rotate_x(self):
@@ -347,11 +344,11 @@ class MainWindow(QMainWindow):
         """Called when Reset is clicked.
 
         Resets rotation values to 0 and slice num to the default `int((z-1)/2)`
-        for the current image, then `refresh`es."""
+        for the model image, then `refresh`es."""
         global_vars.THETA_X = 0
         global_vars.THETA_Y = 0
         global_vars.THETA_Z = 0
-        global_vars.SLICE = int((global_vars.MODEL_IMAGE.GetSize()[2] - 1) / 2)
+        global_vars.SLICE = int((get_model_image().GetSize()[2] - 1) / 2)
         render_curr_slice()
         self.render_all_sliders()
 
@@ -459,7 +456,7 @@ def render_curr_slice() -> Union[np.ndarray, None]:
 
     curr_window.image.setPixmap(q_pixmap)
     curr_window.image_num_label.setText(
-        f"Image {global_vars.INDEX + 1} of {len(global_vars.IMAGE_DICT)}"
+        f"Image {global_vars.CURR_IMAGE_INDEX + 1} of {len(global_vars.IMAGE_DICT)}"
     )
     if curr_window == MAIN_WINDOW:
         curr_window.image_path_label.setText(str(curr_path().name))
@@ -495,7 +492,7 @@ def export_curr_slice_as_img(extension: str):
     :return: `None`"""
     curr_window = STACKED_WIDGET.currentWidget()
     file_name = (
-        global_vars.INDEX + 1
+        global_vars.CURR_IMAGE_INDEX + 1
         if settings.EXPORTED_FILE_NAMES_USE_INDEX
         else curr_path().name
     )
