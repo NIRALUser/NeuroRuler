@@ -58,8 +58,7 @@ from src.utils.img_helpers import (
     curr_metadata,
     curr_physical_units,
     curr_path,
-    model_image_path,
-    get_model_image,
+    get_curr_properties_tuple,
 )
 import src.utils.img_helpers as img_helpers
 
@@ -100,7 +99,9 @@ class MainWindow(QMainWindow):
         self.action_test_show_resource.triggered.connect(self.test_show_resource)
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
-        self.action_print_model_image_path.triggered.connect(print_model_image_path)
+        self.action_print_curr_properties_tuple.triggered.connect(
+            print_curr_properties_tuple
+        )
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -215,7 +216,7 @@ class MainWindow(QMainWindow):
         self.y_slider.setValue(global_vars.THETA_Y)
         self.z_slider.setValue(global_vars.THETA_Z)
         # Probably not necessary. Just in case.
-        self.slice_slider.setMaximum(get_model_image().GetSize()[2] - 1)
+        self.slice_slider.setMaximum(curr_image().GetSize()[2] - 1)
         self.slice_slider.setValue(global_vars.SLICE)
         self.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
         self.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
@@ -276,8 +277,6 @@ class MainWindow(QMainWindow):
             self.disable_elements()
             return
 
-        # TODO: Unit test that when deleting the first image, then the model image is the new first image
-
         render_curr_slice()
 
     def next_img(self):
@@ -334,11 +333,11 @@ class MainWindow(QMainWindow):
         """Called when Reset is clicked.
 
         Resets rotation values to 0 and slice num to the default `int((z-1)/2)`
-        for the model image, then `refresh`es."""
+        for the current image, then `refresh`es."""
         global_vars.THETA_X = 0
         global_vars.THETA_Y = 0
         global_vars.THETA_Z = 0
-        global_vars.SLICE = img_helpers.get_middle_of_2nd_dimension(get_model_image())
+        global_vars.SLICE = img_helpers.get_middle_of_z_dimension(curr_image())
         render_curr_slice()
         self.render_all_sliders()
 
@@ -376,7 +375,9 @@ class CircumferenceWindow(QMainWindow):
         )
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
-        self.action_print_model_image_path.triggered.connect(print_model_image_path)
+        self.action_print_curr_properties_tuple.triggered.connect(
+            print_curr_properties_tuple
+        )
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -541,11 +542,9 @@ def print_dimensions() -> None:
     print(curr_image().GetSize())
 
 
-def print_model_image_path() -> None:
-    """Print the model image's path to terminal.
-
-    Currently used to test that the model image is set correct on deletion, etc."""
-    print(model_image_path())
+def print_curr_properties_tuple() -> None:
+    """Print current batch's properties tuple to terminal."""
+    print(get_curr_properties_tuple())
 
 
 def goto_main() -> None:
