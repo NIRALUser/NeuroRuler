@@ -1,6 +1,6 @@
 """GUI helper functions.
 
-Note importing PyQt6 in any file that's imported by a test file will cause an error."""
+Note, importing PyQt6 in any file that's imported by a test file will cause an error."""
 
 import string
 from typing import Union

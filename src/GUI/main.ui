@@ -670,7 +670,7 @@
     <addaction name="action_test_show_resource"/>
     <addaction name="action_print_metadata"/>
     <addaction name="action_print_dimensions"/>
-    <addaction name="action_print_curr_properties_tuple"/>
+    <addaction name="action_print_properties"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
@@ -916,15 +916,15 @@
     <string>Ctrl+P, Ctrl+S</string>
    </property>
   </action>
-  <action name="action_print_curr_properties_tuple">
+  <action name="action_print_properties">
    <property name="text">
-    <string>Print current properties tuple</string>
+    <string>Print properties</string>
    </property>
    <property name="toolTip">
-    <string>Print current properties tuple.</string>
+    <string>Print properties of the loaded batch.</string>
    </property>
    <property name="statusTip">
-    <string>Print current properties tuple.</string>
+    <string>Print properties of the loaded batch.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>

@@ -1,15 +1,20 @@
 """Parse CLI arguments and set global settings."""
 
 import argparse
+import json
 
 import src.utils.user_settings as settings
 import src.utils.constants as constants
 
 
+def parse_json() -> None:
+    """TODO"""
+    pass
+
 def parse_gui_cli() -> None:
     """Parse GUI CLI args and set global settings in `user_settings.py`."""
     parser = argparse.ArgumentParser(
-        usage="python -m [-h] [-d] [-s] [-e] [-f] [-t THEME] [-c COLOR] src.GUI.main"
+        usage="./gui.py [-h] [-d] [-s] [-e] [-f] [-t THEME] [-c COLOR]"
     )
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
     parser.add_argument(
@@ -32,8 +37,8 @@ def parse_gui_cli() -> None:
         "-t",
         "--theme",
         help="configure theme, options are "
-        + (str(constants.THEMES))[1:-1].replace("'", "")
-        + "; default theme is dark-hct",
+        + str(constants.THEMES)[1:-1].replace("'", "")
+        + ", and the default theme is dark-hct",
     )
     parser.add_argument(
         "-c",

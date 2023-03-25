@@ -1,7 +1,7 @@
 """Global settings that the user should be able to modify directly, unlike global_vars.py and constants.py, via
 JSON, GUI, CLI, etc.
 
-For now, we modify these by using CLI args and hardcoding."""
+For now, we modify these by using CLI args and hardcoding. But we need to implement JSON for configuring this."""
 
 from pathlib import Path
 from screeninfo import get_monitors, ScreenInfoError
@@ -59,7 +59,7 @@ The problem likely lies in :code:`src.GUI.main.render_curr_slice()`? Not a huge 
 This is considered a setting because the user can modify it via CLI. It's just that the default
 value is a constant value from constants.py.
 
-parse_cli.py hardcodes this value to theme colors from BSS JSON files for themes where the theme color
+parser.py hardcodes this value to theme colors from BSS JSON files for themes where the theme color
 isn't the HCT main color."""
 
 THEME_NAME: str = "dark-hct"

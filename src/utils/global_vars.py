@@ -17,21 +17,21 @@ Each dictionary of images has the same properties, as defined by mri_image.valid
     ...
 }
 
-dict[Path, sitk.Image] is an images dict.
-We could instead store a list of sitk.Image, but dict allows us to avoid duplicate Paths easily.
+dict[Path, sitk.Image] is a group of images.
+We could instead store list[sitk.Image], but dict allows us to avoid duplicate Paths easily.
 Also, I don't think sitk.Image stores path.
 
-The IMAGE_DICT group is by default the first group in this list. If we want to be able to change batches in the GUI,
-we can mutate IMAGE_DICT to point to a different group's dict.
+The IMAGE_DICT group is by default the 0'th group in this list. If we want to be able to change batches in the GUI,
+we can change CURR_BATCH_INDEX.
 
 IMAGE_GROUPS[properties tuple] gets the dict[Path, sitk.Image] images corresponding to those properties.
 IMAGE_GROUPS[list(IMAGE_GROUPS.keys())[0]] gets the first group of images (since dict maintains insertion order
-in Python 3.7+)."""
+in Python 3.7+, https://mail.python.org/pipermail/python-dev/2017-December/151283.html)."""
 
 IMAGE_DICT: dict[Path, sitk.Image] = dict()
 """Global mapping of unique Path to sitk.Image. The current (i.e., loaded in GUI) group of images in IMAGE_GROUPS.
 
-Since Python 3.7+, dicts maintain insertion order. Therefore, we can use INDEX for retrieval and deletion.
+Since Python 3.7+, dicts maintain insertion order. Therefore, we can use CURR_IMAGE_INDEX for retrieval and deletion.
 
 Use list(IMAGE_DICT.keys())[i] to return the i'th key in the dict, which can also index into the dict.
 This may be slow but will be used only

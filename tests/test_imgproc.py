@@ -6,8 +6,7 @@ import SimpleITK as sitk
 import numpy as np
 import cv2
 import pytest
-import pathlib
-from sortedcontainers import SortedDict
+from pathlib import Path
 from src.utils.imgproc import contour, length_of_contour
 import src.utils.exceptions as exceptions
 from src.utils.constants import (
@@ -21,7 +20,7 @@ from src.utils.img_helpers import rotated_slice_hardcoded
 EPSILON: float = 0.001
 """Used for `float` comparisons."""
 
-EXAMPLE_IMAGES: SortedDict = SortedDict()
+EXAMPLE_IMAGES: dict[Path, sitk.Image] = dict()
 for extension in SUPPORTED_EXTENSIONS:
     for path in EXAMPLE_DATA_DIR.glob(extension):
         READER.SetFileName(str(path))

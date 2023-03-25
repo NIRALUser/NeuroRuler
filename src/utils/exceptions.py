@@ -22,29 +22,10 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
 
     def __init__(self, num_contours):
         self.message = (
-            f"You attempted to compute the circumference of an invalid brain slice. After processing, contours detected: {num_contours}\n"
-            f"Likely noise or otherwise not a valid brain slice."
+            f"You attempted to compute the circumference of something that isn't a valid brain slice. After processing, contours detected was {num_contours}\n"
+            f"Likely just noise or otherwise not a valid brain slice."
         )
         super().__init__(self.message)
-
-
-@deprecated
-class RemoveFromEmptyList(Exception):
-    """Self-explanatory."""
-
-    def __init__(self):
-        self.message = f"You attempted to remove an image from an empty list of images."
-        super().__init__(self.message)
-
-
-@deprecated
-class RemoveFromListOfLengthOne(Exception):
-    """If the list becomes empty, there's no image to render, which might cause an `IndexError`."""
-
-    def __init__(self):
-        self.message = f"You attempted to remove an image from a list of size 1 (i.e., the list would become empty after the delete)."
-        super().__init__(self.message)
-
 
 @deprecated
 class RemoveAtInvalidIndex(Exception):
@@ -73,21 +54,8 @@ class InvalidColor(Exception):
         self.message = f"Invalid color {color} specified."
         super().__init__(self.message)
 
-
-class DuplicateFilepathsInMRIImageList(Exception):
-    def __init__(self, paths: set[Path]):
-        self.message = f"Duplicate file path(s) {set(map(str, paths))} were added to the MRIImageList."
-        super().__init__(self.message)
-
-
 # sitk can handle any rotation, but we should enforce -90 and 90 bounds.
 class RotationOutOfBounds(Exception):
     def __init__(self, theta: int, axis: str):
         self.message = f"{axis} rotation value {theta} out of bounds. Min rotation value is {ROTATION_MIN} degrees, and max is {ROTATION_MAX}."
         super().__init__(self.message)
-
-
-class DoesNotMatchModelImage(Exception):
-    def __init__(self, path: Path):
-        self.message = f"Newly added image with path {path} has properties (e.g., dimensions, pixel spacing, etc.) that do not match the first image in the list."
-        super().__init__
