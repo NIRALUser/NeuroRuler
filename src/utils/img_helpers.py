@@ -13,6 +13,10 @@ import src.utils.constants as constants
 def update_image_groups(path_list: list[Path]) -> None:
     """Initialize IMAGE_GROUPS. See the docstring for IMAGE_GROUPS in global_vars.py.
 
+    NOTE: Does not set IMAGE_DICT to be the CURR_BATCH_INDEX image group in IMAGE_GROUPS.
+    But IMAGE_DICT is a pointer to an images dict in IMAGE_GROUPS, so this function could
+    mutate (as you would probably want) IMAGE_DICT.
+
     IMAGE_GROUPS is a mapping from properties tuple to a group of images, where a group of images is a dict[Path, sitk.Image].
 
     Each dictionary of images has the same properties, as defined by mri_image.validate_image.
@@ -37,7 +41,7 @@ def update_image_groups(path_list: list[Path]) -> None:
             global_vars.IMAGE_GROUPS[new_img_properties][path] = new_img
         else:
             # Create new dictionary associated with the new properties.
-            # First entry is path: new_img
+            # First entry also created.
             global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
 
     # TODO: Think this is not needed but keeping it here just in case. Delete later if not needed.
@@ -57,9 +61,9 @@ def initialize_globals(path_list: list[Path]) -> None:
     :param path_list:
     :type path_list: list[Path]"""
     global_vars.IMAGE_GROUPS.clear()
-    update_image_groups(path_list)
     global_vars.CURR_IMAGE_INDEX = 0
     global_vars.CURR_BATCH_INDEX = 0
+    update_image_groups(path_list)
     global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
         list(global_vars.IMAGE_GROUPS.keys())[0]
     ]

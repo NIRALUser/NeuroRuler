@@ -251,6 +251,9 @@ class MainWindow(QMainWindow):
             self.render_all_sliders()
             self.enable_elements()
         else:
+            # Doesn't need to re-render sliders to set max value of slice slider.
+            # update_image_groups does not change the batch.
+            # Therefore, max value of slice slider does not change.
             update_image_groups(path_list)
 
         render_curr_slice()

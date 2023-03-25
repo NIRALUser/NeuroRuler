@@ -187,7 +187,7 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
 
     TODO: Unit test with pre-computed circumferences to really confirm this."""
     # Write settings of slices that cause ComputeCircumferenceOfInvalidSlice to a file to make sure they actually are just noise and not brain slices.
-    f = open(pathlib.Path("tests") / "noise_vals.txt", "w")
+    f = open(Path("tests") / "noise_vals.txt", "w")
     f.write(
         f"Write settings of slices that cause ComputeCircumferenceOfInvalidSlice (>= {NUM_CONTOURS_IN_INVALID_SLICE} contours detected)\nto this file to make sure they actually are invalid brain slices\n\n"
     )
