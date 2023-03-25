@@ -979,7 +979,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="export_button">
         <property name="enabled">
          <bool>false</bool>
         </property>

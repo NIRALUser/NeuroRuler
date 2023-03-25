@@ -116,7 +116,7 @@ class MainWindow(QMainWindow):
         )
         self.next_button.clicked.connect(self.next_img)
         self.previous_button.clicked.connect(self.previous_img)
-        self.apply_button.clicked.connect(goto_circumference)
+        self.apply_button.clicked.connect(self.settings_export_view_toggle)
         self.x_slider.valueChanged.connect(self.rotate_x)
         self.y_slider.valueChanged.connect(self.rotate_y)
         self.z_slider.valueChanged.connect(self.rotate_z)
@@ -124,12 +124,7 @@ class MainWindow(QMainWindow):
         self.reset_button.clicked.connect(self.reset_settings)
         self.show()
 
-    def enable_elements(self) -> None:
-        """Called when File > Open is clicked and when switching from CircumferenceWindow to MainWindow
-        (i.e., when Adjust button is clicked).
-
-        Enable image, menu items, buttons, and sliders. Disable Export > CSV."""
-        self._enabled = True
+    def render_initial_view(self) -> None:
         self.action_open.setEnabled(True)
         self.action_add_images.setEnabled(True)
         self.action_remove_image.setEnabled(True)
@@ -143,7 +138,15 @@ class MainWindow(QMainWindow):
         self.y_slider.setEnabled(True)
         self.z_slider.setEnabled(True)
         self.slice_slider.setEnabled(True)
+        self.x_rotation_label.setEnabled(True)
+        self.y_rotation_label.setEnabled(True)
+        self.z_rotation_label.setEnabled(True)
+        self.slice_num_label.setEnabled(True)
         self.reset_button.setEnabled(True)
+        self.smoothing_preview_button.setEnabled(True)
+        self.otsu_radio_button.setEnabled(True)
+        self.binary_radio_button.setEnabled(True)
+        self.threshold_preview_button.setEnabled(True)
         self.action_export_csv.setEnabled(False)
         self.action_export_png.setEnabled(True)
         self.action_export_jpg.setEnabled(True)
@@ -151,21 +154,47 @@ class MainWindow(QMainWindow):
         self.action_export_ppm.setEnabled(True)
         self.action_export_xbm.setEnabled(True)
         self.action_export_xpm.setEnabled(True)
-        self.x_rotation_label.setEnabled(True)
-        self.y_rotation_label.setEnabled(True)
-        self.z_rotation_label.setEnabled(True)
-        self.slice_num_label.setEnabled(True)
-        self.smoothing_preview_button.setEnabled(True)
-        self.otsu_radio_button.setEnabled(True)
-        self.binary_radio_button.setEnabled(True)
-        self.threshold_preview_button.setEnabled(True)
+
+    def settings_export_view_toggle(self) -> None:
+        global_vars.SETTINGS_VIEW_ENABLED = not global_vars.SETTINGS_VIEW_ENABLED
+        settings_view_enabled = global_vars.SETTINGS_VIEW_ENABLED
+        if (settings_view_enabled):
+            self.apply_button.setText("Apply")
+            self.circumference_label.setText("Calculated Circumference: N/A")
+        else:
+            self.apply_button.setText("Adjust")
+            units: Union[str, None] = curr_physical_units()
+            binary_contour_slice: np.ndarray = render_curr_slice()
+            circumference: float = imgproc.length_of_contour(binary_contour_slice)
+            self.circumference_label.setText(
+                f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
+            )
+        self.action_open.setEnabled(settings_view_enabled)
+        self.action_add_images.setEnabled(settings_view_enabled)
+        self.action_remove_image.setEnabled(settings_view_enabled)
+        self.x_slider.setEnabled(settings_view_enabled)
+        self.y_slider.setEnabled(settings_view_enabled)
+        self.z_slider.setEnabled(settings_view_enabled)
+        self.slice_slider.setEnabled(settings_view_enabled)
+        self.x_rotation_label.setEnabled(settings_view_enabled)
+        self.y_rotation_label.setEnabled(settings_view_enabled)
+        self.z_rotation_label.setEnabled(settings_view_enabled)
+        self.slice_num_label.setEnabled(settings_view_enabled)
+        self.reset_button.setEnabled(settings_view_enabled)
+        self.smoothing_preview_button.setEnabled(settings_view_enabled)
+        self.otsu_radio_button.setEnabled(settings_view_enabled)
+        self.binary_radio_button.setEnabled(settings_view_enabled)
+        self.threshold_preview_button.setEnabled(settings_view_enabled)
+        self.action_export_csv.setEnabled(not settings_view_enabled)
+        self.circumference_label.setEnabled(not settings_view_enabled)
+        self.export_button.setEnabled(not settings_view_enabled)
 
     # TODO: Could just construct a new MainWindow()? Maybe might not work?
     def disable_elements(self) -> None:
         """Called when the list is now empty, i.e. just removed from list of length 1.
 
         Needs only handle the items that will be different from the usual state."""
-        # self.action_open.setEnabled(True)
+        self.action_open.setEnabled(True)
         self.action_add_images.setEnabled(False)
         self.action_remove_image.setEnabled(False)
         self.circumference_label.setEnabled(False)
@@ -181,12 +210,13 @@ class MainWindow(QMainWindow):
         self.previous_button.setEnabled(False)
         self.next_button.setEnabled(False)
         self.apply_button.setEnabled(False)
+        self.apply_button.setText("Apply")
         self.x_slider.setEnabled(False)
         self.y_slider.setEnabled(False)
         self.z_slider.setEnabled(False)
         self.slice_slider.setEnabled(False)
         self.reset_button.setEnabled(False)
-        # self.action_export_csv.setEnabled(False)
+        self.action_export_csv.setEnabled(False)
         self.action_export_png.setEnabled(False)
         self.action_export_jpg.setEnabled(False)
         self.action_export_bmp.setEnabled(False)
@@ -197,6 +227,12 @@ class MainWindow(QMainWindow):
         self.y_rotation_label.setEnabled(False)
         self.z_rotation_label.setEnabled(False)
         self.slice_num_label.setEnabled(False)
+        self.circumference_label.setEnabled(False)
+        self.export_button.setEnabled(False)
+        self.smoothing_preview_button.setEnabled(False)
+        self.otsu_radio_button.setEnabled(False)
+        self.binary_radio_button.setEnabled(False)
+        self.threshold_preview_button.setEnabled(False)
 
     def render_all_sliders(self) -> None:
         """Sets all slider values to the global rotation and slice values.
@@ -252,7 +288,8 @@ class MainWindow(QMainWindow):
         if not extend:
             initialize_globals(path_list)
             self.render_all_sliders()
-            self.enable_elements()
+            self._enabled = True
+            self.render_initial_view()
         else:
             # Doesn't need to re-render sliders to set max value of slice slider.
             # update_image_groups does not change the batch.
@@ -349,59 +386,6 @@ class MainWindow(QMainWindow):
         )
 
 
-class CircumferenceWindow(QMainWindow):
-    """Displayed after pressing Apply in MainWindow.
-
-    Displays the same MRI slice as in MainWindow previously but overlays contour on top.
-    Also displays the computed circumference.
-
-    No sliders (yet) but displays rotation & slice values.
-    CircumferenceWindow is NOT finished.
-
-    There should be only one instance of this class."""
-
-    def __init__(self):
-        """Load circumference.ui and connect GUI events to methods/functions."""
-        super(CircumferenceWindow, self).__init__()
-        loadUi(str(Path("src") / "GUI" / "circumference.ui"), self)
-        self.enable_and_disable_elements()
-        self.action_exit.triggered.connect(exit)
-        self.action_github.triggered.connect(lambda: webbrowser.open(GITHUB_LINK))
-        self.action_documentation.triggered.connect(
-            lambda: webbrowser.open(DOCUMENTATION_LINK)
-        )
-        self.action_print_metadata.triggered.connect(print_metadata)
-        self.action_print_dimensions.triggered.connect(print_dimensions)
-        self.action_print_properties.triggered.connect(print_properties)
-        self.action_export_png.triggered.connect(
-            lambda: export_curr_slice_as_img("png")
-        )
-        self.action_export_jpg.triggered.connect(
-            lambda: export_curr_slice_as_img("jpg")
-        )
-        self.action_export_bmp.triggered.connect(
-            lambda: export_curr_slice_as_img("bmp")
-        )
-        self.action_export_ppm.triggered.connect(
-            lambda: export_curr_slice_as_img("ppm")
-        )
-        self.action_export_xbm.triggered.connect(
-            lambda: export_curr_slice_as_img("xbm")
-        )
-        self.action_export_xpm.triggered.connect(
-            lambda: export_curr_slice_as_img("xpm")
-        )
-        self.adjust_slice_button.clicked.connect(goto_main)
-        self.show()
-
-    def enable_and_disable_elements(self):
-        """Called when switching from MainWindow to CircumferenceWindow (i.e., Apply button is clicked).
-
-        Needs only handle the things that are different from MainWindow."""
-        self.action_open.setEnabled(False)
-        self.action_export_csv.setEnabled(True)
-
-
 def render_curr_slice() -> Union[np.ndarray, None]:
     """Resamples the currently selected MRIImage using its rotation and slice settings,
     then renders the resulting slice in the GUI.
@@ -429,7 +413,7 @@ def render_curr_slice() -> Union[np.ndarray, None]:
 
     rv_dummy_var: np.ndarray = np.zeros(0)
 
-    if curr_window == CIRCUMFERENCE_WINDOW:
+    if not global_vars.SETTINGS_VIEW_ENABLED:
         binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
         rv_dummy_var = binary_contour_slice
         mask_QImage(
@@ -444,7 +428,7 @@ def render_curr_slice() -> Union[np.ndarray, None]:
     curr_window.image_num_label.setText(
         f"Image {global_vars.CURR_IMAGE_INDEX + 1} of {len(global_vars.IMAGE_DICT)}"
     )
-    if curr_window == MAIN_WINDOW:
+    if curr_window == global_vars.SETTINGS_VIEW_ENABLED:
         curr_window.image_path_label.setText(str(curr_path().name))
         curr_window.image_path_label.setStatusTip(str(curr_path()))
     curr_window.image.setStatusTip(
@@ -455,7 +439,7 @@ def render_curr_slice() -> Union[np.ndarray, None]:
         )
     )
 
-    if curr_window == CIRCUMFERENCE_WINDOW:
+    if not global_vars.SETTINGS_VIEW_ENABLED:
         return rv_dummy_var
 
 
@@ -487,36 +471,6 @@ def export_curr_slice_as_img(extension: str):
         / f"{file_name}_{'contoured_' if curr_window == CIRCUMFERENCE_WINDOW else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
     )
     curr_window.image.pixmap().save(path, extension)
-
-
-def goto_circumference() -> None:
-    """Called when MainWindow's Apply button is clicked.
-
-    From MainWindow, switch to CircumferenceWindow.
-
-    Enable and disable CircumferenceWindow GUI elements.
-
-    Compute circumference and update slice settings.
-
-    Re-render contoured MRI slice.
-
-    :return: `None`"""
-    STACKED_WIDGET.setCurrentWidget(CIRCUMFERENCE_WINDOW)
-    units: Union[str, None] = curr_physical_units()
-    CIRCUMFERENCE_WINDOW.enable_and_disable_elements()
-
-    # Ignore the error message. render_curr_slice() always returns np.ndarray here
-    # since curr_window must be CIRCUMFERENCE_WINDOW here.
-
-    binary_contour_slice: np.ndarray = render_curr_slice()
-
-    circumference: float = imgproc.length_of_contour(binary_contour_slice)
-    CIRCUMFERENCE_WINDOW.circumference_label.setText(
-        f"Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
-    )
-    CIRCUMFERENCE_WINDOW.slice_settings_text.setText(
-        f"X rotation: {global_vars.THETA_X}°\nY rotation: {global_vars.THETA_Y}°\nZ rotation: {global_vars.THETA_Z}°\nSlice: {global_vars.SLICE}"
-    )
 
 
 def print_metadata() -> None:
@@ -556,19 +510,6 @@ def print_properties() -> None:
     pprint.pprint(OrderedDict(zip(fields, curr_properties)))
 
 
-def goto_main() -> None:
-    """Called when CircumferenceWindow's Adjust button is clicked.
-
-    From CircumferenceWindow, switch to MainWindow.
-
-    Enables and disables MainWindow GUI elements.
-
-    :return: `None`"""
-    STACKED_WIDGET.setCurrentWidget(MAIN_WINDOW)
-    render_curr_slice()
-    MAIN_WINDOW.enable_elements()
-
-
 def main() -> None:
     """Main entrypoint of GUI."""
 
@@ -593,10 +534,8 @@ def main() -> None:
     # Setting the index allows for switching between windows.
     STACKED_WIDGET = QtWidgets.QStackedWidget()
     MAIN_WINDOW = MainWindow()
-    CIRCUMFERENCE_WINDOW = CircumferenceWindow()
 
     STACKED_WIDGET.addWidget(MAIN_WINDOW)
-    STACKED_WIDGET.addWidget(CIRCUMFERENCE_WINDOW)
     STACKED_WIDGET.setMinimumWidth(settings.MIN_WIDTH)
     STACKED_WIDGET.setMinimumHeight(settings.MIN_HEIGHT)
     STACKED_WIDGET.show()

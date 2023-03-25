@@ -73,6 +73,9 @@ THETA_Z: int = 0
 SLICE: int = 0
 """0-indexed"""
 
+# TODO: documentation
+SETTINGS_VIEW_ENABLED: bool = True
+
 
 def main():
     """For testing."""
