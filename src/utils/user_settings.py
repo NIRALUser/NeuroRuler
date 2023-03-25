@@ -84,7 +84,7 @@ except ScreenInfoError:
     pass
 
 
-MIN_WIDTH: int = int(PRIMARY_MONITOR_DIMENSIONS[0] * 0.55)
-"""Min width of the GUI. Defaults to width of primary monitor * .55"""
-MIN_HEIGHT: int = int(PRIMARY_MONITOR_DIMENSIONS[1] * 0.75)
-"""Min height of the GUI. Defaults to height of primary monitor * .75"""
+MIN_WIDTH: int = int(PRIMARY_MONITOR_DIMENSIONS[0] * 0.65)
+"""Min width of the GUI. Defaults to width of primary monitor * .65"""
+MIN_HEIGHT: int = int(PRIMARY_MONITOR_DIMENSIONS[1] * 0.85)
+"""Min height of the GUI. Defaults to height of primary monitor * .85"""

@@ -1,6 +1,6 @@
 """Image helper functions.
 
-Currently holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
+Holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
 
 from typing import Union
 import SimpleITK as sitk
@@ -20,18 +20,19 @@ def update_image_groups(path_list: list[Path]) -> None:
         global_vars.READER.SetFileName(str(path))
         new_img: sitk.Image = global_vars.READER.Execute()
         new_img_properties: tuple = get_properties(new_img)
-        for group in global_vars.IMAGE_GROUPS:
-            group_properties: tuple = group[0]
-            group_image_dict: dict[Path, sitk.Image] = group[1]
-            if new_img_properties == group_properties:
-                # A duplicate path will get here but we reassign the sitk.Image anyway
-                # Because maybe the path stayed the same but the image file changed
-                # No harm in reassigning. Already needed to do READER.Execute() to get properties anyway.
-                group_image_dict[path] = new_img
-                break
+        if new_img_properties in global_vars.IMAGE_GROUPS:
+            # A duplicate path will get here, but we reassign the sitk.Image anyway
+            # Because maybe the path stayed the same but the image file changed
+            # No harm in reassigning. Already needed to do READER.Execute() to get properties anyway, might
+            # as well reassign.
+            global_vars.IMAGE_GROUPS[new_img_properties][path] = new_img
         else:
-            global_vars.IMAGE_GROUPS.append((new_img_properties, {path: new_img}))
-    global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[0][1]
+            # Create new dictionary associated with the new properties.
+            # First entry is path: new_img
+            global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
+    global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
+        list(global_vars.IMAGE_GROUPS.keys())[0]
+    ]
 
 
 def initialize_globals(path_list: list[Path]) -> None:
@@ -51,18 +52,16 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.THETA_X = 0
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
-    model_image: sitk.Image = get_model_image()
-    global_vars.SLICE = int((model_image.GetSize()[2] - 1) / 2)
-    global_vars.EULER_3D_TRANSFORM.SetCenter(
-        model_image.TransformContinuousIndexToPhysicalPoint(
-            [((dimension - 1) / 2.0) for dimension in model_image.GetSize()]
-        )
-    )
+    # curr_img has the same properties as the whole group in IMAGE_DICT
+    curr_img: sitk.Image = curr_image()
+    global_vars.SLICE = get_middle_of_z_dimension(curr_img)
+    global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
     global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
+
 
 def clear_globals():
     """Clear global variables for unit testing in test_img_helpers.
-    
+
     Don't need to reset Euler3DTransform since that's not used in the tests there."""
     global_vars.IMAGE_GROUPS.clear()
     global_vars.IMAGE_DICT.clear()
@@ -85,9 +84,7 @@ def get_properties(img: sitk.Image) -> tuple:
     :rtype: tuple"""
     return (
         img.GetSize(),
-        img.TransformContinuousIndexToPhysicalPoint(
-            [(dimension - 1) / 2.0 for dimension in img.GetSize()]
-        ),
+        get_center_of_rotation(img),
         img.GetSpacing(),
     )
 
@@ -147,11 +144,7 @@ def rotated_slice_hardcoded(
     :type theta_z: int
     :param slice_num:
     :type slice_num: int"""
-    global_vars.EULER_3D_TRANSFORM.SetCenter(
-        mri_img_3d.TransformContinuousIndexToPhysicalPoint(
-            [(dimension - 1) / 2.0 for dimension in mri_img_3d.GetSize()]
-        )
-    )
+    global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(mri_img_3d))
     global_vars.EULER_3D_TRANSFORM.SetRotation(
         degrees_to_radians(theta_x),
         degrees_to_radians(theta_y),
@@ -192,28 +185,35 @@ def curr_physical_units() -> Union[str, None]:
     return None
 
 
-def model_image_path() -> Path:
-    """Get path of the model image.
+def get_curr_properties_tuple() -> tuple:
+    """Return properties tuple for the current loaded group of images.
 
-    Since MODEL_IMAGE should always be the first image, internally returns the first key in the global
-    IMAGE_DICT.
-
-    :return: MODEL_IMAGE's Path
-    :rtype: Path"""
-    return list(global_vars.IMAGE_DICT.keys())[0]
+    :return: current properties tuple
+    :rtype: tuple"""
+    return list(global_vars.IMAGE_GROUPS.keys())[global_vars.CURR_BATCH_INDEX]
 
 
-def get_model_image() -> sitk.Image:
-    return global_vars.IMAGE_DICT[list(global_vars.IMAGE_DICT.keys())[0]]
-
-def get_middle_of_2nd_dimension(img: sitk.Image) -> int:
-    """Used to get the middle of the z dimension (i.e., 2nd dimension, 0-indexed) of a sitk.Image
+def get_middle_of_z_dimension(img: sitk.Image) -> int:
+    """int((img.GetSize()[2] - 1) / 2)
 
     :param img:
     :type img: sitk.Image
-    :return: Middle of the z dimension (2nd dimension, 0-indexed)
+    :return: int((img.GetSize()[2] - 1) / 2)
     :rtype: int"""
     return int((img.GetSize()[2] - 1) / 2)
+
+
+def get_center_of_rotation(img: sitk.Image) -> tuple:
+    """img.TransformContinuousIndexToPhysicalPoint([
+    (dimension - 1) / 2.0 for dimension in img.GetSize()])
+
+    :param: img
+    :type img: sitk.Image
+    :return: img.TransformContinuousIndexToPhysicalPoint([
+    (dimension - 1) / 2.0 for dimension in img.GetSize()]"""
+    return img.TransformContinuousIndexToPhysicalPoint(
+        [(dimension - 1) / 2.0 for dimension in img.GetSize()]
+    )
 
 
 def del_curr_img() -> None:
@@ -221,23 +221,24 @@ def del_curr_img() -> None:
 
     Will decrement CURR_IMAGE_INDEX if removing the last element.
 
-    Will not check for IMAGE_DICT being empty after the deletion. This happens in the GUI."""
+    Will not check for IMAGE_DICT being empty after the deletion. This happens in the GUI.
+    """
     if len(global_vars.IMAGE_DICT) == 0:
         print("Can't remove from empty list!")
         return
 
-    del global_vars.IMAGE_DICT[
-        list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
-    ]
+    del global_vars.IMAGE_DICT[curr_path()]
 
     # Just deleted the last image. Index must decrease by 1
     if global_vars.CURR_IMAGE_INDEX == len(global_vars.IMAGE_DICT):
         global_vars.CURR_IMAGE_INDEX -= 1
 
+
 def next_img() -> None:
     global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX + 1) % len(
         global_vars.IMAGE_DICT
     )
+
 
 def previous_img() -> None:
     global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX - 1) % len(

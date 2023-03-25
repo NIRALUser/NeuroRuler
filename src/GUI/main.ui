@@ -670,7 +670,7 @@
     <addaction name="action_test_show_resource"/>
     <addaction name="action_print_metadata"/>
     <addaction name="action_print_dimensions"/>
-    <addaction name="action_print_model_image_path"/>
+    <addaction name="action_print_curr_properties_tuple"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
@@ -887,9 +887,6 @@
    <property name="statusTip">
     <string>Test displaying a resource (help.svg).</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
-   </property>
   </action>
   <action name="action_print_metadata">
    <property name="text">
@@ -919,15 +916,18 @@
     <string>Ctrl+P, Ctrl+S</string>
    </property>
   </action>
-  <action name="action_print_model_image_path">
+  <action name="action_print_curr_properties_tuple">
    <property name="text">
-    <string>Print model image path</string>
+    <string>Print current properties tuple</string>
    </property>
    <property name="toolTip">
-    <string>Print model image path.</string>
+    <string>Print current properties tuple.</string>
    </property>
    <property name="statusTip">
-    <string>Print model image path.</string>
+    <string>Print current properties tuple.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>
