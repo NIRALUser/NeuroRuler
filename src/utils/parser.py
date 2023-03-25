@@ -11,10 +11,11 @@ def parse_json() -> None:
     """TODO"""
     pass
 
+
 def parse_gui_cli() -> None:
     """Parse GUI CLI args and set global settings in `user_settings.py`."""
     parser = argparse.ArgumentParser(
-        usage="./gui.py [-h] [-d] [-s] [-e] [-f] [-t THEME] [-c COLOR]"
+        usage="./gui.py [-h] [-d] [-s] [-e] [-t THEME] [-c COLOR]"
     )
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
     parser.add_argument(
@@ -25,12 +26,6 @@ def parse_gui_cli() -> None:
         "--export-index",
         help="exported filenames will use the index displayed in the GUI instead of the \
                         original image name",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-f",
-        "--full-path",
-        help="image status bar will show full path",
         action="store_true",
     )
     parser.add_argument(
@@ -58,10 +53,6 @@ def parse_gui_cli() -> None:
     if args.export_index:
         settings.EXPORTED_FILE_NAMES_USE_INDEX = True
         print("Exported files will use the index displayed in the GUI.")
-
-    if args.full_path:
-        settings.IMAGE_STATUS_BAR_SHOWS_FULL_PATH = True
-        print("Image status bar will show full path to image.")
 
     if args.theme:
         if args.theme not in constants.THEMES:

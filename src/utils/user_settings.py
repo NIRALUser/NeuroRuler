@@ -42,9 +42,6 @@ If False (default), then exported files will be named using the file name of the
 
 E.g. MicroBiome_1month_T1w_0_0_0_0.png, MicroBiome_1month_T1w_90_180_0_60.csv."""
 
-IMAGE_STATUS_BAR_SHOWS_FULL_PATH: bool = False
-"""If False (default), the GUI will display only the file name of the image instead of the full path."""
-
 CONTOUR_COLOR: str = constants.HCT_MAIN_COLOR
 """Color of the contour. Defaults to constants.HCT_MAIN_COLOR = #b55162 = R 181 G 81 B 98.
 
@@ -84,7 +81,7 @@ except ScreenInfoError:
     pass
 
 
-MIN_WIDTH: int = int(PRIMARY_MONITOR_DIMENSIONS[0] * 0.65)
-"""Min width of the GUI. Defaults to width of primary monitor * .65"""
-MIN_HEIGHT: int = int(PRIMARY_MONITOR_DIMENSIONS[1] * 0.85)
-"""Min height of the GUI. Defaults to height of primary monitor * .85"""
+MIN_WIDTH: int = int(PRIMARY_MONITOR_DIMENSIONS[0] * 0.7)
+"""Min width of the GUI. Defaults to width of primary monitor * .7"""
+MIN_HEIGHT: int = int(PRIMARY_MONITOR_DIMENSIONS[1] * 0.9)
+"""Min height of the GUI. Defaults to height of primary monitor * .9"""
