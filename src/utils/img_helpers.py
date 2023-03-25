@@ -11,8 +11,21 @@ import src.utils.constants as constants
 
 
 def update_image_groups(path_list: list[Path]) -> None:
-    """Given list[str] of paths, put each path (and corresponding sitk.Image) into global IMAGE_DICT
-    and IMAGE_GROUPS.
+    """Initialize IMAGE_GROUPS. See the docstring for IMAGE_GROUPS in global_vars.py.
+
+    NOTE: Does not set IMAGE_DICT to be the CURR_BATCH_INDEX image group in IMAGE_GROUPS.
+    But IMAGE_DICT is a pointer to an images dict in IMAGE_GROUPS, so this function could
+    mutate (as you would probably want) IMAGE_DICT.
+
+    IMAGE_GROUPS is a mapping from properties tuple to a group of images, where a group of images is a dict[Path, sitk.Image].
+
+    Each dictionary of images has the same properties, as defined by mri_image.validate_image.
+
+    {
+        properties tuple: dict[Path, sitk.Image]
+        properties tuple: dict[Path, sitk.Image]
+        ...
+    }
 
     :param path_list:
     :type path_list: list[Path]"""
@@ -28,31 +41,37 @@ def update_image_groups(path_list: list[Path]) -> None:
             global_vars.IMAGE_GROUPS[new_img_properties][path] = new_img
         else:
             # Create new dictionary associated with the new properties.
-            # First entry is path: new_img
+            # First entry also created.
             global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
-    global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
-        list(global_vars.IMAGE_GROUPS.keys())[0]
-    ]
+
+    # TODO: Think this is not needed but keeping it here just in case. Delete later if not needed.
+    # global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
+    #     list(global_vars.IMAGE_GROUPS.keys())[0]
+    # ]
 
 
 def initialize_globals(path_list: list[Path]) -> None:
     """After pressing File > Open, the global variables need to be cleared and (re)initialized.
 
-    The mutated global variables: IMAGE_GROUPS, IMAGE_DICT, INDEX, READER, THETA_X, THETA_Y, THETA_Z, SLICE,
-    EULER_3D_TRANSFORM.
+    The mutated global variables: IMAGE_GROUPS, IMAGE_DICT, CURR_IMAGE_INDEX, CURR_BATCH_INDEX,
+    READER, THETA_X, THETA_Y, THETA_Z, SLICE, EULER_3D_TRANSFORM.
 
-    Specifically, clears IMAGE_GROUPS and then populates it. IMAGE_DICT is the first image dict in IMAGE_GROUPS.
+    Specifically, clears IMAGE_GROUPS and then populates it. IMAGE_DICT is then the first group of images.
 
     :param path_list:
     :type path_list: list[Path]"""
     global_vars.IMAGE_GROUPS.clear()
-    update_image_groups(path_list)
-    # IMAGE_DICT was updated by update_image_groups
     global_vars.CURR_IMAGE_INDEX = 0
+    global_vars.CURR_BATCH_INDEX = 0
+    update_image_groups(path_list)
+    global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
+        list(global_vars.IMAGE_GROUPS.keys())[0]
+    ]
     global_vars.THETA_X = 0
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
-    # curr_img has the same properties as the whole group in IMAGE_DICT
+    # curr_img has the same properties as the whole group in IMAGE_DICT. Use it to set slice and center of rotation
+    # TODO: Set maximum for the slice slider in the GUI!
     curr_img: sitk.Image = curr_image()
     global_vars.SLICE = get_middle_of_z_dimension(curr_img)
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
@@ -72,7 +91,7 @@ def clear_globals():
     global_vars.SLICE = 0
 
 
-# TODO: Add more properties
+# TODO: Add more properties?
 def get_properties(img: sitk.Image) -> tuple:
     """Tuple of properties of a sitk.Image.
 
@@ -90,7 +109,7 @@ def get_properties(img: sitk.Image) -> tuple:
 
 
 def curr_path() -> Path:
-    """Return the Path of the current image.
+    """Return the Path of the currently loaded image in IMAGE_DICT.
 
     :return: Path of current image
     :rtype: Path"""
@@ -132,7 +151,7 @@ def rotated_slice_hardcoded(
 ):
     """Get 2D rotated slice of mri_img_3d from hardcoded values. Rotation values are in degrees, slice_num is an int.
 
-    For unit testing.
+    For unit testing. Sets center of global EULER_3D_TRANSFORM to center of rotation of mri_img_3d.
 
     :param mri_img_3d:
     :type mri_img_3d: sitk.Image
@@ -154,7 +173,7 @@ def rotated_slice_hardcoded(
 
 
 def curr_metadata() -> dict[str, str]:
-    """Computes and returns current image's metadata.
+    """Computes and returns currently loaded image's metadata.
 
     Note: Does not return all metadata stored in the file, just the metadata stored in sitk.Image.GetMetaDataKeys()
     For example, it's possible for a sitk.Image to have spacing values retrieved by GetSpacing(), but the same spacing values won't
@@ -171,7 +190,7 @@ def curr_metadata() -> dict[str, str]:
 
 # TODO: works only for NIFTI, not NRRD
 def curr_physical_units() -> Union[str, None]:
-    """Return current image's physical units from sitk.GetMetaData if it exists, else None.
+    """Return currently loaded image's physical units from sitk.GetMetaData if it exists, else None.
 
     TODO: works only for NIFTI, not NRRD.
 
@@ -217,12 +236,13 @@ def get_center_of_rotation(img: sitk.Image) -> tuple:
 
 
 def del_curr_img() -> None:
-    """Won't remove if IMAGE_DICT is empty. Will print message and return early.
+    """Delete currently loaded image.
+
+    Won't remove if IMAGE_DICT is empty. Will print message and return early.
 
     Will decrement CURR_IMAGE_INDEX if removing the last element.
 
-    Will not check for IMAGE_DICT being empty after the deletion. This happens in the GUI.
-    """
+    Will not check for IMAGE_DICT being empty after the deletion. This happens in the GUI."""
     if len(global_vars.IMAGE_DICT) == 0:
         print("Can't remove from empty list!")
         return
@@ -235,12 +255,14 @@ def del_curr_img() -> None:
 
 
 def next_img() -> None:
+    """Increment CURR_IMAGE_INDEX, wrapping if necessary."""
     global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX + 1) % len(
         global_vars.IMAGE_DICT
     )
 
 
 def previous_img() -> None:
+    """Decrement CURR_IMAGE_INDEX, wrapping if necessary."""
     global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX - 1) % len(
         global_vars.IMAGE_DICT
     )

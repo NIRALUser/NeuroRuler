@@ -3,18 +3,11 @@
 Loads `src/GUI/main.ui` and `src/GUI/circumference.ui`, both made in QtDesigner.
 
 In addition, also loads `.qss` stylesheets and `resources.py` (icons) files, generated
-by BreezeStyleSheets. Our fork of the repo is here: https://github.com/COMP523TeamD/BreezeStyleSheets.
-
-There's a lot of boilerplate here to get current slice, i.e. `global_vars.IMAGE_DICT[global_vars.IMAGE_DICT.index]`
-Isn't too inefficient but could be improved. Tried more global variables but it was pretty bad.
-
-`MainWindow` and `CircumferenceWindow` are in the same file due to the need for shared global variables.
+by BreezeStyleSheets. Our fork of the repo: https://github.com/COMP523TeamD/BreezeStyleSheets.
 
 Functions like `render_curr_slice` and `export_curr_slice_as_img` that are common to both windows
-are made functions instead of methods to avoid duplicated code. They do behave slightly differently
+are made functions instead of methods to avoid duplicated code. They behave slightly differently
 depending on the window, so the currently active window is computed in these functions.
-
-If a behavior is unique to a window, then it is a method in the class (though it could be made a function).
 
 Native menu bar is currently disabled. See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/9.
 tl;dr on macOS, there can only be one menubar shared between the two classes. Now that we want only one window,
@@ -36,6 +29,10 @@ from PyQt6.uic.load_ui import loadUi
 # qimage2ndarray needs to go after PyQt6 imports or there will be a ModuleNotFoundError.
 import qimage2ndarray
 import pprint
+
+# The regular Python 3.7+ dict maintains insertion order.
+# This is used only in print_properties()
+from collections import OrderedDict
 
 import src.utils.constants as constants
 
@@ -59,10 +56,9 @@ from src.utils.img_helpers import (
     curr_physical_units,
     curr_path,
     get_curr_properties_tuple,
+    get_middle_of_z_dimension,
 )
 import src.utils.img_helpers as img_helpers
-
-from src.utils.parse_cli import parse_gui_cli
 
 DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
 DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
@@ -99,9 +95,7 @@ class MainWindow(QMainWindow):
         self.action_test_show_resource.triggered.connect(self.test_show_resource)
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
-        self.action_print_curr_properties_tuple.triggered.connect(
-            print_curr_properties_tuple
-        )
+        self.action_print_properties.triggered.connect(print_properties)
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -260,6 +254,9 @@ class MainWindow(QMainWindow):
             self.render_all_sliders()
             self.enable_elements()
         else:
+            # Doesn't need to re-render sliders to set max value of slice slider.
+            # update_image_groups does not change the batch.
+            # Therefore, max value of slice slider does not change.
             update_image_groups(path_list)
 
         render_curr_slice()
@@ -337,7 +334,7 @@ class MainWindow(QMainWindow):
         global_vars.THETA_X = 0
         global_vars.THETA_Y = 0
         global_vars.THETA_Z = 0
-        global_vars.SLICE = img_helpers.get_middle_of_z_dimension(curr_image())
+        global_vars.SLICE = get_middle_of_z_dimension(curr_image())
         render_curr_slice()
         self.render_all_sliders()
 
@@ -375,9 +372,7 @@ class CircumferenceWindow(QMainWindow):
         )
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
-        self.action_print_curr_properties_tuple.triggered.connect(
-            print_curr_properties_tuple
-        )
+        self.action_print_properties.triggered.connect(print_properties)
         self.action_export_png.triggered.connect(
             lambda: export_curr_slice_as_img("png")
         )
@@ -542,9 +537,23 @@ def print_dimensions() -> None:
     print(curr_image().GetSize())
 
 
-def print_curr_properties_tuple() -> None:
-    """Print current batch's properties tuple to terminal."""
-    print(get_curr_properties_tuple())
+def print_properties() -> None:
+    """Print current batch's properties to terminal.
+
+    Internally, the properties tuple is a tuple of values only and doesn't contain
+    field names. This function creates a dictionary with field names for printing. But the dictionary
+    doesn't exist in the program."""
+    if not len(global_vars.IMAGE_DICT):
+        print("No loaded image!")
+        return
+    curr_properties: tuple = get_curr_properties_tuple()
+    fields: tuple = ("dimensions", "center of rotation", "spacing")
+    if len(fields) != len(curr_properties):
+        print(
+            "Update src/GUI/main.print_curr_properties_tuple() !\nNumber of fields and number of properties don't match."
+        )
+        exit(1)
+    pprint.pprint(OrderedDict(zip(fields, curr_properties)))
 
 
 def goto_main() -> None:
@@ -562,7 +571,6 @@ def goto_main() -> None:
 
 def main() -> None:
     """Main entrypoint of GUI."""
-    parse_gui_cli()
 
     # See MainWindow.test for an example of how to access a resource
     # This import can't go at the top because parse_gui_cli has to get THEME_NAME before the import

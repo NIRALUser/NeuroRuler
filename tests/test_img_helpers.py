@@ -42,22 +42,23 @@ def test_hashing():
     assert first_group_hash != third_group_hash
 
 
-def test_update_image_groups():
+def test_initialize_globals_and_update_image_groups():
+    """This tests update_image_groups since initialize_globals calls update_image_groups."""
     clear_globals()
     assert len(global_vars.IMAGE_GROUPS) == 0
-    update_image_groups(IMAGE_PATHS)
+    initialize_globals(IMAGE_PATHS)
     assert len(global_vars.IMAGE_GROUPS) == 3
     clear_globals()
-    update_image_groups(IMAGE_PATHS[:5])
+    initialize_globals(IMAGE_PATHS[:5])
     assert len(global_vars.IMAGE_GROUPS) == 1
     clear_globals()
-    update_image_groups(IMAGE_PATHS[:6])
+    initialize_globals(IMAGE_PATHS[:6])
     assert len(global_vars.IMAGE_GROUPS) == 2
 
 
 def test_curr_path():
     clear_globals()
-    update_image_groups(IMAGE_PATHS)
+    initialize_globals(IMAGE_PATHS)
     for i in range(4):
         next_img()
     assert curr_path() == IMAGE_PATHS[4]
@@ -72,7 +73,7 @@ def test_curr_path():
 
 def test_del_curr_img_delete_last():
     clear_globals()
-    update_image_groups(IMAGE_PATHS)
+    initialize_globals(IMAGE_PATHS)
     global_vars.CURR_IMAGE_INDEX = (
         len(global_vars.IMAGE_GROUPS[list(global_vars.IMAGE_GROUPS.keys())[0]]) - 1
     )
