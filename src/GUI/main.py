@@ -19,6 +19,7 @@ from typing import Union
 import SimpleITK as sitk
 import numpy as np
 from PyQt6 import QtWidgets
+from PyQt6 import QtGui
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PyQt6.uic.load_ui import loadUi
@@ -81,7 +82,9 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         loadUi(str(Path("src") / "GUI" / "main.ui"), self)
         self.setWindowTitle("Head Circumference Tool")
-        """Set to True on first call to enable_elements."""
+        self.setWindowIcon(
+            QtGui.QIcon(str(Path("src") / "GUI" / "static" / "hct_logo.png"))
+        )
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(lambda: self.browse_files(True))
         self.action_remove_image.triggered.connect(self.remove_curr_img)
@@ -163,7 +166,7 @@ class MainWindow(QMainWindow):
             self.render_curr_slice()
         else:
             self.apply_button.setText("Adjust")
-            # Ignore the typing error here.
+            # Ignore the type annotation error here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
             self.render_circumference(binary_contour_slice)
@@ -269,15 +272,16 @@ class MainWindow(QMainWindow):
             self.render_all_sliders()
             self.render_initial_view()
             self.render_image_num_and_path()
+            self.render_curr_slice()
         else:
             # Doesn't need to re-render sliders to set max value of slice slider.
             # update_image_groups does not change the batch.
             # Therefore, max value of slice slider does not change.
             # Must render image_num.
+            # Does not need to render current slice. Images are added to the end of the dict.
+            # And adding duplicate key doesn't change key order.
             update_image_groups(path_list)
             self.render_image_num_and_path()
-
-        self.render_curr_slice()
 
     def render_curr_slice(self) -> Union[np.ndarray, None]:
         """Resamples the currently selected MRIImage using its rotation and slice settings,
