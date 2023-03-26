@@ -193,10 +193,10 @@ This will allow you to lay out all elements.
 Image visualization
 ===================
 
-.. currentmodule:: src.GUI.main
+.. currentmodule:: src.GUI.main.MainWindow
 .. autofunction:: render_curr_slice
 
-`[source] <_modules/src/GUI/main.html#render_curr_slice>`_
+`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
 
 .. _PyQt6QRC:
 
@@ -283,13 +283,13 @@ as the name implies. This circumvented difficulties [#npqimage]_ with converting
 
 `GitHub <https://github.com/hmeine/qimage2ndarray>`_ and `Documentation <http://hmeine.github.io/qimage2ndarray/>`_ (very brief).
 
-.. currentmodule:: src.GUI.main
+.. currentmodule:: src.GUI.main.MainWindow
 .. autofunction:: render_curr_slice
 
 .. warning:: In :code:`src/GUI/main.py`, if :code:`import qimage2ndarray` goes before the PyQt imports (which an
     autoformatter might do), there will be a :code:`ModuleNotFoundError`.
 
-`[source] <_modules/src/GUI/main.html#render_curr_slice>`_
+`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
 
 .. _BreezeStyleSheets:
 
@@ -463,7 +463,7 @@ warnings, functools
 
 Allow us to mark functions :code:`@deprecated`.
 
-.. currentmodule:: src.utils.global_vars
+.. currentmodule:: src.utils.constants
 .. autofunction:: deprecated
 
 .. _sphinxsetuptools:

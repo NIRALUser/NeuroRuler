@@ -3,13 +3,14 @@
 import argparse
 import json
 from pathlib import Path
+import string
 
 import src.utils.user_settings as user_settings
 import src.utils.constants as constants
 import src.utils.exceptions as exceptions
 
 SETTINGS: dict = dict()
-"""Dict resulting from JSON. Global within the file."""
+"""Dict of settings resulting from JSON file parsing. Global within the file."""
 
 
 def parse_json() -> None:
@@ -33,18 +34,25 @@ def parse_json() -> None:
         "EXPORTED_FILE_NAMES_USE_INDEX"
     )
 
-    user_settings.CONTOUR_COLOR = SETTINGS["CONTOUR_COLOR"]
-    if (
-        not user_settings.CONTOUR_COLOR.isalpha()
-        and len(user_settings.CONTOUR_COLOR) != 6
-    ):
-        raise exceptions.InvalidJSONField(
-            "CONTOUR_COLOR", "Name (e.g., red, blue) or 6-hexit color code RRGGBB"
-        )
-
     user_settings.THEME_NAME = SETTINGS["THEME_NAME"]
     if user_settings.THEME_NAME not in constants.THEMES:
-        raise exceptions.InvalidJSONField("THEME_NAME", str(constants.THEMES))
+        raise exceptions.InvalidJSONField(
+            "THEME_NAME", list_of_options_to_str(constants.THEMES)
+        )
+
+    contour_color: str = SETTINGS["CONTOUR_COLOR"]
+    if contour_color == "":
+        user_settings.CONTOUR_COLOR = default_contour_color()
+    elif contour_color.isalpha():
+        user_settings.CONTOUR_COLOR = contour_color
+    elif len(contour_color) == 6 and all(char in string.hexdigits for char in contour_color):
+        user_settings.CONTOUR_COLOR = contour_color
+    else:
+        raise exceptions.InvalidJSONField(
+            "CONTOUR_COLOR",
+            'Name (e.g., "red", "blue") or 6-hexit color code "RRGGBB" or "" (empty string) '
+            "to set a default color based on theme",
+        )
 
     user_settings.MIN_WIDTH_RATIO = parse_float("MIN_WIDTH_RATIO")
     user_settings.MIN_HEIGHT_RATIO = parse_float("MIN_HEIGHT_RATIO")
@@ -139,7 +147,7 @@ def parse_gui_cli() -> None:
         "-t",
         "--theme",
         help="configure theme, options are "
-        + str(constants.THEMES)[1:-1].replace("'", "")
+        + list_of_options_to_str(constants.THEMES).replace('"', "")
         + ", and the default theme is dark-hct",
     )
     parser.add_argument(
@@ -164,19 +172,12 @@ def parse_gui_cli() -> None:
     if args.theme:
         if args.theme not in constants.THEMES:
             print(
-                "Invalid theme specified. Options are "
-                + (str(constants.THEMES))[1:-1].replace("'", "")
-                + "."
+                f"Invalid theme specified. Options are {list_of_options_to_str(constants.THEMES)}"
             )
             exit(1)
 
         user_settings.THEME_NAME = args.theme
-        if args.theme == "dark":
-            # Theme color from dark.json
-            user_settings.CONTOUR_COLOR = "3daee9"
-        elif args.theme == "light":
-            # Theme color from light.json
-            user_settings.CONTOUR_COLOR = "3daef3"
+        user_settings.CONTOUR_COLOR = default_contour_color()
         print(f"Theme {args.theme} specified.")
 
     if args.color:
@@ -184,3 +185,28 @@ def parse_gui_cli() -> None:
         print(
             f"Contour color is {'#' if not args.color.isalpha() else ''}{args.color}."
         )
+
+
+def list_of_options_to_str(strs: list[str]) -> str:
+    r"""Convert list[str] of options of the form ['a', 'b', 'c', 'd'] to str representation
+    "a", "b", "c", or "d" """
+    # Need at least 1 comma in the list
+    assert len(strs) > 2
+    s = str(strs)[1:-1].replace("'", '"')
+    final_comma_position: int = s.rfind(",")
+    return s[: final_comma_position + 1] + " or " + s[final_comma_position + 2 :]
+
+
+def default_contour_color() -> str:
+    """Uses theme name to determine a default contour color.
+
+    Only call after validating theme name so that a str (not None) must be returned.
+
+    :return: color code "RRGGBB"
+    :rtype: str"""
+    if "hct" in user_settings.THEME_NAME:
+        return constants.HCT_MAIN_COLOR
+    elif user_settings.THEME_NAME == "dark":
+        return constants.DARK_THEME_COLOR
+    elif user_settings.THEME_NAME == "light":
+        return constants.LIGHT_THEME_COLOR

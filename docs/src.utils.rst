@@ -44,10 +44,10 @@ src.utils.imgproc module
    :undoc-members:
    :show-inheritance:
 
-src.utils.parse\_cli module
----------------------------
+src.utils.parser module
+-----------------------
 
-.. automodule:: src.utils.parse_cli
+.. automodule:: src.utils.parser
    :members:
    :undoc-members:
    :show-inheritance:

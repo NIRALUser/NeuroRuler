@@ -14,10 +14,11 @@
     "FILE_BROWSER_START_DIR": "ExampleData",
     // Whether exported file names use the image number in the program or the original file name
     "EXPORTED_FILE_NAMES_USE_INDEX": "False",
-    // Can be a name (e.g., red, blue) or 6-hexit color code RRGGBB
-    "CONTOUR_COLOR": "b55162",
     // Options: dark, dark-hct, light, light-hct
     "THEME_NAME": "dark-hct",
+    // Defaults to "" (empty string) to be automatically set by THEME_NAME.
+    // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that
+    "CONTOUR_COLOR": "",
     // Minimum width and height of the GUI as a ratio of primary monitor size.
     // Enter a number between 0 (not inclusive) and 1.
     "MIN_WIDTH_RATIO": 0.6,

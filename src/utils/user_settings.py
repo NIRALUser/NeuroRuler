@@ -42,6 +42,11 @@ If False (default), then exported files will be named using the file name of the
 
 E.g. MicroBiome_1month_T1w_0_0_0_0.png, MicroBiome_1month_T1w_90_180_0_60.csv."""
 
+THEME_NAME: str = "dark-hct"
+"""Name of theme in src/GUI/themes.
+
+The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
+
 CONTOUR_COLOR: str = constants.HCT_MAIN_COLOR
 """Color of the contour. Defaults to constants.HCT_MAIN_COLOR = #b55162 = R 181 G 81 B 98.
 
@@ -49,24 +54,7 @@ This can be a 6-hexit string rrggbb (don't prepend 0x) or a name (e.g. red, blue
 
 Internally, this is converted to a QColor using imgproc.string_to_QColor().
 
-QColor supports 8-hexit rrggbbaa but doesn't work in our GUI, i.e. aa=00 appears fully bright in the GUI.
-
-The problem likely lies in :code:`src.GUI.main.render_curr_slice()`? Not a huge deal.
-
-This is considered a setting because the user can modify it via CLI. It's just that the default
-value is a constant value from constants.py.
-
-parser.py hardcodes this value to theme colors from BSS JSON files for themes where the theme color
-isn't the HCT main color."""
-
-THEME_NAME: str = "dark-hct"
-"""Name of theme in src/GUI/themes.
-
-Defaults to 'dark-hct'.
-
-Configurable via -t, --theme CLI option.
-
-The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
+QColor supports 8-hexit rrggbbaa but doesn't work in our GUI, i.e. aa=00 appears fully bright in the GUI."""
 
 PRIMARY_MONITOR_DIMENSIONS: list[int] = [500, 500]
 """Set to user's primary monitor's dimensions. 500, 500 are dummy values"""

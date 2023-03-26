@@ -29,18 +29,19 @@ ROTATION_MAX: int = 90
 SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """File formats supported. Must be a subset of the file formats supported by SimpleITK.
 
-TODO: Support .txt for loading image paths from text file (which we can export)."""
+TODO: Support .txt for loading image paths from text file (which we can quite easily export using global_vars.IMAGE_GROUPS)."""
 EXAMPLE_DATA_DIR: Path = Path("ExampleData")
 """Directory for storing example data."""
 
 THEME_DIR: Path = Path("src") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
-THEMES: set[str] = set()
+THEMES: list[str] = []
 """List of themes, i.e. the names of the directories in THEME_DIR."""
 if len(list(THEME_DIR.glob("*"))) != 0:
     for path in THEME_DIR.iterdir():
         if path.is_dir():
-            THEMES.add(path.name)
+            THEMES.append(path.name)
+    THEMES = sorted(THEMES)
 else:
     # TODO: Without this, autodocumentation will crash. Is there a better way around this?
     print(
@@ -56,6 +57,9 @@ Shouldn't use this much if we use BreezeStyleSheet themes, in which each theme h
 theme color.
 
 This is more here for reference than actual use in the program."""
+
+DARK_THEME_COLOR: str = "3daee9"
+LIGHT_THEME_COLOR: str = "3daef3"
 
 NUM_CONTOURS_IN_INVALID_SLICE: int = 10
 """If this number of contours or more is detected in a slice after processing by contour()
