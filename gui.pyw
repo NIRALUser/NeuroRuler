@@ -4,7 +4,8 @@
 # This file can be double-clicked on Windows to start without opening a terminal
 
 from src.GUI.main import main
-from src.utils.parser import parse_gui_cli
+from src.utils.parser import parse_json, parse_gui_cli
 
+parse_json()
 parse_gui_cli()
 main()

@@ -2,12 +2,10 @@
 
 Loads `src/GUI/main.ui`, made in QtDesigner.
 
-In addition, also loads `.qss` stylesheets and `resources.py` (icons) files, generated
+Loads `.qss` stylesheets and `resources.py` (icons) files, generated
 by BreezeStyleSheets. Our fork of the repo: https://github.com/COMP523TeamD/BreezeStyleSheets.
 
-Native menu bar is enabled.
-Note that on macOS, there can only be one menubar shared between multiple windows, if there are multiple windows,
-which we switched away from.
+Native menu bar (macOS) is enabled since we are now using only one window.
 See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/9."""
 
 import importlib
@@ -59,6 +57,8 @@ from src.utils.img_helpers import (
 
 import src.utils.img_helpers as img_helpers
 
+PATH_TO_UI_FILE: Path = Path("src") / "GUI" / "main.ui"
+PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
 DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
 DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
 GITHUB_LINK: str = "https://github.com/COMP523TeamD/HeadCircumferenceTool"
@@ -73,18 +73,16 @@ MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "units not found"
 class MainWindow(QMainWindow):
     """Main window of the application.
 
-    Displays image and rotation & slice sliders, along with a reset button.
-
-    Also displays the index of the current image and previous & next buttons."""
+    Settings mode and circumference mode."""
 
     def __init__(self):
-        """Load main.ui file from QtDesigner and connect GUI events to methods/functions."""
+        """Load main.ui file and connect GUI events to methods/functions.
+
+        Sets window title and icon."""
         super(MainWindow, self).__init__()
-        loadUi(str(Path("src") / "GUI" / "main.ui"), self)
+        loadUi(str(PATH_TO_UI_FILE), self)
         self.setWindowTitle("Head Circumference Tool")
-        self.setWindowIcon(
-            QtGui.QIcon(str(Path("src") / "GUI" / "static" / "hct_logo.png"))
-        )
+        self.setWindowIcon(QtGui.QIcon(str(PATH_TO_HCT_LOGO)))
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(lambda: self.browse_files(True))
         self.action_remove_image.triggered.connect(self.remove_curr_img)
@@ -126,6 +124,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def render_initial_view(self) -> None:
+        """Called after File > Open. Enables GUI elements."""
         self.action_open.setEnabled(True)
         self.action_add_images.setEnabled(True)
         self.action_remove_image.setEnabled(True)
@@ -157,11 +156,17 @@ class MainWindow(QMainWindow):
         self.action_export_xpm.setEnabled(True)
 
     def settings_export_view_toggle(self) -> None:
+        """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
+
+        Toggle SETTINGS_VIEW_ENABLED, change apply button text, render stuff depending on the current mode.
+
+        Enables/disables GUI elements depending on the value of SETTINGS_VIEW_ENABLED.
+        """
         global_vars.SETTINGS_VIEW_ENABLED = not global_vars.SETTINGS_VIEW_ENABLED
         settings_view_enabled = global_vars.SETTINGS_VIEW_ENABLED
         if settings_view_enabled:
             self.apply_button.setText("Apply")
-            self.circumference_label.setText("Calculated Circumference: N/A")
+            self.circumference_label.setText(DEFAULT_CIRCUMFERENCE_LABEL_TEXT)
             # Render uncontoured slice after pressing adjust
             self.render_curr_slice()
         else:
@@ -238,17 +243,19 @@ class MainWindow(QMainWindow):
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
 
-        If `extend`, then `IMAGE_GROUPS` will be extended with new files. Else, `IMAGE_GROUPS` will be cleared and
-        (re)initialized (e.g. when choosing files for the first time or just re-opening).
+        If `extend`, then `IMAGE_GROUPS` will be updated with new images.
 
-        Since IMAGE_DICT is a reference to the first image dict in IMAGE_GROUPS, IMAGE_DICT is also cleared and
-        (re)initialized, by extension.
+        Else, `IMAGE_GROUPS` will be cleared and
+        (re)initialized (e.g. when choosing files for the first time or re-opening).
 
-        Opens file menu and calls `enable_and_disable_elements()` if not `extend`.
+        Since IMAGE_DICT is a reference to an image dict in IMAGE_GROUPS, IMAGE_DICT is also cleared and
+        (re)initialized.
 
-        Lastly, calls `render_curr_slice()` or `refresh()`.
+        Opens file menu.
 
-        :param extend: Whether to clear IMAGE_GROUPS and (re)initialize or extend on it
+        Renders various elements depending on the value of `extend`.
+
+        :param extend: Whether to clear IMAGE_GROUPS and (re)initialize or add images to it. Determines which GUI elements are rendered.
         :type extend: bool
         :return: None"""
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
@@ -284,16 +291,16 @@ class MainWindow(QMainWindow):
             self.render_image_num_and_path()
 
     def render_curr_slice(self) -> Union[np.ndarray, None]:
-        """Resamples the currently selected MRIImage using its rotation and slice settings,
+        """Resamples the currently selected image using its rotation and slice settings,
         then renders the resulting slice in the GUI.
 
         DOES NOT set text for `image_num_label` and file path labels.
 
-        If `not SETTINGS_VIEW_ENABLED`, also calls `imgproc.contour()` to outline
-        the contour of the image.
+        If `not SETTINGS_VIEW_ENABLED`, also calls `imgproc.contour()` and outlines
+        the contour of the QImage (mutating it).
 
         Additionally, also returns a view of the binary contoured slice if `not SETTINGS_VIEW_ENABLED`.
-        This saves work when calculating the circumference.
+        This saves work when computing circumference.
 
         :return: np.ndarray if `not SETTINGS_VIEW_ENABLED` else None
         :rtype: np.ndarray or None"""
@@ -361,8 +368,9 @@ class MainWindow(QMainWindow):
 
     def render_all_sliders(self) -> None:
         """Sets all slider values to the global rotation and slice values.
+        Also updates maximum value of slice slider.
 
-        Called on reset.
+        Called on reset. Will need to be called when updating batch index, if we implement this.
 
         Not called when the user updates a slider.
 
@@ -370,7 +378,6 @@ class MainWindow(QMainWindow):
         self.x_slider.setValue(global_vars.THETA_X)
         self.y_slider.setValue(global_vars.THETA_Y)
         self.z_slider.setValue(global_vars.THETA_Z)
-        # Probably not necessary. Just in case.
         self.slice_slider.setMaximum(curr_image().GetSize()[2] - 1)
         self.slice_slider.setValue(global_vars.SLICE)
         self.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
@@ -383,7 +390,8 @@ class MainWindow(QMainWindow):
     def remove_curr_img(self) -> None:
         """Called after File > Remove File.
 
-        Removes current image from `IMAGE_DICT`.
+        Removes current image from `IMAGE_DICT`. Since `IMAGE_DICT` is a reference to an image dict
+        in `IMAGE_GROUPS`, it's removed from `IMAGE_GROUPS` as well.
 
         :returns: None"""
         img_helpers.del_curr_img()
@@ -396,35 +404,35 @@ class MainWindow(QMainWindow):
         self.render_image_num_and_path()
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
-            # Ignore the typing error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     def next_img(self):
         """Called when Next button is clicked.
 
-        Advance index and refresh."""
+        Advance index and render."""
         img_helpers.next_img()
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
-            # Ignore the typing error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     def previous_img(self):
         """Called when Previous button is clicked.
 
-        Decrement index and refresh."""
+        Decrement index and render."""
         img_helpers.previous_img()
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
-            # Ignore the typing error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     def rotate_x(self):
-        """Called any time the user updates the x slider.
+        """Called when the user updates the x slider.
 
         Render image and set `x_rotation_label`."""
         x_slider_val: int = self.x_slider.value()
@@ -433,7 +441,7 @@ class MainWindow(QMainWindow):
         self.x_rotation_label.setText(f"X rotation: {x_slider_val}°")
 
     def rotate_y(self):
-        """Called any time the user updates the y slider.
+        """Called when the user updates the y slider.
 
         Render image and set `y_rotation_label`."""
         y_slider_val: int = self.y_slider.value()
@@ -442,7 +450,7 @@ class MainWindow(QMainWindow):
         self.y_rotation_label.setText(f"Y rotation: {y_slider_val}°")
 
     def rotate_z(self):
-        """Called any time the user updates the z slider.
+        """Called when the user updates the z slider.
 
         Render image and set `z_rotation_label`."""
         z_slider_val: int = self.z_slider.value()
@@ -451,7 +459,7 @@ class MainWindow(QMainWindow):
         self.z_rotation_label.setText(f"Z rotation: {z_slider_val}°")
 
     def slice_update(self):
-        """Called any time the user updates the slice slider.
+        """Called when the user updates the slice slider.
 
         Render image and set `slice_num_label`."""
         slice_slider_val: int = self.slice_slider.value()
@@ -463,7 +471,7 @@ class MainWindow(QMainWindow):
         """Called when Reset is clicked.
 
         Resets rotation values to 0 and slice num to the default `int((z-1)/2)`
-        for the current image, then `refresh`es."""
+        for the current image, then renders current image and sliders."""
         global_vars.THETA_X = 0
         global_vars.THETA_Y = 0
         global_vars.THETA_Z = 0
@@ -512,9 +520,11 @@ class MainWindow(QMainWindow):
 
 
 def print_metadata() -> None:
-    """Print current MRIImage's metadata to terminal.
+    """Print current image's metadata to terminal. Internally, uses sitk.GetMetaData, which doesn't return
+    all metadata (e.g., doesn't return spacing values whereas sitk.GetSpacing does).
 
-    NRRD files typically don't have a lot of metadata compared to the NIfTI..."""
+    Typically, this returns less metdata for NRRD than for NIfTI."""
+
     if not len(global_vars.IMAGE_DICT):
         print("Can't print metadata when there's no image!")
         return
@@ -522,13 +532,14 @@ def print_metadata() -> None:
 
 
 def print_dimensions() -> None:
-    """Print current MRIImage's dimensions to terminal."""
+    """Print currently displayed image's dimensions to terminal."""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print dimensions when there's no image!")
         return
     print(curr_image().GetSize())
 
 
+# TODO: If updating img_helpers.get_properties(), this needs to be slightly adjusted!
 def print_properties() -> None:
     """Print current batch's properties to terminal.
 
@@ -542,7 +553,7 @@ def print_properties() -> None:
     fields: tuple = ("dimensions", "center of rotation", "spacing")
     if len(fields) != len(curr_properties):
         print(
-            "Update src/GUI/main.print_curr_properties_tuple() !\nNumber of fields and number of properties don't match."
+            "Update src/GUI/main.print_properties() !\nNumber of fields and number of properties don't match."
         )
         exit(1)
     pprint.pprint(OrderedDict(zip(fields, curr_properties)))
@@ -550,9 +561,8 @@ def print_properties() -> None:
 
 def main() -> None:
     """Main entrypoint of GUI."""
-
-    # See MainWindow.test for an example of how to access a resource
-    # This import can't go at the top because gui.py.parse_gui_cli() has to set THEME_NAME before the import
+    # This import can't go at the top of the file
+    # because gui.py.parse_gui_cli() has to set THEME_NAME before the import occurs
     importlib.import_module(f"src.GUI.themes.{settings.THEME_NAME}.resources")
 
     if not settings.IMG_DIR.exists():
@@ -560,18 +570,23 @@ def main() -> None:
 
     app = QApplication(sys.argv)
 
-    # This puts arrow buttons on the sliders but makes sliding stop early sometimes?
-    # Should be a way to put those arrow buttons on sliders via QSS
+    # TODO: This puts arrow buttons on the left and right endpoints of the sliders
+    # If the QSS below isn't loaded (i.e., comment out the below two lines)
+    # We should figure out how to get arrow buttons on sliders for (+, -) 1 precise adjustments.
+    # Currently, the sliders allow this (left click on the left or right end), but it's not obvious in the GUI.
+
     # app.setStyle('Fusion')
 
     with open(constants.THEME_DIR / settings.THEME_NAME / f"stylesheet.qss", "r") as f:
         app.setStyleSheet(f.read())
 
     MAIN_WINDOW = MainWindow()
-    MAIN_WINDOW.setMinimumWidth(settings.MIN_WIDTH)
-    MAIN_WINDOW.setMinimumHeight(settings.MIN_HEIGHT)
-    # TODO: This might not be necessary since MainWindow.__init__ does self.show()
-    MAIN_WINDOW.show()
+    MAIN_WINDOW.setMinimumWidth(
+        int(settings.MIN_WIDTH_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[0])
+    )
+    MAIN_WINDOW.setMinimumHeight(
+        int(settings.MIN_HEIGHT_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[1])
+    )
 
     try:
         sys.exit(app.exec())

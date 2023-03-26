@@ -1,7 +1,7 @@
 """Custom exceptions, most of which aren't actually in use rn."""
 
 from pathlib import Path
-from src.utils.constants import deprecated, ROTATION_MAX, ROTATION_MIN
+from src.utils.constants import deprecated, ROTATION_MAX, ROTATION_MIN, JSON_CONFIG_PATH
 
 
 # TODO: Make __init__ accept theta_x, theta_y, theta_z, slice_num as parameters to display those to the user?
@@ -60,4 +60,10 @@ class InvalidColor(Exception):
 class RotationOutOfBounds(Exception):
     def __init__(self, theta: int, axis: str):
         self.message = f"{axis} rotation value {theta} out of bounds. Min rotation value is {ROTATION_MIN} degrees, and max is {ROTATION_MAX}."
+        super().__init__(self.message)
+
+
+class InvalidJSONField(Exception):
+    def __init__(self, field: str, expected: str):
+        self.message = f"The field {field} in {JSON_CONFIG_PATH} has an invalid type or value.\nExpected: {expected}"
         super().__init__(self.message)
