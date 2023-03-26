@@ -27,6 +27,7 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
         )
         super().__init__(self.message)
 
+
 @deprecated
 class RemoveAtInvalidIndex(Exception):
     """The error message accounts for the user seeing a 1-indexed list."""
@@ -53,6 +54,7 @@ class InvalidColor(Exception):
     def __init__(self, color: str):
         self.message = f"Invalid color {color} specified."
         super().__init__(self.message)
+
 
 # sitk can handle any rotation, but we should enforce -90 and 90 bounds.
 class RotationOutOfBounds(Exception):

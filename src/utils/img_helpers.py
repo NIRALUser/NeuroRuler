@@ -242,7 +242,8 @@ def del_curr_img() -> None:
 
     Will decrement CURR_IMAGE_INDEX if removing the last element.
 
-    Will not check for IMAGE_DICT being empty after the deletion. This happens in the GUI."""
+    Will not check for IMAGE_DICT being empty after the deletion. This happens in the GUI.
+    """
     if len(global_vars.IMAGE_DICT) == 0:
         print("Can't remove from empty list!")
         return
