@@ -8,6 +8,7 @@ from pathlib import Path
 import src.utils.global_vars as global_vars
 from src.utils.constants import degrees_to_radians
 import src.utils.constants as constants
+import src.utils.user_settings as user_settings
 
 
 def update_image_groups(path_list: list[Path]) -> None:
@@ -53,7 +54,7 @@ def update_image_groups(path_list: list[Path]) -> None:
 def initialize_globals(path_list: list[Path]) -> None:
     """After pressing File > Open, the global variables need to be cleared and (re)initialized.
 
-    The mutated global variables: IMAGE_GROUPS, IMAGE_DICT, CURR_IMAGE_INDEX, CURR_BATCH_INDEX,
+    Mutated global variables: IMAGE_GROUPS, IMAGE_DICT, CURR_IMAGE_INDEX, CURR_BATCH_INDEX,
     READER, THETA_X, THETA_Y, THETA_Z, SLICE, EULER_3D_TRANSFORM.
 
     Specifically, clears IMAGE_GROUPS and then populates it. IMAGE_DICT is then the first group of images.
@@ -71,8 +72,8 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
     # curr_img has the same properties as the whole group in IMAGE_DICT. Use it to set slice and center of rotation
-    # TODO: Set maximum for the slice slider in the GUI!
     curr_img: sitk.Image = curr_image()
+    # TODO: Set maximum for the slice slider in the GUI!
     global_vars.SLICE = get_middle_of_z_dimension(curr_img)
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
     global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
@@ -97,6 +98,8 @@ def get_properties(img: sitk.Image) -> tuple:
 
     TODO: Add more properties
 
+    If modifying this, src/GUI/main.py print_properties also has to be modified slightly.
+
     :param img:
     :type img: sitk.Image
     :return: (dimensions, center of rotation used in EULER_3D_TRANSFORM, spacing)
@@ -109,7 +112,7 @@ def get_properties(img: sitk.Image) -> tuple:
 
 
 def curr_path() -> Path:
-    """Return the Path of the currently loaded image in IMAGE_DICT.
+    """Return the Path of the currently displayed image in IMAGE_DICT.
 
     :return: Path of current image
     :rtype: Path"""
@@ -117,7 +120,7 @@ def curr_path() -> Path:
 
 
 def curr_image() -> sitk.Image:
-    """Return the image at the current index in global_vars.IMAGE_DICT.
+    """Return the sitk.Image at the current index in global_vars.IMAGE_DICT.
 
     :return: current image
     :rtype: sitk.Image"""
@@ -126,6 +129,9 @@ def curr_image() -> sitk.Image:
 
 def curr_rotated_slice() -> sitk.Image:
     """Return 2D rotated slice of the current image determined by rotation and slice settings in global_vars.py
+
+    Smoothing occurs here and is rendered if user_settings.SMOOTH_BEFORE_RENDERING. Else, smoothing occurs
+    in imgproc.contour.
 
     Sets global_vars.EULER_3D_TRANSFORM's rotation values but not its center since all loaded images should
     have the same center. TODO: Check this in `validate()`
@@ -137,9 +143,20 @@ def curr_rotated_slice() -> sitk.Image:
         degrees_to_radians(global_vars.THETA_Y),
         degrees_to_radians(global_vars.THETA_Z),
     )
-    return sitk.Resample(curr_image(), global_vars.EULER_3D_TRANSFORM)[
-        :, :, global_vars.SLICE
-    ]
+    rotated_slice: sitk.Image = sitk.Resample(
+        curr_image(), global_vars.EULER_3D_TRANSFORM
+    )[:, :, global_vars.SLICE]
+    if user_settings.DEBUG and user_settings.SMOOTH_BEFORE_RENDERING:
+        print(
+            "img_helpers.curr_rotated_slice() smoothed the image before rendering (i.e., user sees smoothed slice)"
+        )
+    return (
+        sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+            sitk.Cast(rotated_slice, sitk.sitkFloat64)
+        )
+        if user_settings.SMOOTH_BEFORE_RENDERING
+        else rotated_slice
+    )
 
 
 def rotated_slice_hardcoded(
@@ -173,7 +190,7 @@ def rotated_slice_hardcoded(
 
 
 def curr_metadata() -> dict[str, str]:
-    """Computes and returns currently loaded image's metadata.
+    """Computes and returns currently displayed image's metadata.
 
     Note: Does not return all metadata stored in the file, just the metadata stored in sitk.Image.GetMetaDataKeys()
     For example, it's possible for a sitk.Image to have spacing values retrieved by GetSpacing(), but the same spacing values won't
@@ -190,7 +207,7 @@ def curr_metadata() -> dict[str, str]:
 
 # TODO: works only for NIFTI, not NRRD
 def curr_physical_units() -> Union[str, None]:
-    """Return currently loaded image's physical units from sitk.GetMetaData if it exists, else None.
+    """Return currently displayed image's physical units from sitk.GetMetaData if it exists, else None.
 
     TODO: works only for NIFTI, not NRRD.
 
@@ -205,7 +222,7 @@ def curr_physical_units() -> Union[str, None]:
 
 
 def get_curr_properties_tuple() -> tuple:
-    """Return properties tuple for the current loaded group of images.
+    """Return properties tuple for the currently loaded batch of images.
 
     :return: current properties tuple
     :rtype: tuple"""
@@ -236,14 +253,14 @@ def get_center_of_rotation(img: sitk.Image) -> tuple:
 
 
 def del_curr_img() -> None:
-    """Delete currently loaded image.
+    """Remove currently displayed image from IMAGE_DICT and IMAGE_GROUPS.
 
     Won't remove if IMAGE_DICT is empty. Will print message and return early.
 
     Will decrement CURR_IMAGE_INDEX if removing the last element.
 
-    Will not check for IMAGE_DICT being empty after the deletion. This happens in the GUI.
-    """
+    Will not check for IMAGE_DICT being empty after the deletion (GUI should be disabled).
+    This happens in the GUI."""
     if len(global_vars.IMAGE_DICT) == 0:
         print("Can't remove from empty list!")
         return

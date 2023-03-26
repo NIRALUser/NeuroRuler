@@ -14,13 +14,22 @@ import functools
 from numpy import pi
 from typing import Union
 
+JSON_CONFIG_PATH: Path = Path("config.json")
+"""Self-explanatory"""
+
+EXPECTED_NUM_FIELDS_IN_JSON: int = 9
+"""Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
+will be raised."""
+
 ROTATION_MIN: int = -90
 """In degrees"""
 ROTATION_MAX: int = 90
 """In degrees"""
 
 SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
-"""File formats supported. Must be a subset of the file formats supported by SimpleITK."""
+"""File formats supported. Must be a subset of the file formats supported by SimpleITK.
+
+TODO: Support .txt for loading image paths from text file (which we can export)."""
 EXAMPLE_DATA_DIR: Path = Path("ExampleData")
 """Directory for storing example data."""
 
@@ -43,7 +52,7 @@ HCT_MAIN_COLOR: str = "b55162"
 
 The pink-ish color used in the midterm presentation. Imperceptibly different from the website logo color.
 
-Shouldn't use this much if we still use BreezeStyleSheet themes, in which each theme has a unique
+Shouldn't use this much if we use BreezeStyleSheet themes, in which each theme has a unique
 theme color.
 
 This is more here for reference than actual use in the program."""

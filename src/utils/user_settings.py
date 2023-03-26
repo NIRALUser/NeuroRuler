@@ -1,7 +1,7 @@
 """Global settings that the user should be able to modify directly, unlike global_vars.py and constants.py, via
 JSON, GUI, CLI, etc.
 
-For now, we modify these by using CLI args and hardcoding. But we need to implement JSON for configuring this."""
+Default values are what's in the config.json file, which should match what's in this file."""
 
 from pathlib import Path
 from screeninfo import get_monitors, ScreenInfoError
@@ -15,7 +15,7 @@ Defaults to False."""
 SMOOTH_BEFORE_RENDERING: bool = False
 """Whether or not to smooth the image before rendering, defaults to False.
 
-Affects MRIImage.resample() and imgproc.contour()."""
+Affects img_helpers.curr_rotated_slice() and imgproc.contour()."""
 
 IMG_DIR: Path = Path("img")
 """Directory for storing images. Defaults to `./img/`.
@@ -69,19 +69,19 @@ Configurable via -t, --theme CLI option.
 The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
 
 PRIMARY_MONITOR_DIMENSIONS: list[int] = [500, 500]
-"""Will be set to user's primary monitor's dimensions. 500, 500 are dummy values"""
+"""Set to user's primary monitor's dimensions. 500, 500 are dummy values"""
 
 try:
     for m in get_monitors():
         if m.is_primary:
             PRIMARY_MONITOR_DIMENSIONS[0] = m.width
             PRIMARY_MONITOR_DIMENSIONS[1] = m.height
+            break
 except ScreenInfoError:
     # This will occur on GH automated tests.
     pass
 
-
-MIN_WIDTH: int = int(PRIMARY_MONITOR_DIMENSIONS[0] * 0.7)
-"""Min width of the GUI. Defaults to width of primary monitor * .7"""
-MIN_HEIGHT: int = int(PRIMARY_MONITOR_DIMENSIONS[1] * 0.9)
-"""Min height of the GUI. Defaults to height of primary monitor * .9"""
+MIN_WIDTH_RATIO: float = 0.6
+"""Min GUI width as fraction of primary monitor width. Configurable in JSON"""
+MIN_HEIGHT_RATIO: float = 0.8
+"""Min GUI height as fraction of primary monitor height. Configurable in JSON"""

@@ -2,14 +2,105 @@
 
 import argparse
 import json
+from pathlib import Path
 
-import src.utils.user_settings as settings
+import src.utils.user_settings as user_settings
 import src.utils.constants as constants
+import src.utils.exceptions as exceptions
+
+SETTINGS: dict = dict()
 
 
 def parse_json() -> None:
-    """TODO"""
-    pass
+    """Given a JSON, parse it and set user settings in user_settings.py."""
+    global SETTINGS
+    SETTINGS = load_json(constants.JSON_CONFIG_PATH)
+    if len(SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_JSON:
+        raise Exception(
+            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_JSON} rows in JSON file but found {len(SETTINGS)}."
+        )
+    user_settings.DEBUG = parse_bool("DEBUG")
+    if user_settings.DEBUG:
+        print("Printing debug messages.")
+    user_settings.SMOOTH_BEFORE_RENDERING = parse_bool("SMOOTH_BEFORE_RENDERING")
+    user_settings.IMG_DIR = parse_path("IMG_DIR")
+    user_settings.FILE_BROWSER_START_DIR = parse_path("FILE_BROWSER_START_DIR")
+    user_settings.EXPORTED_FILE_NAMES_USE_INDEX = parse_bool(
+        "EXPORTED_FILE_NAMES_USE_INDEX"
+    )
+    user_settings.CONTOUR_COLOR = SETTINGS["CONTOUR_COLOR"]
+    user_settings.THEME_NAME = SETTINGS["THEME_NAME"]
+    user_settings.MIN_WIDTH_RATIO = SETTINGS["MIN_WIDTH_RATIO"]
+    user_settings.MIN_HEIGHT_RATIO = SETTINGS["MIN_HEIGHT_RATIO"]
+
+
+# Source: https://github.com/Alexhuszagh/BreezeStyleSheets/blob/main/configure.py#L82
+def load_json(path: Path) -> dict:
+    """Load config.json file, ignoring comments //.
+
+    Source: https://github.com/Alexhuszagh/BreezeStyleSheets/blob/main/configure.py#L82
+    """
+    with open(path) as f:
+        lines = f.read().splitlines()
+    lines = [i for i in lines if not i.strip().startswith("//")]
+    return json.loads("\n".join(lines))
+
+
+def parse_bool(field: str) -> bool:
+    """For bool field "True" or "False", return the bool.
+
+    :param field: JSON field
+    :type field: str
+    :raise: exceptions.InvalidJSONField if s is not "True" or "False"
+    :return: True or False
+    :rtype: bool"""
+    if SETTINGS[field] != "True" and SETTINGS[field] != "False":
+        raise exceptions.InvalidJSONField(
+            field, 'bool ("True" or "False", with quotation marks)'
+        )
+    return True if SETTINGS[field] == "True" else False
+
+
+def parse_path(field: str) -> Path:
+    """For path field, return a Path.
+
+    :param field: JSON field
+    :type field: str
+    :raise: exceptions.InvalidJSONField
+    :return:
+    :rtype: Path"""
+    try:
+        return Path(SETTINGS[field])
+    except:
+        raise exceptions.InvalidJSONField(field, "path")
+
+
+def parse_int(field: str) -> int:
+    """For int field, return int.
+
+    :param field: JSON field
+    :type field: str
+    :raise: exceptions.InvalidJSONField
+    :return:
+    :rtype: int"""
+    try:
+        return int(SETTINGS[field])
+    except:
+        raise exceptions.InvalidJSONField(field, "int")
+
+
+def parse_float(field: str) -> float:
+    """For float field, return float.
+
+    :param field: JSON field
+    :type field: str
+    :raise: exceptions.InvalidJSONField
+    :return:
+    :rtype: float"""
+    try:
+        return float(SETTINGS[field])
+    except:
+        raise exceptions.InvalidJSONField(field, "float")
 
 
 def parse_gui_cli() -> None:
@@ -43,15 +134,15 @@ def parse_gui_cli() -> None:
     args = parser.parse_args()
 
     if args.debug:
-        settings.DEBUG = True
+        user_settings.DEBUG = True
         print("Debug CLI option supplied.")
 
     if args.smooth:
-        settings.SMOOTH_BEFORE_RENDERING = True
+        user_settings.SMOOTH_BEFORE_RENDERING = True
         print("Smooth CLI option supplied.")
 
     if args.export_index:
-        settings.EXPORTED_FILE_NAMES_USE_INDEX = True
+        user_settings.EXPORTED_FILE_NAMES_USE_INDEX = True
         print("Exported files will use the index displayed in the GUI.")
 
     if args.theme:
@@ -63,17 +154,17 @@ def parse_gui_cli() -> None:
             )
             exit(1)
 
-        settings.THEME_NAME = args.theme
+        user_settings.THEME_NAME = args.theme
         if args.theme == "dark":
             # Theme color from dark.json
-            settings.CONTOUR_COLOR = "3daee9"
+            user_settings.CONTOUR_COLOR = "3daee9"
         elif args.theme == "light":
             # Theme color from light.json
-            settings.CONTOUR_COLOR = "3daef3"
+            user_settings.CONTOUR_COLOR = "3daef3"
         print(f"Theme {args.theme} specified.")
 
     if args.color:
-        settings.CONTOUR_COLOR = args.color
+        user_settings.CONTOUR_COLOR = args.color
         print(
             f"Contour color is {'#' if not args.color.isalpha() else ''}{args.color}."
         )

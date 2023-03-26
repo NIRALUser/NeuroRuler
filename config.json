@@ -1,0 +1,25 @@
+// Comments beginning with // are ignored.
+// Use "True" or "False" for binary options
+// For other field types, the comments specify what the allowed values are.
+// Do not add or remove fields in this file if you're a user
+// If you're a developer who's adding or removing options, modify parser.py and constants.EXPECTED_NUM_FIELDS_IN_JSON
+{
+    // Print debugging messages during execution
+    "DEBUG": "False",
+    // Smooth the image before rendering it
+    "SMOOTH_BEFORE_RENDERING": "False",
+    // Directory to store exported images in
+    "IMG_DIR": "img",
+    // Directory that the file browser (File > Open/Add images) should start searching from
+    "FILE_BROWSER_START_DIR": "ExampleData",
+    // Whether exported file names use the image number in the program or the original file name
+    "EXPORTED_FILE_NAMES_USE_INDEX": "False",
+    // Can be a name (e.g., red, blue) or 6-hexit color code RRGGBB
+    "CONTOUR_COLOR": "b55162",
+    // Options: dark, dark-hct, light, light-hct
+    "THEME_NAME": "dark-hct",
+    // Minimum width and height of the GUI as a ratio of primary monitor size.
+    // Enter a number between 0 (not inclusive) and 1.
+    "MIN_WIDTH_RATIO": 0.6,
+    "MIN_HEIGHT_RATIO": 0.8
+}

@@ -14,7 +14,7 @@ Current working directory must be `.../HeadCircumferenceTool`.
 
 Windows users can double-click on `gui.pyw` to start the application.
 
-For any OS, the following will work, though you may need to run `chmod +x gui.py`:
+For any OS, the following will work, though you may need to run `chmod +x gui.py` on macOS/Linux:
 
 .. code-block:: text
     usage: ./gui.py [-h] [-d] [-s] [-e] [-t THEME] [-c COLOR]
@@ -28,3 +28,9 @@ For any OS, the following will work, though you may need to run `chmod +x gui.py
                             configure theme, options are dark, dark-hct, light, light-hct, and the default theme is dark-hct
       -c COLOR, --color COLOR
                             contour color as name (e.g. red) or hex color code rrggbb
+
+Configure settings
+##################
+
+Edit `config.json <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/config.json>`_.
+CLI arguments override what's there.
