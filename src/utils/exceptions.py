@@ -64,6 +64,6 @@ class RotationOutOfBounds(Exception):
 
 
 class InvalidJSONField(Exception):
-    def __init__(self, field: str, expected_type: str):
-        self.message = f"The field {field} in {JSON_CONFIG_PATH} has an invalid value.\nExpected type: {expected_type}."
+    def __init__(self, field: str, expected: str):
+        self.message = f"The field {field} in {JSON_CONFIG_PATH} has an invalid type or value.\nExpected: {expected}"
         super().__init__(self.message)

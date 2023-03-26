@@ -9,16 +9,20 @@ import src.utils.constants as constants
 import src.utils.exceptions as exceptions
 
 SETTINGS: dict = dict()
+"""Dict resulting from JSON. Global within the file."""
 
 
 def parse_json() -> None:
-    """Given a JSON, parse it and set user settings in user_settings.py."""
+    """Parse JSON and set user settings in user_settings.py.
+
+    load_json will load constants.JSON_CONFIG_PATH."""
     global SETTINGS
     SETTINGS = load_json(constants.JSON_CONFIG_PATH)
     if len(SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_JSON:
         raise Exception(
             f"Expected {constants.EXPECTED_NUM_FIELDS_IN_JSON} rows in JSON file but found {len(SETTINGS)}."
         )
+
     user_settings.DEBUG = parse_bool("DEBUG")
     if user_settings.DEBUG:
         print("Printing debug messages.")
@@ -28,10 +32,22 @@ def parse_json() -> None:
     user_settings.EXPORTED_FILE_NAMES_USE_INDEX = parse_bool(
         "EXPORTED_FILE_NAMES_USE_INDEX"
     )
+
     user_settings.CONTOUR_COLOR = SETTINGS["CONTOUR_COLOR"]
+    if (
+        not user_settings.CONTOUR_COLOR.isalpha()
+        and len(user_settings.CONTOUR_COLOR) != 6
+    ):
+        raise exceptions.InvalidJSONField(
+            "CONTOUR_COLOR", "Name (e.g., red, blue) or 6-hexit color code RRGGBB"
+        )
+
     user_settings.THEME_NAME = SETTINGS["THEME_NAME"]
-    user_settings.MIN_WIDTH_RATIO = SETTINGS["MIN_WIDTH_RATIO"]
-    user_settings.MIN_HEIGHT_RATIO = SETTINGS["MIN_HEIGHT_RATIO"]
+    if user_settings.THEME_NAME not in constants.THEMES:
+        raise exceptions.InvalidJSONField("THEME_NAME", str(constants.THEMES))
+
+    user_settings.MIN_WIDTH_RATIO = parse_float("MIN_WIDTH_RATIO")
+    user_settings.MIN_HEIGHT_RATIO = parse_float("MIN_HEIGHT_RATIO")
 
 
 # Source: https://github.com/Alexhuszagh/BreezeStyleSheets/blob/main/configure.py#L82
