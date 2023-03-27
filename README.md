@@ -19,7 +19,7 @@ pip install -r requirements.txt
 
 ## Start GUI
 
-Windows users can double-click on `gui.pyw` to start the application.
+Windows users can double-click on `gui.pyw` to start the application. Or if that doesn't work, just enter `python gui.py` in Windows Terminal.
 
 On any OS, you can start the GUI by running the `gui.py` script. Your current working directory should be
 `.../HeadCircumferenceTool`. You may need to run `chmod +x gui.py`.
