@@ -1,4 +1,4 @@
-"""Parse CLI arguments and set global settings."""
+"""Parse config JSON and CLI arguments to set global settings."""
 
 import argparse
 import json
@@ -143,16 +143,15 @@ def parse_gui_cli() -> None:
     parser.add_argument(
         "-e",
         "--export-index",
-        help="exported filenames will use the index displayed in the GUI instead of the \
-                        original image name",
+        help="exported file names use the index displayed in the GUI instead of the \
+                        original file name",
         action="store_true",
     )
     parser.add_argument(
         "-t",
         "--theme",
         help="configure theme, options are "
-        + list_of_options_to_str(constants.THEMES).replace('"', "")
-        + ", and the default theme is dark-hct",
+        + list_of_options_to_str(constants.THEMES).replace('"', ""),
     )
     parser.add_argument(
         "-c",

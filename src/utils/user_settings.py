@@ -8,17 +8,15 @@ from screeninfo import get_monitors, ScreenInfoError
 import src.utils.constants as constants
 
 DEBUG: bool = False
-"""Whether or not to print debugging information throughout execution.
-
-Defaults to False."""
+"""Whether or not to print debugging information throughout execution."""
 
 SMOOTH_BEFORE_RENDERING: bool = False
-"""Whether or not to smooth the image before rendering, defaults to False.
+"""Whether or not to smooth the image before rendering.
 
 Affects img_helpers.curr_rotated_slice() and imgproc.contour()."""
 
 IMG_DIR: Path = Path("img")
-"""Directory for storing images. Defaults to `./img/`.
+"""Directory for storing images. Defaults to `img/`.
 
 TODO: Warn the user that images here may be overwritten in our documentation. It is not a safe directory
 to use for file storage and should only be used by the program."""
@@ -28,9 +26,8 @@ FILE_BROWSER_START_DIR: Path = Path("ExampleData")
 
 Defaults to ExampleData/ during development, for now.
 
-Will default to the home directory for the user.
+Should default to the home directory for the user."""
 
-Should be configurable via JSON later."""
 
 EXPORTED_FILE_NAMES_USE_INDEX: bool = False
 """If True, then exported files will be named using the index in the program.
@@ -48,7 +45,7 @@ THEME_NAME: str = "dark-hct"
 The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
 
 CONTOUR_COLOR: str = constants.HCT_MAIN_COLOR
-"""Color of the contour. Defaults to constants.HCT_MAIN_COLOR = #b55162 = R 181 G 81 B 98.
+"""Color of the contour. See parser.py for how the default contour color is determined.
 
 This can be a 6-hexit string rrggbb (don't prepend 0x) or a name (e.g. red, blue, etc.).
 

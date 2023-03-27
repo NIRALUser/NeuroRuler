@@ -12,21 +12,11 @@ import src.utils.user_settings as user_settings
 
 
 def update_image_groups(path_list: list[Path]) -> None:
-    """Initialize IMAGE_GROUPS. See the docstring for IMAGE_GROUPS in global_vars.py.
+    """Initialize IMAGE_GROUPS. See the docstring for IMAGE_GROUPS in global_vars.py for more info.
 
     NOTE: Does not set IMAGE_DICT to be the CURR_BATCH_INDEX image group in IMAGE_GROUPS.
-    But IMAGE_DICT is a pointer to an images dict in IMAGE_GROUPS, so this function could
+    IMAGE_DICT is a pointer to an images dict in IMAGE_GROUPS, so this function can
     mutate (as you would probably want) IMAGE_DICT.
-
-    IMAGE_GROUPS is a mapping from properties tuple to a group of images, where a group of images is a dict[Path, sitk.Image].
-
-    Each dictionary of images has the same properties, as defined by mri_image.validate_image.
-
-    {
-        properties tuple: dict[Path, sitk.Image]
-        properties tuple: dict[Path, sitk.Image]
-        ...
-    }
 
     :param path_list:
     :type path_list: list[Path]"""
@@ -45,7 +35,7 @@ def update_image_groups(path_list: list[Path]) -> None:
             # First entry also created.
             global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
 
-    # TODO: Think this is not needed but keeping it here just in case. Delete later if not needed.
+    # TODO: Think this is not needed but keeping it here just in case. Delete later if unneeded.
     # global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
     #     list(global_vars.IMAGE_GROUPS.keys())[0]
     # ]
@@ -71,7 +61,8 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.THETA_X = 0
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
-    # curr_img has the same properties as the whole group in IMAGE_DICT. Use it to set slice and center of rotation
+    # curr_img has the same properties as the whole group in IMAGE_DICT.
+    # Use it to set slice and center of rotation for the group
     curr_img: sitk.Image = curr_image()
     # TODO: Set maximum for the slice slider in the GUI!
     global_vars.SLICE = get_middle_of_z_dimension(curr_img)
@@ -112,7 +103,7 @@ def get_properties(img: sitk.Image) -> tuple:
 
 
 def curr_path() -> Path:
-    """Return the Path of the currently displayed image in IMAGE_DICT.
+    """Return the current Path in IMAGE_DICT. That is, the key at index CURR_IMAGE_INDEX.
 
     :return: Path of current image
     :rtype: Path"""
@@ -128,13 +119,13 @@ def curr_image() -> sitk.Image:
 
 
 def curr_rotated_slice() -> sitk.Image:
-    """Return 2D rotated slice of the current image determined by rotation and slice settings in global_vars.py
+    """Return 2D rotated slice of the current image determined by global rotation and slice settings.
 
     Smoothing occurs here and is rendered if user_settings.SMOOTH_BEFORE_RENDERING. Else, smoothing occurs
     in imgproc.contour.
 
     Sets global_vars.EULER_3D_TRANSFORM's rotation values but not its center since all loaded images should
-    have the same center. TODO: Check this in `validate()`
+    have the same center.
 
     :return: 2D rotated slice
     :rtype: sitk.Image"""
@@ -193,7 +184,7 @@ def curr_metadata() -> dict[str, str]:
     """Computes and returns currently displayed image's metadata.
 
     Note: Does not return all metadata stored in the file, just the metadata stored in sitk.Image.GetMetaDataKeys()
-    For example, it's possible for a sitk.Image to have spacing values retrieved by GetSpacing(), but the same spacing values won't
+    For example, it's possible to get a sitk.Image's spacing using GetSpacing(), but the same spacing values won't
     be returned by this function.
 
     :return: metadata
@@ -255,9 +246,7 @@ def get_center_of_rotation(img: sitk.Image) -> tuple:
 def del_curr_img() -> None:
     """Remove currently displayed image from IMAGE_DICT and IMAGE_GROUPS.
 
-    Won't remove if IMAGE_DICT is empty. Will print message and return early.
-
-    Will decrement CURR_IMAGE_INDEX if removing the last element.
+    Decrements CURR_IMAGE_INDEX if removing the last element.
 
     Will not check for IMAGE_DICT being empty after the deletion (GUI should be disabled).
     This happens in the GUI."""

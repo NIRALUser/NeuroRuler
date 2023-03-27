@@ -28,22 +28,6 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
         super().__init__(self.message)
 
 
-@deprecated
-class RemoveAtInvalidIndex(Exception):
-    """The error message accounts for the user seeing a 1-indexed list."""
-
-    def __init__(self, index: int):
-        self.message = f"You attempted to remove an image at index {index + 1}, which doesn't exist in the list of images."
-        super().__init__(self.message)
-
-
-@deprecated
-class UnexpectedNegativeNum(Exception):
-    def __init__(self):
-        self.message = f""
-        super().__init__(self.message)
-
-
 class ArraysDifferentShape(Exception):
     def __init__(self):
         self.message = f"Ran into two arrays of different shape when it was necessary that they be of the same shape."
@@ -56,14 +40,23 @@ class InvalidColor(Exception):
         super().__init__(self.message)
 
 
-# sitk can handle any rotation, but we should enforce -90 and 90 bounds.
 class RotationOutOfBounds(Exception):
+    """Should never be encountered in the GUI because our sliders have min and max.
+    This will be for CLI arguments."""
+
     def __init__(self, theta: int, axis: str):
         self.message = f"{axis} rotation value {theta} out of bounds. Min rotation value is {ROTATION_MIN} degrees, and max is {ROTATION_MAX}."
         super().__init__(self.message)
 
 
 class InvalidJSONField(Exception):
+    """`field` is the name of the invalid field
+
+    `expected` is some information about what the expected value should be"""
+
     def __init__(self, field: str, expected: str):
+        """`field` is the name of the invalid field
+
+        `expected` is some information about what the expected value should be"""
         self.message = f"The field {field} in {JSON_CONFIG_PATH} has an invalid type or value.\nExpected: {expected}"
         super().__init__(self.message)

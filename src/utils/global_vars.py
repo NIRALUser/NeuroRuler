@@ -1,7 +1,5 @@
 """Global variables and functions that change throughout program execution, unlike constants.py,
-that the user should not be able to modify directly, unlike user_settings.py.
-
-Can run this file as module (python -m src.utils.global_vars) to debug stuff."""
+that the user should not be able to modify directly, unlike user_settings.py."""
 
 import SimpleITK as sitk
 from pathlib import Path
@@ -17,16 +15,10 @@ Each dictionary of images has the same properties, as defined by img_helpers.get
     ...
 }
 
-dict[Path, sitk.Image] is a group of images.
-We could instead store list[sitk.Image], but dict allows us to avoid duplicate Paths easily.
-Also, I don't think sitk.Image stores path.
-
-The IMAGE_DICT group is by default the 0'th group in this list. If we want to be able to change batches in the GUI,
+The IMAGE_DICT group is by default the 0'th group in this list. If we want to be able to change batches,
 we can change CURR_BATCH_INDEX.
 
-IMAGE_GROUPS[properties tuple] gets the dict[Path, sitk.Image] images corresponding to those properties.
-
-IMAGE_GROUPS[list(IMAGE_GROUPS.keys())[0]] gets the first group of images (since dict maintains insertion order
+IMAGE_GROUPS[list(IMAGE_GROUPS.keys())[0]] gets the first group of images (dict maintains insertion order
 in Python 3.7+, https://mail.python.org/pipermail/python-dev/2017-December/151283.html)."""
 
 IMAGE_DICT: dict[Path, sitk.Image] = dict()
@@ -35,17 +27,17 @@ IMAGE_DICT: dict[Path, sitk.Image] = dict()
 Since Python 3.7+, dicts maintain insertion order. Therefore, we can use CURR_IMAGE_INDEX for retrieval and deletion.
 
 Use list(IMAGE_DICT.keys())[i] to return the i'th key in the dict, which can also index into the dict.
-This may be slow but will be used only
-in the GUI for insertion and deletion operations, which are uncommon, so should be okay.
+Not sure about this operation's speed, but it's used only
+in the GUI for insertion and deletion operations, should be fine.
 
-All images in the dictionary always have matching properties, as defined by mri_image.get_properties.
+All images in the dictionary have matching properties, as defined by mri_image.get_properties.
 This is due to the setup of IMAGE_GROUPS."""
 
 CURR_IMAGE_INDEX: int = 0
-"""Image of the current image in the current batch of images, which is a dict[Path, sitk.Image].
+"""Image of the current image in the loaded batch of images, which is a dict[Path, sitk.Image].
 
-Typical use would be IMAGE_DICT[list(IMAGE_DICT.keys())[CURR_IMAGE_INDEX]] (or just use img_helpers functions),
-which would return a sitk.Image."""
+You should probably use the helper functions in img_helpers instead of this (unless you're writing helper
+functions)."""
 
 CURR_BATCH_INDEX: int = 0
 """TODO: Not implemented (idk if useful yet). For now, this is just 0 throughout the program.
@@ -66,7 +58,7 @@ EULER_3D_TRANSFORM: sitk.Euler3DTransform = sitk.Euler3DTransform()
 It is assumed that all currently loaded images have the same center of rotation. The center won't change
 for the currently loaded batch of images.
 
-Going to a different batch will change the center. Make sure to set it. Or encapsulate an Euler3DTransform for each batch.
+Switching the batch will change the center. Make sure to set it. Or encapsulate an Euler3DTransform for each batch?
 
 Rotation values are the global rotation values in global_vars.py."""
 

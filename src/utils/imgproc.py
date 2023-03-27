@@ -10,7 +10,7 @@ import src.utils.user_settings as settings
 
 
 # The RV is a np array, not sitk.Image
-# because we can't actually use a sitk.Image contour in the program
+# because we can't actually use a sitk.Image contour in the rest of the process
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
 def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:

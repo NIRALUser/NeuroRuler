@@ -1,12 +1,11 @@
 """Constant values and functions. DO NOT MUTATE ANY VARIABLE IN THIS FILE!
 
-This file should never import any module in this repo to avoid any circular import problems.
+This file holds values that will never change after program setup, unlike global_vars.py.
+No values here should be modifiable by the user, unlike user_settings.py.
+But things like THEMES, a mutable set that will never change after initial setup, can go here.
 
-It holds values that will never change after program setup (i.e., during execution), unlike global_vars.py.
-But things like THEMES can go here. Specifically, THEMES is a mutable set, but it will never
-change after initial setup.
+This file should not import any module in this repo to avoid circular imports."""
 
-No values here should be modifiable by the user, unlike user_settings.py."""
 
 from pathlib import Path
 import warnings
