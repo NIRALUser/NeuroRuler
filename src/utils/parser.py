@@ -45,7 +45,9 @@ def parse_json() -> None:
         user_settings.CONTOUR_COLOR = default_contour_color()
     elif contour_color.isalpha():
         user_settings.CONTOUR_COLOR = contour_color
-    elif len(contour_color) == 6 and all(char in string.hexdigits for char in contour_color):
+    elif len(contour_color) == 6 and all(
+        char in string.hexdigits for char in contour_color
+    ):
         user_settings.CONTOUR_COLOR = contour_color
     else:
         raise exceptions.InvalidJSONField(
@@ -56,6 +58,8 @@ def parse_json() -> None:
 
     user_settings.MIN_WIDTH_RATIO = parse_float("MIN_WIDTH_RATIO")
     user_settings.MIN_HEIGHT_RATIO = parse_float("MIN_HEIGHT_RATIO")
+    user_settings.MAX_WIDTH_RATIO = parse_float("MAX_WIDTH_RATIO")
+    user_settings.MAX_HEIGHT_RATIO = parse_float("MAX_HEIGHT_RATIO")
 
 
 # Source: https://github.com/Alexhuszagh/BreezeStyleSheets/blob/main/configure.py#L82
