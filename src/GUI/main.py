@@ -588,6 +588,13 @@ def main() -> None:
         int(settings.MIN_HEIGHT_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[1])
     )
 
+    MAIN_WINDOW.setMaximumWidth(
+        int(settings.MAX_WIDTH_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[0])
+    )
+    MAIN_WINDOW.setMaximumHeight(
+        int(settings.MAX_HEIGHT_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[1])
+    )
+
     try:
         sys.exit(app.exec())
     except:

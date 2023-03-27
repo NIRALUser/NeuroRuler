@@ -73,3 +73,7 @@ MIN_WIDTH_RATIO: float = 0.6
 """Min GUI width as fraction of primary monitor width. Configurable in JSON"""
 MIN_HEIGHT_RATIO: float = 0.8
 """Min GUI height as fraction of primary monitor height. Configurable in JSON"""
+MAX_WIDTH_RATIO: float = 0.6
+"""Max GUI width as fraction of primary monitor width. Configurable in JSON"""
+MAX_HEIGHT_RATIO: float = 0.8
+"""Max GUI height as fraction of primary monitor height. Configurable in JSON"""

@@ -56,6 +56,8 @@ def parse_json() -> None:
 
     user_settings.MIN_WIDTH_RATIO = parse_float("MIN_WIDTH_RATIO")
     user_settings.MIN_HEIGHT_RATIO = parse_float("MIN_HEIGHT_RATIO")
+    user_settings.MAX_WIDTH_RATIO = parse_float("MAX_WIDTH_RATIO")
+    user_settings.MAX_HEIGHT_RATIO = parse_float("MAX_HEIGHT_RATIO")
 
 
 # Source: https://github.com/Alexhuszagh/BreezeStyleSheets/blob/main/configure.py#L82
