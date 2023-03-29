@@ -11,7 +11,7 @@ NIFTI_PATH = "ExampleData/MicroBiome_1month_T1w.nii.gz"
 x_rotation = 0
 y_rotation = 0
 z_rotation = 0
-slice_num = 150
+slice_num = 70
 
 
 def main() -> None:
@@ -24,28 +24,35 @@ def main() -> None:
     current_slice = image[:, :, slice_num]
     process_slice(current_slice)
 
-
+# https://slicer.readthedocs.io/en/latest/user_guide/modules/gradientanisotropicdiffusion.html
 def process_slice(current_slice: sitk.Image) -> None:
-    show_current_slice(current_slice)
+    # show_current_slice(current_slice)
     # Image smoothing
-    smooth_slice = sitk.GradientAnisotropicDiffusionImageFilter().Execute(current_slice)
+    smooth_filter: sitk.GradientAnisotropicDiffusionImageFilter = sitk.GradientAnisotropicDiffusionImageFilter()
+    print(smooth_filter.GetConductanceParameter())
+    print(smooth_filter.GetNumberOfIterations())
+    print(smooth_filter.GetTimeStep())
+    smooth_filter.SetConductanceParameter(1.0)
+    smooth_filter.SetNumberOfIterations(10)
+    smooth_filter.SetTimeStep(0.0625)
+    smooth_slice: sitk.GradientAnisotropicDiffusionImageFilter = smooth_filter.Execute(sitk.Cast(current_slice, sitk.sitkFloat64))
     show_current_slice(smooth_slice)
     # FG/BG selection
     # TODO: user chooses between otsu and BinaryThresholdImageFilter
-    otsu = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
-    show_current_slice(otsu)
+    # otsu = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
+    # show_current_slice(otsu)
     # Fill holes
-    hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
-    show_current_slice(hole_filling)
-    # Invert image
-    inverted_image = sitk.NotImageFilter().Execute(hole_filling)
-    show_current_slice(inverted_image)
-    # Select largest component
-    largest_component = select_largest_component(inverted_image)
-    show_current_slice(largest_component)
-    # Generate contour
-    contour = sitk.BinaryContourImageFilter().Execute(largest_component)
-    show_current_slice(contour)
+    # hole_filling = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
+    # show_current_slice(hole_filling)
+    # # Invert image
+    # inverted_image = sitk.NotImageFilter().Execute(hole_filling)
+    # show_current_slice(inverted_image)
+    # # Select largest component
+    # largest_component = select_largest_component(inverted_image)
+    # show_current_slice(largest_component)
+    # # Generate contour
+    # contour = sitk.BinaryContourImageFilter().Execute(largest_component)
+    # show_current_slice(contour)
 
 
 def show_current_slice(current_slice: sitk.Image) -> None:

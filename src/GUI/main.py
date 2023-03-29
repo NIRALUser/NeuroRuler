@@ -48,6 +48,7 @@ from src.utils.img_helpers import (
     update_image_groups,
     curr_image,
     curr_rotated_slice,
+    curr_smooth_slice,
     curr_metadata,
     curr_physical_units,
     curr_path,
@@ -68,6 +69,7 @@ DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 # TODO: Do we assume units are mm unless specified otherwise?
 MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "units not found"
+
 
 
 class MainWindow(QMainWindow):
@@ -121,6 +123,7 @@ class MainWindow(QMainWindow):
         self.z_slider.valueChanged.connect(self.rotate_z)
         self.slice_slider.valueChanged.connect(self.slice_update)
         self.reset_button.clicked.connect(self.reset_settings)
+        self.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
         self.show()
 
     def render_initial_view(self) -> None:
@@ -154,6 +157,13 @@ class MainWindow(QMainWindow):
         self.action_export_ppm.setEnabled(True)
         self.action_export_xbm.setEnabled(True)
         self.action_export_xpm.setEnabled(True)
+        self.smoothing_preview_button.setEnabled(True)
+        self.conductance_parameter_label.setEnabled(True)
+        self.conductance_parameter_input.setEnabled(True)
+        self.smoothing_iterations_label.setEnabled(True)
+        self.smoothing_iterations_input.setEnabled(True)
+        self.time_step_label.setEnabled(True)
+        self.time_step_input.setEnabled(True)
 
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
@@ -170,6 +180,7 @@ class MainWindow(QMainWindow):
             # Render uncontoured slice after pressing adjust
             self.render_curr_slice()
         else:
+            self.update_smoothing_settings()
             self.apply_button.setText("Adjust")
             # Ignore the type annotation error here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
@@ -195,6 +206,13 @@ class MainWindow(QMainWindow):
         self.action_export_csv.setEnabled(not settings_view_enabled)
         self.circumference_label.setEnabled(not settings_view_enabled)
         self.export_button.setEnabled(not settings_view_enabled)
+        self.smoothing_preview_button.setEnabled(settings_view_enabled)
+        self.conductance_parameter_label.setEnabled(settings_view_enabled)
+        self.conductance_parameter_input.setEnabled(settings_view_enabled)
+        self.smoothing_iterations_label.setEnabled(settings_view_enabled)
+        self.smoothing_iterations_input.setEnabled(settings_view_enabled)
+        self.time_step_label.setEnabled(settings_view_enabled)
+        self.time_step_input.setEnabled(settings_view_enabled)
 
     # TODO: Could just construct a new MainWindow()? Maybe might not work?
     def disable_elements(self) -> None:
@@ -239,6 +257,13 @@ class MainWindow(QMainWindow):
         self.otsu_radio_button.setEnabled(False)
         self.binary_radio_button.setEnabled(False)
         self.threshold_preview_button.setEnabled(False)
+        self.smoothing_preview_button.setEnabled(False)
+        self.conductance_parameter_label.setEnabled(False)
+        self.conductance_parameter_input.setEnabled(False)
+        self.smoothing_iterations_label.setEnabled(False)
+        self.smoothing_iterations_input.setEnabled(False)
+        self.time_step_label.setEnabled(False)
+        self.time_step_input.setEnabled(False)
 
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
@@ -327,6 +352,53 @@ class MainWindow(QMainWindow):
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
             return rv_dummy_var
+        
+    def update_smoothing_settings(self) -> None:
+        """Updates global smoothing settings."""
+
+        conductance: str = self.conductance_parameter_input.displayText()
+        try:
+            float(conductance)
+            global_vars.CONDUCTANCE_PARAMETER = float(conductance)
+        except ValueError:
+            None
+        self.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
+        self.conductance_parameter_input.setPlaceholderText(str(global_vars.CONDUCTANCE_PARAMETER))
+        global_vars.SMOOTHING_FILTER.SetConductanceParameter(global_vars.CONDUCTANCE_PARAMETER)
+
+        iterations: str = self.smoothing_iterations_input.displayText()
+        try:
+            int(iterations)
+            global_vars.CONDUCTANCE_PARAMETER = int(iterations)
+        except ValueError:
+            None
+        self.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
+        self.smoothing_iterations_input.setPlaceholderText(str(global_vars.SMOOTHING_ITERATIONS))
+        global_vars.SMOOTHING_FILTER.SetNumberOfIterations(global_vars.SMOOTHING_ITERATIONS)
+
+        time_step: str = self.time_step_input.displayText()
+        try:
+            float(time_step)
+            global_vars.TIME_STEP = float(time_step)
+        except ValueError:
+            None
+        self.time_step_input.setText(str(global_vars.TIME_STEP))
+        self.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
+        global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
+
+    def render_smooth_slice(self) -> Union[np.ndarray, None]:
+        """Renders smooth slice in GUI. Allows user to preview result of smoothing settings."""
+        self.update_smoothing_settings()
+        
+        smooth_slice: sitk.Image = curr_smooth_slice()
+
+        slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
+
+        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
+
+        q_pixmap: QPixmap = QPixmap(q_img)
+
+        self.image.setPixmap(q_pixmap)
 
     def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
         """Called after pressing Apply or when

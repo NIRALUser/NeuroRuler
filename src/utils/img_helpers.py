@@ -68,6 +68,10 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.SLICE = get_middle_of_z_dimension(curr_img)
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
     global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
+    global_vars.SMOOTHING_FILTER.SetConductanceParameter(3.0)
+    global_vars.SMOOTHING_FILTER.SetNumberOfIterations(5)
+    global_vars.SMOOTHING_FILTER.SetTimeStep(0.0625)
+    global_vars.SETTINGS_VIEW_ENABLED = True
 
 
 def clear_globals():
@@ -148,6 +152,16 @@ def curr_rotated_slice() -> sitk.Image:
         if user_settings.SMOOTH_BEFORE_RENDERING
         else rotated_slice
     )
+
+def curr_smooth_slice() -> sitk.Image:
+    """Return smoothed 2D rotated slice of the current image determined by global smoothing settings.
+
+    :return: smooth 2D rotated slice
+    :rtype: sitk.Image"""
+    rotated_slice: sitk.Image = curr_rotated_slice()
+    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
+    smooth_slice: sitk.Image = global_vars.SMOOTHING_FILTER.Execute(sitk.Cast(rotated_slice, sitk.sitkFloat64))
+    return smooth_slice
 
 
 def rotated_slice_hardcoded(
