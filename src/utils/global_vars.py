@@ -71,7 +71,26 @@ THETA_Z: int = 0
 SLICE: int = 0
 """0-indexed"""
 
-# TODO: documentation
+SMOOTHING_FILTER: sitk.GradientAnisotropicDiffusionImageFilter = sitk.GradientAnisotropicDiffusionImageFilter()
+"""Global sitk.GradientAnisotropicDiffusionImageFilter for image smoothing.
+
+See https://slicer.readthedocs.io/en/latest/user_guide/modules/gradientanisotropicdiffusion.html for more information."""
+
+CONDUCTANCE_PARAMETER: float = 1.0
+"""Smoothing option.
+
+Conductance controls the sensitivity of the conductance term. As a general rule, the lower the value, the more strongly the filter preserves edges. A high value will cause diffusion (smoothing) across edges. Note that the number of iterations controls how much smoothing is done within regions bounded by edges."""
+
+SMOOTHING_ITERATIONS: int = 5
+"""Smoothing option.
+
+The more iterations, the more smoothing. Each iteration takes the same amount of time. If it takes 10 seconds for one iteration, then it will take 100 seconds for 10 iterations. Note that the conductance controls how much each iteration smooths across edges."""
+
+TIME_STEP: float = 0.0625
+"""Smoothing option.
+
+The time step depends on the dimensionality of the image. In Slicer the images are 3D and the default (.0625) time step will provide a stable solution."""
+
 SETTINGS_VIEW_ENABLED: bool = True
 """Whether the user is able to adjust settings (settings screen) or not
 (circumference and contoured image screen).

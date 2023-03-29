@@ -48,6 +48,7 @@ from src.utils.img_helpers import (
     update_image_groups,
     curr_image,
     curr_rotated_slice,
+    curr_smooth_slice,
     curr_metadata,
     curr_physical_units,
     curr_path,
@@ -121,6 +122,7 @@ class MainWindow(QMainWindow):
         self.z_slider.valueChanged.connect(self.rotate_z)
         self.slice_slider.valueChanged.connect(self.slice_update)
         self.reset_button.clicked.connect(self.reset_settings)
+        self.smoothing_preview_button.connect(self.render_smooth_slice)
         self.show()
 
     def render_initial_view(self) -> None:
@@ -154,6 +156,7 @@ class MainWindow(QMainWindow):
         self.action_export_ppm.setEnabled(True)
         self.action_export_xbm.setEnabled(True)
         self.action_export_xpm.setEnabled(True)
+        self.smoothing_preview_button.setEnabled(True)
 
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
@@ -195,6 +198,7 @@ class MainWindow(QMainWindow):
         self.action_export_csv.setEnabled(not settings_view_enabled)
         self.circumference_label.setEnabled(not settings_view_enabled)
         self.export_button.setEnabled(not settings_view_enabled)
+        self.smoothing_preview_button.setEnabled(settings_view_enabled)
 
     # TODO: Could just construct a new MainWindow()? Maybe might not work?
     def disable_elements(self) -> None:
@@ -239,6 +243,7 @@ class MainWindow(QMainWindow):
         self.otsu_radio_button.setEnabled(False)
         self.binary_radio_button.setEnabled(False)
         self.threshold_preview_button.setEnabled(False)
+        self.smoothing_preview_button.setEnabled(False)
 
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
@@ -327,6 +332,18 @@ class MainWindow(QMainWindow):
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
             return rv_dummy_var
+
+    def render_smooth_slice(self) -> Union[np.ndarray, None]:
+        """Renders smooth slice in GUI. Allows user to preview result of smoothing settings."""
+        smooth_slice: sitk.Image = curr_smooth_slice()
+
+        slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
+
+        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
+
+        q_pixmap: QPixmap = QPixmap(q_img)
+
+        self.image.setPixmap(q_pixmap)
 
     def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
         """Called after pressing Apply or when
