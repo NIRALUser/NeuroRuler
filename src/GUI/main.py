@@ -347,6 +347,12 @@ class MainWindow(QMainWindow):
         
         self.render_curr_slice()
 
+    def set_view_z(self) -> None:
+        global_vars.VIEW = global_vars.View.Z
+        self.x_view_radio_button.setChecked(False)
+        self.y_view_radio_button.setChecked(False)
+        self.z_view_radio_button.setChecked(True)
+
     def render_curr_slice(self) -> Union[np.ndarray, None]:
         """Resamples the currently selected image using its rotation and slice settings,
         then renders the resulting slice in the GUI.
@@ -361,6 +367,10 @@ class MainWindow(QMainWindow):
 
         :return: np.ndarray if `not SETTINGS_VIEW_ENABLED` else None
         :rtype: np.ndarray or None"""
+
+        if (not global_vars.SETTINGS_VIEW_ENABLED):
+            self.set_view_z()
+
         rotated_slice: sitk.Image = curr_rotated_slice()
 
         slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
@@ -421,6 +431,8 @@ class MainWindow(QMainWindow):
     def render_smooth_slice(self) -> Union[np.ndarray, None]:
         """Renders smooth slice in GUI. Allows user to preview result of smoothing settings."""
         self.update_smoothing_settings()
+
+        self.set_view_z()
         
         smooth_slice: sitk.Image = curr_smooth_slice()
 
