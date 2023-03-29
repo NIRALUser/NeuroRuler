@@ -53,7 +53,7 @@ from src.utils.img_helpers import (
     curr_physical_units,
     curr_path,
     get_curr_properties_tuple,
-    get_middle_of_z_dimension,
+    get_middle_dimension,
 )
 
 import src.utils.img_helpers as img_helpers
@@ -124,6 +124,9 @@ class MainWindow(QMainWindow):
         self.slice_slider.valueChanged.connect(self.slice_update)
         self.reset_button.clicked.connect(self.reset_settings)
         self.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
+        self.x_view_radio_button.clicked.connect(self.update_view)
+        self.y_view_radio_button.clicked.connect(self.update_view)
+        self.z_view_radio_button.clicked.connect(self.update_view)
         self.show()
 
     def render_initial_view(self) -> None:
@@ -164,6 +167,9 @@ class MainWindow(QMainWindow):
         self.smoothing_iterations_input.setEnabled(True)
         self.time_step_label.setEnabled(True)
         self.time_step_input.setEnabled(True)
+        self.x_view_radio_button.setEnabled(True)
+        self.y_view_radio_button.setEnabled(True)
+        self.z_view_radio_button.setEnabled(True)
 
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
@@ -213,6 +219,9 @@ class MainWindow(QMainWindow):
         self.smoothing_iterations_input.setEnabled(settings_view_enabled)
         self.time_step_label.setEnabled(settings_view_enabled)
         self.time_step_input.setEnabled(settings_view_enabled)
+        self.x_view_radio_button.setEnabled(settings_view_enabled)
+        self.y_view_radio_button.setEnabled(settings_view_enabled)
+        self.z_view_radio_button.setEnabled(settings_view_enabled)
 
     # TODO: Could just construct a new MainWindow()? Maybe might not work?
     def disable_elements(self) -> None:
@@ -264,6 +273,9 @@ class MainWindow(QMainWindow):
         self.smoothing_iterations_input.setEnabled(False)
         self.time_step_label.setEnabled(False)
         self.time_step_input.setEnabled(False)
+        self.x_view_radio_button.setEnabled(False)
+        self.y_view_radio_button.setEnabled(False)
+        self.z_view_radio_button.setEnabled(False)
 
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
@@ -314,6 +326,26 @@ class MainWindow(QMainWindow):
             # And adding duplicate key doesn't change key order.
             update_image_groups(path_list)
             self.render_image_num_and_path()
+
+    def update_view(self) -> None:
+        """Renders view."""
+
+        if (self.x_view_radio_button.isChecked() and global_vars.VIEW != global_vars.View.X):
+            global_vars.VIEW = global_vars.View.X
+            self.y_view_radio_button.setChecked(False)
+            self.z_view_radio_button.setChecked(False)
+
+        elif (self.y_view_radio_button.isChecked() and global_vars.VIEW != global_vars.View.Y):
+            global_vars.VIEW = global_vars.View.Y
+            self.x_view_radio_button.setChecked(False)
+            self.z_view_radio_button.setChecked(False)
+
+        else:
+            global_vars.VIEW = global_vars.View.Z
+            self.x_view_radio_button.setChecked(False)
+            self.y_view_radio_button.setChecked(False)
+        
+        self.render_curr_slice()
 
     def render_curr_slice(self) -> Union[np.ndarray, None]:
         """Resamples the currently selected image using its rotation and slice settings,
@@ -547,7 +579,7 @@ class MainWindow(QMainWindow):
         global_vars.THETA_X = 0
         global_vars.THETA_Y = 0
         global_vars.THETA_Z = 0
-        global_vars.SLICE = get_middle_of_z_dimension(curr_image())
+        global_vars.SLICE = get_middle_dimension(curr_image(), 2)
         self.render_curr_slice()
         self.render_all_sliders()
 

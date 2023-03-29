@@ -65,13 +65,16 @@ def initialize_globals(path_list: list[Path]) -> None:
     # Use it to set slice and center of rotation for the group
     curr_img: sitk.Image = curr_image()
     # TODO: Set maximum for the slice slider in the GUI!
-    global_vars.SLICE = get_middle_of_z_dimension(curr_img)
+    global_vars.SLICE = get_middle_dimension(curr_img, 2)
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
     global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
     global_vars.SMOOTHING_FILTER.SetConductanceParameter(3.0)
     global_vars.SMOOTHING_FILTER.SetNumberOfIterations(5)
     global_vars.SMOOTHING_FILTER.SetTimeStep(0.0625)
     global_vars.SETTINGS_VIEW_ENABLED = True
+    global_vars.VIEW = global_vars.View.Z
+    global_vars.X_CENTER = get_middle_dimension(curr_img, 0)
+    global_vars.Y_CENTER = get_middle_dimension(curr_img, 1)
 
 
 def clear_globals():
@@ -121,7 +124,6 @@ def curr_image() -> sitk.Image:
     :rtype: sitk.Image"""
     return global_vars.IMAGE_DICT[curr_path()]
 
-
 def curr_rotated_slice() -> sitk.Image:
     """Return 2D rotated slice of the current image determined by global rotation and slice settings.
 
@@ -138,9 +140,16 @@ def curr_rotated_slice() -> sitk.Image:
         degrees_to_radians(global_vars.THETA_Y),
         degrees_to_radians(global_vars.THETA_Z),
     )
-    rotated_slice: sitk.Image = sitk.Resample(
+    rotated_image: sitk.Image = sitk.Resample(
         curr_image(), global_vars.EULER_3D_TRANSFORM
-    )[:, :, global_vars.SLICE]
+    )
+    rotated_slice: sitk.Image
+    if (global_vars.VIEW == global_vars.View.X):
+        rotated_slice = rotated_image[global_vars.X_CENTER, :, :]
+    elif (global_vars.VIEW == global_vars.View.Y):
+         rotated_slice = rotated_image[:, global_vars.Y_CENTER, :]
+    else:
+        rotated_slice = rotated_image[:, :, global_vars.SLICE]
     if user_settings.DEBUG and user_settings.SMOOTH_BEFORE_RENDERING:
         print(
             "img_helpers.curr_rotated_slice() smoothed the image before rendering (i.e., user sees smoothed slice)"
@@ -234,14 +243,15 @@ def get_curr_properties_tuple() -> tuple:
     return list(global_vars.IMAGE_GROUPS.keys())[global_vars.CURR_BATCH_INDEX]
 
 
-def get_middle_of_z_dimension(img: sitk.Image) -> int:
-    """int((img.GetSize()[2] - 1) / 2)
+def get_middle_dimension(img: sitk.Image, axis: int) -> int:
+    """int((img.GetSize()[axis] - 1) / 2)
 
     :param img:
+    :param axis: int (0-2)
     :type img: sitk.Image
     :return: int((img.GetSize()[2] - 1) / 2)
     :rtype: int"""
-    return int((img.GetSize()[2] - 1) / 2)
+    return int((img.GetSize()[axis] - 1) / 2)
 
 
 def get_center_of_rotation(img: sitk.Image) -> tuple:

@@ -3,6 +3,7 @@ that the user should not be able to modify directly, unlike user_settings.py."""
 
 import SimpleITK as sitk
 from pathlib import Path
+from enum import Enum
 
 IMAGE_GROUPS: dict[tuple, dict[Path, sitk.Image]] = dict()
 """Mapping from properties tuple to a group of images, where a group of images is a dict[Path, sitk.Image].
@@ -70,6 +71,18 @@ THETA_Z: int = 0
 """In degrees"""
 SLICE: int = 0
 """0-indexed"""
+
+X_CENTER: int = 0
+"""Used for changing views."""
+
+Y_CENTER: int = 0
+"""Used for changing views."""
+
+View = Enum('View', ['X', 'Y', 'Z'])
+VIEW = View.Z
+"""Current view.
+
+Uses enum 'View'."""
 
 SMOOTHING_FILTER: sitk.GradientAnisotropicDiffusionImageFilter = sitk.GradientAnisotropicDiffusionImageFilter()
 """Global sitk.GradientAnisotropicDiffusionImageFilter for image smoothing.
