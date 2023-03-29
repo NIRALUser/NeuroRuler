@@ -76,7 +76,7 @@ SMOOTHING_FILTER: sitk.GradientAnisotropicDiffusionImageFilter = sitk.GradientAn
 
 See https://slicer.readthedocs.io/en/latest/user_guide/modules/gradientanisotropicdiffusion.html for more information."""
 
-CONDUCTANCE_PARAMETER: float = 1.0
+CONDUCTANCE_PARAMETER: float = 3.0
 """Smoothing option.
 
 Conductance controls the sensitivity of the conductance term. As a general rule, the lower the value, the more strongly the filter preserves edges. A high value will cause diffusion (smoothing) across edges. Note that the number of iterations controls how much smoothing is done within regions bounded by edges."""

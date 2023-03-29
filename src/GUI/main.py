@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
         self.z_slider.valueChanged.connect(self.rotate_z)
         self.slice_slider.valueChanged.connect(self.slice_update)
         self.reset_button.clicked.connect(self.reset_settings)
-        self.smoothing_preview_button.connect(self.render_smooth_slice)
+        self.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
         self.show()
 
     def render_initial_view(self) -> None:
@@ -157,6 +157,12 @@ class MainWindow(QMainWindow):
         self.action_export_xbm.setEnabled(True)
         self.action_export_xpm.setEnabled(True)
         self.smoothing_preview_button.setEnabled(True)
+        self.conductance_parameter_label.setEnabled(True)
+        self.conductance_parameter_input.setEnabled(True)
+        self.smoothing_iterations_label.setEnabled(True)
+        self.smoothing_iterations_input.setEnabled(True)
+        self.time_step_label.setEnabled(True)
+        self.time_step_input.setEnabled(True)
 
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
@@ -199,6 +205,12 @@ class MainWindow(QMainWindow):
         self.circumference_label.setEnabled(not settings_view_enabled)
         self.export_button.setEnabled(not settings_view_enabled)
         self.smoothing_preview_button.setEnabled(settings_view_enabled)
+        self.conductance_parameter_label.setEnabled(settings_view_enabled)
+        self.conductance_parameter_input.setEnabled(settings_view_enabled)
+        self.smoothing_iterations_label.setEnabled(settings_view_enabled)
+        self.smoothing_iterations_input.setEnabled(settings_view_enabled)
+        self.time_step_label.setEnabled(settings_view_enabled)
+        self.time_step_input.setEnabled(settings_view_enabled)
 
     # TODO: Could just construct a new MainWindow()? Maybe might not work?
     def disable_elements(self) -> None:
@@ -244,6 +256,12 @@ class MainWindow(QMainWindow):
         self.binary_radio_button.setEnabled(False)
         self.threshold_preview_button.setEnabled(False)
         self.smoothing_preview_button.setEnabled(False)
+        self.conductance_parameter_label.setEnabled(False)
+        self.conductance_parameter_input.setEnabled(False)
+        self.smoothing_iterations_label.setEnabled(False)
+        self.smoothing_iterations_input.setEnabled(False)
+        self.time_step_label.setEnabled(False)
+        self.time_step_input.setEnabled(False)
 
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.

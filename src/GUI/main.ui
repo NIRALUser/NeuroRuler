@@ -393,17 +393,17 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
-                 <widget class="QLabel" name="parameter">
+                 <widget class="QLabel" name="conductance_parameter_label">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>Parameter X:</string>
+                   <string>Conductance:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit">
+                 <widget class="QLineEdit" name="conductance_parameter_input">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -439,17 +439,17 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <item>
-                 <widget class="QLabel" name="label_5">
+                 <widget class="QLabel" name="smoothing_iterations_label">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>Parameter Y:</string>
+                   <string>Iterations:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_2">
+                 <widget class="QLineEdit" name="smoothing_iterations_input">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -485,17 +485,17 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
-                 <widget class="QLabel" name="label_6">
+                 <widget class="QLabel" name="time_step_label">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>Parameter Z:</string>
+                   <string>Time Step:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_3">
+                 <widget class="QLineEdit" name="time_step_input">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
