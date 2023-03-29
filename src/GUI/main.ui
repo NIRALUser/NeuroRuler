@@ -419,6 +419,12 @@
                     <height>0</height>
                    </size>
                   </property>
+                  <property name="maxLength">
+                   <number>10</number>
+                  </property>
+                  <property name="placeholderText">
+                   <string>3.0</string>
+                  </property>
                  </widget>
                 </item>
                </layout>
@@ -465,6 +471,12 @@
                     <height>0</height>
                    </size>
                   </property>
+                  <property name="maxLength">
+                   <number>10</number>
+                  </property>
+                  <property name="placeholderText">
+                   <string>5</string>
+                  </property>
                  </widget>
                 </item>
                </layout>
@@ -510,6 +522,12 @@
                     <width>15</width>
                     <height>0</height>
                    </size>
+                  </property>
+                  <property name="maxLength">
+                   <number>10</number>
+                  </property>
+                  <property name="placeholderText">
+                   <string>0.0625</string>
                   </property>
                  </widget>
                 </item>

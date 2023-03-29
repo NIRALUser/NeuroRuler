@@ -71,6 +71,7 @@ DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "units not found"
 
 
+
 class MainWindow(QMainWindow):
     """Main window of the application.
 
@@ -179,6 +180,7 @@ class MainWindow(QMainWindow):
             # Render uncontoured slice after pressing adjust
             self.render_curr_slice()
         else:
+            self.update_smoothing_settings()
             self.apply_button.setText("Adjust")
             # Ignore the type annotation error here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
@@ -350,9 +352,44 @@ class MainWindow(QMainWindow):
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
             return rv_dummy_var
+        
+    def update_smoothing_settings(self) -> None:
+        """Updates global smoothing settings."""
+
+        conductance: str = self.conductance_parameter_input.displayText()
+        try:
+            float(conductance)
+            global_vars.CONDUCTANCE_PARAMETER = float(conductance)
+        except ValueError:
+            None
+        self.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
+        self.conductance_parameter_input.setPlaceholderText(str(global_vars.CONDUCTANCE_PARAMETER))
+        global_vars.SMOOTHING_FILTER.SetConductanceParameter(global_vars.CONDUCTANCE_PARAMETER)
+
+        iterations: str = self.smoothing_iterations_input.displayText()
+        try:
+            int(iterations)
+            global_vars.CONDUCTANCE_PARAMETER = int(iterations)
+        except ValueError:
+            None
+        self.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
+        self.smoothing_iterations_input.setPlaceholderText(str(global_vars.SMOOTHING_ITERATIONS))
+        global_vars.SMOOTHING_FILTER.SetNumberOfIterations(global_vars.SMOOTHING_ITERATIONS)
+
+        time_step: str = self.time_step_input.displayText()
+        try:
+            float(time_step)
+            global_vars.TIME_STEP = float(time_step)
+        except ValueError:
+            None
+        self.time_step_input.setText(str(global_vars.TIME_STEP))
+        self.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
+        global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
 
     def render_smooth_slice(self) -> Union[np.ndarray, None]:
         """Renders smooth slice in GUI. Allows user to preview result of smoothing settings."""
+        self.update_smoothing_settings()
+        
         smooth_slice: sitk.Image = curr_smooth_slice()
 
         slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)

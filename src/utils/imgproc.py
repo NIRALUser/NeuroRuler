@@ -7,6 +7,7 @@ import numpy as np
 import src.utils.exceptions as exceptions
 from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE
 import src.utils.user_settings as settings
+from src.utils.global_vars import SMOOTHING_FILTER
 
 
 # The RV is a np array, not sitk.Image
@@ -34,14 +35,10 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
         print(
             "imgproc.contour() smoothed the slice provided to it AFTER rendering (i.e., user does not see smoothed slice)."
         )
-    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
-    # However, this does throw some weird errors
-    # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
-    # Stable time step for this image must be smaller than 0.0997431
     smooth_slice: sitk.Image = (
         mri_slice
         if settings.SMOOTH_BEFORE_RENDERING
-        else sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+        else SMOOTHING_FILTER.Execute(
             sitk.Cast(mri_slice, sitk.sitkFloat64)
         )
     )

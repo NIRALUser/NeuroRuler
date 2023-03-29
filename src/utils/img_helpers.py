@@ -68,9 +68,9 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.SLICE = get_middle_of_z_dimension(curr_img)
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
     global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
-    global_vars.SMOOTHING_FILTER.SetConductanceParameter(global_vars.CONDUCTANCE_PARAMETER)
-    global_vars.SMOOTHING_FILTER.SetNumberOfIterations(global_vars.SMOOTHING_ITERATIONS)
-    global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
+    global_vars.SMOOTHING_FILTER.SetConductanceParameter(3.0)
+    global_vars.SMOOTHING_FILTER.SetNumberOfIterations(5)
+    global_vars.SMOOTHING_FILTER.SetTimeStep(0.0625)
     global_vars.SETTINGS_VIEW_ENABLED = True
 
 
