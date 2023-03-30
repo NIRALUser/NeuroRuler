@@ -78,13 +78,15 @@ X_CENTER: int = 0
 Y_CENTER: int = 0
 """Used for changing views."""
 
-View = Enum('View', ['X', 'Y', 'Z'])
+View = Enum("View", ["X", "Y", "Z"])
 VIEW = View.Z
 """Current view.
 
 Uses enum 'View'."""
 
-SMOOTHING_FILTER: sitk.GradientAnisotropicDiffusionImageFilter = sitk.GradientAnisotropicDiffusionImageFilter()
+SMOOTHING_FILTER: sitk.GradientAnisotropicDiffusionImageFilter = (
+    sitk.GradientAnisotropicDiffusionImageFilter()
+)
 """Global sitk.GradientAnisotropicDiffusionImageFilter for image smoothing.
 
 See https://slicer.readthedocs.io/en/latest/user_guide/modules/gradientanisotropicdiffusion.html for more information."""

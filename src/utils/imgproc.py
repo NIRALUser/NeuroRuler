@@ -38,9 +38,7 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
     smooth_slice: sitk.Image = (
         mri_slice
         if settings.SMOOTH_BEFORE_RENDERING
-        else SMOOTHING_FILTER.Execute(
-            sitk.Cast(mri_slice, sitk.sitkFloat64)
-        )
+        else SMOOTHING_FILTER.Execute(sitk.Cast(mri_slice, sitk.sitkFloat64))
     )
 
     otsu: sitk.Image = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)

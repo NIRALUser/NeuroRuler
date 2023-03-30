@@ -124,6 +124,7 @@ def curr_image() -> sitk.Image:
     :rtype: sitk.Image"""
     return global_vars.IMAGE_DICT[curr_path()]
 
+
 def curr_rotated_slice() -> sitk.Image:
     """Return 2D rotated slice of the current image determined by global rotation and slice settings.
 
@@ -144,10 +145,10 @@ def curr_rotated_slice() -> sitk.Image:
         curr_image(), global_vars.EULER_3D_TRANSFORM
     )
     rotated_slice: sitk.Image
-    if (global_vars.VIEW == global_vars.View.X):
+    if global_vars.VIEW == global_vars.View.X:
         rotated_slice = rotated_image[global_vars.X_CENTER, :, :]
-    elif (global_vars.VIEW == global_vars.View.Y):
-         rotated_slice = rotated_image[:, global_vars.Y_CENTER, :]
+    elif global_vars.VIEW == global_vars.View.Y:
+        rotated_slice = rotated_image[:, global_vars.Y_CENTER, :]
     else:
         rotated_slice = rotated_image[:, :, global_vars.SLICE]
     if user_settings.DEBUG and user_settings.SMOOTH_BEFORE_RENDERING:
@@ -162,6 +163,7 @@ def curr_rotated_slice() -> sitk.Image:
         else rotated_slice
     )
 
+
 def curr_smooth_slice() -> sitk.Image:
     """Return smoothed 2D rotated slice of the current image determined by global smoothing settings.
 
@@ -169,7 +171,9 @@ def curr_smooth_slice() -> sitk.Image:
     :rtype: sitk.Image"""
     rotated_slice: sitk.Image = curr_rotated_slice()
     # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
-    smooth_slice: sitk.Image = global_vars.SMOOTHING_FILTER.Execute(sitk.Cast(rotated_slice, sitk.sitkFloat64))
+    smooth_slice: sitk.Image = global_vars.SMOOTHING_FILTER.Execute(
+        sitk.Cast(rotated_slice, sitk.sitkFloat64)
+    )
     return smooth_slice
 
 

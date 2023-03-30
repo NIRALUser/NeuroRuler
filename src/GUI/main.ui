@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>809</width>
-    <height>697</height>
+    <width>858</width>
+    <height>864</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1080,8 +1080,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>809</width>
-     <height>18</height>
+     <width>858</width>
+     <height>24</height>
     </rect>
    </property>
    <property name="nativeMenuBar">
@@ -1133,10 +1133,11 @@
     <property name="title">
      <string>Debug</string>
     </property>
-    <addaction name="action_test_show_resource"/>
+    <addaction name="action_test_stuff"/>
     <addaction name="action_print_metadata"/>
     <addaction name="action_print_dimensions"/>
     <addaction name="action_print_properties"/>
+    <addaction name="action_print_direction"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
@@ -1343,15 +1344,18 @@
     <string>Ctrl+G</string>
    </property>
   </action>
-  <action name="action_test_show_resource">
+  <action name="action_test_stuff">
    <property name="text">
-    <string>Test show resource</string>
+    <string>Test stuff</string>
    </property>
    <property name="toolTip">
-    <string>Test displaying a resource (help.svg).</string>
+    <string>Connected to test_stuff method. Modify to test stuff.</string>
    </property>
    <property name="statusTip">
-    <string>Test displaying a resource (help.svg).</string>
+    <string>Connected to test_stuff method. Modify to test stuff.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="action_print_metadata">
@@ -1392,8 +1396,13 @@
    <property name="statusTip">
     <string>Print properties of the loaded batch.</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
+  </action>
+  <action name="action_print_direction">
+   <property name="text">
+    <string>Print direction</string>
+   </property>
+   <property name="statusTip">
+    <string>Print direction</string>
    </property>
   </action>
  </widget>

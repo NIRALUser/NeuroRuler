@@ -24,18 +24,23 @@ def main() -> None:
     current_slice = image[:, :, slice_num]
     process_slice(current_slice)
 
+
 # https://slicer.readthedocs.io/en/latest/user_guide/modules/gradientanisotropicdiffusion.html
 def process_slice(current_slice: sitk.Image) -> None:
     # show_current_slice(current_slice)
     # Image smoothing
-    smooth_filter: sitk.GradientAnisotropicDiffusionImageFilter = sitk.GradientAnisotropicDiffusionImageFilter()
+    smooth_filter: sitk.GradientAnisotropicDiffusionImageFilter = (
+        sitk.GradientAnisotropicDiffusionImageFilter()
+    )
     print(smooth_filter.GetConductanceParameter())
     print(smooth_filter.GetNumberOfIterations())
     print(smooth_filter.GetTimeStep())
     smooth_filter.SetConductanceParameter(1.0)
     smooth_filter.SetNumberOfIterations(10)
     smooth_filter.SetTimeStep(0.0625)
-    smooth_slice: sitk.GradientAnisotropicDiffusionImageFilter = smooth_filter.Execute(sitk.Cast(current_slice, sitk.sitkFloat64))
+    smooth_slice: sitk.GradientAnisotropicDiffusionImageFilter = smooth_filter.Execute(
+        sitk.Cast(current_slice, sitk.sitkFloat64)
+    )
     show_current_slice(smooth_slice)
     # FG/BG selection
     # TODO: user chooses between otsu and BinaryThresholdImageFilter

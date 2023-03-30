@@ -54,9 +54,12 @@ from src.utils.img_helpers import (
     curr_path,
     get_curr_properties_tuple,
     get_middle_dimension,
+    get_center_of_rotation,
 )
 
 import src.utils.img_helpers as img_helpers
+
+from src.utils.constants import degrees_to_radians
 
 PATH_TO_UI_FILE: Path = Path("src") / "GUI" / "main.ui"
 PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
@@ -69,7 +72,6 @@ DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 # TODO: Do we assume units are mm unless specified otherwise?
 MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "units not found"
-
 
 
 class MainWindow(QMainWindow):
@@ -93,10 +95,11 @@ class MainWindow(QMainWindow):
         self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
-        self.action_test_show_resource.triggered.connect(self.test_stuff)
+        self.action_test_stuff.triggered.connect(self.test_stuff)
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
         self.action_print_properties.triggered.connect(print_properties)
+        self.action_print_direction.triggered.connect(print_direction)
         self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -333,12 +336,18 @@ class MainWindow(QMainWindow):
     def update_view(self) -> None:
         """Renders view."""
 
-        if (self.x_view_radio_button.isChecked() and global_vars.VIEW != global_vars.View.X):
+        if (
+            self.x_view_radio_button.isChecked()
+            and global_vars.VIEW != global_vars.View.X
+        ):
             global_vars.VIEW = global_vars.View.X
             self.y_view_radio_button.setChecked(False)
             self.z_view_radio_button.setChecked(False)
 
-        elif (self.y_view_radio_button.isChecked() and global_vars.VIEW != global_vars.View.Y):
+        elif (
+            self.y_view_radio_button.isChecked()
+            and global_vars.VIEW != global_vars.View.Y
+        ):
             global_vars.VIEW = global_vars.View.Y
             self.x_view_radio_button.setChecked(False)
             self.z_view_radio_button.setChecked(False)
@@ -347,7 +356,7 @@ class MainWindow(QMainWindow):
             global_vars.VIEW = global_vars.View.Z
             self.x_view_radio_button.setChecked(False)
             self.y_view_radio_button.setChecked(False)
-        
+
         self.render_curr_slice()
 
     def set_view_z(self) -> None:
@@ -371,7 +380,7 @@ class MainWindow(QMainWindow):
         :return: np.ndarray if `not SETTINGS_VIEW_ENABLED` else None
         :rtype: np.ndarray or None"""
 
-        if (not global_vars.SETTINGS_VIEW_ENABLED):
+        if not global_vars.SETTINGS_VIEW_ENABLED:
             self.set_view_z()
 
         rotated_slice: sitk.Image = curr_rotated_slice()
@@ -405,7 +414,7 @@ class MainWindow(QMainWindow):
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
             return rv_dummy_var
-        
+
     def update_smoothing_settings(self) -> None:
         """Updates global smoothing settings."""
 
@@ -416,8 +425,12 @@ class MainWindow(QMainWindow):
         except ValueError:
             None
         self.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
-        self.conductance_parameter_input.setPlaceholderText(str(global_vars.CONDUCTANCE_PARAMETER))
-        global_vars.SMOOTHING_FILTER.SetConductanceParameter(global_vars.CONDUCTANCE_PARAMETER)
+        self.conductance_parameter_input.setPlaceholderText(
+            str(global_vars.CONDUCTANCE_PARAMETER)
+        )
+        global_vars.SMOOTHING_FILTER.SetConductanceParameter(
+            global_vars.CONDUCTANCE_PARAMETER
+        )
 
         iterations: str = self.smoothing_iterations_input.displayText()
         try:
@@ -426,8 +439,12 @@ class MainWindow(QMainWindow):
         except ValueError:
             None
         self.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
-        self.smoothing_iterations_input.setPlaceholderText(str(global_vars.SMOOTHING_ITERATIONS))
-        global_vars.SMOOTHING_FILTER.SetNumberOfIterations(global_vars.SMOOTHING_ITERATIONS)
+        self.smoothing_iterations_input.setPlaceholderText(
+            str(global_vars.SMOOTHING_ITERATIONS)
+        )
+        global_vars.SMOOTHING_FILTER.SetNumberOfIterations(
+            global_vars.SMOOTHING_ITERATIONS
+        )
 
         time_step: str = self.time_step_input.displayText()
         try:
@@ -444,7 +461,7 @@ class MainWindow(QMainWindow):
         self.update_smoothing_settings()
 
         self.set_view_z()
-        
+
         smooth_slice: sitk.Image = curr_smooth_slice()
 
         slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
@@ -607,9 +624,15 @@ class MainWindow(QMainWindow):
         self.render_all_sliders()
 
     def test_stuff(self) -> None:
-        """Connected to Test > Test show resource. Dummy function for testing stuff."""
-        print(curr_image().GetDirection())
-        curr_image().SetDirection((-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0))
+        """Connected to Debug > Test stuff. Dummy button and function for easily testing stuff.
+
+        Assume that anything you put here will be overwritten freely."""
+        curr_img = curr_image()
+        reorient_filter = sitk.DICOMOrientImageFilter()
+        reorient_filter.SetDesiredCoordinateOrientation("LPS")
+        new_img = reorient_filter.Execute(curr_img)
+        global_vars.IMAGE_DICT[curr_path()] = new_img
+        self.render_curr_slice()
 
     # TODO: File name should also include circumference when not SETTINGS_VIEW_ENABLED?
     def export_curr_slice_as_img(self, extension: str):
@@ -679,6 +702,14 @@ def print_properties() -> None:
         )
         exit(1)
     pprint.pprint(OrderedDict(zip(fields, curr_properties)))
+
+
+def print_direction() -> None:
+    """Print current image's dimensions to terminal."""
+    if not len(global_vars.IMAGE_DICT):
+        print("Can't print direction when there's no image!")
+        return
+    print(curr_image().GetDirection())
 
 
 def main() -> None:

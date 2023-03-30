@@ -88,6 +88,13 @@ NIFTI_METADATA_UNITS_KEY: str = "xyzt_units"
 NUM_DIGITS_TO_ROUND_TO: int = 3
 """For floats, number of digits n to round to, i.e. round(float, n)."""
 
+DEFAULT_ORIENTATION_STR: str = "LPS"
+"""Orientation string to pass into sitk.DICOMOrientImageFilter to orient all images the same way."""
+
+DEFAULT_ORIENTATION_TUPLE: tuple = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+"""Orientation tuple (representing a direction matrix) resulting from sitk.Image.GetSpacing() that's
+the same as the DEFAULT_ORIENTATION_STR."""
+
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 def deprecated(func):
