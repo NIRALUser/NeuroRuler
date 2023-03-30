@@ -125,9 +125,6 @@ def curr_image() -> sitk.Image:
 def curr_rotated_slice() -> sitk.Image:
     """Return 2D rotated slice of the current image determined by global rotation and slice settings.
 
-    Smoothing occurs here and is rendered if user_settings.SMOOTH_BEFORE_RENDERING. Else, smoothing occurs
-    in imgproc.contour.
-
     Sets global_vars.EULER_3D_TRANSFORM's rotation values but not its center since all loaded images should
     have the same center.
 
@@ -141,17 +138,7 @@ def curr_rotated_slice() -> sitk.Image:
     rotated_slice: sitk.Image = sitk.Resample(
         curr_image(), global_vars.EULER_3D_TRANSFORM
     )[:, :, global_vars.SLICE]
-    if user_settings.DEBUG and user_settings.SMOOTH_BEFORE_RENDERING:
-        print(
-            "img_helpers.curr_rotated_slice() smoothed the image before rendering (i.e., user sees smoothed slice)"
-        )
-    return (
-        sitk.GradientAnisotropicDiffusionImageFilter().Execute(
-            sitk.Cast(rotated_slice, sitk.sitkFloat64)
-        )
-        if user_settings.SMOOTH_BEFORE_RENDERING
-        else rotated_slice
-    )
+    return rotated_slice
 
 def curr_smooth_slice() -> sitk.Image:
     """Return smoothed 2D rotated slice of the current image determined by global smoothing settings.

@@ -22,26 +22,13 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
     Calls sitk.GetArrayFromImage() at the end, which will return the transpose of the sitk.Image.
     retranspose defaults to False to match images viewed in ITK-SNAP (radiological conventions).
 
-    If user_settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice`
-    since it was smoothed in :code:`img_helpers.curr_rotated_slice()`.
-
     :param mri_slice: 2D MRI slice
     :type mri_slice: sitk.Image
     :param retranspose: Whether to return a re-transposed ndarray. Defaults to False.
     :type retranspose: bool
     :return: binary (0|1) numpy array with only the points on the contour = 1
     :rtype: np.ndarray"""
-    if settings.DEBUG and not settings.SMOOTH_BEFORE_RENDERING:
-        print(
-            "imgproc.contour() smoothed the slice provided to it AFTER rendering (i.e., user does not see smoothed slice)."
-        )
-    smooth_slice: sitk.Image = (
-        mri_slice
-        if settings.SMOOTH_BEFORE_RENDERING
-        else SMOOTHING_FILTER.Execute(
-            sitk.Cast(mri_slice, sitk.sitkFloat64)
-        )
-    )
+    smooth_slice: sitk.Image = (SMOOTHING_FILTER.Execute(sitk.Cast(mri_slice, sitk.sitkFloat64)))
 
     otsu: sitk.Image = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
 
