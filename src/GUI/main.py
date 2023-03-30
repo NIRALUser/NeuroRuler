@@ -390,6 +390,14 @@ class MainWindow(QMainWindow):
                 np.transpose(binary_contour_slice),
                 string_to_QColor(settings.CONTOUR_COLOR),
             )
+        elif global_vars.VIEW != global_vars.View.Z:
+            z_indicator: np.ndarray = np.zeros(slice_np.shape)
+            z_indicator[global_vars.SLICE, :] = 1
+            mask_QImage(
+                q_img,
+                np.transpose(z_indicator),
+                string_to_QColor(settings.CONTOUR_COLOR),
+            )
 
         q_pixmap: QPixmap = QPixmap(q_img)
 
