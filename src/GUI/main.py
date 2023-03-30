@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
         self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
-        self.action_test_show_resource.triggered.connect(test_stuff)
+        self.action_test_show_resource.triggered.connect(self.test_stuff)
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
         self.action_print_properties.triggered.connect(print_properties)
