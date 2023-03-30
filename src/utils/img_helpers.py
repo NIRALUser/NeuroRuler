@@ -188,7 +188,6 @@ def curr_rotated_slice() -> sitk.Image:
 
     return rotated_slice
 
-
 def curr_smooth_slice() -> sitk.Image:
     """Return smoothed 2D rotated slice of the current image determined by global smoothing settings.
 
