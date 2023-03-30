@@ -5,6 +5,7 @@ Holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_va
 from typing import Union
 import SimpleITK as sitk
 from pathlib import Path
+from enum import Enum
 import src.utils.global_vars as global_vars
 from src.utils.constants import degrees_to_radians
 import src.utils.constants as constants
@@ -72,7 +73,7 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.SMOOTHING_FILTER.SetNumberOfIterations(5)
     global_vars.SMOOTHING_FILTER.SetTimeStep(0.0625)
     global_vars.SETTINGS_VIEW_ENABLED = True
-    global_vars.VIEW = global_vars.View.Z
+    global_vars.VIEW = constants.View.Z
     global_vars.X_CENTER = get_middle_dimension(curr_img, 0)
     global_vars.Y_CENTER = get_middle_dimension(curr_img, 1)
 
@@ -125,6 +126,41 @@ def curr_image() -> sitk.Image:
     return global_vars.IMAGE_DICT[curr_path()]
 
 
+def set_curr_image(image: sitk.Image) -> None:
+    """Set the sitk.Image at the current index in global_vars.IMAGE_DICT.
+
+    :param image:
+    :type image: sitk.Image
+    :return: None
+    :rtype: None"""
+    global_vars.IMAGE_DICT[curr_path()] = image
+
+
+def orient_curr_image(view: Enum) -> None:
+    """Given a view enum, set the current image to the oriented version for that view.
+
+    :param image: not mutated
+    :type image: sitk.Image
+    :param view:
+    :type view: View.X, View.Y, or View.Z"""
+    if view not in constants.VIEW_TO_ORIENTATION_STR:
+        raise Exception(
+            "Expected View.X, View.Y, or View.Z but did not get one of those."
+        )
+    global_vars.ORIENT_FILTER.SetDesiredCoordinateOrientation(
+        constants.VIEW_TO_ORIENTATION_STR[view]
+    )
+    oriented: sitk.Image = global_vars.ORIENT_FILTER.Execute(curr_image())
+    set_curr_image(oriented)
+
+def curr_image_size() -> tuple:
+    """Return dimensions of current image.
+    
+    :return: dimensions
+    :rtype: tuple"""
+    return curr_image().GetSize()
+
+
 def curr_rotated_slice() -> sitk.Image:
     """Return 2D rotated slice of the current image determined by global rotation and slice settings.
 
@@ -145,9 +181,9 @@ def curr_rotated_slice() -> sitk.Image:
         curr_image(), global_vars.EULER_3D_TRANSFORM
     )
     rotated_slice: sitk.Image
-    if global_vars.VIEW == global_vars.View.X:
+    if global_vars.VIEW == constants.View.X:
         rotated_slice = rotated_image[global_vars.X_CENTER, :, :]
-    elif global_vars.VIEW == global_vars.View.Y:
+    elif global_vars.VIEW == constants.View.Y:
         rotated_slice = rotated_image[:, global_vars.Y_CENTER, :]
     else:
         rotated_slice = rotated_image[:, :, global_vars.SLICE]
@@ -253,7 +289,7 @@ def get_middle_dimension(img: sitk.Image, axis: int) -> int:
     :param img:
     :param axis: int (0-2)
     :type img: sitk.Image
-    :return: int((img.GetSize()[2] - 1) / 2)
+    :return: int((img.GetSize()[axis] - 1) / 2)
     :rtype: int"""
     return int((img.GetSize()[axis] - 1) / 2)
 

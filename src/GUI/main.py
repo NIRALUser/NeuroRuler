@@ -13,6 +13,7 @@ import sys
 import webbrowser
 from pathlib import Path
 from typing import Union
+from enum import Enum
 
 import SimpleITK as sitk
 import numpy as np
@@ -47,6 +48,8 @@ from src.utils.img_helpers import (
     initialize_globals,
     update_image_groups,
     curr_image,
+    curr_image_size,
+    set_curr_image,
     curr_rotated_slice,
     curr_smooth_slice,
     curr_metadata,
@@ -59,7 +62,6 @@ from src.utils.img_helpers import (
 
 import src.utils.img_helpers as img_helpers
 
-from src.utils.constants import degrees_to_radians
 
 PATH_TO_UI_FILE: Path = Path("src") / "GUI" / "main.ui"
 PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
@@ -70,8 +72,9 @@ DOCUMENTATION_LINK: str = "https://headcircumferencetool.readthedocs.io/en/lates
 DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
-# TODO: Do we assume units are mm unless specified otherwise?
-MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "units not found"
+
+# We assume units are millimeters if we can't find units in metadata
+MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "millimeters (mm)"
 
 
 class MainWindow(QMainWindow):
@@ -100,6 +103,15 @@ class MainWindow(QMainWindow):
         self.action_print_dimensions.triggered.connect(print_dimensions)
         self.action_print_properties.triggered.connect(print_properties)
         self.action_print_direction.triggered.connect(print_direction)
+        self.action_orient_for_x_view.triggered.connect(
+            lambda: self.orient_curr_image(constants.View.X)
+        )
+        self.action_orient_for_y_view.triggered.connect(
+            lambda: self.orient_curr_image(constants.View.Y)
+        )
+        self.action_orient_for_z_view.triggered.connect(
+            lambda: self.orient_curr_image(constants.View.Z)
+        )
         self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -163,6 +175,9 @@ class MainWindow(QMainWindow):
         self.action_export_ppm.setEnabled(True)
         self.action_export_xbm.setEnabled(True)
         self.action_export_xpm.setEnabled(True)
+        self.action_orient_for_x_view.setEnabled(True)
+        self.action_orient_for_y_view.setEnabled(True)
+        self.action_orient_for_z_view.setEnabled(True)
         self.smoothing_preview_button.setEnabled(True)
         self.conductance_parameter_label.setEnabled(True)
         self.conductance_parameter_input.setEnabled(True)
@@ -199,6 +214,9 @@ class MainWindow(QMainWindow):
         self.action_open.setEnabled(settings_view_enabled)
         self.action_add_images.setEnabled(settings_view_enabled)
         self.action_remove_image.setEnabled(settings_view_enabled)
+        self.action_orient_for_x_view.setEnabled(settings_view_enabled)
+        self.action_orient_for_y_view.setEnabled(settings_view_enabled)
+        self.action_orient_for_z_view.setEnabled(settings_view_enabled)
         self.x_slider.setEnabled(settings_view_enabled)
         self.y_slider.setEnabled(settings_view_enabled)
         self.z_slider.setEnabled(settings_view_enabled)
@@ -338,29 +356,30 @@ class MainWindow(QMainWindow):
 
         if (
             self.x_view_radio_button.isChecked()
-            and global_vars.VIEW != global_vars.View.X
+            and global_vars.VIEW != constants.View.X
         ):
-            global_vars.VIEW = global_vars.View.X
+            global_vars.VIEW = constants.View.X
             self.y_view_radio_button.setChecked(False)
             self.z_view_radio_button.setChecked(False)
 
         elif (
             self.y_view_radio_button.isChecked()
-            and global_vars.VIEW != global_vars.View.Y
+            and global_vars.VIEW != constants.View.Y
         ):
-            global_vars.VIEW = global_vars.View.Y
+            global_vars.VIEW = constants.View.Y
             self.x_view_radio_button.setChecked(False)
             self.z_view_radio_button.setChecked(False)
 
         else:
-            global_vars.VIEW = global_vars.View.Z
+            global_vars.VIEW = constants.View.Z
             self.x_view_radio_button.setChecked(False)
             self.y_view_radio_button.setChecked(False)
 
+        self.orient_curr_image(global_vars.VIEW)
         self.render_curr_slice()
 
     def set_view_z(self) -> None:
-        global_vars.VIEW = global_vars.View.Z
+        global_vars.VIEW = constants.View.Z
         self.x_view_radio_button.setChecked(False)
         self.y_view_radio_button.setChecked(False)
         self.z_view_radio_button.setChecked(True)
@@ -399,9 +418,10 @@ class MainWindow(QMainWindow):
                 np.transpose(binary_contour_slice),
                 string_to_QColor(settings.CONTOUR_COLOR),
             )
-        elif global_vars.VIEW != global_vars.View.Z:
+
+        elif global_vars.VIEW != constants.View.Z:
             z_indicator: np.ndarray = np.zeros(slice_np.shape)
-            z_indicator[global_vars.SLICE, :] = 1
+            z_indicator[curr_image_size()[2] - global_vars.SLICE - 1, :] = 1
             mask_QImage(
                 q_img,
                 np.transpose(z_indicator),
@@ -663,12 +683,15 @@ class MainWindow(QMainWindow):
         )
         self.image.pixmap().save(path, extension)
 
+    def orient_curr_image(self, view: Enum) -> None:
+        img_helpers.orient_curr_image(view)
+
 
 def print_metadata() -> None:
     """Print current image's metadata to terminal. Internally, uses sitk.GetMetaData, which doesn't return
     all metadata (e.g., doesn't return spacing values whereas sitk.GetSpacing does).
 
-    Typically, this returns less metdata for NRRD than for NIfTI."""
+    Typically, this returns less metadata for NRRD than for NIfTI."""
 
     if not len(global_vars.IMAGE_DICT):
         print("Can't print metadata when there's no image!")

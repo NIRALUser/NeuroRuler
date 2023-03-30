@@ -141,10 +141,10 @@
              <string>Control X rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
             </property>
             <property name="minimum">
-             <number>-180</number>
+             <number>-90</number>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <number>90</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -192,10 +192,10 @@
              <string>Control Y rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
             </property>
             <property name="minimum">
-             <number>-180</number>
+             <number>-90</number>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <number>90</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -243,10 +243,10 @@
              <string>Control Z rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
             </property>
             <property name="minimum">
-             <number>-180</number>
+             <number>-90</number>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <number>90</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -1138,6 +1138,9 @@
     <addaction name="action_print_dimensions"/>
     <addaction name="action_print_properties"/>
     <addaction name="action_print_direction"/>
+    <addaction name="action_orient_for_x_view"/>
+    <addaction name="action_orient_for_y_view"/>
+    <addaction name="action_orient_for_z_view"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
@@ -1403,6 +1406,21 @@
    </property>
    <property name="statusTip">
     <string>Print direction</string>
+   </property>
+  </action>
+  <action name="action_orient_for_x_view">
+   <property name="text">
+    <string>Orient for X view</string>
+   </property>
+  </action>
+  <action name="action_orient_for_y_view">
+   <property name="text">
+    <string>Orient for Y view</string>
+   </property>
+  </action>
+  <action name="action_orient_for_z_view">
+   <property name="text">
+    <string>Orient for Z view</string>
    </property>
   </action>
  </widget>
