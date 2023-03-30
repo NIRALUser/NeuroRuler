@@ -10,11 +10,6 @@ import src.utils.constants as constants
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
 
-SMOOTH_BEFORE_RENDERING: bool = False
-"""Whether or not to smooth the image before rendering.
-
-Affects img_helpers.curr_rotated_slice() and imgproc.contour()."""
-
 IMG_DIR: Path = Path("img")
 """Directory for storing images. Defaults to `img/`.
 

@@ -340,6 +340,7 @@ class MainWindow(QMainWindow):
             self.render_all_sliders()
             self.render_initial_view()
             self.render_image_num_and_path()
+            self.orient_curr_image(global_vars.VIEW)
             self.render_curr_slice()
         else:
             # Doesn't need to re-render sliders to set max value of slice slider.
@@ -443,7 +444,7 @@ class MainWindow(QMainWindow):
             float(conductance)
             global_vars.CONDUCTANCE_PARAMETER = float(conductance)
         except ValueError:
-            None
+            pass
         self.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
         self.conductance_parameter_input.setPlaceholderText(
             str(global_vars.CONDUCTANCE_PARAMETER)
@@ -457,7 +458,7 @@ class MainWindow(QMainWindow):
             int(iterations)
             global_vars.CONDUCTANCE_PARAMETER = int(iterations)
         except ValueError:
-            None
+            pass
         self.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
         self.smoothing_iterations_input.setPlaceholderText(
             str(global_vars.SMOOTHING_ITERATIONS)
@@ -471,7 +472,7 @@ class MainWindow(QMainWindow):
             float(time_step)
             global_vars.TIME_STEP = float(time_step)
         except ValueError:
-            None
+            pass
         self.time_step_input.setText(str(global_vars.TIME_STEP))
         self.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
         global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
@@ -576,6 +577,7 @@ class MainWindow(QMainWindow):
 
         Advance index and render."""
         img_helpers.next_img()
+        self.orient_curr_image(global_vars.VIEW)
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
 
@@ -588,6 +590,7 @@ class MainWindow(QMainWindow):
 
         Decrement index and render."""
         img_helpers.previous_img()
+        self.orient_curr_image(global_vars.VIEW)
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
 

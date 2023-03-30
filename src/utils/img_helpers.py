@@ -1,6 +1,6 @@
-"""Image helper functions.
+"""Image helper functions that don't quite fit into the main algorithm, unlike imgproc.py.
 
-Holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
+Mostly holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
 
 from typing import Union
 import SimpleITK as sitk
@@ -9,7 +9,6 @@ from enum import Enum
 import src.utils.global_vars as global_vars
 from src.utils.constants import degrees_to_radians
 import src.utils.constants as constants
-import src.utils.user_settings as user_settings
 
 
 def update_image_groups(path_list: list[Path]) -> None:
@@ -92,6 +91,7 @@ def clear_globals():
 
 
 # TODO: Add more properties?
+# TODO: Implement some tolerance for spacing
 def get_properties(img: sitk.Image) -> tuple:
     """Tuple of properties of a sitk.Image.
 
@@ -153,9 +153,10 @@ def orient_curr_image(view: Enum) -> None:
     oriented: sitk.Image = global_vars.ORIENT_FILTER.Execute(curr_image())
     set_curr_image(oriented)
 
+
 def curr_image_size() -> tuple:
     """Return dimensions of current image.
-    
+
     :return: dimensions
     :rtype: tuple"""
     return curr_image().GetSize()
@@ -163,9 +164,6 @@ def curr_image_size() -> tuple:
 
 def curr_rotated_slice() -> sitk.Image:
     """Return 2D rotated slice of the current image determined by global rotation and slice settings.
-
-    Smoothing occurs here and is rendered if user_settings.SMOOTH_BEFORE_RENDERING. Else, smoothing occurs
-    in imgproc.contour.
 
     Sets global_vars.EULER_3D_TRANSFORM's rotation values but not its center since all loaded images should
     have the same center.
@@ -187,17 +185,8 @@ def curr_rotated_slice() -> sitk.Image:
         rotated_slice = rotated_image[:, global_vars.Y_CENTER, :]
     else:
         rotated_slice = rotated_image[:, :, global_vars.SLICE]
-    if user_settings.DEBUG and user_settings.SMOOTH_BEFORE_RENDERING:
-        print(
-            "img_helpers.curr_rotated_slice() smoothed the image before rendering (i.e., user sees smoothed slice)"
-        )
-    return (
-        sitk.GradientAnisotropicDiffusionImageFilter().Execute(
-            sitk.Cast(rotated_slice, sitk.sitkFloat64)
-        )
-        if user_settings.SMOOTH_BEFORE_RENDERING
-        else rotated_slice
-    )
+
+    return rotated_slice
 
 
 def curr_smooth_slice() -> sitk.Image:
