@@ -141,10 +141,10 @@
              <string>Control X rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
             </property>
             <property name="minimum">
-             <number>-90</number>
+             <number>-180</number>
             </property>
             <property name="maximum">
-             <number>90</number>
+             <number>180</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -192,10 +192,10 @@
              <string>Control Y rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
             </property>
             <property name="minimum">
-             <number>-90</number>
+             <number>-180</number>
             </property>
             <property name="maximum">
-             <number>90</number>
+             <number>180</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>

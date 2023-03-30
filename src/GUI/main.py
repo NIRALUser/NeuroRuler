@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
         self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
-        self.action_test_show_resource.triggered.connect(self.test_show_resource)
+        self.action_test_show_resource.triggered.connect(test_stuff)
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
         self.action_print_properties.triggered.connect(print_properties)
@@ -606,15 +606,10 @@ class MainWindow(QMainWindow):
         self.render_curr_slice()
         self.render_all_sliders()
 
-    def test_show_resource(self) -> None:
-        """Connected to Test > Test show resource. Dummy function for testing stuff.
-
-        Currently displays `help.svg` (`help.svg` not in the repo since it's compiled in resources.py).
-        """
-        self.image.setPixmap(QPixmap(f":/{settings.THEME_NAME}/help.svg"))
-        self.image.setStatusTip(
-            "This is intentional, if it's a question mark then that's good :), means we can display icons"
-        )
+    def test_stuff(self) -> None:
+        """Connected to Test > Test show resource. Dummy function for testing stuff."""
+        print(curr_image().GetDirection())
+        curr_image().SetDirection((-1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0))
 
     # TODO: File name should also include circumference when not SETTINGS_VIEW_ENABLED?
     def export_curr_slice_as_img(self, extension: str):

@@ -25,6 +25,6 @@
     "MIN_HEIGHT_RATIO": 0.5,
     // Maximum width and height of the GUI as a ratio of primary monitor size.
     // Enter a number between 0 (not inclusive) and 1.
-    "MAX_WIDTH_RATIO": 0.6,
-    "MAX_HEIGHT_RATIO": 0.6
+    "MAX_WIDTH_RATIO": 0.9,
+    "MAX_HEIGHT_RATIO": 0.9
 }
