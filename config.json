@@ -1,30 +1,30 @@
-// Comments beginning with // are ignored.
+// Lines beginning with // are ignored comments.
 // Use "True" or "False" for binary options
 // For other field types, the comments specify what the allowed values are.
-// Do not add or remove fields in this file if you're a user
-// If you're a developer who's adding or removing options, modify parser.py and constants.EXPECTED_NUM_FIELDS_IN_JSON
+// If you're a user, do not change the number of fields in this file. Only modify values.
+// If you're a developer who's adding or removing fields, modify parser.py and constants.EXPECTED_NUM_FIELDS_IN_JSON
 {
-    // Print debugging messages during execution
+    // Print debugging messages during execution.
     "DEBUG": "False",
-    // Smooth the image before rendering it
+    // Smooth the image before rendering it.
     "SMOOTH_BEFORE_RENDERING": "False",
-    // Directory to store exported images in
+    // Directory to store exported images in. Enter a path.
     "IMG_DIR": "img",
-    // Directory that the file browser (File > Open/Add images) should start searching from
+    // Directory that the file browser (File > Open/Add images) should start searching from. Enter a path.
     "FILE_BROWSER_START_DIR": "ExampleData",
-    // Whether exported file names use the image number in the program or the original file name
+    // Whether exported file names use the image number in the program or the original file name.
     "EXPORTED_FILE_NAMES_USE_INDEX": "False",
-    // Options: dark, dark-hct, light, light-hct
+    // Options: dark, dark-hct, light, light-hct.
     "THEME_NAME": "dark-hct",
     // Defaults to "" (empty string) to be automatically set by THEME_NAME.
-    // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that
+    // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that.
     "CONTOUR_COLOR": "",
     // Minimum width and height of the GUI as a ratio of primary monitor size.
-    // Enter a number between 0 (not inclusive) and 1.
+    // Enter a number in the range (0, 1]
     "MIN_WIDTH_RATIO": 0.6,
     "MIN_HEIGHT_RATIO": 0.5,
     // Maximum width and height of the GUI as a ratio of primary monitor size.
-    // Enter a number between 0 (not inclusive) and 1.
-    "MAX_WIDTH_RATIO": 0.6,
-    "MAX_HEIGHT_RATIO": 0.6
+    // Enter a number in the range (0, 1]
+    "MAX_WIDTH_RATIO": 0.9,
+    "MAX_HEIGHT_RATIO": 0.9
 }

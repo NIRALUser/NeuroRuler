@@ -53,6 +53,7 @@ from src.utils.img_helpers import (
     curr_path,
     get_curr_properties_tuple,
     get_middle_of_z_dimension,
+    get_curr_spacing,
 )
 
 import src.utils.img_helpers as img_helpers
@@ -95,6 +96,7 @@ class MainWindow(QMainWindow):
         self.action_print_metadata.triggered.connect(print_metadata)
         self.action_print_dimensions.triggered.connect(print_dimensions)
         self.action_print_properties.triggered.connect(print_properties)
+        self.action_print_spacing.triggered.connect(print_spacing)
         self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -559,6 +561,12 @@ def print_properties() -> None:
     pprint.pprint(OrderedDict(zip(fields, curr_properties)))
 
 
+# Spacing doesn't change when the image rotates.
+def print_spacing() -> None:
+    """Print current image's spacing to terminal."""
+    print(get_curr_spacing())
+
+
 def main() -> None:
     """Main entrypoint of GUI."""
     # This import can't go at the top of the file
@@ -604,6 +612,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     import src.utils.parser as parser
-
+    parser.parse_json()
     parser.parse_gui_cli()
     main()

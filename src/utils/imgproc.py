@@ -7,6 +7,7 @@ import numpy as np
 import src.utils.exceptions as exceptions
 from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE
 import src.utils.user_settings as settings
+from src.utils.img_helpers import get_curr_spacing
 
 
 # The RV is a np array, not sitk.Image
@@ -131,3 +132,42 @@ def length_of_contour(
     # True means we assume the contour is a closed curve.
     arc_length = cv2.arcLength(parent_contour, True)
     return arc_length
+
+
+def curr_arc_length(contour_boundary_points: np.ndarray) -> float:
+     """Given a numpy array representing boundary points of a contour (i.e. the result of `cv2.findContours`),
+     return arc length using the current image's x and y spacing values. Slices for which
+     circumference is calculated are always parallel to z, so the z spacing value is always ignored.
+
+     TODO: Not 100% sure if x and y are in the right order here
+
+     :param contour_boundary_points: Looks like [[[122  76]] [[121  77]] [[107  77]] ... [[106  78]]]. The return value of `cv2.findContours`.
+     :type contour_boundary_points: np.ndarray"""
+     assert len(contour_boundary_points) > 1
+     arc_length: float = 0
+     spacing: tuple = get_curr_spacing()
+     x_spacing: float = spacing[0]
+     y_spacing: float = spacing[1]
+     for i in range(len(contour_boundary_points) - 1):
+         # contours[0] would return [[x y]], so need to do an additional [0] index to just get [x y]
+         arc_length += distance_2d(
+             contour_boundary_points[i][0], contour_boundary_points[i + 1][0], x_spacing, y_spacing)
+     # Get distance between first and last points
+     arc_length += distance_2d(
+         contour_boundary_points[-1][0], contour_boundary_points[0][0], x_spacing, y_spacing)
+     return arc_length
+
+
+def distance_2d(x, y, x_spacing: float, y_spacing: float) -> float:
+     """Return the distance between two 2D iterables (list or tuple) given x and y spacing values.
+     
+     :param x: 2D point
+     :type x: iterable
+     :param y: 2D point
+     :type y: iterable
+     :param x_spacing:
+     :type x_spacing: float
+     :param y_spacing:
+     :type y_spacing: float"""
+     assert len(x) == 2 and len(y) == 2
+     return np.sqrt((x_spacing * (x[0] - x[1])) ** 2 + (y_spacing * (y[0] - y[1])) ** 2)

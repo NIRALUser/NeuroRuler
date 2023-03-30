@@ -220,6 +220,11 @@ def get_curr_properties_tuple() -> tuple:
     return list(global_vars.IMAGE_GROUPS.keys())[global_vars.CURR_BATCH_INDEX]
 
 
+def get_curr_spacing() -> tuple:
+    """Return spacing of the current image."""
+    return curr_image().GetSpacing()
+
+
 def get_middle_of_z_dimension(img: sitk.Image) -> int:
     """int((img.GetSize()[2] - 1) / 2)
 
