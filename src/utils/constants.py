@@ -32,6 +32,9 @@ TODO: Support .txt for loading image paths from text file (which we can quite ea
 EXAMPLE_DATA_DIR: Path = Path("ExampleData")
 """Directory for storing example data."""
 
+UI_FILE_PATH: Path = Path("src") / "GUI" / "mainwindow.ui"
+COMPILED_UI_FILE_PATH: Path = Path("src") / "GUI" / "ui_mainwindow.py"
+
 THEME_DIR: Path = Path("src") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
 THEMES: list[str] = []
