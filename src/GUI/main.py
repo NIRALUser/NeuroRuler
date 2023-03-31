@@ -31,6 +31,7 @@ import pprint
 # This is used only in print_properties()
 from collections import OrderedDict
 
+from src.utils.constants import View
 import src.utils.constants as constants
 
 # Note, do not use imports like
@@ -47,17 +48,15 @@ from src.GUI.helpers import (
 from src.utils.img_helpers import (
     initialize_globals,
     update_image_groups,
-    curr_image,
-    curr_image_size,
-    set_curr_image,
-    curr_rotated_slice,
-    curr_smooth_slice,
-    curr_metadata,
-    curr_physical_units,
-    curr_path,
+    get_curr_image,
+    get_curr_image_size,
+    get_curr_rotated_slice,
+    get_curr_smooth_slice,
+    get_curr_metadata,
+    get_curr_physical_units,
+    get_curr_path,
     get_curr_properties_tuple,
     get_middle_dimension,
-    get_center_of_rotation,
 )
 
 import src.utils.img_helpers as img_helpers
@@ -403,7 +402,7 @@ class MainWindow(QMainWindow):
         if not global_vars.SETTINGS_VIEW_ENABLED:
             self.set_view_z()
 
-        rotated_slice: sitk.Image = curr_rotated_slice()
+        rotated_slice: sitk.Image = get_curr_rotated_slice()
 
         slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
@@ -422,7 +421,7 @@ class MainWindow(QMainWindow):
 
         elif global_vars.VIEW != constants.View.Z:
             z_indicator: np.ndarray = np.zeros(slice_np.shape)
-            z_indicator[curr_image_size()[2] - global_vars.SLICE - 1, :] = 1
+            z_indicator[get_curr_image_size()[2] - global_vars.SLICE - 1, :] = 1
             mask_QImage(
                 q_img,
                 np.transpose(z_indicator),
@@ -441,10 +440,10 @@ class MainWindow(QMainWindow):
 
         conductance: str = self.conductance_parameter_input.displayText()
         try:
-            float(conductance)
             global_vars.CONDUCTANCE_PARAMETER = float(conductance)
         except ValueError:
-            pass
+            if settings.DEBUG:
+                print("Conductance must be a float!")
         self.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
         self.conductance_parameter_input.setPlaceholderText(
             str(global_vars.CONDUCTANCE_PARAMETER)
@@ -455,10 +454,10 @@ class MainWindow(QMainWindow):
 
         iterations: str = self.smoothing_iterations_input.displayText()
         try:
-            int(iterations)
             global_vars.CONDUCTANCE_PARAMETER = int(iterations)
         except ValueError:
-            pass
+            if settings.DEBUG:
+                print("Iterations must be an integer!")
         self.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
         self.smoothing_iterations_input.setPlaceholderText(
             str(global_vars.SMOOTHING_ITERATIONS)
@@ -469,10 +468,10 @@ class MainWindow(QMainWindow):
 
         time_step: str = self.time_step_input.displayText()
         try:
-            float(time_step)
             global_vars.TIME_STEP = float(time_step)
         except ValueError:
-            pass
+            if settings.DEBUG:
+                print("Time step must be a float!")
         self.time_step_input.setText(str(global_vars.TIME_STEP))
         self.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
         global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
@@ -483,7 +482,7 @@ class MainWindow(QMainWindow):
 
         self.set_view_z()
 
-        smooth_slice: sitk.Image = curr_smooth_slice()
+        smooth_slice: sitk.Image = get_curr_smooth_slice()
 
         slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
 
@@ -495,7 +494,7 @@ class MainWindow(QMainWindow):
 
     def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
         """Called after pressing Apply or when
-        not SETTINGS_VIEW_ENABLED and (pressing Next or Previous or Remove Image)
+        (not SETTINGS_VIEW_ENABLED and (pressing Next or Previous or Remove Image))
 
         Computes circumference from binary_contour_slice and renders circumference label.
 
@@ -510,7 +509,7 @@ class MainWindow(QMainWindow):
             raise Exception(
                 "Rendering circumference label when global_vars.SETTINGS_VIEW_ENABLED"
             )
-        units: Union[str, None] = curr_physical_units()
+        units: Union[str, None] = get_curr_physical_units()
         circumference: float = imgproc.length_of_contour(binary_contour_slice)
         self.circumference_label.setText(
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
@@ -527,9 +526,9 @@ class MainWindow(QMainWindow):
         self.image_num_label.setText(
             f"Image {global_vars.CURR_IMAGE_INDEX + 1} of {len(global_vars.IMAGE_DICT)}"
         )
-        self.image_path_label.setText(str(curr_path().name))
-        self.image_path_label.setStatusTip(str(curr_path()))
-        self.image.setStatusTip(str(curr_path()))
+        self.image_path_label.setText(str(get_curr_path().name))
+        self.image_path_label.setStatusTip(str(get_curr_path()))
+        self.image.setStatusTip(str(get_curr_path()))
 
     def render_all_sliders(self) -> None:
         """Sets all slider values to the global rotation and slice values.
@@ -543,7 +542,7 @@ class MainWindow(QMainWindow):
         self.x_slider.setValue(global_vars.THETA_X)
         self.y_slider.setValue(global_vars.THETA_Y)
         self.z_slider.setValue(global_vars.THETA_Z)
-        self.slice_slider.setMaximum(curr_image().GetSize()[2] - 1)
+        self.slice_slider.setMaximum(get_curr_image().GetSize()[2] - 1)
         self.slice_slider.setValue(global_vars.SLICE)
         self.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
         self.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
@@ -642,7 +641,7 @@ class MainWindow(QMainWindow):
         global_vars.THETA_X = 0
         global_vars.THETA_Y = 0
         global_vars.THETA_Z = 0
-        global_vars.SLICE = get_middle_dimension(curr_image(), 2)
+        global_vars.SLICE = get_middle_dimension(get_curr_image(), View.Z)
         self.render_curr_slice()
         self.render_all_sliders()
 
@@ -650,11 +649,11 @@ class MainWindow(QMainWindow):
         """Connected to Debug > Test stuff. Dummy button and function for easily testing stuff.
 
         Assume that anything you put here will be overwritten freely."""
-        curr_img = curr_image()
+        curr_img = get_curr_image()
         reorient_filter = sitk.DICOMOrientImageFilter()
         reorient_filter.SetDesiredCoordinateOrientation("LPS")
         new_img = reorient_filter.Execute(curr_img)
-        global_vars.IMAGE_DICT[curr_path()] = new_img
+        global_vars.IMAGE_DICT[get_curr_path()] = new_img
         self.render_curr_slice()
 
     # TODO: File name should also include circumference when not SETTINGS_VIEW_ENABLED?
@@ -678,7 +677,7 @@ class MainWindow(QMainWindow):
         file_name = (
             global_vars.CURR_IMAGE_INDEX + 1
             if settings.EXPORTED_FILE_NAMES_USE_INDEX
-            else curr_path().name
+            else get_curr_path().name
         )
         path: str = str(
             settings.IMG_DIR
@@ -699,7 +698,7 @@ def print_metadata() -> None:
     if not len(global_vars.IMAGE_DICT):
         print("Can't print metadata when there's no image!")
         return
-    pprint.pprint(curr_metadata())
+    pprint.pprint(get_curr_metadata())
 
 
 def print_dimensions() -> None:
@@ -707,7 +706,7 @@ def print_dimensions() -> None:
     if not len(global_vars.IMAGE_DICT):
         print("Can't print dimensions when there's no image!")
         return
-    print(curr_image().GetSize())
+    print(get_curr_image().GetSize())
 
 
 # TODO: If updating img_helpers.get_properties(), this needs to be slightly adjusted!
@@ -735,7 +734,7 @@ def print_direction() -> None:
     if not len(global_vars.IMAGE_DICT):
         print("Can't print direction when there's no image!")
         return
-    print(curr_image().GetDirection())
+    print(get_curr_image().GetDirection())
 
 
 def main() -> None:

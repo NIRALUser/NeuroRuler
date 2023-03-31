@@ -45,7 +45,7 @@ def mask_QImage(
 
     QImage and numpy use [reversed w,h order](https://stackoverflow.com/a/68220805/18479243).
 
-    To be clear, this function checks that
+    This function checks that
     `q_img.size().width() == binary_mask.shape[0]` and `q_img.size().height() == binary_mask.shape[1]`.
 
     :param q_img:
