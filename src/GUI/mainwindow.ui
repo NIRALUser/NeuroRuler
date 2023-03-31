@@ -1138,9 +1138,6 @@
     <addaction name="action_print_dimensions"/>
     <addaction name="action_print_properties"/>
     <addaction name="action_print_direction"/>
-    <addaction name="action_orient_for_x_view"/>
-    <addaction name="action_orient_for_y_view"/>
-    <addaction name="action_orient_for_z_view"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>

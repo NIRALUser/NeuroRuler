@@ -5,8 +5,12 @@ Loads `src/GUI/mainwindow.ui`, made in QtDesigner.
 Loads `.qss` stylesheets and `resources.py` (icons) files, generated
 by BreezeStyleSheets. Our fork of the repo: https://github.com/COMP523TeamD/BreezeStyleSheets.
 
-Native menu bar (macOS) is enabled since we are now using only one window.
-See https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/9."""
+If adding a new GUI element (in the GUI or in the menubar, whatever), you'll have to modify
+modify __init__ and settings_view_toggle.
+
+Edge cases: If this element should be disabled after enable_elements or enabled after disable_elements,
+then you will need to modify those."""
+
 
 import importlib
 import sys
@@ -18,13 +22,19 @@ from enum import Enum
 import SimpleITK as sitk
 import numpy as np
 
-from PySide6 import QtWidgets
 from PySide6 import QtGui, QtCore
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide6.QtGui import QPixmap, QAction
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QFileDialog,
+    QMenu,
+    QMenuBar,
+    QWidgetAction,
+    QWidget,
+)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import Qt
-Qt.FindChildOption.FindChildrenRecursively
 
 from src.GUI.ui_mainwindow import Ui_MainWindow
 
@@ -68,6 +78,7 @@ import src.utils.img_helpers as img_helpers
 
 LOADER: QUiLoader = QUiLoader()
 PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
+
 DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
 DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
 GITHUB_LINK: str = "https://github.com/COMP523TeamD/HeadCircumferenceTool"
@@ -109,15 +120,6 @@ class MainWindow(QMainWindow):
         self.ui.action_print_dimensions.triggered.connect(print_dimensions)
         self.ui.action_print_properties.triggered.connect(print_properties)
         self.ui.action_print_direction.triggered.connect(print_direction)
-        self.ui.action_orient_for_x_view.triggered.connect(
-            lambda: self.orient_curr_image(constants.View.X)
-        )
-        self.ui.action_orient_for_y_view.triggered.connect(
-            lambda: self.orient_curr_image(constants.View.Y)
-        )
-        self.ui.action_orient_for_z_view.triggered.connect(
-            lambda: self.orient_curr_image(constants.View.Z)
-        )
         self.ui.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -150,50 +152,20 @@ class MainWindow(QMainWindow):
         self.ui.z_view_radio_button.clicked.connect(self.update_view)
         self.show()
 
-    def render_initial_view(self) -> None:
-        """Called after File > Open. Enables GUI elements."""
-        self.ui.action_open.setEnabled(True)
-        self.ui.action_add_images.setEnabled(True)
-        self.ui.action_remove_image.setEnabled(True)
-        self.ui.image.setEnabled(True)
-        self.ui.image_path_label.setEnabled(True)
-        self.ui.image_num_label.setEnabled(True)
-        self.ui.previous_button.setEnabled(True)
-        self.ui.next_button.setEnabled(True)
-        self.ui.apply_button.setEnabled(True)
-        self.ui.x_slider.setEnabled(True)
-        self.ui.y_slider.setEnabled(True)
-        self.ui.z_slider.setEnabled(True)
-        self.ui.slice_slider.setEnabled(True)
-        self.ui.x_rotation_label.setEnabled(True)
-        self.ui.y_rotation_label.setEnabled(True)
-        self.ui.z_rotation_label.setEnabled(True)
-        self.ui.slice_num_label.setEnabled(True)
-        self.ui.reset_button.setEnabled(True)
-        self.ui.smoothing_preview_button.setEnabled(True)
-        self.ui.otsu_radio_button.setEnabled(True)
-        self.ui.binary_radio_button.setEnabled(True)
-        self.ui.threshold_preview_button.setEnabled(True)
-        self.ui.action_export_csv.setEnabled(False)
-        self.ui.action_export_png.setEnabled(True)
-        self.ui.action_export_jpg.setEnabled(True)
-        self.ui.action_export_bmp.setEnabled(True)
-        self.ui.action_export_ppm.setEnabled(True)
-        self.ui.action_export_xbm.setEnabled(True)
-        self.ui.action_export_xpm.setEnabled(True)
-        self.ui.action_orient_for_x_view.setEnabled(True)
-        self.ui.action_orient_for_y_view.setEnabled(True)
-        self.ui.action_orient_for_z_view.setEnabled(True)
-        self.ui.smoothing_preview_button.setEnabled(True)
-        self.ui.conductance_parameter_label.setEnabled(True)
-        self.ui.conductance_parameter_input.setEnabled(True)
-        self.ui.smoothing_iterations_label.setEnabled(True)
-        self.ui.smoothing_iterations_input.setEnabled(True)
-        self.ui.time_step_label.setEnabled(True)
-        self.ui.time_step_input.setEnabled(True)
-        self.ui.x_view_radio_button.setEnabled(True)
-        self.ui.y_view_radio_button.setEnabled(True)
-        self.ui.z_view_radio_button.setEnabled(True)
+    def enable_elements(self) -> None:
+        """Called after File > Open.
+
+        Enables GUI elements. Explicitly disables some (e.g., Export CSV menu item).
+        """
+        # findChildren searches recursively by default
+        for widget in self.findChildren(QWidget):
+            widget.setEnabled(True)
+
+        # Menu stuff
+        for widget in self.findChildren(QAction):
+            widget.setEnabled(True)
+
+        self.ui.action_export_csv.setEnabled(not global_vars.SETTINGS_VIEW_ENABLED)
 
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
@@ -220,9 +192,6 @@ class MainWindow(QMainWindow):
         self.ui.action_open.setEnabled(settings_view_enabled)
         self.ui.action_add_images.setEnabled(settings_view_enabled)
         self.ui.action_remove_image.setEnabled(settings_view_enabled)
-        self.ui.action_orient_for_x_view.setEnabled(settings_view_enabled)
-        self.ui.action_orient_for_y_view.setEnabled(settings_view_enabled)
-        self.ui.action_orient_for_z_view.setEnabled(settings_view_enabled)
         self.ui.x_slider.setEnabled(settings_view_enabled)
         self.ui.y_slider.setEnabled(settings_view_enabled)
         self.ui.z_slider.setEnabled(settings_view_enabled)
@@ -250,62 +219,32 @@ class MainWindow(QMainWindow):
         self.ui.y_view_radio_button.setEnabled(settings_view_enabled)
         self.ui.z_view_radio_button.setEnabled(settings_view_enabled)
 
-    # TODO: Could just construct a new MainWindow()? Maybe might not work?
     def disable_elements(self) -> None:
-        """Called when the list is now empty, i.e. just removed from list of length 1."""
+        """Called when the list is now empty, i.e. just removed from list of length 1.
+
+        Explicitly enables elements that should never be disabled and sets default text.
+        """
+        central_widget = self.findChildren(QWidget, "centralwidget")[0]
+        menubar = self.menuBar()
+
+        for gui_element in central_widget.findChildren(QWidget):
+            gui_element.setEnabled(False)
+
+        # findChildren searches recursively by default
+        for menu in menubar.findChildren(QMenu):
+            for action in menu.actions():
+                action.setEnabled(False)
+
         self.ui.action_open.setEnabled(True)
-        self.ui.action_add_images.setEnabled(False)
-        self.ui.action_remove_image.setEnabled(False)
-        self.ui.circumference_label.setEnabled(False)
         self.ui.circumference_label.setText(DEFAULT_CIRCUMFERENCE_LABEL_TEXT)
-        # Keep this enabled to show the text "Select images..." without it being transparent
         self.ui.image.setEnabled(True)
         self.ui.image.clear()
         self.ui.image.setText(DEFAULT_IMAGE_TEXT)
         self.ui.image.setStatusTip(DEFAULT_IMAGE_STATUS_TEXT)
-        self.ui.image_path_label.setEnabled(False)
         self.ui.image_path_label.setText(DEFAULT_IMAGE_PATH_LABEL_TEXT)
-        self.ui.image_num_label.setEnabled(False)
         self.ui.image_num_label.setText(DEFAULT_IMAGE_NUM_LABEL_TEXT)
-        self.ui.previous_button.setEnabled(False)
-        self.ui.next_button.setEnabled(False)
-        self.ui.apply_button.setEnabled(False)
         self.ui.apply_button.setText("Apply")
-        self.ui.x_slider.setEnabled(False)
-        self.ui.y_slider.setEnabled(False)
-        self.ui.z_slider.setEnabled(False)
-        self.ui.slice_slider.setEnabled(False)
-        self.ui.reset_button.setEnabled(False)
-        self.ui.action_export_csv.setEnabled(False)
-        self.ui.action_export_png.setEnabled(False)
-        self.ui.action_export_jpg.setEnabled(False)
-        self.ui.action_export_bmp.setEnabled(False)
-        self.ui.action_export_ppm.setEnabled(False)
-        self.ui.action_export_xbm.setEnabled(False)
-        self.ui.action_export_xpm.setEnabled(False)
-        self.ui.x_rotation_label.setEnabled(False)
-        self.ui.y_rotation_label.setEnabled(False)
-        self.ui.z_rotation_label.setEnabled(False)
-        self.ui.slice_num_label.setEnabled(False)
-        self.ui.circumference_label.setEnabled(False)
-        self.ui.export_button.setEnabled(False)
-        self.ui.smoothing_preview_button.setEnabled(False)
-        self.ui.otsu_radio_button.setEnabled(False)
-        self.ui.binary_radio_button.setEnabled(False)
-        self.ui.threshold_preview_button.setEnabled(False)
-        self.ui.smoothing_preview_button.setEnabled(False)
-        self.ui.conductance_parameter_label.setEnabled(False)
-        self.ui.conductance_parameter_input.setEnabled(False)
-        self.ui.smoothing_iterations_label.setEnabled(False)
-        self.ui.smoothing_iterations_input.setEnabled(False)
-        self.ui.time_step_label.setEnabled(False)
-        self.ui.time_step_input.setEnabled(False)
-        self.ui.x_view_radio_button.setChecked(False)
-        self.ui.y_view_radio_button.setChecked(False)
         self.ui.z_view_radio_button.setChecked(True)
-        self.ui.x_view_radio_button.setEnabled(False)
-        self.ui.y_view_radio_button.setEnabled(False)
-        self.ui.z_view_radio_button.setEnabled(False)
 
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
@@ -344,7 +283,7 @@ class MainWindow(QMainWindow):
         if not extend:
             initialize_globals(path_list)
             self.render_all_sliders()
-            self.render_initial_view()
+            self.enable_elements()
             self.render_image_num_and_path()
             self.orient_curr_image(global_vars.VIEW)
             self.render_curr_slice()
@@ -355,6 +294,7 @@ class MainWindow(QMainWindow):
             # Must render image_num.
             # Does not need to render current slice. Images are added to the end of the dict.
             # And adding duplicate key doesn't change key order.
+            self.enable_elements()
             update_image_groups(path_list)
             self.render_image_num_and_path()
 
@@ -451,7 +391,9 @@ class MainWindow(QMainWindow):
         except ValueError:
             if settings.DEBUG:
                 print("Conductance must be a float!")
-        self.ui.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
+        self.ui.conductance_parameter_input.setText(
+            str(global_vars.CONDUCTANCE_PARAMETER)
+        )
         self.ui.conductance_parameter_input.setPlaceholderText(
             str(global_vars.CONDUCTANCE_PARAMETER)
         )
@@ -465,7 +407,9 @@ class MainWindow(QMainWindow):
         except ValueError:
             if settings.DEBUG:
                 print("Iterations must be an integer!")
-        self.ui.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
+        self.ui.smoothing_iterations_input.setText(
+            str(global_vars.SMOOTHING_ITERATIONS)
+        )
         self.ui.smoothing_iterations_input.setPlaceholderText(
             str(global_vars.SMOOTHING_ITERATIONS)
         )
@@ -693,6 +637,10 @@ class MainWindow(QMainWindow):
         self.ui.image.pixmap().save(path, extension)
 
     def orient_curr_image(self, view: Enum) -> None:
+        """Mutate the current image by applying ORIENT_FILTER on it.
+
+        The orientation applied depends on the view. See img_helpers.orient_curr_image.
+        """
         img_helpers.orient_curr_image(view)
 
 
@@ -789,6 +737,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     import src.utils.parser as parser
+
     parser.parse_json()
     parser.parse_gui_cli()
     main()
