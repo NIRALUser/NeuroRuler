@@ -185,6 +185,8 @@ class MainWindow(QMainWindow):
         else:
             self.update_smoothing_settings()
             self.ui.apply_button.setText("Adjust")
+            global_vars.VIEW = View.Z
+            self.orient_curr_image()
             # Ignore the type annotation error here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
@@ -286,7 +288,7 @@ class MainWindow(QMainWindow):
             self.render_all_sliders()
             self.enable_elements()
             self.render_image_num_and_path()
-            self.orient_curr_image(global_vars.VIEW)
+            self.orient_curr_image()
             self.render_curr_slice()
         else:
             # Doesn't need to re-render sliders to set max value of slice slider.
@@ -323,7 +325,7 @@ class MainWindow(QMainWindow):
             self.ui.x_view_radio_button.setChecked(False)
             self.ui.y_view_radio_button.setChecked(False)
 
-        self.orient_curr_image(global_vars.VIEW)
+        self.orient_curr_image()
         self.render_curr_slice()
 
     def set_view_z(self) -> None:
@@ -462,7 +464,19 @@ class MainWindow(QMainWindow):
                 "Rendering circumference label when global_vars.SETTINGS_VIEW_ENABLED"
             )
         units: Union[str, None] = get_curr_physical_units()
-        circumference: float = imgproc.length_of_contour(binary_contour_slice)
+
+        # Euler3D rotation has no effect on spacing. This is the correct spacing
+        # This is also the same as get_curr_rotated_slice().GetSpacing(), just without index [2]
+        spacing: tuple = get_curr_image().GetSpacing()
+
+        if settings.DEBUG:
+            print(f"Computing circumference, and this is the spacing: {spacing}")
+
+        # TODO
+        # binary_contour_slice is the transpose of the rotated_slice
+        # Thus, should pass spacing values in the reverse order?
+        circumference: float = imgproc.length_of_contour_with_spacing(binary_contour_slice, spacing[1], spacing[0])
+        # circumference: float = imgproc.length_of_contour(binary_contour_slice)
         self.ui.circumference_label.setText(
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )
@@ -528,7 +542,7 @@ class MainWindow(QMainWindow):
 
         Advance index and render."""
         img_helpers.next_img()
-        self.orient_curr_image(global_vars.VIEW)
+        self.orient_curr_image()
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
 
@@ -637,12 +651,11 @@ class MainWindow(QMainWindow):
         )
         self.ui.image.pixmap().save(path, extension)
 
-    def orient_curr_image(self, view: Enum) -> None:
+    def orient_curr_image(self) -> None:
         """Mutate the current image by applying ORIENT_FILTER on it.
-
-        The orientation applied depends on the view. See img_helpers.orient_curr_image.
-        """
-        img_helpers.orient_curr_image(view)
+        
+        Orients for the current global view."""
+        img_helpers.orient_curr_image(global_vars.VIEW)
 
 
 def print_metadata() -> None:
