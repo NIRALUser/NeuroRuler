@@ -120,6 +120,7 @@ class MainWindow(QMainWindow):
         self.ui.action_print_dimensions.triggered.connect(print_dimensions)
         self.ui.action_print_properties.triggered.connect(print_properties)
         self.ui.action_print_direction.triggered.connect(print_direction)
+        self.ui.action_print_spacing.triggered.connect(print_spacing)
         self.ui.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -690,6 +691,13 @@ def print_direction() -> None:
         print("Can't print direction when there's no image!")
         return
     print(get_curr_image().GetDirection())
+
+
+def print_spacing() -> None:
+    if not len(global_vars.IMAGE_DICT):
+        print("Can't print spacing when there's no image!")
+        return
+    print(get_curr_image().GetSpacing())
 
 
 def main() -> None:

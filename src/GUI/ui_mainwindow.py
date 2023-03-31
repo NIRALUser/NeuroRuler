@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(858, 864)
+        MainWindow.resize(858, 892)
         self.action_documentation = QAction(MainWindow)
         self.action_documentation.setObjectName(u"action_documentation")
         self.action_exit = QAction(MainWindow)
@@ -77,6 +77,8 @@ class Ui_MainWindow(object):
         self.action_orient_for_y_view.setObjectName(u"action_orient_for_y_view")
         self.action_orient_for_z_view = QAction(MainWindow)
         self.action_orient_for_z_view.setObjectName(u"action_orient_for_z_view")
+        self.action_print_spacing = QAction(MainWindow)
+        self.action_print_spacing.setObjectName(u"action_print_spacing")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -604,9 +606,7 @@ class Ui_MainWindow(object):
         self.menu_debug.addAction(self.action_print_dimensions)
         self.menu_debug.addAction(self.action_print_properties)
         self.menu_debug.addAction(self.action_print_direction)
-        self.menu_debug.addAction(self.action_orient_for_x_view)
-        self.menu_debug.addAction(self.action_orient_for_y_view)
-        self.menu_debug.addAction(self.action_orient_for_z_view)
+        self.menu_debug.addAction(self.action_print_spacing)
 
         self.retranslateUi(MainWindow)
 
@@ -780,6 +780,7 @@ class Ui_MainWindow(object):
         self.action_orient_for_x_view.setText(QCoreApplication.translate("MainWindow", u"Orient for X view", None))
         self.action_orient_for_y_view.setText(QCoreApplication.translate("MainWindow", u"Orient for Y view", None))
         self.action_orient_for_z_view.setText(QCoreApplication.translate("MainWindow", u"Orient for Z view", None))
+        self.action_print_spacing.setText(QCoreApplication.translate("MainWindow", u"Print spacing", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
         self.label_10.setText(QCoreApplication.translate("MainWindow", u"Slice Options", None))
         self.x_rotation_label.setText(QCoreApplication.translate("MainWindow", u"X rotation", None))
