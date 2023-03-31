@@ -1,14 +1,14 @@
-"""Image helper functions.
+"""Image helper functions that don't quite fit into the main algorithm, unlike imgproc.py.
 
-Holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
+Mostly holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
 
 from typing import Union
 import SimpleITK as sitk
 from pathlib import Path
+from enum import Enum
 import src.utils.global_vars as global_vars
 from src.utils.constants import degrees_to_radians
 import src.utils.constants as constants
-import src.utils.user_settings as user_settings
 
 
 def update_image_groups(path_list: list[Path]) -> None:
@@ -65,13 +65,16 @@ def initialize_globals(path_list: list[Path]) -> None:
     # Use it to set slice and center of rotation for the group
     curr_img: sitk.Image = curr_image()
     # TODO: Set maximum for the slice slider in the GUI!
-    global_vars.SLICE = get_middle_of_z_dimension(curr_img)
+    global_vars.SLICE = get_middle_dimension(curr_img, 2)
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
     global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
     global_vars.SMOOTHING_FILTER.SetConductanceParameter(3.0)
     global_vars.SMOOTHING_FILTER.SetNumberOfIterations(5)
     global_vars.SMOOTHING_FILTER.SetTimeStep(0.0625)
     global_vars.SETTINGS_VIEW_ENABLED = True
+    global_vars.VIEW = constants.View.Z
+    global_vars.X_CENTER = get_middle_dimension(curr_img, 0)
+    global_vars.Y_CENTER = get_middle_dimension(curr_img, 1)
 
 
 def clear_globals():
@@ -88,6 +91,7 @@ def clear_globals():
 
 
 # TODO: Add more properties?
+# TODO: Implement some tolerance for spacing
 def get_properties(img: sitk.Image) -> tuple:
     """Tuple of properties of a sitk.Image.
 
@@ -122,6 +126,42 @@ def curr_image() -> sitk.Image:
     return global_vars.IMAGE_DICT[curr_path()]
 
 
+def set_curr_image(image: sitk.Image) -> None:
+    """Set the sitk.Image at the current index in global_vars.IMAGE_DICT.
+
+    :param image:
+    :type image: sitk.Image
+    :return: None
+    :rtype: None"""
+    global_vars.IMAGE_DICT[curr_path()] = image
+
+
+def orient_curr_image(view: Enum) -> None:
+    """Given a view enum, set the current image to the oriented version for that view.
+
+    :param image: not mutated
+    :type image: sitk.Image
+    :param view:
+    :type view: View.X, View.Y, or View.Z"""
+    if view not in constants.VIEW_TO_ORIENTATION_STR:
+        raise Exception(
+            "Expected View.X, View.Y, or View.Z but did not get one of those."
+        )
+    global_vars.ORIENT_FILTER.SetDesiredCoordinateOrientation(
+        constants.VIEW_TO_ORIENTATION_STR[view]
+    )
+    oriented: sitk.Image = global_vars.ORIENT_FILTER.Execute(curr_image())
+    set_curr_image(oriented)
+
+
+def curr_image_size() -> tuple:
+    """Return dimensions of current image.
+
+    :return: dimensions
+    :rtype: tuple"""
+    return curr_image().GetSize()
+
+
 def curr_rotated_slice() -> sitk.Image:
     """Return 2D rotated slice of the current image determined by global rotation and slice settings.
 
@@ -135,9 +175,17 @@ def curr_rotated_slice() -> sitk.Image:
         degrees_to_radians(global_vars.THETA_Y),
         degrees_to_radians(global_vars.THETA_Z),
     )
-    rotated_slice: sitk.Image = sitk.Resample(
+    rotated_image: sitk.Image = sitk.Resample(
         curr_image(), global_vars.EULER_3D_TRANSFORM
-    )[:, :, global_vars.SLICE]
+    )
+    rotated_slice: sitk.Image
+    if global_vars.VIEW == constants.View.X:
+        rotated_slice = rotated_image[global_vars.X_CENTER, :, :]
+    elif global_vars.VIEW == constants.View.Y:
+        rotated_slice = rotated_image[:, global_vars.Y_CENTER, :]
+    else:
+        rotated_slice = rotated_image[:, :, global_vars.SLICE]
+
     return rotated_slice
 
 def curr_smooth_slice() -> sitk.Image:
@@ -147,7 +195,9 @@ def curr_smooth_slice() -> sitk.Image:
     :rtype: sitk.Image"""
     rotated_slice: sitk.Image = curr_rotated_slice()
     # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
-    smooth_slice: sitk.Image = global_vars.SMOOTHING_FILTER.Execute(sitk.Cast(rotated_slice, sitk.sitkFloat64))
+    smooth_slice: sitk.Image = global_vars.SMOOTHING_FILTER.Execute(
+        sitk.Cast(rotated_slice, sitk.sitkFloat64)
+    )
     return smooth_slice
 
 
@@ -221,14 +271,15 @@ def get_curr_properties_tuple() -> tuple:
     return list(global_vars.IMAGE_GROUPS.keys())[global_vars.CURR_BATCH_INDEX]
 
 
-def get_middle_of_z_dimension(img: sitk.Image) -> int:
-    """int((img.GetSize()[2] - 1) / 2)
+def get_middle_dimension(img: sitk.Image, axis: int) -> int:
+    """int((img.GetSize()[axis] - 1) / 2)
 
     :param img:
+    :param axis: int (0-2)
     :type img: sitk.Image
-    :return: int((img.GetSize()[2] - 1) / 2)
+    :return: int((img.GetSize()[axis] - 1) / 2)
     :rtype: int"""
-    return int((img.GetSize()[2] - 1) / 2)
+    return int((img.GetSize()[axis] - 1) / 2)
 
 
 def get_center_of_rotation(img: sitk.Image) -> tuple:

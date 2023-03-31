@@ -3,6 +3,8 @@ that the user should not be able to modify directly, unlike user_settings.py."""
 
 import SimpleITK as sitk
 from pathlib import Path
+from enum import Enum
+from src.utils.constants import View
 
 IMAGE_GROUPS: dict[tuple, dict[Path, sitk.Image]] = dict()
 """Mapping from properties tuple to a group of images, where a group of images is a dict[Path, sitk.Image].
@@ -62,6 +64,12 @@ Switching the batch will change the center. Make sure to set it. Or encapsulate 
 
 Rotation values are the global rotation values in global_vars.py."""
 
+ORIENT_FILTER: sitk.DICOMOrientImageFilter = sitk.DICOMOrientImageFilter()
+"""Global sitk.DICOMOrientImageFilter for orienting images.
+
+See https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1DICOMOrientImageFilter.html#details
+and the orientation strings in constants.py. Use ITK-SNAP for the orientations that we copy."""
+
 THETA_X: int = 0
 """In degrees"""
 THETA_Y: int = 0
@@ -71,7 +79,20 @@ THETA_Z: int = 0
 SLICE: int = 0
 """0-indexed"""
 
-SMOOTHING_FILTER: sitk.GradientAnisotropicDiffusionImageFilter = sitk.GradientAnisotropicDiffusionImageFilter()
+X_CENTER: int = 0
+"""Used for changing views."""
+
+Y_CENTER: int = 0
+"""Used for changing views."""
+
+VIEW: Enum = View.Z
+"""Current view.
+
+Uses enum 'View'."""
+
+SMOOTHING_FILTER: sitk.GradientAnisotropicDiffusionImageFilter = (
+    sitk.GradientAnisotropicDiffusionImageFilter()
+)
 """Global sitk.GradientAnisotropicDiffusionImageFilter for image smoothing.
 
 See https://slicer.readthedocs.io/en/latest/user_guide/modules/gradientanisotropicdiffusion.html for more information."""

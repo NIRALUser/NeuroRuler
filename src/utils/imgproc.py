@@ -28,7 +28,9 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
     :type retranspose: bool
     :return: binary (0|1) numpy array with only the points on the contour = 1
     :rtype: np.ndarray"""
-    smooth_slice: sitk.Image = (SMOOTHING_FILTER.Execute(sitk.Cast(mri_slice, sitk.sitkFloat64)))
+    smooth_slice: sitk.Image = SMOOTHING_FILTER.Execute(
+        sitk.Cast(mri_slice, sitk.sitkFloat64)
+    )
 
     otsu: sitk.Image = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
 

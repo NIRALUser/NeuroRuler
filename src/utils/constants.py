@@ -12,11 +12,12 @@ import warnings
 import functools
 from numpy import pi
 from typing import Union
+from enum import Enum
 
 JSON_CONFIG_PATH: Path = Path("config.json")
 """Self-explanatory"""
 
-EXPECTED_NUM_FIELDS_IN_JSON: int = 11
+EXPECTED_NUM_FIELDS_IN_JSON: int = 10
 """Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
 will be raised."""
 
@@ -87,6 +88,31 @@ NIFTI_METADATA_UNITS_KEY: str = "xyzt_units"
 
 NUM_DIGITS_TO_ROUND_TO: int = 3
 """For floats, number of digits n to round to, i.e. round(float, n)."""
+
+View = Enum("View", ["X", "Y", "Z"])
+
+# Got these by looking at ITK-SNAP and
+# https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1DICOMOrientImageFilter.html#details
+# Two characters in each string will make the image oriented properly (i.e., same as ITK-SNAP)
+# The remaining character will affect direction of rotations (CCW vs CW)
+
+# Last 2 are the important ones
+# TODO: X rotation goes the wrong way :(, but it's also wrong for LPI
+X_ORIENTATION_STR: str = "RPI"
+"""Orientation string to pass into sitk.DICOMOrientImageFilter to orient X view correctly."""
+# First and third are the important ones
+Y_ORIENTATION_STR: str = "LPI"
+"""Orientation string to pass into sitk.DICOMOrientImageFilter to orient Y view correctly."""
+# First 2 are the important ones
+Z_ORIENTATION_STR: str = "LPS"
+"""Orientation string to pass into sitk.DICOMOrientImageFilter to orient Z view correctly."""
+
+VIEW_TO_ORIENTATION_STR: dict = {
+    View.X: X_ORIENTATION_STR,
+    View.Y: Y_ORIENTATION_STR,
+    View.Z: Z_ORIENTATION_STR,
+}
+"""Map View enum to its orientation string."""
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
