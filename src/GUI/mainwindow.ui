@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>858</width>
-    <height>864</height>
+    <height>892</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1138,9 +1138,7 @@
     <addaction name="action_print_dimensions"/>
     <addaction name="action_print_properties"/>
     <addaction name="action_print_direction"/>
-    <addaction name="action_orient_for_x_view"/>
-    <addaction name="action_orient_for_y_view"/>
-    <addaction name="action_orient_for_z_view"/>
+    <addaction name="action_print_spacing"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
@@ -1421,6 +1419,11 @@
   <action name="action_orient_for_z_view">
    <property name="text">
     <string>Orient for Z view</string>
+   </property>
+  </action>
+  <action name="action_print_spacing">
+   <property name="text">
+    <string>Print spacing</string>
    </property>
   </action>
  </widget>

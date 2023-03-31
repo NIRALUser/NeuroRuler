@@ -1,6 +1,5 @@
 """Custom exceptions, most of which aren't actually in use rn."""
 
-from pathlib import Path
 from src.utils.constants import deprecated, ROTATION_MAX, ROTATION_MIN, JSON_CONFIG_PATH
 
 

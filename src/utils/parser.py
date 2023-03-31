@@ -10,7 +10,7 @@ import src.utils.constants as constants
 import src.utils.exceptions as exceptions
 
 SETTINGS: dict = dict()
-"""Dict of settings resulting from JSON file parsing. Global within the file."""
+"""Dict of settings resulting from JSON file parsing. Global within this file."""
 
 
 def parse_json() -> None:
