@@ -99,7 +99,7 @@ Note that the number of iterations controls how much smoothing is done within re
 SMOOTHING_ITERATIONS: int = 5
 """Smoothing option.
 
-The more iterations, the more smoothing. Each iteration takes the same amount of time. 
+The more iterations, the more smoothing. Each iteration takes the same amount of time.
 If it takes 10 seconds for one iteration, then it will take 100 seconds for 10 iterations.
 Note that the conductance controls how much each iteration smooths across edges."""
 
