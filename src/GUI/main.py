@@ -366,7 +366,7 @@ class MainWindow(QMainWindow):
         rv_dummy_var: np.ndarray = np.zeros(0)
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
-            if self.otsu_radio_button.isChecked():
+            if self.ui.otsu_radio_button.isChecked():
                 binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
             else:
                 binary_contour_slice: np.ndarray = imgproc.contour2(
@@ -501,7 +501,7 @@ class MainWindow(QMainWindow):
 
         q_pixmap: QPixmap = QPixmap(q_img)
 
-        self.image.setPixmap(q_pixmap)
+        self.ui.image.setPixmap(q_pixmap)
 
     def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
         """Called after pressing Apply or when

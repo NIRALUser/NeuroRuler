@@ -240,7 +240,7 @@ def curr_binary_filter() -> sitk.Image:
 
     :return: filtered 2D rotated slice
     :rtype: sitk.Image"""
-    rotated_slice: sitk.Image = curr_rotated_slice()
+    rotated_slice: sitk.Image = get_curr_rotated_slice()
     filter_slice: sitk.Image = global_vars.BINARY_THRESHOLD_FILTER.Execute(
         sitk.Cast(rotated_slice, sitk.sitkFloat64)
     )
@@ -252,7 +252,7 @@ def curr_otsu_filter() -> sitk.Image:
 
     :return: filtered 2D rotated slice
     :rtype: sitk.Image"""
-    rotated_slice: sitk.Image = curr_rotated_slice()
+    rotated_slice: sitk.Image = get_curr_rotated_slice()
     filter_slice: sitk.Image = global_vars.OTSU_THRESHOLD_FILTER.Execute(
         sitk.Cast(rotated_slice, sitk.sitkFloat64)
     )
