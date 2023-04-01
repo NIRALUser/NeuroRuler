@@ -12,9 +12,10 @@ opencv-python==4.7.0.72
 pytest==6.2.5
 PySide6==6.4.3
 qimage2ndarray==1.10.0
-screeninfo
+screeninfo==0.8.1
 ##############
 # Autoformatting. User does not need, remove later
-black
-black[jupyter]
+black==23.1.0
+black[jupyter]==23.1.0
 ##############
+pre-commit==3.2.1
