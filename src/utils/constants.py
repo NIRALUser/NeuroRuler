@@ -12,11 +12,11 @@ import warnings
 import functools
 from numpy import pi
 from typing import Union
+from enum import Enum
 
 JSON_CONFIG_PATH: Path = Path("config.json")
-"""Self-explanatory"""
-
-EXPECTED_NUM_FIELDS_IN_JSON: int = 11
+"""Settings that configure user_settings.py"""
+EXPECTED_NUM_FIELDS_IN_JSON: int = 10
 """Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
 will be raised."""
 
@@ -32,6 +32,9 @@ TODO: Support .txt for loading image paths from text file (which we can quite ea
 EXAMPLE_DATA_DIR: Path = Path("ExampleData")
 """Directory for storing example data."""
 
+UI_FILE_PATH: Path = Path("src") / "GUI" / "mainwindow.ui"
+COMPILED_UI_FILE_PATH: Path = Path("src") / "GUI" / "ui_mainwindow.py"
+
 THEME_DIR: Path = Path("src") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
 THEMES: list[str] = []
@@ -42,23 +45,18 @@ if len(list(THEME_DIR.glob("*"))) != 0:
             THEMES.append(path.name)
     THEMES = sorted(THEMES)
 else:
-    # TODO: Without this, autodocumentation will crash. Is there a better way around this?
-    print(
-        f"No themes discovered in {str(THEME_DIR)}. Make sure to run from .../HeadCircumferenceTool ."
-    )
+    # Without this, autodocumentation crashes
+    pass
 
 HCT_MAIN_COLOR: str = "b55162"
 """HCT's copyrighted color :P
 
-The pink-ish color used in the midterm presentation. Imperceptibly different from the website logo color.
-
-Shouldn't use this much if we use BreezeStyleSheet themes, in which each theme has a unique
-theme color.
-
-This is more here for reference than actual use in the program."""
+The pink-ish color used in the midterm presentation. Imperceptibly different from the website logo color."""
 
 DARK_THEME_COLOR: str = "3daee9"
+"""Blue that's the main color in dark theme"""
 LIGHT_THEME_COLOR: str = "3daef3"
+"""Blue that's the main color in light theme"""
 
 NUM_CONTOURS_IN_INVALID_SLICE: int = 10
 """If this number of contours or more is detected in a slice after processing by contour()
@@ -86,7 +84,41 @@ NIFTI_METADATA_UNITS_KEY: str = "xyzt_units"
 """In the NIfTI metadata dictionary, the numerical str value attached to this key represents units of the file."""
 
 NUM_DIGITS_TO_ROUND_TO: int = 3
-"""For floats, number of digits n to round to, i.e. round(float, n)."""
+"""For floats, number of digits to round to, i.e. round(float, n)."""
+
+
+class View(Enum):
+    """X, Y, or Z view.
+
+    The letters are assigned indices 0-2 to be used for indexing operations."""
+
+    X = 0
+    Y = 1
+    Z = 2
+
+
+# Got these values by looking at ITK-SNAP and
+# https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1DICOMOrientImageFilter.html#details
+# Two characters in each string orients the image properly (i.e., same as ITK-SNAP)
+# The remaining character affects direction of rotations (CCW vs CW)
+
+# TODO: X rotation goes the wrong way :(, but it's also wrong for LPI
+# Last 2 are the important ones
+X_ORIENTATION_STR: str = "RPI"
+"""Orientation string to pass into sitk.DICOMOrientImageFilter to orient X view correctly."""
+# First and third are the important ones
+Y_ORIENTATION_STR: str = "LPI"
+"""Orientation string to pass into sitk.DICOMOrientImageFilter to orient Y view correctly."""
+# First 2 are the important ones
+Z_ORIENTATION_STR: str = "LPS"
+"""Orientation string to pass into sitk.DICOMOrientImageFilter to orient Z view correctly."""
+
+VIEW_TO_ORIENTATION_STR: dict = {
+    View.X: X_ORIENTATION_STR,
+    View.Y: Y_ORIENTATION_STR,
+    View.Z: Z_ORIENTATION_STR,
+}
+"""Map View enum to its orientation string."""
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically

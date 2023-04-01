@@ -6,8 +6,6 @@
 {
     // Print debugging messages during execution
     "DEBUG": "False",
-    // Smooth the image before rendering it
-    "SMOOTH_BEFORE_RENDERING": "False",
     // Directory to store exported images in
     "IMG_DIR": "img",
     // Directory that the file browser (File > Open/Add images) should start searching from
@@ -25,6 +23,6 @@
     "MIN_HEIGHT_RATIO": 0.5,
     // Maximum width and height of the GUI as a ratio of primary monitor size.
     // Enter a number between 0 (not inclusive) and 1.
-    "MAX_WIDTH_RATIO": 0.9,
-    "MAX_HEIGHT_RATIO": 0.9
+    "MAX_WIDTH_RATIO": 0.83,
+    "MAX_HEIGHT_RATIO": 0.83
 }

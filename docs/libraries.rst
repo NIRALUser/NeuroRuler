@@ -33,33 +33,33 @@ throughout the project though.
     import SimpleITK as sitk
     import numpy as np
     from pathlib import Path
- 
-    # Read in a file 
+
+    # Read in a file
     reader: sitk.ImageFileReader = sitk.ImageFileReader()
     reader.SetFileName(str(Path('some') / 'path' / 'to' / '3D image'))
     mri_3d: sitk.Image = reader.Execute()
- 
+
     # Get its dimensions
-    dimensions: tuple = mri_3d.GetSize() 
- 
+    dimensions: tuple = mri_3d.GetSize()
+
     # 3D rotation setup
     theta_x, theta_y, theta_z = 30, 45, 90
     euler_3d_transform: sitk.Euler3DTransform = sitk.Euler3DTransform()
     euler_3d_transform.SetCenter(mri_3d.TransformContinuousIndexToPhysicalPoint(
                 [((dimension - 1) / 2.0) for dimension in dimensions]))
-    euler_3d_transform.SetRotation(theta_x, theta_y, theta_z) 
- 
+    euler_3d_transform.SetRotation(theta_x, theta_y, theta_z)
+
     # 3D rotate
     rotated_3d: sitk.Image = sitk.Resample(mri_3d, euler_3d_transform)
- 
+
     # 2D slice
     slice_z = 50
     rotated_slice: sitk.Image = rotated_3d[:, :, slice_z]
- 
+
     # Convert to numpy array
     # NOTE: GetArrayFromImage returns the transpose of the sitk representation!
     slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
- 
+
     # Retranspose
     # This returns a view of the array with axes transposed but doesn't modify the internal memory
     slice_np = np.transpose(slice_np)
@@ -262,7 +262,7 @@ However, switching to PySide6 broke window switching, and I couldn't figure it o
                 # Note reversed ordering
                 q_img: QImage = QImage(slice_np.data, slice_np.shape[1], slice_np.shape[0],
                                       QImage.Format.Format_Grayscale16)
-                self.image.setPixmap(QPixmap(q_img)) 
+                self.image.setPixmap(QPixmap(q_img))
 
             # Rest of the code omitted
 
@@ -305,7 +305,7 @@ How it works
 
 Skim the README in the `BreezeStyleSheets repo <https://github.com/Alexhuszagh/BreezeStyleSheets.git>`_.
 
-In a nutshell, we edit a JSON file with hex color codes (the JSON controls only the colors of elements) 
+In a nutshell, we edit a JSON file with hex color codes (the JSON controls only the colors of elements)
 and compile to a :code:`.qss` stylesheet that we can
 use in our program. BSS also generates a :ref:`QRC <PyQt6QRC>` resource file
 for managing resources (icons), which is then converted to a compiled and importable :code:`resources.py` file.
@@ -349,16 +349,16 @@ I ran :code:`diff theme/dark.json theme/dark-green.json` [#diff]_, and the only 
 
 .. note:: You can skip a lot of the rest of this section. In our BreezeStyleSheets fork, there's a script
     `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ that does the rest of this.
-    
+
     First, open `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ and modify
     :code:`PATH_TO_HCT_REPO_THEMES_DIR` to be the :code:`.../themes` directory in your local HCT directory.
-    
+
     Then run :code:`python hct.py <theme_name>`.
     This will run the BSS commands that compile the JSON and then move the compiled files to the HCT repo.
 
     You should now be able to run the HCT GUI with the new theme.
     For now, you would just do :code:`python -m src.GUI.main -t <theme_name>`.
-    
+
     If something changes and this documentation hasn't been updated, apply the :code:`-h` option to see how to
     apply the theme.
 

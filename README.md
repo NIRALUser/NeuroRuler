@@ -58,3 +58,13 @@ options:
 ## Autoformat code
 
 `black .`
+
+This will be run automatically before each commit.
+
+## Modify pre-commit git hook
+
+Edit `.pre-commit-config.yaml`.
+
+`pre-commit install`
+
+More instructions [here](https://pre-commit.com).

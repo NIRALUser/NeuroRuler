@@ -10,7 +10,7 @@ import src.utils.constants as constants
 import src.utils.exceptions as exceptions
 
 SETTINGS: dict = dict()
-"""Dict of settings resulting from JSON file parsing. Global within the file."""
+"""Dict of settings resulting from JSON file parsing. Global within this file."""
 
 
 def parse_json() -> None:
@@ -27,7 +27,6 @@ def parse_json() -> None:
     user_settings.DEBUG = parse_bool("DEBUG")
     if user_settings.DEBUG:
         print("Printing debug messages.")
-    user_settings.SMOOTH_BEFORE_RENDERING = parse_bool("SMOOTH_BEFORE_RENDERING")
     user_settings.IMG_DIR = parse_path("IMG_DIR")
     user_settings.FILE_BROWSER_START_DIR = parse_path("FILE_BROWSER_START_DIR")
     user_settings.EXPORTED_FILE_NAMES_USE_INDEX = parse_bool(
@@ -163,10 +162,6 @@ def parse_gui_cli() -> None:
     if args.debug:
         user_settings.DEBUG = True
         print("Debug CLI option supplied.")
-
-    if args.smooth:
-        user_settings.SMOOTH_BEFORE_RENDERING = True
-        print("Smooth CLI option supplied.")
 
     if args.export_index:
         user_settings.EXPORTED_FILE_NAMES_USE_INDEX = True

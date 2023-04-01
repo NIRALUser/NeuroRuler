@@ -61,14 +61,14 @@ def test_curr_path():
     initialize_globals(IMAGE_PATHS)
     for i in range(4):
         next_img()
-    assert curr_path() == IMAGE_PATHS[4]
+    assert get_curr_path() == IMAGE_PATHS[4]
     for i in range(2):
         next_img()
     # Since the group is only the first 5
     # Wraps around
-    assert curr_path() == IMAGE_PATHS[1]
+    assert get_curr_path() == IMAGE_PATHS[1]
     next_img()
-    assert curr_path() == IMAGE_PATHS[2]
+    assert get_curr_path() == IMAGE_PATHS[2]
 
 
 def test_del_curr_img_delete_last():

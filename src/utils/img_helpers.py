@@ -1,14 +1,14 @@
-"""Image helper functions.
+"""Image helper functions that don't quite fit into the main algorithm, unlike imgproc.py.
 
-Holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
+Mostly holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
 
 from typing import Union
 import SimpleITK as sitk
 from pathlib import Path
+from enum import Enum
 import src.utils.global_vars as global_vars
-from src.utils.constants import degrees_to_radians
+from src.utils.constants import degrees_to_radians, View
 import src.utils.constants as constants
-import src.utils.user_settings as user_settings
 
 
 def update_image_groups(path_list: list[Path]) -> None:
@@ -20,25 +20,23 @@ def update_image_groups(path_list: list[Path]) -> None:
 
     :param path_list:
     :type path_list: list[Path]"""
+    # On load, orient the image for Z view by default
+    # If we don't do this, then the misaligned image's GetSize()[2] won't actually be the inferior-superior axis
+    # Then the max slice value would not be correct because it would use some other axis
+    global_vars.ORIENT_FILTER.SetDesiredCoordinateOrientation(
+        constants.Z_ORIENTATION_STR
+    )
     for path in path_list:
         global_vars.READER.SetFileName(str(path))
         new_img: sitk.Image = global_vars.READER.Execute()
+        new_img = global_vars.ORIENT_FILTER.Execute(new_img)
         new_img_properties: tuple = get_properties(new_img)
         if new_img_properties in global_vars.IMAGE_GROUPS:
-            # A duplicate path will get here, but we reassign the sitk.Image anyway
-            # Because maybe the path stayed the same but the image file changed
-            # No harm in reassigning. Already needed to do READER.Execute() to get properties anyway, might
-            # as well reassign.
+            # Duplicate path will get here, but reassign the sitk.Image anyway
+            # Already needed to do READER.Execute() to get properties anyway, might as well reassign
             global_vars.IMAGE_GROUPS[new_img_properties][path] = new_img
         else:
-            # Create new dictionary associated with the new properties.
-            # First entry also created.
             global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
-
-    # TODO: Think this is not needed but keeping it here just in case. Delete later if unneeded.
-    # global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
-    #     list(global_vars.IMAGE_GROUPS.keys())[0]
-    # ]
 
 
 def initialize_globals(path_list: list[Path]) -> None:
@@ -63,18 +61,26 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.THETA_Z = 0
     # curr_img has the same properties as the whole group in IMAGE_DICT.
     # Use it to set slice and center of rotation for the group
-    curr_img: sitk.Image = curr_image()
+    curr_img: sitk.Image = get_curr_image()
     # TODO: Set maximum for the slice slider in the GUI!
-    global_vars.SLICE = get_middle_of_z_dimension(curr_img)
+    global_vars.SLICE = get_middle_dimension(curr_img, View.Z)
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
     global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
+    global_vars.SMOOTHING_FILTER.SetConductanceParameter(3.0)
+    global_vars.SMOOTHING_FILTER.SetNumberOfIterations(5)
+    global_vars.SMOOTHING_FILTER.SetTimeStep(0.0625)
+    global_vars.SETTINGS_VIEW_ENABLED = True
+    global_vars.VIEW = constants.View.Z
+    global_vars.X_CENTER = get_middle_dimension(curr_img, View.X)
+    global_vars.Y_CENTER = get_middle_dimension(curr_img, View.Y)
 
     global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(100)
     global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(200)
     global_vars.BINARY_THRESHOLD_FILTER.SetInsideValue(0)
     global_vars.BINARY_THRESHOLD_FILTER.SetOutsideValue(1)
 
-def clear_globals():
+
+def clear_globals() -> None:
     """Clear global variables for unit testing in test_img_helpers.
 
     Don't need to reset Euler3DTransform since that's not used in the tests there."""
@@ -88,6 +94,7 @@ def clear_globals():
 
 
 # TODO: Add more properties?
+# TODO: Implement tolerance for spacing
 def get_properties(img: sitk.Image) -> tuple:
     """Tuple of properties of a sitk.Image.
 
@@ -106,7 +113,7 @@ def get_properties(img: sitk.Image) -> tuple:
     )
 
 
-def curr_path() -> Path:
+def get_curr_path() -> Path:
     """Return the current Path in IMAGE_DICT. That is, the key at index CURR_IMAGE_INDEX.
 
     :return: Path of current image
@@ -114,19 +121,52 @@ def curr_path() -> Path:
     return list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
 
 
-def curr_image() -> sitk.Image:
+def get_curr_image() -> sitk.Image:
     """Return the sitk.Image at the current index in global_vars.IMAGE_DICT.
 
     :return: current image
     :rtype: sitk.Image"""
-    return global_vars.IMAGE_DICT[curr_path()]
+    return global_vars.IMAGE_DICT[get_curr_path()]
 
 
-def curr_rotated_slice() -> sitk.Image:
+def set_curr_image(image: sitk.Image) -> None:
+    """Set the sitk.Image at the current index in global_vars.IMAGE_DICT.
+
+    :param image:
+    :type image: sitk.Image
+    :return: None
+    :rtype: None"""
+    global_vars.IMAGE_DICT[get_curr_path()] = image
+
+
+def orient_curr_image(view: Enum) -> None:
+    """Given a view enum, set the current image to the oriented version for that view.
+
+    :param image: not mutated
+    :type image: sitk.Image
+    :param view:
+    :type view: View.X, View.Y, or View.Z"""
+    if view not in constants.VIEW_TO_ORIENTATION_STR:
+        raise Exception(
+            "Expected View.X, View.Y, or View.Z but did not get one of those."
+        )
+    global_vars.ORIENT_FILTER.SetDesiredCoordinateOrientation(
+        constants.VIEW_TO_ORIENTATION_STR[view]
+    )
+    oriented: sitk.Image = global_vars.ORIENT_FILTER.Execute(get_curr_image())
+    set_curr_image(oriented)
+
+
+def get_curr_image_size() -> tuple:
+    """Return dimensions of current image.
+
+    :return: dimensions
+    :rtype: tuple"""
+    return get_curr_image().GetSize()
+
+
+def get_curr_rotated_slice() -> sitk.Image:
     """Return 2D rotated slice of the current image determined by global rotation and slice settings.
-
-    Smoothing occurs here and is rendered if user_settings.SMOOTH_BEFORE_RENDERING. Else, smoothing occurs
-    in imgproc.contour.
 
     Sets global_vars.EULER_3D_TRANSFORM's rotation values but not its center since all loaded images should
     have the same center.
@@ -138,20 +178,31 @@ def curr_rotated_slice() -> sitk.Image:
         degrees_to_radians(global_vars.THETA_Y),
         degrees_to_radians(global_vars.THETA_Z),
     )
-    rotated_slice: sitk.Image = sitk.Resample(
-        curr_image(), global_vars.EULER_3D_TRANSFORM
-    )[:, :, global_vars.SLICE]
-    if user_settings.DEBUG and user_settings.SMOOTH_BEFORE_RENDERING:
-        print(
-            "img_helpers.curr_rotated_slice() smoothed the image before rendering (i.e., user sees smoothed slice)"
-        )
-    return (
-        sitk.GradientAnisotropicDiffusionImageFilter().Execute(
-            sitk.Cast(rotated_slice, sitk.sitkFloat64)
-        )
-        if user_settings.SMOOTH_BEFORE_RENDERING
-        else rotated_slice
+    rotated_image: sitk.Image = sitk.Resample(
+        get_curr_image(), global_vars.EULER_3D_TRANSFORM
     )
+    rotated_slice: sitk.Image
+    if global_vars.VIEW == constants.View.X:
+        rotated_slice = rotated_image[global_vars.X_CENTER, :, :]
+    elif global_vars.VIEW == constants.View.Y:
+        rotated_slice = rotated_image[:, global_vars.Y_CENTER, :]
+    else:
+        rotated_slice = rotated_image[:, :, global_vars.SLICE]
+
+    return rotated_slice
+
+
+def get_curr_smooth_slice() -> sitk.Image:
+    """Return smoothed 2D rotated slice of the current image determined by global smoothing settings.
+
+    :return: smooth 2D rotated slice
+    :rtype: sitk.Image"""
+    rotated_slice: sitk.Image = get_curr_rotated_slice()
+    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
+    smooth_slice: sitk.Image = global_vars.SMOOTHING_FILTER.Execute(
+        sitk.Cast(rotated_slice, sitk.sitkFloat64)
+    )
+    return smooth_slice
 
 
 def rotated_slice_hardcoded(
@@ -183,25 +234,32 @@ def rotated_slice_hardcoded(
     )
     return sitk.Resample(mri_img_3d, global_vars.EULER_3D_TRANSFORM)[:, :, slice_num]
 
+
 def curr_binary_filter() -> sitk.Image:
     """Return filtered slice of the current image based on binary filter determined by global threshold settings.
-   
+
     :return: filtered 2D rotated slice
-    :rtype: sitk.Image""" 
+    :rtype: sitk.Image"""
     rotated_slice: sitk.Image = curr_rotated_slice()
-    filter_slice: sitk.Image = global_vars.BINARY_THRESHOLD_FILTER.Execute(sitk.Cast(rotated_slice, sitk.sitkFloat64))
+    filter_slice: sitk.Image = global_vars.BINARY_THRESHOLD_FILTER.Execute(
+        sitk.Cast(rotated_slice, sitk.sitkFloat64)
+    )
     return filter_slice
+
 
 def curr_otsu_filter() -> sitk.Image:
     """Return filtered slice of the current image based on Otsu filter.
-   
+
     :return: filtered 2D rotated slice
-    :rtype: sitk.Image""" 
+    :rtype: sitk.Image"""
     rotated_slice: sitk.Image = curr_rotated_slice()
-    filter_slice: sitk.Image = global_vars.OTSU_THRESHOLD_FILTER.Execute(sitk.Cast(rotated_slice, sitk.sitkFloat64))
+    filter_slice: sitk.Image = global_vars.OTSU_THRESHOLD_FILTER.Execute(
+        sitk.Cast(rotated_slice, sitk.sitkFloat64)
+    )
     return filter_slice
 
-def curr_metadata() -> dict[str, str]:
+
+def get_curr_metadata() -> dict[str, str]:
     """Computes and returns currently displayed image's metadata.
 
     Note: Does not return all metadata stored in the file, just the metadata stored in sitk.Image.GetMetaDataKeys()
@@ -210,7 +268,7 @@ def curr_metadata() -> dict[str, str]:
 
     :return: metadata
     :rtype: dict[str, str]"""
-    curr_img: sitk.Image = curr_image()
+    curr_img: sitk.Image = get_curr_image()
     rv: dict[str, str] = dict()
     for key in curr_img.GetMetaDataKeys():
         rv[key] = curr_img.GetMetaData(key)
@@ -218,14 +276,14 @@ def curr_metadata() -> dict[str, str]:
 
 
 # TODO: works only for NIFTI, not NRRD
-def curr_physical_units() -> Union[str, None]:
+def get_curr_physical_units() -> Union[str, None]:
     """Return currently displayed image's physical units from sitk.GetMetaData if it exists, else None.
 
     TODO: works only for NIFTI, not NRRD.
 
     :return: units or None
     :rtype: str or None"""
-    curr_img: sitk.Image = curr_image()
+    curr_img: sitk.Image = get_curr_image()
     if constants.NIFTI_METADATA_UNITS_KEY in curr_img.GetMetaDataKeys():
         return constants.NIFTI_METADATA_UNITS_VALUE_TO_PHYSICAL_UNITS[
             curr_img.GetMetaData(constants.NIFTI_METADATA_UNITS_KEY)
@@ -241,14 +299,15 @@ def get_curr_properties_tuple() -> tuple:
     return list(global_vars.IMAGE_GROUPS.keys())[global_vars.CURR_BATCH_INDEX]
 
 
-def get_middle_of_z_dimension(img: sitk.Image) -> int:
-    """int((img.GetSize()[2] - 1) / 2)
+def get_middle_dimension(img: sitk.Image, axis: View) -> int:
+    """int((img.GetSize()[axis.value] - 1) / 2)
 
     :param img:
+    :param axis: int (0-2)
     :type img: sitk.Image
-    :return: int((img.GetSize()[2] - 1) / 2)
+    :return: int((img.GetSize()[axis.value] - 1) / 2)
     :rtype: int"""
-    return int((img.GetSize()[2] - 1) / 2)
+    return int((img.GetSize()[axis.value] - 1) / 2)
 
 
 def get_center_of_rotation(img: sitk.Image) -> tuple:
@@ -275,7 +334,7 @@ def del_curr_img() -> None:
         print("Can't remove from empty list!")
         return
 
-    del global_vars.IMAGE_DICT[curr_path()]
+    del global_vars.IMAGE_DICT[get_curr_path()]
 
     # Just deleted the last image. Index must decrease by 1
     if global_vars.CURR_IMAGE_INDEX == len(global_vars.IMAGE_DICT):

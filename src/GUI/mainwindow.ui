@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>809</width>
-    <height>877</height>
+    <width>858</width>
+    <height>892</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -243,10 +243,10 @@
              <string>Control Z rotation value. Left click on the left end or right end to decrease or increase angle by 1 degree.</string>
             </property>
             <property name="minimum">
-             <number>-180</number>
+             <number>-90</number>
             </property>
             <property name="maximum">
-             <number>180</number>
+             <number>90</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -303,6 +303,65 @@
              <enum>Qt::Horizontal</enum>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_18">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QRadioButton" name="x_view_radio_button">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>X view</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="y_view_radio_button">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Y view</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="z_view_radio_button">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Z view</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <spacer name="verticalSpacer">
@@ -393,17 +452,17 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
-                 <widget class="QLabel" name="parameter">
+                 <widget class="QLabel" name="conductance_parameter_label">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>Parameter X:</string>
+                   <string>Conductance:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit">
+                 <widget class="QLineEdit" name="conductance_parameter_input">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -418,6 +477,12 @@
                     <width>15</width>
                     <height>0</height>
                    </size>
+                  </property>
+                  <property name="maxLength">
+                   <number>10</number>
+                  </property>
+                  <property name="placeholderText">
+                   <string>3.0</string>
                   </property>
                  </widget>
                 </item>
@@ -439,17 +504,17 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <item>
-                 <widget class="QLabel" name="label_5">
+                 <widget class="QLabel" name="smoothing_iterations_label">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>Parameter Y:</string>
+                   <string>Iterations:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_2">
+                 <widget class="QLineEdit" name="smoothing_iterations_input">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -464,6 +529,12 @@
                     <width>15</width>
                     <height>0</height>
                    </size>
+                  </property>
+                  <property name="maxLength">
+                   <number>10</number>
+                  </property>
+                  <property name="placeholderText">
+                   <string>5</string>
                   </property>
                  </widget>
                 </item>
@@ -485,17 +556,17 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
-                 <widget class="QLabel" name="label_6">
+                 <widget class="QLabel" name="time_step_label">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
                   <property name="text">
-                   <string>Parameter Z:</string>
+                   <string>Time Step:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_3">
+                 <widget class="QLineEdit" name="time_step_input">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -510,6 +581,12 @@
                     <width>15</width>
                     <height>0</height>
                    </size>
+                  </property>
+                  <property name="maxLength">
+                   <number>10</number>
+                  </property>
+                  <property name="placeholderText">
+                   <string>0.0625</string>
                   </property>
                  </widget>
                 </item>
@@ -632,6 +709,9 @@
                 <property name="checked">
                  <bool>true</bool>
                 </property>
+                <property name="autoExclusive">
+                 <bool>false</bool>
+                </property>
                </widget>
               </item>
               <item>
@@ -654,6 +734,9 @@
                 </property>
                 <property name="text">
                  <string>Binary Threshold</string>
+                </property>
+                <property name="autoExclusive">
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -1050,10 +1133,12 @@
     <property name="title">
      <string>Debug</string>
     </property>
-    <addaction name="action_test_show_resource"/>
+    <addaction name="action_test_stuff"/>
     <addaction name="action_print_metadata"/>
     <addaction name="action_print_dimensions"/>
     <addaction name="action_print_properties"/>
+    <addaction name="action_print_direction"/>
+    <addaction name="action_print_spacing"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
@@ -1260,15 +1345,18 @@
     <string>Ctrl+G</string>
    </property>
   </action>
-  <action name="action_test_show_resource">
+  <action name="action_test_stuff">
    <property name="text">
-    <string>Test show resource</string>
+    <string>Test stuff</string>
    </property>
    <property name="toolTip">
-    <string>Test displaying a resource (help.svg).</string>
+    <string>Connected to test_stuff method. Modify to test stuff.</string>
    </property>
    <property name="statusTip">
-    <string>Test displaying a resource (help.svg).</string>
+    <string>Connected to test_stuff method. Modify to test stuff.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="action_print_metadata">
@@ -1309,8 +1397,33 @@
    <property name="statusTip">
     <string>Print properties of the loaded batch.</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
+  </action>
+  <action name="action_print_direction">
+   <property name="text">
+    <string>Print direction</string>
+   </property>
+   <property name="statusTip">
+    <string>Print direction</string>
+   </property>
+  </action>
+  <action name="action_orient_for_x_view">
+   <property name="text">
+    <string>Orient for X view</string>
+   </property>
+  </action>
+  <action name="action_orient_for_y_view">
+   <property name="text">
+    <string>Orient for Y view</string>
+   </property>
+  </action>
+  <action name="action_orient_for_z_view">
+   <property name="text">
+    <string>Orient for Z view</string>
+   </property>
+  </action>
+  <action name="action_print_spacing">
+   <property name="text">
+    <string>Print spacing</string>
    </property>
   </action>
  </widget>

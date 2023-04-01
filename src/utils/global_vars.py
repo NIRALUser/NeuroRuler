@@ -3,6 +3,7 @@ that the user should not be able to modify directly, unlike user_settings.py."""
 
 import SimpleITK as sitk
 from pathlib import Path
+from src.utils.constants import View
 
 IMAGE_GROUPS: dict[tuple, dict[Path, sitk.Image]] = dict()
 """Mapping from properties tuple to a group of images, where a group of images is a dict[Path, sitk.Image].
@@ -73,7 +74,9 @@ SLICE: int = 0
 
 OTSU_THRESHOLD_FILTER: sitk.OtsuThresholdImageFilter = sitk.OtsuThresholdImageFilter()
 """Global OTSU filter"""
-BINARY_THRESHOLD_FILTER: sitk.BinaryThresholdImageFilter = sitk.BinaryThresholdImageFilter()
+BINARY_THRESHOLD_FILTER: sitk.BinaryThresholdImageFilter = (
+    sitk.BinaryThresholdImageFilter()
+)
 """Global Binary filter"""
 LOWER_THRESHOLD: int = 100
 """Threshold option for binary threshold"""
@@ -84,7 +87,65 @@ INSIDE_VALUE: int = 0
 OUTSIDE_VALUE: int = 1
 """Threshold option for outside color"""
 
-# TODO: documentation
+OTSU_THRESHOLD_FILTER: sitk.OtsuThresholdImageFilter = sitk.OtsuThresholdImageFilter()
+"""Global OTSU filter"""
+BINARY_THRESHOLD_FILTER: sitk.BinaryThresholdImageFilter = (
+    sitk.BinaryThresholdImageFilter()
+)
+"""Global Binary filter"""
+LOWER_THRESHOLD: int = 100
+"""Threshold option for binary threshold"""
+UPPER_THRESHOLD: int = 200
+"""Threshold option for binary threshold"""
+INSIDE_VALUE: int = 0
+"""Threshold option for inside color"""
+OUTSIDE_VALUE: int = 1
+"""Threshold option for outside color"""
+
+X_CENTER: int = 0
+"""Used for changing views."""
+
+Y_CENTER: int = 0
+"""Used for changing views."""
+
+VIEW: View = View.Z
+"""Current view."""
+
+SMOOTHING_FILTER: sitk.GradientAnisotropicDiffusionImageFilter = (
+    sitk.GradientAnisotropicDiffusionImageFilter()
+)
+"""Global sitk.GradientAnisotropicDiffusionImageFilter for image smoothing.
+
+See https://slicer.readthedocs.io/en/latest/user_guide/modules/gradientanisotropicdiffusion.html for more information."""
+
+CONDUCTANCE_PARAMETER: float = 3.0
+"""Smoothing option.
+
+Conductance controls the sensitivity of the conductance term.
+As a general rule, the lower the value, the more strongly the filter preserves edges.
+A high value will cause diffusion (smoothing) across edges.
+Note that the number of iterations controls how much smoothing is done within regions bounded by edges."""
+
+SMOOTHING_ITERATIONS: int = 5
+"""Smoothing option.
+
+The more iterations, the more smoothing. Each iteration takes the same amount of time.
+If it takes 10 seconds for one iteration, then it will take 100 seconds for 10 iterations.
+Note that the conductance controls how much each iteration smooths across edges."""
+
+TIME_STEP: float = 0.0625
+"""Smoothing option.
+
+The time step depends on the dimensionality of the image.
+In Slicer the images are 3D and the default (.0625) time step will provide a stable solution."""
+
+ORIENT_FILTER: sitk.DICOMOrientImageFilter = sitk.DICOMOrientImageFilter()
+"""Global sitk.DICOMOrientImageFilter for orienting images.
+
+See https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1DICOMOrientImageFilter.html#details
+and the orientation strings in constants.py. Use ITK-SNAP for the orientations that we copy."""
+
+
 SETTINGS_VIEW_ENABLED: bool = True
 """Whether the user is able to adjust settings (settings screen) or not
 (circumference and contoured image screen).
