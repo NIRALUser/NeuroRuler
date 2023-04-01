@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>809</width>
-    <height>697</height>
+    <height>877</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -662,7 +662,7 @@
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_8">
                   <item>
-                   <widget class="QLabel" name="label_9">
+                   <widget class="QLabel" name="lower_threshold">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -672,7 +672,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="lineEdit_5">
+                   <widget class="QLineEdit" name="lower_threshold_input">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -708,7 +708,7 @@
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_7">
                   <item>
-                   <widget class="QLabel" name="label_8">
+                   <widget class="QLabel" name="upper_threshold">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -718,7 +718,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="lineEdit_4">
+                   <widget class="QLineEdit" name="upper_threshold_input">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -998,7 +998,7 @@
      <x>0</x>
      <y>0</y>
      <width>809</width>
-     <height>18</height>
+     <height>37</height>
     </rect>
    </property>
    <property name="nativeMenuBar">

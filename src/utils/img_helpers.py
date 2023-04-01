@@ -69,6 +69,10 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(curr_img))
     global_vars.EULER_3D_TRANSFORM.SetRotation(0, 0, 0)
 
+    global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(100)
+    global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(200)
+    global_vars.BINARY_THRESHOLD_FILTER.SetInsideValue(0)
+    global_vars.BINARY_THRESHOLD_FILTER.SetOutsideValue(1)
 
 def clear_globals():
     """Clear global variables for unit testing in test_img_helpers.
@@ -179,6 +183,23 @@ def rotated_slice_hardcoded(
     )
     return sitk.Resample(mri_img_3d, global_vars.EULER_3D_TRANSFORM)[:, :, slice_num]
 
+def curr_binary_filter() -> sitk.Image:
+    """Return filtered slice of the current image based on binary filter determined by global threshold settings.
+   
+    :return: filtered 2D rotated slice
+    :rtype: sitk.Image""" 
+    rotated_slice: sitk.Image = curr_rotated_slice()
+    filter_slice: sitk.Image = global_vars.BINARY_THRESHOLD_FILTER.Execute(sitk.Cast(rotated_slice, sitk.sitkFloat64))
+    return filter_slice
+
+def curr_otsu_filter() -> sitk.Image:
+    """Return filtered slice of the current image based on Otsu filter.
+   
+    :return: filtered 2D rotated slice
+    :rtype: sitk.Image""" 
+    rotated_slice: sitk.Image = curr_rotated_slice()
+    filter_slice: sitk.Image = global_vars.OTSU_THRESHOLD_FILTER.Execute(sitk.Cast(rotated_slice, sitk.sitkFloat64))
+    return filter_slice
 
 def curr_metadata() -> dict[str, str]:
     """Computes and returns currently displayed image's metadata.

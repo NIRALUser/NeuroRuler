@@ -49,6 +49,8 @@ from src.utils.img_helpers import (
     curr_image,
     curr_rotated_slice,
     curr_metadata,
+    curr_binary_filter,
+    curr_otsu_filter,
     curr_physical_units,
     curr_path,
     get_curr_properties_tuple,
@@ -86,6 +88,7 @@ class MainWindow(QMainWindow):
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(lambda: self.browse_files(True))
         self.action_remove_image.triggered.connect(self.remove_curr_img)
+        self.threshold_preview_button.clicked.connect(self.render_threshold)
         self.action_exit.triggered.connect(exit)
         self.action_github.triggered.connect(lambda: webbrowser.open(GITHUB_LINK))
         self.action_documentation.triggered.connect(
@@ -146,6 +149,10 @@ class MainWindow(QMainWindow):
         self.smoothing_preview_button.setEnabled(True)
         self.otsu_radio_button.setEnabled(True)
         self.binary_radio_button.setEnabled(True)
+        self.lower_threshold.setEnabled(True)
+        self.lower_threshold_input.setEnabled(True)
+        self.upper_threshold.setEnabled(True)
+        self.upper_threshold_input.setEnabled(True)
         self.threshold_preview_button.setEnabled(True)
         self.action_export_csv.setEnabled(False)
         self.action_export_png.setEnabled(True)
@@ -191,6 +198,10 @@ class MainWindow(QMainWindow):
         self.smoothing_preview_button.setEnabled(settings_view_enabled)
         self.otsu_radio_button.setEnabled(settings_view_enabled)
         self.binary_radio_button.setEnabled(settings_view_enabled)
+        self.lower_threshold.setEnabled(settings_view_enabled)
+        self.lower_threshold_input.setEnabled(settings_view_enabled)
+        self.upper_threshold.setEnabled(settings_view_enabled)
+        self.upper_threshold_input.setEnabled(settings_view_enabled)
         self.threshold_preview_button.setEnabled(settings_view_enabled)
         self.action_export_csv.setEnabled(not settings_view_enabled)
         self.circumference_label.setEnabled(not settings_view_enabled)
@@ -238,6 +249,10 @@ class MainWindow(QMainWindow):
         self.smoothing_preview_button.setEnabled(False)
         self.otsu_radio_button.setEnabled(False)
         self.binary_radio_button.setEnabled(False)
+        self.lower_threshold.setEnabled(False)
+        self.lower_threshold_input.setEnabled(False)
+        self.upper_threshold.setEnabled(False)
+        self.upper_threshold_input.setEnabled(False)
         self.threshold_preview_button.setEnabled(False)
 
     def browse_files(self, extend: bool) -> None:
@@ -313,7 +328,10 @@ class MainWindow(QMainWindow):
         rv_dummy_var: np.ndarray = np.zeros(0)
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
-            binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
+            if self.otsu_radio_button.isChecked():
+                binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
+            else:
+                binary_contour_slice: np.ndarray = imgproc.contour2(rotated_slice, False)
             rv_dummy_var = binary_contour_slice
             mask_QImage(
                 q_img,
@@ -327,6 +345,45 @@ class MainWindow(QMainWindow):
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
             return rv_dummy_var
+        
+    def update_binary_filter_settings(self) -> None:
+        """Updates global binary filter settings."""
+
+        lower_threshold: str = self.lower_threshold_input.displayText()
+        try:
+            float(lower_threshold)
+            global_vars.LOWER_THRESHOLD = float(lower_threshold)
+        except ValueError:
+            None
+        self.lower_threshold_input.setText(str(global_vars.LOWER_THRESHOLD))
+        self.lower_threshold_input.setPlaceholderText(str(global_vars.LOWER_THRESHOLD))
+        global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(global_vars.LOWER_THRESHOLD)
+
+        upper_threshold: str = self.upper_threshold_input.displayText()
+        try:
+            float(upper_threshold)
+            global_vars.UPPER_THRESHOLD = float(upper_threshold)
+        except ValueError:
+            None
+        self.upper_threshold_input.setText(str(global_vars.UPPER_THRESHOLD))
+        self.upper_threshold_input.setPlaceholderText(str(global_vars.UPPER_THRESHOLD))
+        global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(global_vars.UPPER_THRESHOLD)
+
+    def render_threshold(self) -> Union[np.ndarray, None]:
+        """Render filtered image slice on UI"""
+        if self.otsu_radio_button.isChecked():
+            filter_img: sitk.Image = curr_otsu_filter()
+        else: 
+            self.update_binary_filter_settings()
+            filter_img: sitk.Image = curr_binary_filter()
+
+        slice_np: np.ndarray = sitk.GetArrayFromImage(filter_img)
+
+        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
+
+        q_pixmap: QPixmap = QPixmap(q_img)
+
+        self.image.setPixmap(q_pixmap)
 
     def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
         """Called after pressing Apply or when

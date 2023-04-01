@@ -7,6 +7,58 @@ import numpy as np
 import src.utils.exceptions as exceptions
 from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE
 import src.utils.user_settings as settings
+from src.utils.global_vars import OTSU_THRESHOLD_FILTER, BINARY_THRESHOLD_FILTER
+
+def contour2(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
+    """Generate the contour of a 2D slice by applying smoothing, Otsu threshold,
+    hole filling, and island removal (remove largest component). Return a binary (0|1) numpy
+    array with only the points on the contour=1.
+
+    Calls sitk.GetArrayFromImage() at the end, which will return the transpose of the sitk.Image.
+    retranspose defaults to False to match images viewed in ITK-SNAP (radiological conventions).
+
+    If user_settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice`
+    since it was smoothed in :code:`img_helpers.curr_rotated_slice()`.
+
+    :param mri_slice: 2D MRI slice
+    :type mri_slice: sitk.Image
+    :param retranspose: Whether to return a re-transposed ndarray. Defaults to False.
+    :type retranspose: bool
+    :return: binary (0|1) numpy array with only the points on the contour = 1
+    :rtype: np.ndarray"""
+    if settings.DEBUG and not settings.SMOOTH_BEFORE_RENDERING:
+        print(
+            "imgproc.contour() smoothed the slice provided to it AFTER rendering (i.e., user does not see smoothed slice)."
+        )
+    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
+    # However, this does throw some weird errors
+    # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
+    # Stable time step for this image must be smaller than 0.0997431
+    smooth_slice: sitk.Image = (
+        mri_slice
+        if settings.SMOOTH_BEFORE_RENDERING
+        else sitk.GradientAnisotropicDiffusionImageFilter().Execute(
+            sitk.Cast(mri_slice, sitk.sitkFloat64)
+        )
+    )
+
+    binary: sitk.Image = BINARY_THRESHOLD_FILTER.Execute(smooth_slice)
+
+    hole_filling: sitk.Image = sitk.BinaryGrindPeakImageFilter().Execute(binary)
+
+    # BinaryGrindPeakImageFilter has inverted foreground/background 0 and 1, need to invert
+    inverted: sitk.Image = sitk.NotImageFilter().Execute(hole_filling)
+
+    largest_component: sitk.Image = select_largest_component(inverted)
+
+    contour: sitk.Image = sitk.BinaryContourImageFilter().Execute(largest_component)
+
+    # GetArrayFromImage returns the transpose of the sitk representation
+    contour_np: np.ndarray = sitk.GetArrayFromImage(contour)
+    
+    if retranspose:
+        return np.transpose(contour_np)
+    return contour_np
 
 
 # The RV is a np array, not sitk.Image
@@ -46,7 +98,7 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
         )
     )
 
-    otsu: sitk.Image = sitk.OtsuThresholdImageFilter().Execute(smooth_slice)
+    otsu: sitk.Image = OTSU_THRESHOLD_FILTER.Execute(smooth_slice)
 
     hole_filling: sitk.Image = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
 

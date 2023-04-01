@@ -71,6 +71,19 @@ THETA_Z: int = 0
 SLICE: int = 0
 """0-indexed"""
 
+OTSU_THRESHOLD_FILTER: sitk.OtsuThresholdImageFilter = sitk.OtsuThresholdImageFilter()
+"""Global OTSU filter"""
+BINARY_THRESHOLD_FILTER: sitk.BinaryThresholdImageFilter = sitk.BinaryThresholdImageFilter()
+"""Global Binary filter"""
+LOWER_THRESHOLD: int = 100
+"""Threshold option for binary threshold"""
+UPPER_THRESHOLD: int = 200
+"""Threshold option for binary threshold"""
+INSIDE_VALUE: int = 0
+"""Threshold option for inside color"""
+OUTSIDE_VALUE: int = 1
+"""Threshold option for outside color"""
+
 # TODO: documentation
 SETTINGS_VIEW_ENABLED: bool = True
 """Whether the user is able to adjust settings (settings screen) or not
