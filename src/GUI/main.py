@@ -53,7 +53,7 @@ import src.utils.constants as constants
 # This would make the global variables not work
 import src.utils.global_vars as global_vars
 import src.utils.imgproc as imgproc
-import src.utils.user_settings as settings
+import src.utils.user_settings as user_settings
 from src.GUI.helpers import (
     string_to_QColor,
     mask_QImage,
@@ -270,7 +270,7 @@ class MainWindow(QMainWindow):
         ).replace(",", "")
 
         files = QFileDialog.getOpenFileNames(
-            self, "Open files", str(settings.FILE_BROWSER_START_DIR), file_filter
+            self, "Open files", str(user_settings.FILE_BROWSER_START_DIR), file_filter
         )
 
         # list[str]
@@ -364,7 +364,7 @@ class MainWindow(QMainWindow):
             mask_QImage(
                 q_img,
                 np.transpose(binary_contour_slice),
-                string_to_QColor(settings.CONTOUR_COLOR),
+                string_to_QColor(user_settings.CONTOUR_COLOR),
             )
 
         elif global_vars.VIEW != constants.View.Z:
@@ -373,7 +373,7 @@ class MainWindow(QMainWindow):
             mask_QImage(
                 q_img,
                 np.transpose(z_indicator),
-                string_to_QColor(settings.CONTOUR_COLOR),
+                string_to_QColor(user_settings.CONTOUR_COLOR),
             )
 
         q_pixmap: QPixmap = QPixmap(q_img)
@@ -390,7 +390,7 @@ class MainWindow(QMainWindow):
         try:
             global_vars.CONDUCTANCE_PARAMETER = float(conductance)
         except ValueError:
-            if settings.DEBUG:
+            if user_settings.DEBUG:
                 print("Conductance must be a float!")
         self.ui.conductance_parameter_input.setText(
             str(global_vars.CONDUCTANCE_PARAMETER)
@@ -406,7 +406,7 @@ class MainWindow(QMainWindow):
         try:
             global_vars.CONDUCTANCE_PARAMETER = int(iterations)
         except ValueError:
-            if settings.DEBUG:
+            if user_settings.DEBUG:
                 print("Iterations must be an integer!")
         self.ui.smoothing_iterations_input.setText(
             str(global_vars.SMOOTHING_ITERATIONS)
@@ -422,7 +422,7 @@ class MainWindow(QMainWindow):
         try:
             global_vars.TIME_STEP = float(time_step)
         except ValueError:
-            if settings.DEBUG:
+            if user_settings.DEBUG:
                 print("Time step must be a float!")
         self.ui.time_step_input.setText(str(global_vars.TIME_STEP))
         self.ui.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
@@ -601,12 +601,10 @@ class MainWindow(QMainWindow):
         """Connected to Debug > Test stuff. Dummy button and function for easily testing stuff.
 
         Assume that anything you put here will be overwritten freely."""
-        curr_img = get_curr_image()
-        reorient_filter = sitk.DICOMOrientImageFilter()
-        reorient_filter.SetDesiredCoordinateOrientation("LPS")
-        new_img = reorient_filter.Execute(curr_img)
-        global_vars.IMAGE_DICT[get_curr_path()] = new_img
-        self.render_curr_slice()
+        self.ui.image.setPixmap(QPixmap(f":/{user_settings.THEME_NAME}/help.svg"))
+        self.ui.image.setStatusTip(
+            "This is intentional, if it's a question mark then that's good :), means we can display icons"
+        )
 
     # TODO: File name should also include circumference when not SETTINGS_VIEW_ENABLED?
     def export_curr_slice_as_img(self, extension: str):
@@ -628,11 +626,11 @@ class MainWindow(QMainWindow):
         :return: `None`"""
         file_name = (
             global_vars.CURR_IMAGE_INDEX + 1
-            if settings.EXPORTED_FILE_NAMES_USE_INDEX
+            if user_settings.EXPORTED_FILE_NAMES_USE_INDEX
             else get_curr_path().name
         )
         path: str = str(
-            settings.IMG_DIR
+            user_settings.IMG_DIR
             / f"{file_name}_{'contoured_' if not global_vars.SETTINGS_VIEW_ENABLED else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
         )
         self.ui.image.pixmap().save(path, extension)
@@ -704,10 +702,10 @@ def main() -> None:
     """Main entrypoint of GUI."""
     # This import can't go at the top of the file
     # because gui.py.parse_gui_cli() has to set THEME_NAME before the import occurs
-    importlib.import_module(f"src.GUI.themes.{settings.THEME_NAME}.resources")
+    importlib.import_module(f"src.GUI.themes.{user_settings.THEME_NAME}.resources")
 
-    if not settings.IMG_DIR.exists():
-        settings.IMG_DIR.mkdir()
+    if not user_settings.IMG_DIR.exists():
+        user_settings.IMG_DIR.mkdir()
 
     app = QApplication(sys.argv)
 
@@ -718,28 +716,34 @@ def main() -> None:
 
     # app.setStyle('Fusion')
 
-    with open(constants.THEME_DIR / settings.THEME_NAME / f"stylesheet.qss", "r") as f:
+    with open(
+        constants.THEME_DIR / user_settings.THEME_NAME / f"stylesheet.qss", "r"
+    ) as f:
         app.setStyleSheet(f.read())
 
     MAIN_WINDOW = MainWindow()
     MAIN_WINDOW.setMinimumWidth(
-        int(settings.MIN_WIDTH_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[0])
+        int(user_settings.MIN_WIDTH_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[0])
     )
     MAIN_WINDOW.setMinimumHeight(
-        int(settings.MIN_HEIGHT_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[1])
+        int(
+            user_settings.MIN_HEIGHT_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[1]
+        )
     )
 
     MAIN_WINDOW.setMaximumWidth(
-        int(settings.MAX_WIDTH_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[0])
+        int(user_settings.MAX_WIDTH_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[0])
     )
     MAIN_WINDOW.setMaximumHeight(
-        int(settings.MAX_HEIGHT_RATIO * settings.PRIMARY_MONITOR_DIMENSIONS[1])
+        int(
+            user_settings.MAX_HEIGHT_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[1]
+        )
     )
 
     try:
         sys.exit(app.exec())
     except:
-        if settings.DEBUG:
+        if user_settings.DEBUG:
             print("Exiting")
 
 
