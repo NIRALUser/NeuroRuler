@@ -61,7 +61,7 @@ from src.GUI.helpers import (
 
 from src.utils.img_helpers import (
     initialize_globals,
-    update_image_groups,
+    update_images,
     get_curr_image,
     get_curr_image_size,
     get_curr_rotated_slice,
@@ -250,13 +250,10 @@ class MainWindow(QMainWindow):
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
 
-        If `extend`, then `IMAGE_GROUPS` will be updated with new images.
+        If `extend`, then `IMAGE_DICT` will be updated with new images.
 
-        Else, `IMAGE_GROUPS` will be cleared and
+        Else, `IMAGE_DICT` will be cleared and
         (re)initialized (e.g. when choosing files for the first time or re-opening).
-
-        Since IMAGE_DICT is a reference to an image dict in IMAGE_GROUPS, IMAGE_DICT is also cleared and
-        (re)initialized.
 
         Opens file menu.
 
@@ -296,7 +293,7 @@ class MainWindow(QMainWindow):
             # Does not need to render current slice. Images are added to the end of the dict.
             # And adding duplicate key doesn't change key order.
             self.enable_elements()
-            update_image_groups(path_list)
+            update_images(path_list)
             self.render_image_num_and_path()
 
     def update_view(self) -> None:

@@ -11,12 +11,15 @@ from src.utils.constants import degrees_to_radians, View
 import src.utils.constants as constants
 
 
-def update_image_groups(path_list: list[Path]) -> None:
-    """Initialize IMAGE_GROUPS. See the docstring for IMAGE_GROUPS in global_vars.py for more info.
+def update_images(path_list: list[Path]) -> bool:
+    """Initialize IMAGE_DICT. See the docstring for IMAGE_DICT in global_vars.py for more info.
+
+    If it doesn't match the properties of previously saved images, then this method returns
+    False, and IMAGE_DICT isn't updated.
 
     NOTE: Does not set IMAGE_DICT to be the CURR_BATCH_INDEX image group in IMAGE_GROUPS.
     IMAGE_DICT is a pointer to an images dict in IMAGE_GROUPS, so this function can
-    mutate (as you would probably want) IMAGE_DICT.
+    mutate (as you would probably want) IMAGE_DICT. (TODO: update this)
 
     :param path_list:
     :type path_list: list[Path]"""
@@ -31,12 +34,23 @@ def update_image_groups(path_list: list[Path]) -> None:
         new_img: sitk.Image = global_vars.READER.Execute()
         new_img = global_vars.ORIENT_FILTER.Execute(new_img)
         new_img_properties: tuple = get_properties(new_img)
-        if new_img_properties in global_vars.IMAGE_GROUPS:
+        if global_vars.IMAGE_DICT:
+            if get_properties(list(global_vars.IMAGE_DICT.values())[0]) != new_img_properties:
+                return False
+            global_vars.IMAGE_DICT[path] = new_img
+        else:
+            print("new image!")
+            global_vars.IMAGE_DICT = {path: new_img}
+            print(list(global_vars.IMAGE_DICT.keys())[0])
+
+        return True
+
+        #if new_img_properties in global_vars.IMAGE_GROUPS:
             # Duplicate path will get here, but reassign the sitk.Image anyway
             # Already needed to do READER.Execute() to get properties anyway, might as well reassign
-            global_vars.IMAGE_GROUPS[new_img_properties][path] = new_img
-        else:
-            global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
+        #    global_vars.IMAGE_GROUPS[new_img_properties][path] = new_img
+        #else:
+        #    global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
 
 
 def initialize_globals(path_list: list[Path]) -> None:
@@ -45,17 +59,14 @@ def initialize_globals(path_list: list[Path]) -> None:
     Mutated global variables: IMAGE_GROUPS, IMAGE_DICT, CURR_IMAGE_INDEX, CURR_BATCH_INDEX,
     READER, THETA_X, THETA_Y, THETA_Z, SLICE, EULER_3D_TRANSFORM.
 
-    Specifically, clears IMAGE_GROUPS and then populates it. IMAGE_DICT is then the first group of images.
+    Specifically, clears IMAGE_DICT and then populates it.
 
     :param path_list:
     :type path_list: list[Path]"""
-    global_vars.IMAGE_GROUPS.clear()
     global_vars.CURR_IMAGE_INDEX = 0
     global_vars.CURR_BATCH_INDEX = 0
-    update_image_groups(path_list)
-    global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
-        list(global_vars.IMAGE_GROUPS.keys())[0]
-    ]
+    global_vars.IMAGE_DICT.clear()
+    update_images(path_list)
     global_vars.THETA_X = 0
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
@@ -79,7 +90,6 @@ def clear_globals() -> None:
     """Clear global variables for unit testing in test_img_helpers.
 
     Don't need to reset Euler3DTransform since that's not used in the tests there."""
-    global_vars.IMAGE_GROUPS.clear()
     global_vars.IMAGE_DICT.clear()
     global_vars.CURR_IMAGE_INDEX = 0
     global_vars.THETA_X = 0
@@ -113,6 +123,7 @@ def get_curr_path() -> Path:
 
     :return: Path of current image
     :rtype: Path"""
+    #print("global_vars.CURR_IMAGE_INDEX", global_vars.CURR_IMAGE_INDEX, len(list(global_vars.IMAGE_DICT.keys())))
     return list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
 
 
@@ -265,9 +276,11 @@ def get_curr_physical_units() -> Union[str, None]:
 def get_curr_properties_tuple() -> tuple:
     """Return properties tuple for the currently loaded batch of images.
 
+    TODO: only have one set of properties. Also, what happens if there no current properties?
+
     :return: current properties tuple
     :rtype: tuple"""
-    return list(global_vars.IMAGE_GROUPS.keys())[global_vars.CURR_BATCH_INDEX]
+    return get_properties(list(global_vars.IMAGE_DICT.values())[0])
 
 
 def get_middle_dimension(img: sitk.Image, axis: View) -> int:
