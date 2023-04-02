@@ -76,6 +76,10 @@ def initialize_globals(path_list: list[Path]) -> None:
 
     global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(100)
     global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(200)
+
+    # TODO: Super weird
+    # On Hank's computer, this needs to be 0 and 1
+    # On Jesse's computer, this needs to be 1 and 0
     global_vars.BINARY_THRESHOLD_FILTER.SetInsideValue(0)
     global_vars.BINARY_THRESHOLD_FILTER.SetOutsideValue(1)
 

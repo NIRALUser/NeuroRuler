@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 import src.utils.exceptions as exceptions
-from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE
+from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE, ThresholdFilter
 import src.utils.user_settings as settings
 from src.utils.global_vars import (
     SMOOTHING_FILTER,
@@ -13,11 +13,14 @@ from src.utils.global_vars import (
     BINARY_THRESHOLD_FILTER,
 )
 
+
 # The RV is a np array, not sitk.Image
 # because we can't actually use a sitk.Image contour in the rest of the process
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
-def contour(mri_slice: sitk.Image, retranspose: bool = False, otsu_or_binary: int = 0) -> np.ndarray:
+def contour(
+    mri_slice: sitk.Image, threshold_filter: ThresholdFilter = ThresholdFilter.Otsu
+) -> np.ndarray:
     """Generate the contour of a 2D slice by applying smoothing, Otsu threshold,
     hole filling, and island removal (remove largest component). Return a binary (0|1) numpy
     array with only the points on the contour=1.
@@ -27,17 +30,15 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False, otsu_or_binary: in
 
     :param mri_slice: 2D MRI slice
     :type mri_slice: sitk.Image
-    :param retranspose: Whether to return a re-transposed ndarray. Defaults to False.
-    :type retranspose: bool
-    :param otsu_or_binary: O indicates otsu filter(default), and 1 indicates binary filter. Defaults to 0.
-    :type otsu_or_binary: bool
+    :param threshold_filter: ThresholdFilter.Otsu or ThresholdFilter.Binary. Defaults to ThresholdFilter.Otsu
+    :type threshold_filter: ThresholdFilter
     :return: binary (0|1) numpy array with only the points on the contour = 1
     :rtype: np.ndarray"""
     smooth_slice: sitk.Image = SMOOTHING_FILTER.Execute(
         sitk.Cast(mri_slice, sitk.sitkFloat64)
     )
 
-    if otsu_or_binary == 0:
+    if threshold_filter == ThresholdFilter.Otsu:
         image_filter: sitk.Image = OTSU_THRESHOLD_FILTER.Execute(smooth_slice)
     else:
         image_filter: sitk.Image = BINARY_THRESHOLD_FILTER.Execute(smooth_slice)
@@ -54,8 +55,6 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False, otsu_or_binary: in
     # GetArrayFromImage returns the transpose of the sitk representation
     contour_np: np.ndarray = sitk.GetArrayFromImage(contour)
 
-    if retranspose:
-        return np.transpose(contour_np)
     return contour_np
 
 

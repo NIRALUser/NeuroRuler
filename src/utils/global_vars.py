@@ -87,21 +87,6 @@ INSIDE_VALUE: int = 0
 OUTSIDE_VALUE: int = 1
 """Threshold option for outside color"""
 
-OTSU_THRESHOLD_FILTER: sitk.OtsuThresholdImageFilter = sitk.OtsuThresholdImageFilter()
-"""Global OTSU filter"""
-BINARY_THRESHOLD_FILTER: sitk.BinaryThresholdImageFilter = (
-    sitk.BinaryThresholdImageFilter()
-)
-"""Global Binary filter"""
-LOWER_THRESHOLD: int = 100
-"""Threshold option for binary threshold"""
-UPPER_THRESHOLD: int = 200
-"""Threshold option for binary threshold"""
-INSIDE_VALUE: int = 0
-"""Threshold option for inside color"""
-OUTSIDE_VALUE: int = 1
-"""Threshold option for outside color"""
-
 X_CENTER: int = 0
 """Used for changing views."""
 

@@ -45,7 +45,7 @@ import pprint
 # This is used only in print_properties()
 from collections import OrderedDict
 
-from src.utils.constants import View
+from src.utils.constants import View, ThresholdFilter
 import src.utils.constants as constants
 
 # Note, do not use imports like
@@ -367,10 +367,12 @@ class MainWindow(QMainWindow):
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
             if self.ui.otsu_radio_button.isChecked():
-                binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False, 0)
+                binary_contour_slice: np.ndarray = imgproc.contour(
+                    rotated_slice, ThresholdFilter.Otsu
+                )
             else:
                 binary_contour_slice: np.ndarray = imgproc.contour(
-                    rotated_slice, False, 1
+                    rotated_slice, ThresholdFilter.Binary
                 )
             rv_dummy_var = binary_contour_slice
             mask_QImage(
