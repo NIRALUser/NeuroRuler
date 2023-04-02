@@ -13,56 +13,11 @@ from src.utils.global_vars import (
     BINARY_THRESHOLD_FILTER,
 )
 
-
-def contour2(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
-    """Generate the contour of a 2D slice by applying smoothing, Otsu threshold,
-    hole filling, and island removal (remove largest component). Return a binary (0|1) numpy
-    array with only the points on the contour=1.
-
-    Calls sitk.GetArrayFromImage() at the end, which will return the transpose of the sitk.Image.
-    retranspose defaults to False to match images viewed in ITK-SNAP (radiological conventions).
-
-    If user_settings.SMOOTH_BEFORE_RENDERING is True, this function will not re-smooth `mri_slice`
-    since it was smoothed in :code:`img_helpers.curr_rotated_slice()`.
-
-    :param mri_slice: 2D MRI slice
-    :type mri_slice: sitk.Image
-    :param retranspose: Whether to return a re-transposed ndarray. Defaults to False.
-    :type retranspose: bool
-    :return: binary (0|1) numpy array with only the points on the contour = 1
-    :rtype: np.ndarray"""
-    # The cast is necessary, otherwise get sitk::ERROR: Pixel type: 16-bit signed integer is not supported in 2D
-    # However, this does throw some weird errors
-    # GradientAnisotropicDiffusionImageFilter (0x107fa6a00): Anisotropic diffusion unstable time step: 0.125
-    # Stable time step for this image must be smaller than 0.0997431
-    smooth_slice: sitk.Image = SMOOTHING_FILTER.Execute(
-        sitk.Cast(mri_slice, sitk.sitkFloat64)
-    )
-
-    binary: sitk.Image = BINARY_THRESHOLD_FILTER.Execute(smooth_slice)
-
-    hole_filling: sitk.Image = sitk.BinaryGrindPeakImageFilter().Execute(binary)
-
-    # BinaryGrindPeakImageFilter has inverted foreground/background 0 and 1, need to invert
-    inverted: sitk.Image = sitk.NotImageFilter().Execute(hole_filling)
-
-    largest_component: sitk.Image = select_largest_component(inverted)
-
-    contour: sitk.Image = sitk.BinaryContourImageFilter().Execute(largest_component)
-
-    # GetArrayFromImage returns the transpose of the sitk representation
-    contour_np: np.ndarray = sitk.GetArrayFromImage(contour)
-
-    if retranspose:
-        return np.transpose(contour_np)
-    return contour_np
-
-
 # The RV is a np array, not sitk.Image
 # because we can't actually use a sitk.Image contour in the rest of the process
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
-def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
+def contour(mri_slice: sitk.Image, retranspose: bool = False, otsu_or_binary: int = 0) -> np.ndarray:
     """Generate the contour of a 2D slice by applying smoothing, Otsu threshold,
     hole filling, and island removal (remove largest component). Return a binary (0|1) numpy
     array with only the points on the contour=1.
@@ -74,15 +29,20 @@ def contour(mri_slice: sitk.Image, retranspose: bool = False) -> np.ndarray:
     :type mri_slice: sitk.Image
     :param retranspose: Whether to return a re-transposed ndarray. Defaults to False.
     :type retranspose: bool
+    :param otsu_or_binary: O indicates otsu filter(default), and 1 indicates binary filter. Defaults to 0.
+    :type otsu_or_binary: bool
     :return: binary (0|1) numpy array with only the points on the contour = 1
     :rtype: np.ndarray"""
     smooth_slice: sitk.Image = SMOOTHING_FILTER.Execute(
         sitk.Cast(mri_slice, sitk.sitkFloat64)
     )
 
-    otsu: sitk.Image = OTSU_THRESHOLD_FILTER.Execute(smooth_slice)
+    if otsu_or_binary == 0:
+        image_filter: sitk.Image = OTSU_THRESHOLD_FILTER.Execute(smooth_slice)
+    else:
+        image_filter: sitk.Image = BINARY_THRESHOLD_FILTER.Execute(smooth_slice)
 
-    hole_filling: sitk.Image = sitk.BinaryGrindPeakImageFilter().Execute(otsu)
+    hole_filling: sitk.Image = sitk.BinaryGrindPeakImageFilter().Execute(image_filter)
 
     # BinaryGrindPeakImageFilter has inverted foreground/background 0 and 1, need to invert
     inverted: sitk.Image = sitk.NotImageFilter().Execute(hole_filling)

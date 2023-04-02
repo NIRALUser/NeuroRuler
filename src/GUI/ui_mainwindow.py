@@ -19,7 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
     QLineEdit, QMainWindow, QMenu, QMenuBar,
     QPushButton, QRadioButton, QScrollBar, QSizePolicy,
-    QSpacerItem, QStatusBar, QVBoxLayout, QWidget)
+    QSpacerItem, QStatusBar, QVBoxLayout, QWidget, QButtonGroup)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -382,11 +382,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_9.addItem(self.verticalSpacer_12)
 
+        self.filter_button_group = QButtonGroup()
+
         self.otsu_radio_button = QRadioButton(self.centralwidget)
         self.otsu_radio_button.setObjectName(u"otsu_radio_button")
         self.otsu_radio_button.setEnabled(False)
         self.otsu_radio_button.setChecked(True)
-        self.otsu_radio_button.setAutoExclusive(False)
+        #self.otsu_radio_button.setAutoExclusive(False)
+        self.filter_button_group.addButton(self.otsu_radio_button)
 
         self.verticalLayout_9.addWidget(self.otsu_radio_button)
 
@@ -397,7 +400,10 @@ class Ui_MainWindow(object):
         self.binary_radio_button = QRadioButton(self.centralwidget)
         self.binary_radio_button.setObjectName(u"binary_radio_button")
         self.binary_radio_button.setEnabled(False)
-        self.binary_radio_button.setAutoExclusive(False)
+        #self.binary_radio_button.setAutoExclusive(False)
+        self.filter_button_group.addButton(self.binary_radio_button)
+
+        self.filter_button_group.setExclusive(True)
 
         self.verticalLayout_9.addWidget(self.binary_radio_button)
 

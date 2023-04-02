@@ -112,7 +112,6 @@ class MainWindow(QMainWindow):
         self.ui.action_open.triggered.connect(lambda: self.browse_files(False))
         self.ui.action_add_images.triggered.connect(lambda: self.browse_files(True))
         self.ui.action_remove_image.triggered.connect(self.remove_curr_img)
-        self.ui.threshold_preview_button.clicked.connect(self.render_threshold)
         self.ui.action_exit.triggered.connect(exit)
         self.ui.action_github.triggered.connect(lambda: webbrowser.open(GITHUB_LINK))
         self.ui.action_documentation.triggered.connect(
@@ -151,6 +150,7 @@ class MainWindow(QMainWindow):
         self.ui.slice_slider.valueChanged.connect(self.slice_update)
         self.ui.reset_button.clicked.connect(self.reset_settings)
         self.ui.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
+        self.ui.threshold_preview_button.clicked.connect(self.render_threshold)
         self.ui.x_view_radio_button.clicked.connect(self.update_view)
         self.ui.y_view_radio_button.clicked.connect(self.update_view)
         self.ui.z_view_radio_button.clicked.connect(self.update_view)
@@ -367,10 +367,10 @@ class MainWindow(QMainWindow):
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
             if self.ui.otsu_radio_button.isChecked():
-                binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
+                binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False, 0)
             else:
-                binary_contour_slice: np.ndarray = imgproc.contour2(
-                    rotated_slice, False
+                binary_contour_slice: np.ndarray = imgproc.contour(
+                    rotated_slice, False, 1
                 )
             rv_dummy_var = binary_contour_slice
             mask_QImage(
