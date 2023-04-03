@@ -35,10 +35,8 @@ def update_images(path_list: list[Path]) -> bool:
         new_img = global_vars.ORIENT_FILTER.Execute(new_img)
         new_img_properties: tuple = get_properties(new_img)
 
-        print(path)
-
         if global_vars.IMAGE_DICT:
-            if get_properties(list(global_vars.IMAGE_DICT.values())[0]) != new_img_properties:
+            if get_curr_properties_tuple() != new_img_properties:
                 all_added = False
             else:
                 global_vars.IMAGE_DICT[path] = new_img
@@ -64,7 +62,7 @@ def initialize_globals(path_list: list[Path]) -> bool:
     :return: bool"""
     global_vars.CURR_IMAGE_INDEX = 0
     global_vars.IMAGE_DICT.clear()
-    was_added = update_images(path_list)
+    all_added = update_images(path_list)
     global_vars.THETA_X = 0
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
@@ -82,7 +80,7 @@ def initialize_globals(path_list: list[Path]) -> bool:
     global_vars.VIEW = constants.View.Z
     global_vars.X_CENTER = get_middle_dimension(curr_img, View.X)
     global_vars.Y_CENTER = get_middle_dimension(curr_img, View.Y)
-    return was_added
+    return all_added
 
 
 def clear_globals() -> None:
@@ -122,7 +120,6 @@ def get_curr_path() -> Path:
 
     :return: Path of current image
     :rtype: Path"""
-    #print("global_vars.CURR_IMAGE_INDEX", global_vars.CURR_IMAGE_INDEX, len(list(global_vars.IMAGE_DICT.keys())))
     return list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
 
 
@@ -274,8 +271,6 @@ def get_curr_physical_units() -> Union[str, None]:
 
 def get_curr_properties_tuple() -> tuple:
     """Return properties tuple for the currently loaded batch of images.
-
-    TODO: only have one set of properties. Also, what happens if there no current properties?
 
     :return: current properties tuple
     :rtype: tuple"""

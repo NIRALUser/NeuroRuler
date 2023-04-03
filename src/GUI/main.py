@@ -278,10 +278,10 @@ class MainWindow(QMainWindow):
         # Convert to list[Path]. Slight inefficiency but worth.
         path_list = list(map(Path, path_list))
 
-        was_added = True
+        all_added = True
 
         if not extend:
-            was_added = initialize_globals(path_list)
+            all_added = initialize_globals(path_list)
             self.render_all_sliders()
             self.enable_elements()
             self.render_image_num_and_path()
@@ -295,11 +295,10 @@ class MainWindow(QMainWindow):
             # Does not need to render current slice. Images are added to the end of the dict.
             # And adding duplicate key doesn't change key order.
             self.enable_elements()
-            was_added = update_images(path_list)
+            all_added = update_images(path_list)
             self.render_image_num_and_path()
 
-        if not was_added:
-            self.render_image_num_and_path()
+        if not all_added:
             print("error! shit")
 
     def update_view(self) -> None:

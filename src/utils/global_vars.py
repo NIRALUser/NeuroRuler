@@ -6,7 +6,7 @@ from pathlib import Path
 from src.utils.constants import View
 
 IMAGE_DICT: dict[Path, sitk.Image] = dict()
-"""The current (i.e., loaded in GUI) group of images.
+"""The group of images that have been loaded.
 
 Since Python 3.7+, dicts maintain insertion order. Therefore, we can use CURR_IMAGE_INDEX for retrieval and deletion.
 
