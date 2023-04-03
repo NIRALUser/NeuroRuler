@@ -15,58 +15,56 @@ def update_images(path_list: list[Path]) -> bool:
     """Initialize IMAGE_DICT. See the docstring for IMAGE_DICT in global_vars.py for more info.
 
     If it doesn't match the properties of previously saved images, then this method returns
-    False, and IMAGE_DICT isn't updated.
-
-    NOTE: Does not set IMAGE_DICT to be the CURR_BATCH_INDEX image group in IMAGE_GROUPS.
-    IMAGE_DICT is a pointer to an images dict in IMAGE_GROUPS, so this function can
-    mutate (as you would probably want) IMAGE_DICT. (TODO: update this)
+    False, and IMAGE_DICT isn't updated with the differing images.
 
     :param path_list:
-    :type path_list: list[Path]"""
+    :type path_list: list[Path]
+    :return: bool"""
     # On load, orient the image for Z view by default
     # If we don't do this, then the misaligned image's GetSize()[2] won't actually be the inferior-superior axis
     # Then the max slice value would not be correct because it would use some other axis
     global_vars.ORIENT_FILTER.SetDesiredCoordinateOrientation(
         constants.Z_ORIENTATION_STR
     )
+
+    all_added = True
+
     for path in path_list:
         global_vars.READER.SetFileName(str(path))
         new_img: sitk.Image = global_vars.READER.Execute()
         new_img = global_vars.ORIENT_FILTER.Execute(new_img)
         new_img_properties: tuple = get_properties(new_img)
+
+        print(path)
+
         if global_vars.IMAGE_DICT:
             if get_properties(list(global_vars.IMAGE_DICT.values())[0]) != new_img_properties:
-                return False
-            global_vars.IMAGE_DICT[path] = new_img
+                all_added = False
+            else:
+                global_vars.IMAGE_DICT[path] = new_img
         else:
-            print("new image!")
             global_vars.IMAGE_DICT = {path: new_img}
-            print(list(global_vars.IMAGE_DICT.keys())[0])
 
-        return True
-
-        #if new_img_properties in global_vars.IMAGE_GROUPS:
-            # Duplicate path will get here, but reassign the sitk.Image anyway
-            # Already needed to do READER.Execute() to get properties anyway, might as well reassign
-        #    global_vars.IMAGE_GROUPS[new_img_properties][path] = new_img
-        #else:
-        #    global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
+    return all_added
 
 
-def initialize_globals(path_list: list[Path]) -> None:
+def initialize_globals(path_list: list[Path]) -> bool:
     """After pressing File > Open, the global variables need to be cleared and (re)initialized.
 
-    Mutated global variables: IMAGE_GROUPS, IMAGE_DICT, CURR_IMAGE_INDEX, CURR_BATCH_INDEX,
+    If loading images with different properties, then this method returns
+    False, and IMAGE_DICT isn't updated with the differing images.
+
+    Mutated global variables: IMAGE_GROUPS, IMAGE_DICT, CURR_IMAGE_INDEX,
     READER, THETA_X, THETA_Y, THETA_Z, SLICE, EULER_3D_TRANSFORM.
 
     Specifically, clears IMAGE_DICT and then populates it.
 
     :param path_list:
-    :type path_list: list[Path]"""
+    :type path_list: list[Path]
+    :return: bool"""
     global_vars.CURR_IMAGE_INDEX = 0
-    global_vars.CURR_BATCH_INDEX = 0
     global_vars.IMAGE_DICT.clear()
-    update_images(path_list)
+    was_added = update_images(path_list)
     global_vars.THETA_X = 0
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
@@ -84,6 +82,7 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.VIEW = constants.View.Z
     global_vars.X_CENTER = get_middle_dimension(curr_img, View.X)
     global_vars.Y_CENTER = get_middle_dimension(curr_img, View.Y)
+    return was_added
 
 
 def clear_globals() -> None:
