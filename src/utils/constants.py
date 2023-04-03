@@ -104,6 +104,11 @@ class ThresholdFilter(Enum):
     Binary = 1
 
 
+class BinaryColor(Enum):
+    Black = 0
+    White = 1
+
+
 # Got these values by looking at ITK-SNAP and
 # https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1DICOMOrientImageFilter.html#details
 # Two characters in each string orients the image properly (i.e., same as ITK-SNAP)

@@ -5,13 +5,22 @@ import cv2
 import numpy as np
 
 import src.utils.exceptions as exceptions
-from src.utils.constants import NUM_CONTOURS_IN_INVALID_SLICE, ThresholdFilter
+from src.utils.constants import (
+    NUM_CONTOURS_IN_INVALID_SLICE,
+    ThresholdFilter,
+    BinaryColor,
+)
 import src.utils.user_settings as settings
 from src.utils.global_vars import (
     SMOOTHING_FILTER,
     OTSU_THRESHOLD_FILTER,
     BINARY_THRESHOLD_FILTER,
 )
+
+NUM_PIXELS_TO_CHECK_ON_EACH_EDGE_FOR_BACKGROUND_COLOR_DETECTION: int = 25
+"""Roughly this many pixels are checked along the top, bottom, left, and right edges of the image."""
+MAX_NUM_MISMATCHED_PIXELS_FOR_BACKGROUND_COLOR_DETECTION: int = 3
+"""At most this many edge pixels can be different from the pixel at (0, 0)."""
 
 
 # The RV is a np array, not sitk.Image
@@ -39,13 +48,23 @@ def contour(
     )
 
     if threshold_filter == ThresholdFilter.Otsu:
-        image_filter: sitk.Image = OTSU_THRESHOLD_FILTER.Execute(smooth_slice)
+        # This always does fg = 0 (black), bg = 1 (white)
+        thresholded: sitk.Image = OTSU_THRESHOLD_FILTER.Execute(smooth_slice)
     else:
-        image_filter: sitk.Image = BINARY_THRESHOLD_FILTER.Execute(smooth_slice)
+        # This sometimes does fg = 0 (black), bg = 1 (white); other times fg = 1 (white), bg = 0 (black)
+        # Depends on the lower and upper threshold settings
+        thresholded: sitk.Image = BINARY_THRESHOLD_FILTER.Execute(smooth_slice)
+        if (
+            background_color_of_binary_thresholded_slice(thresholded)
+            == BinaryColor.Black
+        ):
+            thresholded = sitk.NotImageFilter().Execute(thresholded)
 
-    hole_filling: sitk.Image = sitk.BinaryGrindPeakImageFilter().Execute(image_filter)
+    # Image needs to be inverted here (i.e., brain 0 black and background 1 white)
+    # for BinaryGrindPeakImageFilter to work
+    hole_filling: sitk.Image = sitk.BinaryGrindPeakImageFilter().Execute(thresholded)
 
-    # BinaryGrindPeakImageFilter has inverted foreground/background 0 and 1, need to invert
+    # BinaryGrindPeakImageFilter results in inverted foreground/background 0 and 1, need to invert
     inverted: sitk.Image = sitk.NotImageFilter().Execute(hole_filling)
 
     largest_component: sitk.Image = select_largest_component(inverted)
@@ -53,9 +72,7 @@ def contour(
     contour: sitk.Image = sitk.BinaryContourImageFilter().Execute(largest_component)
 
     # GetArrayFromImage returns the transpose of the sitk representation
-    contour_np: np.ndarray = sitk.GetArrayFromImage(contour)
-
-    return contour_np
+    return sitk.GetArrayFromImage(contour)
 
 
 # Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
@@ -124,3 +141,40 @@ def length_of_contour(
     # True means we assume the contour is a closed curve.
     arc_length = cv2.arcLength(parent_contour, True)
     return arc_length
+
+
+# TODO: Implement this better, but this realistically is all we need...
+def background_color_of_binary_thresholded_slice(img_2d: sitk.Image) -> BinaryColor:
+    """Checks the background color of the slice returning from binary threshold filter
+    since some settings result in fg 0, bg 1, and other settings result in fg 1, bg 0.
+
+    This function assumes there won't be a lot of noise or islands.
+
+    :param img_2d:
+    :type img_2d: sitk.Image
+    :return: BinaryColor.Black or BinaryColor.White
+    :rtype: BinaryColor"""
+    width: int = img_2d.GetWidth()
+    height: int = img_2d.GetHeight()
+    background_color: int = img_2d.GetPixel(0, 0)
+    mismatched_pixels: int = 0
+    for i in range(
+        1,
+        width,
+        width // NUM_PIXELS_TO_CHECK_ON_EACH_EDGE_FOR_BACKGROUND_COLOR_DETECTION,
+    ):
+        mismatched_pixels += img_2d.GetPixel(i, 0) != background_color
+        mismatched_pixels += img_2d.GetPixel(i, height - 1) != background_color
+    for j in range(
+        1,
+        height,
+        height // NUM_PIXELS_TO_CHECK_ON_EACH_EDGE_FOR_BACKGROUND_COLOR_DETECTION,
+    ):
+        mismatched_pixels += img_2d.GetPixel(0, j) != background_color
+        mismatched_pixels += img_2d.GetPixel(width - 1, j) != background_color
+    if mismatched_pixels > MAX_NUM_MISMATCHED_PIXELS_FOR_BACKGROUND_COLOR_DETECTION:
+        raise Exception(
+            f"Could not successfully detect background color after executing binary threshold.\nMore than {MAX_NUM_MISMATCHED_PIXELS_FOR_BACKGROUND_COLOR_DETECTION} pixels on the top, bottom, left, or right edge don't match the pixel at the top left corner."
+        )
+
+    return BinaryColor(background_color)
