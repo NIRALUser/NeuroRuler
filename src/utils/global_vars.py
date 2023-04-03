@@ -78,14 +78,10 @@ BINARY_THRESHOLD_FILTER: sitk.BinaryThresholdImageFilter = (
     sitk.BinaryThresholdImageFilter()
 )
 """Global Binary filter"""
-LOWER_THRESHOLD: int = 100
+LOWER_THRESHOLD: int = 0.0
 """Threshold option for binary threshold"""
-UPPER_THRESHOLD: int = 200
+UPPER_THRESHOLD: int = 200.0
 """Threshold option for binary threshold"""
-INSIDE_VALUE: int = 0
-"""Threshold option for inside color"""
-OUTSIDE_VALUE: int = 1
-"""Threshold option for outside color"""
 
 X_CENTER: int = 0
 """Used for changing views."""

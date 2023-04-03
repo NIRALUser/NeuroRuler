@@ -387,7 +387,6 @@ class Ui_MainWindow(object):
         self.otsu_radio_button = QRadioButton(self.centralwidget)
         self.otsu_radio_button.setObjectName(u"otsu_radio_button")
         self.otsu_radio_button.setEnabled(False)
-        self.otsu_radio_button.setChecked(True)
         #self.otsu_radio_button.setAutoExclusive(False)
         self.filter_button_group.addButton(self.otsu_radio_button)
 
@@ -400,6 +399,7 @@ class Ui_MainWindow(object):
         self.binary_radio_button = QRadioButton(self.centralwidget)
         self.binary_radio_button.setObjectName(u"binary_radio_button")
         self.binary_radio_button.setEnabled(False)
+        self.binary_radio_button.setChecked(True)
         #self.binary_radio_button.setAutoExclusive(False)
         self.filter_button_group.addButton(self.binary_radio_button)
 
@@ -838,7 +838,9 @@ class Ui_MainWindow(object):
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Threshold Options", None))
         self.otsu_radio_button.setText(QCoreApplication.translate("MainWindow", u"Otsu Threshold", None))
         self.binary_radio_button.setText(QCoreApplication.translate("MainWindow", u"Binary Threshold", None))
+        self.lower_threshold_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"0.0", None))
         self.lower_threshold.setText(QCoreApplication.translate("MainWindow", u"Lower Threshold:", None))
+        self.upper_threshold_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"200.0", None))
         self.upper_threshold.setText(QCoreApplication.translate("MainWindow", u"Upper Threshold:", None))
         self.threshold_preview_button.setText(QCoreApplication.translate("MainWindow", u"Preview", None))
 #if QT_CONFIG(tooltip)

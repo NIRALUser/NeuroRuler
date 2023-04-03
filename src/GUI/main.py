@@ -150,6 +150,8 @@ class MainWindow(QMainWindow):
         self.ui.slice_slider.valueChanged.connect(self.slice_update)
         self.ui.reset_button.clicked.connect(self.reset_settings)
         self.ui.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
+        self.ui.otsu_radio_button.clicked.connect(self.disable_binary_if_using_otsu)
+        self.ui.binary_radio_button.clicked.connect(self.enable_binary_if_using_binary)
         self.ui.threshold_preview_button.clicked.connect(self.render_threshold)
         self.ui.x_view_radio_button.clicked.connect(self.update_view)
         self.ui.y_view_radio_button.clicked.connect(self.update_view)
@@ -171,6 +173,22 @@ class MainWindow(QMainWindow):
 
         self.ui.action_export_csv.setEnabled(not global_vars.SETTINGS_VIEW_ENABLED)
 
+    def disable_binary_if_using_otsu(self) -> None:
+        """Called when using Otsu filter
+        
+        Disable binary input box.
+        """
+        self.ui.upper_threshold_input.setEnabled(False)
+        self.ui.lower_threshold_input.setEnabled(False)
+
+    def enable_binary_if_using_binary(self) -> None:
+        """Called when using Binary filter
+        
+        Restore binary input box.
+        """
+        self.ui.upper_threshold_input.setEnabled(True)
+        self.ui.lower_threshold_input.setEnabled(True)
+
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
 
@@ -187,6 +205,7 @@ class MainWindow(QMainWindow):
             self.render_curr_slice()
         else:
             self.update_smoothing_settings()
+            self.update_binary_filter_settings()
             self.ui.apply_button.setText("Adjust")
             # Ignore the type annotation error here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
