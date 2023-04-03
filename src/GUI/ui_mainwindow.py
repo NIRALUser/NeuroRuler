@@ -19,7 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
     QLineEdit, QMainWindow, QMenu, QMenuBar,
     QPushButton, QRadioButton, QScrollBar, QSizePolicy,
-    QSpacerItem, QStatusBar, QVBoxLayout, QWidget)
+    QSpacerItem, QStatusBar, QVBoxLayout, QWidget, QButtonGroup)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -382,11 +382,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_9.addItem(self.verticalSpacer_12)
 
+        self.filter_button_group = QButtonGroup()
+
         self.otsu_radio_button = QRadioButton(self.centralwidget)
         self.otsu_radio_button.setObjectName(u"otsu_radio_button")
         self.otsu_radio_button.setEnabled(False)
-        self.otsu_radio_button.setChecked(True)
-        self.otsu_radio_button.setAutoExclusive(False)
+        #self.otsu_radio_button.setAutoExclusive(False)
+        self.filter_button_group.addButton(self.otsu_radio_button)
 
         self.verticalLayout_9.addWidget(self.otsu_radio_button)
 
@@ -397,7 +399,11 @@ class Ui_MainWindow(object):
         self.binary_radio_button = QRadioButton(self.centralwidget)
         self.binary_radio_button.setObjectName(u"binary_radio_button")
         self.binary_radio_button.setEnabled(False)
-        self.binary_radio_button.setAutoExclusive(False)
+        self.binary_radio_button.setChecked(True)
+        #self.binary_radio_button.setAutoExclusive(False)
+        self.filter_button_group.addButton(self.binary_radio_button)
+
+        self.filter_button_group.setExclusive(True)
 
         self.verticalLayout_9.addWidget(self.binary_radio_button)
 
@@ -405,20 +411,20 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.horizontalLayout_8 = QHBoxLayout()
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.label_9 = QLabel(self.centralwidget)
-        self.label_9.setObjectName(u"label_9")
-        self.label_9.setEnabled(False)
+        self.lower_threshold = QLabel(self.centralwidget)
+        self.lower_threshold.setObjectName(u"lower_threshold")
+        self.lower_threshold.setEnabled(False)
 
-        self.horizontalLayout_8.addWidget(self.label_9)
+        self.horizontalLayout_8.addWidget(self.lower_threshold)
 
-        self.lineEdit_5 = QLineEdit(self.centralwidget)
-        self.lineEdit_5.setObjectName(u"lineEdit_5")
-        self.lineEdit_5.setEnabled(False)
-        sizePolicy1.setHeightForWidth(self.lineEdit_5.sizePolicy().hasHeightForWidth())
-        self.lineEdit_5.setSizePolicy(sizePolicy1)
-        self.lineEdit_5.setMinimumSize(QSize(15, 0))
+        self.lower_threshold_input = QLineEdit(self.centralwidget)
+        self.lower_threshold_input.setObjectName(u"lower_threshold_input")
+        self.lower_threshold_input.setEnabled(False)
+        sizePolicy1.setHeightForWidth(self.lower_threshold_input.sizePolicy().hasHeightForWidth())
+        self.lower_threshold_input.setSizePolicy(sizePolicy1)
+        self.lower_threshold_input.setMinimumSize(QSize(15, 0))
 
-        self.horizontalLayout_8.addWidget(self.lineEdit_5)
+        self.horizontalLayout_8.addWidget(self.lower_threshold_input)
 
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_8)
@@ -429,20 +435,20 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7 = QHBoxLayout()
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.label_8 = QLabel(self.centralwidget)
-        self.label_8.setObjectName(u"label_8")
-        self.label_8.setEnabled(False)
+        self.upper_threshold = QLabel(self.centralwidget)
+        self.upper_threshold.setObjectName(u"upper_threshold")
+        self.upper_threshold.setEnabled(False)
 
-        self.horizontalLayout_7.addWidget(self.label_8)
+        self.horizontalLayout_7.addWidget(self.upper_threshold)
 
-        self.lineEdit_4 = QLineEdit(self.centralwidget)
-        self.lineEdit_4.setObjectName(u"lineEdit_4")
-        self.lineEdit_4.setEnabled(False)
-        sizePolicy1.setHeightForWidth(self.lineEdit_4.sizePolicy().hasHeightForWidth())
-        self.lineEdit_4.setSizePolicy(sizePolicy1)
-        self.lineEdit_4.setMinimumSize(QSize(15, 0))
+        self.upper_threshold_input = QLineEdit(self.centralwidget)
+        self.upper_threshold_input.setObjectName(u"upper_threshold_input")
+        self.upper_threshold_input.setEnabled(False)
+        sizePolicy1.setHeightForWidth(self.upper_threshold_input.sizePolicy().hasHeightForWidth())
+        self.upper_threshold_input.setSizePolicy(sizePolicy1)
+        self.upper_threshold_input.setMinimumSize(QSize(15, 0))
 
-        self.horizontalLayout_7.addWidget(self.lineEdit_4)
+        self.horizontalLayout_7.addWidget(self.upper_threshold_input)
 
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_7)
@@ -568,7 +574,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 858, 24))
+        self.menubar.setGeometry(QRect(0, 0, 809, 37))
         self.menubar.setNativeMenuBar(True)
         self.menu_file = QMenu(self.menubar)
         self.menu_file.setObjectName(u"menu_file")
@@ -832,8 +838,10 @@ class Ui_MainWindow(object):
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Threshold Options", None))
         self.otsu_radio_button.setText(QCoreApplication.translate("MainWindow", u"Otsu Threshold", None))
         self.binary_radio_button.setText(QCoreApplication.translate("MainWindow", u"Binary Threshold", None))
-        self.label_9.setText(QCoreApplication.translate("MainWindow", u"Lower Threshold:", None))
-        self.label_8.setText(QCoreApplication.translate("MainWindow", u"Upper Threshold:", None))
+        self.lower_threshold_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"0.0", None))
+        self.lower_threshold.setText(QCoreApplication.translate("MainWindow", u"Lower Threshold:", None))
+        self.upper_threshold_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"200.0", None))
+        self.upper_threshold.setText(QCoreApplication.translate("MainWindow", u"Upper Threshold:", None))
         self.threshold_preview_button.setText(QCoreApplication.translate("MainWindow", u"Preview", None))
 #if QT_CONFIG(tooltip)
         self.apply_button.setToolTip(QCoreApplication.translate("MainWindow", u"Compute circumference using current settings.", None))

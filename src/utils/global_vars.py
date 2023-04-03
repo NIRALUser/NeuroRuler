@@ -72,6 +72,17 @@ THETA_Z: int = 0
 SLICE: int = 0
 """0-indexed"""
 
+OTSU_THRESHOLD_FILTER: sitk.OtsuThresholdImageFilter = sitk.OtsuThresholdImageFilter()
+"""Global OTSU filter"""
+BINARY_THRESHOLD_FILTER: sitk.BinaryThresholdImageFilter = (
+    sitk.BinaryThresholdImageFilter()
+)
+"""Global Binary filter"""
+LOWER_THRESHOLD: int = 0.0
+"""Threshold option for binary threshold"""
+UPPER_THRESHOLD: int = 200.0
+"""Threshold option for binary threshold"""
+
 X_CENTER: int = 0
 """Used for changing views."""
 

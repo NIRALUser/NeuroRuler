@@ -45,7 +45,7 @@ import pprint
 # This is used only in print_properties()
 from collections import OrderedDict
 
-from src.utils.constants import View
+from src.utils.constants import View, ThresholdFilter
 import src.utils.constants as constants
 
 # Note, do not use imports like
@@ -67,6 +67,8 @@ from src.utils.img_helpers import (
     get_curr_rotated_slice,
     get_curr_smooth_slice,
     get_curr_metadata,
+    curr_binary_filter,
+    curr_otsu_filter,
     get_curr_physical_units,
     get_curr_path,
     get_curr_properties_tuple,
@@ -148,6 +150,9 @@ class MainWindow(QMainWindow):
         self.ui.slice_slider.valueChanged.connect(self.slice_update)
         self.ui.reset_button.clicked.connect(self.reset_settings)
         self.ui.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
+        self.ui.otsu_radio_button.clicked.connect(self.disable_binary_if_using_otsu)
+        self.ui.binary_radio_button.clicked.connect(self.enable_binary_if_using_binary)
+        self.ui.threshold_preview_button.clicked.connect(self.render_threshold)
         self.ui.x_view_radio_button.clicked.connect(self.update_view)
         self.ui.y_view_radio_button.clicked.connect(self.update_view)
         self.ui.z_view_radio_button.clicked.connect(self.update_view)
@@ -168,6 +173,22 @@ class MainWindow(QMainWindow):
 
         self.ui.action_export_csv.setEnabled(not global_vars.SETTINGS_VIEW_ENABLED)
 
+    def disable_binary_if_using_otsu(self) -> None:
+        """Called when using Otsu filter
+        
+        Disable binary input box.
+        """
+        self.ui.upper_threshold_input.setEnabled(False)
+        self.ui.lower_threshold_input.setEnabled(False)
+
+    def enable_binary_if_using_binary(self) -> None:
+        """Called when using Binary filter
+        
+        Restore binary input box.
+        """
+        self.ui.upper_threshold_input.setEnabled(True)
+        self.ui.lower_threshold_input.setEnabled(True)
+
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
 
@@ -184,6 +205,7 @@ class MainWindow(QMainWindow):
             self.render_curr_slice()
         else:
             self.update_smoothing_settings()
+            self.update_binary_filter_settings()
             self.ui.apply_button.setText("Adjust")
             # Ignore the type annotation error here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
@@ -205,6 +227,10 @@ class MainWindow(QMainWindow):
         self.ui.smoothing_preview_button.setEnabled(settings_view_enabled)
         self.ui.otsu_radio_button.setEnabled(settings_view_enabled)
         self.ui.binary_radio_button.setEnabled(settings_view_enabled)
+        self.ui.lower_threshold.setEnabled(settings_view_enabled)
+        self.ui.lower_threshold_input.setEnabled(settings_view_enabled)
+        self.ui.upper_threshold.setEnabled(settings_view_enabled)
+        self.ui.upper_threshold_input.setEnabled(settings_view_enabled)
         self.ui.threshold_preview_button.setEnabled(settings_view_enabled)
         self.ui.action_export_csv.setEnabled(not settings_view_enabled)
         self.ui.circumference_label.setEnabled(not settings_view_enabled)
@@ -359,7 +385,14 @@ class MainWindow(QMainWindow):
         rv_dummy_var: np.ndarray = np.zeros(0)
 
         if not global_vars.SETTINGS_VIEW_ENABLED:
-            binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
+            if self.ui.otsu_radio_button.isChecked():
+                binary_contour_slice: np.ndarray = imgproc.contour(
+                    rotated_slice, ThresholdFilter.Otsu
+                )
+            else:
+                binary_contour_slice: np.ndarray = imgproc.contour(
+                    rotated_slice, ThresholdFilter.Binary
+                )
             rv_dummy_var = binary_contour_slice
             mask_QImage(
                 q_img,
@@ -437,6 +470,53 @@ class MainWindow(QMainWindow):
         smooth_slice: sitk.Image = get_curr_smooth_slice()
 
         slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
+
+        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
+
+        q_pixmap: QPixmap = QPixmap(q_img)
+
+        self.ui.image.setPixmap(q_pixmap)
+
+    def update_binary_filter_settings(self) -> None:
+        """Updates global binary filter settings."""
+
+        lower_threshold: str = self.ui.lower_threshold_input.displayText()
+        try:
+            float(lower_threshold)
+            global_vars.LOWER_THRESHOLD = float(lower_threshold)
+        except ValueError:
+            None
+        self.ui.lower_threshold_input.setText(str(global_vars.LOWER_THRESHOLD))
+        self.ui.lower_threshold_input.setPlaceholderText(
+            str(global_vars.LOWER_THRESHOLD)
+        )
+        global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
+            global_vars.LOWER_THRESHOLD
+        )
+
+        upper_threshold: str = self.ui.upper_threshold_input.displayText()
+        try:
+            float(upper_threshold)
+            global_vars.UPPER_THRESHOLD = float(upper_threshold)
+        except ValueError:
+            None
+        self.ui.upper_threshold_input.setText(str(global_vars.UPPER_THRESHOLD))
+        self.ui.upper_threshold_input.setPlaceholderText(
+            str(global_vars.UPPER_THRESHOLD)
+        )
+        global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(
+            global_vars.UPPER_THRESHOLD
+        )
+
+    def render_threshold(self) -> Union[np.ndarray, None]:
+        """Render filtered image slice on UI"""
+        if self.ui.otsu_radio_button.isChecked():
+            filter_img: sitk.Image = curr_otsu_filter()
+        else:
+            self.update_binary_filter_settings()
+            filter_img: sitk.Image = curr_binary_filter()
+
+        slice_np: np.ndarray = sitk.GetArrayFromImage(filter_img)
 
         q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
 
