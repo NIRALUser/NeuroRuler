@@ -310,7 +310,7 @@ class MainWindow(QMainWindow):
             self.render_image_num_and_path()
 
         if not all_added:
-            self.raise_error("error! shit")
+            self.raise_error("It appears you have uploaded an image with differing properties from the image(s) uploaded before. This image has not been loaded into the tool.")
 
     def raise_error(self, msg: str) -> None:
         """Creates a dialog with an error message.
@@ -318,7 +318,6 @@ class MainWindow(QMainWindow):
         :param msg: the error message to be displayed
         :type param: str
         :return: None"""
-        #dlg = ErrorDiag(self, msg)
         dlg = ErrorDiag(msg)
         dlg.exec_()
 
