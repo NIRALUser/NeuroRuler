@@ -1,6 +1,6 @@
 """Image helper functions that don't quite fit into the main algorithm, unlike imgproc.py.
 
-Mostly holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
+Mostly holds helper functions for working with IMAGE_DICT in global_vars.py."""
 
 from typing import Union
 import SimpleITK as sitk
@@ -52,7 +52,7 @@ def initialize_globals(path_list: list[Path]) -> bool:
     If loading images with different properties, then this method returns
     False, and IMAGE_DICT isn't updated with the differing images.
 
-    Mutated global variables: IMAGE_GROUPS, IMAGE_DICT, CURR_IMAGE_INDEX,
+    Mutated global variables: IMAGE_DICT, CURR_IMAGE_INDEX,
     READER, THETA_X, THETA_Y, THETA_Z, SLICE, EULER_3D_TRANSFORM.
 
     Specifically, clears IMAGE_DICT and then populates it.
@@ -302,7 +302,7 @@ def get_center_of_rotation(img: sitk.Image) -> tuple:
 
 
 def del_curr_img() -> None:
-    """Remove currently displayed image from IMAGE_DICT and IMAGE_GROUPS.
+    """Remove currently displayed image from IMAGE_DICT.
 
     Decrements CURR_IMAGE_INDEX if removing the last element.
 

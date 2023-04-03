@@ -259,7 +259,7 @@ class MainWindow(QMainWindow):
 
         Renders various elements depending on the value of `extend`.
 
-        :param extend: Whether to clear IMAGE_GROUPS and (re)initialize or add images to it. Determines which GUI elements are rendered.
+        :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
         :type extend: bool
         :return: None"""
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
@@ -289,7 +289,7 @@ class MainWindow(QMainWindow):
             self.render_curr_slice()
         else:
             # Doesn't need to re-render sliders to set max value of slice slider.
-            # update_image_groups does not change the batch.
+            # update_images does not change the batch.
             # Therefore, max value of slice slider does not change.
             # Must render image_num.
             # Does not need to render current slice. Images are added to the end of the dict.
@@ -508,8 +508,7 @@ class MainWindow(QMainWindow):
     def remove_curr_img(self) -> None:
         """Called after File > Remove File.
 
-        Removes current image from `IMAGE_DICT`. Since `IMAGE_DICT` is a reference to an image dict
-        in `IMAGE_GROUPS`, it's removed from `IMAGE_GROUPS` as well.
+        Removes current image from `IMAGE_DICT`.
 
         :returns: None"""
         img_helpers.del_curr_img()

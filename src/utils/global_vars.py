@@ -14,8 +14,7 @@ Use list(IMAGE_DICT.keys())[i] to return the i'th key in the dict, which can als
 Not sure about this operation's speed, but it's used only
 in the GUI for insertion and deletion operations, should be fine.
 
-All images in the dictionary have matching properties, as defined by mri_image.get_properties.
-This is due to the setup of IMAGE_GROUPS."""
+All images in the dictionary have matching properties, as defined by mri_image.get_properties."""
 
 CURR_IMAGE_INDEX: int = 0
 """Image of the current image in the loaded batch of images, which is a dict[Path, sitk.Image].

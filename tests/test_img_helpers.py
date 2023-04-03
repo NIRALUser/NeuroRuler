@@ -76,10 +76,10 @@ def test_del_curr_img_delete_last():
     clear_globals()
     initialize_globals(IMAGE_PATHS)
     global_vars.CURR_IMAGE_INDEX = (
-        len(global_vars.IMAGE_GROUPS[list(global_vars.IMAGE_GROUPS.keys())[0]]) - 1
+        len(global_vars.IMAGE_DICT) - 1
     )
     del_curr_img()
     assert (
         global_vars.CURR_IMAGE_INDEX
-        == len(global_vars.IMAGE_GROUPS[list(global_vars.IMAGE_GROUPS.keys())[0]]) - 1
+        == len(global_vars.IMAGE_DICT) - 1
     )
