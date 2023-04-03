@@ -26,11 +26,12 @@ from PySide6 import QtGui, QtCore
 from PySide6.QtGui import QPixmap, QAction
 from PySide6.QtWidgets import (
     QApplication,
+    QDialog,
+    QLabel,
     QMainWindow,
     QFileDialog,
     QMenu,
-    QMenuBar,
-    QWidgetAction,
+    QVBoxLayout,
     QWidget,
 )
 from PySide6.QtUiTools import QUiLoader
@@ -90,6 +91,16 @@ DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 # We assume units are millimeters if we can't find units in metadata
 MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "millimeters (mm)"
 
+
+class ErrorDiag(QDialog):
+    def __init__(self, msg: str):
+        super().__init__()
+
+        self.setWindowTitle("Error")
+        self.layout = QVBoxLayout()
+        message = QLabel(msg)
+        self.layout.addWidget(message)
+        self.setLayout(self.layout)
 
 class MainWindow(QMainWindow):
     """Main window of the application.
@@ -299,7 +310,17 @@ class MainWindow(QMainWindow):
             self.render_image_num_and_path()
 
         if not all_added:
-            print("error! shit")
+            self.raise_error("error! shit")
+
+    def raise_error(self, msg: str) -> None:
+        """Creates a dialog with an error message.
+
+        :param msg: the error message to be displayed
+        :type param: str
+        :return: None"""
+        #dlg = ErrorDiag(self, msg)
+        dlg = ErrorDiag(msg)
+        dlg.exec_()
 
     def update_view(self) -> None:
         """Renders view."""
