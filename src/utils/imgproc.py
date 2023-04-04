@@ -28,30 +28,31 @@ MAX_NUM_MISMATCHED_PIXELS_FOR_BACKGROUND_COLOR_DETECTION: int = 3
 # To compute arc length, we need a np array
 # To overlay the contour on top of the base image in the GUI, we need a np array
 def contour(
-    mri_slice: sitk.Image, threshold_filter: ThresholdFilter = ThresholdFilter.Otsu
+    img_2d: sitk.Image, threshold_filter: ThresholdFilter = ThresholdFilter.Otsu
 ) -> np.ndarray:
-    """Generate the contour of a 2D slice by applying smoothing, Otsu threshold,
-    hole filling, and island removal (remove largest component). Return a binary (0|1) numpy
+    """Generate the contour of a 2D slice by applying smoothing, Otsu threshold or binary threshold,
+    hole filling, and island removal (select largest component). Return a binary (0|1) numpy
     array with only the points on the contour=1.
 
     Calls sitk.GetArrayFromImage() at the end, which will return the transpose of the sitk.Image.
-    retranspose defaults to False to match images viewed in ITK-SNAP (radiological conventions).
+    Consider whether to re-transpose the result or not.
 
-    :param mri_slice: 2D MRI slice
-    :type mri_slice: sitk.Image
+    :param img_2d:
+    :type img_2d: sitk.Image
     :param threshold_filter: ThresholdFilter.Otsu or ThresholdFilter.Binary. Defaults to ThresholdFilter.Otsu
     :type threshold_filter: ThresholdFilter
     :return: binary (0|1) numpy array with only the points on the contour = 1
     :rtype: np.ndarray"""
     smooth_slice: sitk.Image = SMOOTHING_FILTER.Execute(
-        sitk.Cast(mri_slice, sitk.sitkFloat64)
+        sitk.Cast(img_2d, sitk.sitkFloat64)
     )
 
     if threshold_filter == ThresholdFilter.Otsu:
-        # This always does fg = 0 (black), bg = 1 (white)
+        # This always results in fg = 0 (black), bg = 1 (white)
         thresholded: sitk.Image = OTSU_THRESHOLD_FILTER.Execute(smooth_slice)
     else:
-        # This sometimes does fg = 0 (black), bg = 1 (white); other times fg = 1 (white), bg = 0 (black)
+        # This sometimes results in fg = 0 (black), bg = 1 (white)
+        # other times fg = 1 (white), bg = 0 (black)
         # Depends on the lower and upper threshold settings
         thresholded: sitk.Image = BINARY_THRESHOLD_FILTER.Execute(smooth_slice)
         if (
@@ -92,7 +93,6 @@ def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
     return largest_component_binary_image
 
 
-# Based on commit a230a6b discussion, may not need to worry about non-square pixels
 def length_of_contour(
     binary_contour_slice: np.ndarray, raise_exception: bool = True
 ) -> float:
@@ -143,12 +143,13 @@ def length_of_contour(
     return arc_length
 
 
-# TODO: Implement this better, but this realistically is all we need...
+# TODO: Super naive, but realistically will work fine
 def background_color_of_binary_thresholded_slice(img_2d: sitk.Image) -> BinaryColor:
     """Checks the background color of the slice returning from binary threshold filter
     since some settings result in fg 0, bg 1, and other settings result in fg 1, bg 0.
 
-    This function assumes there won't be a lot of noise or islands.
+    Internally, compares the pixel value at (0, 0) to pixel values at the top, bottom, left, and right edges.
+    Very naive approach that assumes there won't be noise or islands at the edges.
 
     :param img_2d:
     :type img_2d: sitk.Image

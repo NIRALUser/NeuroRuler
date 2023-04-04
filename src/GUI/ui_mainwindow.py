@@ -16,16 +16,17 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QLineEdit, QMainWindow, QMenu, QMenuBar,
-    QPushButton, QRadioButton, QScrollBar, QSizePolicy,
-    QSpacerItem, QStatusBar, QVBoxLayout, QWidget, QButtonGroup)
+from PySide6.QtWidgets import (QApplication, QButtonGroup, QFrame, QHBoxLayout,
+    QLabel, QLineEdit, QMainWindow, QMenu,
+    QMenuBar, QPushButton, QRadioButton, QScrollBar,
+    QSizePolicy, QSpacerItem, QStatusBar, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(858, 892)
+        MainWindow.resize(1000, 864)
         self.action_documentation = QAction(MainWindow)
         self.action_documentation.setObjectName(u"action_documentation")
         self.action_exit = QAction(MainWindow)
@@ -209,24 +210,29 @@ class Ui_MainWindow(object):
         self.horizontalLayout_9 = QHBoxLayout()
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.x_view_radio_button = QRadioButton(self.centralwidget)
+        self.view_button_group = QButtonGroup(MainWindow)
+        self.view_button_group.setObjectName(u"view_button_group")
+        self.view_button_group.addButton(self.x_view_radio_button)
         self.x_view_radio_button.setObjectName(u"x_view_radio_button")
         self.x_view_radio_button.setEnabled(False)
-        self.x_view_radio_button.setAutoExclusive(False)
+        self.x_view_radio_button.setAutoExclusive(True)
 
         self.horizontalLayout_9.addWidget(self.x_view_radio_button)
 
         self.y_view_radio_button = QRadioButton(self.centralwidget)
+        self.view_button_group.addButton(self.y_view_radio_button)
         self.y_view_radio_button.setObjectName(u"y_view_radio_button")
         self.y_view_radio_button.setEnabled(False)
-        self.y_view_radio_button.setAutoExclusive(False)
+        self.y_view_radio_button.setAutoExclusive(True)
 
         self.horizontalLayout_9.addWidget(self.y_view_radio_button)
 
         self.z_view_radio_button = QRadioButton(self.centralwidget)
+        self.view_button_group.addButton(self.z_view_radio_button)
         self.z_view_radio_button.setObjectName(u"z_view_radio_button")
         self.z_view_radio_button.setEnabled(False)
         self.z_view_radio_button.setChecked(True)
-        self.z_view_radio_button.setAutoExclusive(False)
+        self.z_view_radio_button.setAutoExclusive(True)
 
         self.horizontalLayout_9.addWidget(self.z_view_radio_button)
 
@@ -382,13 +388,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_9.addItem(self.verticalSpacer_12)
 
-        self.filter_button_group = QButtonGroup()
-
         self.otsu_radio_button = QRadioButton(self.centralwidget)
+        self.threshold_button_group = QButtonGroup(MainWindow)
+        self.threshold_button_group.setObjectName(u"threshold_button_group")
+        self.threshold_button_group.addButton(self.otsu_radio_button)
         self.otsu_radio_button.setObjectName(u"otsu_radio_button")
         self.otsu_radio_button.setEnabled(False)
-        #self.otsu_radio_button.setAutoExclusive(False)
-        self.filter_button_group.addButton(self.otsu_radio_button)
+        self.otsu_radio_button.setChecked(True)
+        self.otsu_radio_button.setAutoExclusive(True)
 
         self.verticalLayout_9.addWidget(self.otsu_radio_button)
 
@@ -397,13 +404,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_9.addItem(self.verticalSpacer_13)
 
         self.binary_radio_button = QRadioButton(self.centralwidget)
+        self.threshold_button_group.addButton(self.binary_radio_button)
         self.binary_radio_button.setObjectName(u"binary_radio_button")
         self.binary_radio_button.setEnabled(False)
-        self.binary_radio_button.setChecked(True)
-        #self.binary_radio_button.setAutoExclusive(False)
-        self.filter_button_group.addButton(self.binary_radio_button)
-
-        self.filter_button_group.setExclusive(True)
+        self.binary_radio_button.setAutoExclusive(True)
 
         self.verticalLayout_9.addWidget(self.binary_radio_button)
 
@@ -574,7 +578,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 809, 37))
+        self.menubar.setGeometry(QRect(0, 0, 1000, 24))
         self.menubar.setNativeMenuBar(True)
         self.menu_file = QMenu(self.menubar)
         self.menu_file.setObjectName(u"menu_file")
@@ -817,9 +821,9 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(statustip)
         self.slice_slider.setStatusTip(QCoreApplication.translate("MainWindow", u"Control slice value. Left click on the left end or right end to decrease or increase by 1.", None))
 #endif // QT_CONFIG(statustip)
-        self.x_view_radio_button.setText(QCoreApplication.translate("MainWindow", u"X view", None))
-        self.y_view_radio_button.setText(QCoreApplication.translate("MainWindow", u"Y view", None))
-        self.z_view_radio_button.setText(QCoreApplication.translate("MainWindow", u"Z view", None))
+        self.x_view_radio_button.setText(QCoreApplication.translate("MainWindow", u"Sagittal", None))
+        self.y_view_radio_button.setText(QCoreApplication.translate("MainWindow", u"Coronal", None))
+        self.z_view_radio_button.setText(QCoreApplication.translate("MainWindow", u"Axial", None))
 #if QT_CONFIG(tooltip)
         self.reset_button.setToolTip(QCoreApplication.translate("MainWindow", u"Reset rotation and slice values for the current image.", None))
 #endif // QT_CONFIG(tooltip)
@@ -838,10 +842,10 @@ class Ui_MainWindow(object):
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Threshold Options", None))
         self.otsu_radio_button.setText(QCoreApplication.translate("MainWindow", u"Otsu Threshold", None))
         self.binary_radio_button.setText(QCoreApplication.translate("MainWindow", u"Binary Threshold", None))
-        self.lower_threshold_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"0.0", None))
         self.lower_threshold.setText(QCoreApplication.translate("MainWindow", u"Lower Threshold:", None))
-        self.upper_threshold_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"200.0", None))
+        self.lower_threshold_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"0.0", None))
         self.upper_threshold.setText(QCoreApplication.translate("MainWindow", u"Upper Threshold:", None))
+        self.upper_threshold_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"200.0", None))
         self.threshold_preview_button.setText(QCoreApplication.translate("MainWindow", u"Preview", None))
 #if QT_CONFIG(tooltip)
         self.apply_button.setToolTip(QCoreApplication.translate("MainWindow", u"Compute circumference using current settings.", None))

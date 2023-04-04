@@ -15,7 +15,7 @@ from src.utils.constants import (
     SUPPORTED_EXTENSIONS,
 )
 from src.utils.global_vars import READER
-from src.utils.img_helpers import rotated_slice_hardcoded
+from src.utils.img_helpers import get_rotated_slice_hardcoded
 
 EPSILON: float = 0.001
 """Used for `float` comparisons."""
@@ -74,8 +74,10 @@ def test_contour_doesnt_mutate_slice():
     """Test that contour() doesn't mutate its argument."""
     for img in EXAMPLE_IMAGES.values():
         for slice_num in range(img.GetSize()[2] // 3):
-            rotated_slice: sitk.Image = rotated_slice_hardcoded(img, 0, 0, 0, slice_num)
-            rotated_slice_copy: sitk.Image = rotated_slice_hardcoded(
+            rotated_slice: sitk.Image = get_rotated_slice_hardcoded(
+                img, 0, 0, 0, slice_num
+            )
+            rotated_slice_copy: sitk.Image = get_rotated_slice_hardcoded(
                 img, 0, 0, 0, slice_num
             )
             contour(rotated_slice)
@@ -91,7 +93,7 @@ def test_contour_returns_binary_slice():
     """Test that the contour function always returns a binary (0|1) slice."""
     for img in EXAMPLE_IMAGES.values():
         for slice_num in range(img.GetSize()[2] // 5):
-            rotated_slice = rotated_slice_hardcoded(img, 0, 0, 0, slice_num)
+            rotated_slice = get_rotated_slice_hardcoded(img, 0, 0, 0, slice_num)
             contour_slice_np: np.ndarray = contour(rotated_slice)
             assert contour_slice_np.min() <= 1 and contour_slice_np.max() <= 1
 
@@ -103,7 +105,7 @@ def test_contour_retranspose_has_same_dimensions_as_original_image():
             for theta_y in range(0, 30, 15):
                 for theta_z in range(0, 30, 15):
                     for slice_num in range(img.GetSize()[2] // 3):
-                        rotated_slice = rotated_slice_hardcoded(
+                        rotated_slice = get_rotated_slice_hardcoded(
                             img, theta_x, theta_y, theta_z, slice_num
                         )
                         contour_slice: np.ndarray = contour(rotated_slice, True)
@@ -117,7 +119,9 @@ def test_contour_retranspose_has_same_dimensions_as_original_image():
 def test_length_of_contour_doesnt_mutate_contour():
     for img in EXAMPLE_IMAGES.values():
         for slice_num in range(img.GetSize()[2] // 10):
-            rotated_slice: sitk.Image = rotated_slice_hardcoded(img, 0, 0, 0, slice_num)
+            rotated_slice: sitk.Image = get_rotated_slice_hardcoded(
+                img, 0, 0, 0, slice_num
+            )
             contour_slice: np.ndarray = contour(rotated_slice)
             contour_slice_copy: np.ndarray = contour_slice.copy()
             length_of_contour(contour_slice, False)
@@ -133,7 +137,9 @@ def test_contours_0_is_always_parent_contour_if_no_islands():
     """
     for img in EXAMPLE_IMAGES.values():
         for slice_num in range(img.GetSize()[2] // 7):
-            rotated_slice: sitk.Image = rotated_slice_hardcoded(img, 0, 0, 0, slice_num)
+            rotated_slice: sitk.Image = get_rotated_slice_hardcoded(
+                img, 0, 0, 0, slice_num
+            )
             # contour removes islands
             contour_slice: np.ndarray = contour(rotated_slice)
             contours, hierarchy = cv2.findContours(
@@ -150,7 +156,7 @@ def test_arc_length_of_copy_after_transpose_same_as_no_copy_after_transpose():
             for theta_y in range(0, 30, 15):
                 for theta_z in range(0, 30, 15):
                     for slice_num in range(0, img.GetSize()[2], img.GetSize()[2] // 10):
-                        rotated_slice: sitk.Image = rotated_slice_hardcoded(
+                        rotated_slice: sitk.Image = get_rotated_slice_hardcoded(
                             img, theta_x, theta_y, theta_z, slice_num
                         )
                         contour_slice_retransposed_not_copied = contour(rotated_slice)
@@ -199,7 +205,7 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
             for theta_y in range(0, 31, 15):
                 for theta_z in range(0, 31, 15):
                     for slice_num in range(0, img.GetSize()[2]):
-                        rotated_slice: sitk.Image = rotated_slice_hardcoded(
+                        rotated_slice: sitk.Image = get_rotated_slice_hardcoded(
                             img, theta_x, theta_y, theta_z, slice_num
                         )
                         contour_slice: np.ndarray = contour(rotated_slice, True)
@@ -246,7 +252,7 @@ def test_contour_slice_retranspose_same_dimensions_as_original_slice():
                     for slice_num in range(
                         0, original_dimensions[2], original_dimensions[2] // 4
                     ):
-                        rotated_slice: sitk.Image = rotated_slice_hardcoded(
+                        rotated_slice: sitk.Image = get_rotated_slice_hardcoded(
                             img, theta_x, theta_y, theta_z, slice_num
                         )
                         binary_contour = contour(rotated_slice, True)
