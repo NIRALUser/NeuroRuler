@@ -76,11 +76,13 @@ def initialize_globals(path_list: list[Path]) -> bool:
     global_vars.SMOOTHING_FILTER.SetConductanceParameter(3.0)
     global_vars.SMOOTHING_FILTER.SetNumberOfIterations(5)
     global_vars.SMOOTHING_FILTER.SetTimeStep(0.0625)
-    global_vars.SETTINGS_VIEW_ENABLED = True
     global_vars.VIEW = constants.View.Z
     global_vars.X_CENTER = get_middle_dimension(curr_img, View.X)
     global_vars.Y_CENTER = get_middle_dimension(curr_img, View.Y)
     return all_added
+
+    global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(100)
+    global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(200)
 
 
 def clear_globals() -> None:
@@ -93,6 +95,22 @@ def clear_globals() -> None:
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
     global_vars.SLICE = 0
+
+
+def get_curr_path() -> Path:
+    """Return the current Path in IMAGE_DICT. That is, the key at index CURR_IMAGE_INDEX.
+
+    :return: Path of current image
+    :rtype: Path"""
+    return list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
+
+
+def get_curr_image() -> sitk.Image:
+    """Return the sitk.Image at the current index in global_vars.IMAGE_DICT.
+
+    :return: current image
+    :rtype: sitk.Image"""
+    return global_vars.IMAGE_DICT[get_curr_path()]
 
 
 # TODO: Add more properties?
@@ -115,20 +133,36 @@ def get_properties(img: sitk.Image) -> tuple:
     )
 
 
-def get_curr_path() -> Path:
-    """Return the current Path in IMAGE_DICT. That is, the key at index CURR_IMAGE_INDEX.
+def get_middle_dimension(img: sitk.Image, axis: View) -> int:
+    """int((img.GetSize()[axis.value] - 1) / 2)
 
-    :return: Path of current image
-    :rtype: Path"""
-    return list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
+    :param img:
+    :param axis: int (0-2)
+    :type img: sitk.Image
+    :return: int((img.GetSize()[axis.value] - 1) / 2)
+    :rtype: int"""
+    return int((img.GetSize()[axis.value] - 1) / 2)
 
 
-def get_curr_image() -> sitk.Image:
-    """Return the sitk.Image at the current index in global_vars.IMAGE_DICT.
+def get_curr_image_size() -> tuple:
+    """Return dimensions of current image.
 
-    :return: current image
-    :rtype: sitk.Image"""
-    return global_vars.IMAGE_DICT[get_curr_path()]
+    :return: dimensions
+    :rtype: tuple"""
+    return get_curr_image().GetSize()
+
+
+def get_center_of_rotation(img: sitk.Image) -> tuple:
+    """img.TransformContinuousIndexToPhysicalPoint([
+    (dimension - 1) / 2.0 for dimension in img.GetSize()])
+
+    :param: img
+    :type img: sitk.Image
+    :return: img.TransformContinuousIndexToPhysicalPoint([
+    (dimension - 1) / 2.0 for dimension in img.GetSize()]"""
+    return img.TransformContinuousIndexToPhysicalPoint(
+        [(dimension - 1) / 2.0 for dimension in img.GetSize()]
+    )
 
 
 def set_curr_image(image: sitk.Image) -> None:
@@ -157,14 +191,6 @@ def orient_curr_image(view: Enum) -> None:
     )
     oriented: sitk.Image = global_vars.ORIENT_FILTER.Execute(get_curr_image())
     set_curr_image(oriented)
-
-
-def get_curr_image_size() -> tuple:
-    """Return dimensions of current image.
-
-    :return: dimensions
-    :rtype: tuple"""
-    return get_curr_image().GetSize()
 
 
 def get_curr_rotated_slice() -> sitk.Image:
@@ -207,34 +233,28 @@ def get_curr_smooth_slice() -> sitk.Image:
     return smooth_slice
 
 
-def rotated_slice_hardcoded(
-    mri_img_3d: sitk.Image,
-    theta_x: int = 0,
-    theta_y: int = 0,
-    theta_z: int = 0,
-    slice_num: int = 0,
-):
-    """Get 2D rotated slice of mri_img_3d from hardcoded values. Rotation values are in degrees, slice_num is an int.
+def get_curr_binary_thresholded_slice() -> sitk.Image:
+    """Return filtered slice of the current image based on binary filter determined by global threshold settings.
 
-    For unit testing. Sets center of global EULER_3D_TRANSFORM to center of rotation of mri_img_3d.
-
-    :param mri_img_3d:
-    :type mri_img_3d: sitk.Image
-    :param theta_x:
-    :type theta_x: int
-    :param theta_y:
-    :type theta_y: int
-    :param theta_z:
-    :type theta_z: int
-    :param slice_num:
-    :type slice_num: int"""
-    global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(mri_img_3d))
-    global_vars.EULER_3D_TRANSFORM.SetRotation(
-        degrees_to_radians(theta_x),
-        degrees_to_radians(theta_y),
-        degrees_to_radians(theta_z),
+    :return: filtered 2D rotated slice
+    :rtype: sitk.Image"""
+    rotated_slice: sitk.Image = get_curr_rotated_slice()
+    filter_slice: sitk.Image = global_vars.BINARY_THRESHOLD_FILTER.Execute(
+        sitk.Cast(rotated_slice, sitk.sitkFloat64)
     )
-    return sitk.Resample(mri_img_3d, global_vars.EULER_3D_TRANSFORM)[:, :, slice_num]
+    return filter_slice
+
+
+def get_curr_otsu_slice() -> sitk.Image:
+    """Return filtered slice of the current image based on Otsu filter.
+
+    :return: filtered 2D rotated slice
+    :rtype: sitk.Image"""
+    rotated_slice: sitk.Image = get_curr_rotated_slice()
+    filter_slice: sitk.Image = global_vars.OTSU_THRESHOLD_FILTER.Execute(
+        sitk.Cast(rotated_slice, sitk.sitkFloat64)
+    )
+    return filter_slice
 
 
 def get_curr_metadata() -> dict[str, str]:
@@ -277,30 +297,6 @@ def get_curr_properties_tuple() -> tuple:
     return get_properties(list(global_vars.IMAGE_DICT.values())[0])
 
 
-def get_middle_dimension(img: sitk.Image, axis: View) -> int:
-    """int((img.GetSize()[axis.value] - 1) / 2)
-
-    :param img:
-    :param axis: int (0-2)
-    :type img: sitk.Image
-    :return: int((img.GetSize()[axis.value] - 1) / 2)
-    :rtype: int"""
-    return int((img.GetSize()[axis.value] - 1) / 2)
-
-
-def get_center_of_rotation(img: sitk.Image) -> tuple:
-    """img.TransformContinuousIndexToPhysicalPoint([
-    (dimension - 1) / 2.0 for dimension in img.GetSize()])
-
-    :param: img
-    :type img: sitk.Image
-    :return: img.TransformContinuousIndexToPhysicalPoint([
-    (dimension - 1) / 2.0 for dimension in img.GetSize()]"""
-    return img.TransformContinuousIndexToPhysicalPoint(
-        [(dimension - 1) / 2.0 for dimension in img.GetSize()]
-    )
-
-
 def del_curr_img() -> None:
     """Remove currently displayed image from IMAGE_DICT.
 
@@ -331,3 +327,33 @@ def previous_img() -> None:
     global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX - 1) % len(
         global_vars.IMAGE_DICT
     )
+
+
+def get_rotated_slice_hardcoded(
+    mri_img_3d: sitk.Image,
+    theta_x: int = 0,
+    theta_y: int = 0,
+    theta_z: int = 0,
+    slice_num: int = 0,
+):
+    """Get 2D rotated slice of mri_img_3d from hardcoded values. Rotation values are in degrees, slice_num is an int.
+
+    For unit testing. Sets center of global EULER_3D_TRANSFORM to center of rotation of mri_img_3d.
+
+    :param mri_img_3d:
+    :type mri_img_3d: sitk.Image
+    :param theta_x:
+    :type theta_x: int
+    :param theta_y:
+    :type theta_y: int
+    :param theta_z:
+    :type theta_z: int
+    :param slice_num:
+    :type slice_num: int"""
+    global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(mri_img_3d))
+    global_vars.EULER_3D_TRANSFORM.SetRotation(
+        degrees_to_radians(theta_x),
+        degrees_to_radians(theta_y),
+        degrees_to_radians(theta_z),
+    )
+    return sitk.Resample(mri_img_3d, global_vars.EULER_3D_TRANSFORM)[:, :, slice_num]

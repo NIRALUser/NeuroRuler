@@ -20,11 +20,6 @@ EXPECTED_NUM_FIELDS_IN_JSON: int = 10
 """Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
 will be raised."""
 
-ROTATION_MIN: int = -90
-"""In degrees"""
-ROTATION_MAX: int = 90
-"""In degrees"""
-
 SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """File formats supported. Must be a subset of the file formats supported by SimpleITK.
 
@@ -58,6 +53,35 @@ DARK_THEME_COLOR: str = "3daee9"
 LIGHT_THEME_COLOR: str = "3daef3"
 """Blue that's the main color in light theme"""
 
+
+class View(Enum):
+    """X, Y, or Z view.
+
+    The letters are assigned indices 0-2 to be used for indexing operations."""
+
+    X = 0
+    Y = 1
+    Z = 2
+
+
+class ThresholdFilter(Enum):
+    """Determines the threshold filter (Otsu or binary) used in imgproc.contour()."""
+
+    Otsu = 0
+    Binary = 1
+
+
+class BinaryColor(Enum):
+    Black = 0
+    White = 1
+
+
+ROTATION_MIN: int = -90
+"""In degrees"""
+ROTATION_MAX: int = 90
+"""In degrees"""
+
+
 NUM_CONTOURS_IN_INVALID_SLICE: int = 10
 """If this number of contours or more is detected in a slice after processing by contour()
 (Otsu, largest component, etc.), then the slice is considered invalid."""
@@ -85,16 +109,6 @@ NIFTI_METADATA_UNITS_KEY: str = "xyzt_units"
 
 NUM_DIGITS_TO_ROUND_TO: int = 3
 """For floats, number of digits to round to, i.e. round(float, n)."""
-
-
-class View(Enum):
-    """X, Y, or Z view.
-
-    The letters are assigned indices 0-2 to be used for indexing operations."""
-
-    X = 0
-    Y = 1
-    Z = 2
 
 
 # Got these values by looking at ITK-SNAP and

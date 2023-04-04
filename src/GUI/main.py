@@ -46,7 +46,7 @@ import pprint
 # This is used only in print_properties()
 from collections import OrderedDict
 
-from src.utils.constants import View
+from src.utils.constants import View, ThresholdFilter
 import src.utils.constants as constants
 
 # Note, do not use imports like
@@ -68,6 +68,8 @@ from src.utils.img_helpers import (
     get_curr_rotated_slice,
     get_curr_smooth_slice,
     get_curr_metadata,
+    get_curr_binary_thresholded_slice,
+    get_curr_otsu_slice,
     get_curr_physical_units,
     get_curr_path,
     get_curr_properties_tuple,
@@ -79,6 +81,10 @@ import src.utils.img_helpers as img_helpers
 
 LOADER: QUiLoader = QUiLoader()
 PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
+
+SETTINGS_VIEW_ENABLED: bool = True
+"""Whether the user is able to adjust settings (settings screen) or not
+(circumference and contoured image screen)."""
 
 DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
 DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
@@ -159,6 +165,9 @@ class MainWindow(QMainWindow):
         self.ui.slice_slider.valueChanged.connect(self.slice_update)
         self.ui.reset_button.clicked.connect(self.reset_settings)
         self.ui.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
+        self.ui.otsu_radio_button.clicked.connect(self.disable_binary_threshold_inputs)
+        self.ui.binary_radio_button.clicked.connect(self.enable_binary_threshold_inputs)
+        self.ui.threshold_preview_button.clicked.connect(self.render_threshold)
         self.ui.x_view_radio_button.clicked.connect(self.update_view)
         self.ui.y_view_radio_button.clicked.connect(self.update_view)
         self.ui.z_view_radio_button.clicked.connect(self.update_view)
@@ -167,7 +176,8 @@ class MainWindow(QMainWindow):
     def enable_elements(self) -> None:
         """Called after File > Open.
 
-        Enables GUI elements. Explicitly disables some (e.g., Export CSV menu item).
+        Enables GUI elements. Explicitly disables some (e.g., Export CSV menu item and
+        binary threshold inputs, since Otsu is default).
         """
         # findChildren searches recursively by default
         for widget in self.findChildren(QWidget):
@@ -177,7 +187,16 @@ class MainWindow(QMainWindow):
         for widget in self.findChildren(QAction):
             widget.setEnabled(True)
 
-        self.ui.action_export_csv.setEnabled(not global_vars.SETTINGS_VIEW_ENABLED)
+        self.ui.action_export_csv.setEnabled(not SETTINGS_VIEW_ENABLED)
+        self.disable_binary_threshold_inputs()
+
+    def enable_binary_threshold_inputs(self) -> None:
+        """Called when Binary filter button is clicked.
+
+        Restore binary input box.
+        """
+        self.ui.upper_threshold_input.setEnabled(True)
+        self.ui.lower_threshold_input.setEnabled(True)
 
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
@@ -186,8 +205,10 @@ class MainWindow(QMainWindow):
 
         Enables/disables GUI elements depending on the value of SETTINGS_VIEW_ENABLED.
         """
-        global_vars.SETTINGS_VIEW_ENABLED = not global_vars.SETTINGS_VIEW_ENABLED
-        settings_view_enabled = global_vars.SETTINGS_VIEW_ENABLED
+        # Unsure sure why this is necessary here but nowhere else...
+        global SETTINGS_VIEW_ENABLED
+        SETTINGS_VIEW_ENABLED = not SETTINGS_VIEW_ENABLED
+        settings_view_enabled = SETTINGS_VIEW_ENABLED
         if settings_view_enabled:
             self.ui.apply_button.setText("Apply")
             self.ui.circumference_label.setText(DEFAULT_CIRCUMFERENCE_LABEL_TEXT)
@@ -195,12 +216,15 @@ class MainWindow(QMainWindow):
             self.render_curr_slice()
         else:
             self.update_smoothing_settings()
+            self.update_binary_filter_settings()
             self.ui.apply_button.setText("Adjust")
             # Ignore the type annotation error here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
             self.render_circumference(binary_contour_slice)
 
+        # TODO: Call enable_elements and then a disable method (code another one, and it'd be short)
+        # If not settings_view_enabled
         self.ui.action_open.setEnabled(settings_view_enabled)
         self.ui.action_add_images.setEnabled(settings_view_enabled)
         self.ui.action_remove_image.setEnabled(settings_view_enabled)
@@ -216,6 +240,10 @@ class MainWindow(QMainWindow):
         self.ui.smoothing_preview_button.setEnabled(settings_view_enabled)
         self.ui.otsu_radio_button.setEnabled(settings_view_enabled)
         self.ui.binary_radio_button.setEnabled(settings_view_enabled)
+        self.ui.lower_threshold.setEnabled(settings_view_enabled)
+        self.ui.lower_threshold_input.setEnabled(settings_view_enabled)
+        self.ui.upper_threshold.setEnabled(settings_view_enabled)
+        self.ui.upper_threshold_input.setEnabled(settings_view_enabled)
         self.ui.threshold_preview_button.setEnabled(settings_view_enabled)
         self.ui.action_export_csv.setEnabled(not settings_view_enabled)
         self.ui.circumference_label.setEnabled(not settings_view_enabled)
@@ -230,6 +258,20 @@ class MainWindow(QMainWindow):
         self.ui.x_view_radio_button.setEnabled(settings_view_enabled)
         self.ui.y_view_radio_button.setEnabled(settings_view_enabled)
         self.ui.z_view_radio_button.setEnabled(settings_view_enabled)
+        self.ui.lower_threshold_input.setEnabled(
+            settings_view_enabled and self.ui.binary_radio_button.isChecked()
+        )
+        self.ui.upper_threshold_input.setEnabled(
+            settings_view_enabled and self.ui.binary_radio_button.isChecked()
+        )
+
+    def disable_binary_threshold_inputs(self) -> None:
+        """Called when Otsu filter button is clicked.
+
+        Disable binary threshold input boxes.
+        """
+        self.ui.upper_threshold_input.setEnabled(False)
+        self.ui.lower_threshold_input.setEnabled(False)
 
     def disable_elements(self) -> None:
         """Called when the list is now empty, i.e. just removed from list of length 1.
@@ -322,28 +364,18 @@ class MainWindow(QMainWindow):
         dlg.exec_()
 
     def update_view(self) -> None:
-        """Renders view."""
+        """Called when clicking on any of the three view radio buttons.
 
-        if (
-            self.ui.x_view_radio_button.isChecked()
-            and global_vars.VIEW != constants.View.X
-        ):
+        Sets global_vars.VIEW to the correct value. Then orients the current image and renders.
+        """
+        # The three buttons are in a button group in the .ui file
+        # And all have autoExclusive=True
+        if self.ui.x_view_radio_button.isChecked():
             global_vars.VIEW = constants.View.X
-            self.ui.y_view_radio_button.setChecked(False)
-            self.ui.z_view_radio_button.setChecked(False)
-
-        elif (
-            self.ui.y_view_radio_button.isChecked()
-            and global_vars.VIEW != constants.View.Y
-        ):
+        elif self.ui.y_view_radio_button.isChecked():
             global_vars.VIEW = constants.View.Y
-            self.ui.x_view_radio_button.setChecked(False)
-            self.ui.z_view_radio_button.setChecked(False)
-
         else:
             global_vars.VIEW = constants.View.Z
-            self.ui.x_view_radio_button.setChecked(False)
-            self.ui.y_view_radio_button.setChecked(False)
 
         self.orient_curr_image(global_vars.VIEW)
         self.render_curr_slice()
@@ -354,60 +386,8 @@ class MainWindow(QMainWindow):
         self.ui.y_view_radio_button.setChecked(False)
         self.ui.z_view_radio_button.setChecked(True)
 
-    def render_curr_slice(self) -> Union[np.ndarray, None]:
-        """Resamples the currently selected image using its rotation and slice settings,
-        then renders the resulting slice in the GUI.
-
-        DOES NOT set text for `image_num_label` and file path labels.
-
-        If `not SETTINGS_VIEW_ENABLED`, also calls `imgproc.contour()` and outlines
-        the contour of the QImage (mutating it).
-
-        Additionally, also returns a view of the binary contoured slice if `not SETTINGS_VIEW_ENABLED`.
-        This saves work when computing circumference.
-
-        :return: np.ndarray if `not SETTINGS_VIEW_ENABLED` else None
-        :rtype: np.ndarray or None"""
-
-        if not global_vars.SETTINGS_VIEW_ENABLED:
-            self.set_view_z()
-
-        rotated_slice: sitk.Image = get_curr_rotated_slice()
-
-        slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
-
-        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
-
-        rv_dummy_var: np.ndarray = np.zeros(0)
-
-        if not global_vars.SETTINGS_VIEW_ENABLED:
-            binary_contour_slice: np.ndarray = imgproc.contour(rotated_slice, False)
-            rv_dummy_var = binary_contour_slice
-            mask_QImage(
-                q_img,
-                np.transpose(binary_contour_slice),
-                string_to_QColor(user_settings.CONTOUR_COLOR),
-            )
-
-        elif global_vars.VIEW != constants.View.Z:
-            z_indicator: np.ndarray = np.zeros(slice_np.shape)
-            z_indicator[get_curr_image_size()[2] - global_vars.SLICE - 1, :] = 1
-            mask_QImage(
-                q_img,
-                np.transpose(z_indicator),
-                string_to_QColor(user_settings.CONTOUR_COLOR),
-            )
-
-        q_pixmap: QPixmap = QPixmap(q_img)
-
-        self.ui.image.setPixmap(q_pixmap)
-
-        if not global_vars.SETTINGS_VIEW_ENABLED:
-            return rv_dummy_var
-
     def update_smoothing_settings(self) -> None:
         """Updates global smoothing settings."""
-
         conductance: str = self.ui.conductance_parameter_input.displayText()
         try:
             global_vars.CONDUCTANCE_PARAMETER = float(conductance)
@@ -450,20 +430,114 @@ class MainWindow(QMainWindow):
         self.ui.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
         global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
 
-    def render_smooth_slice(self) -> Union[np.ndarray, None]:
-        """Renders smooth slice in GUI. Allows user to preview result of smoothing settings."""
-        self.update_smoothing_settings()
+    def update_binary_filter_settings(self) -> None:
+        """Updates global binary filter settings."""
+        lower_threshold: str = self.ui.lower_threshold_input.displayText()
+        try:
+            global_vars.LOWER_THRESHOLD = float(lower_threshold)
+        except ValueError:
+            pass
+        self.ui.lower_threshold_input.setText(str(global_vars.LOWER_THRESHOLD))
+        self.ui.lower_threshold_input.setPlaceholderText(
+            str(global_vars.LOWER_THRESHOLD)
+        )
+        global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
+            global_vars.LOWER_THRESHOLD
+        )
 
-        self.set_view_z()
+        upper_threshold: str = self.ui.upper_threshold_input.displayText()
+        try:
+            global_vars.UPPER_THRESHOLD = float(upper_threshold)
+        except ValueError:
+            pass
+        self.ui.upper_threshold_input.setText(str(global_vars.UPPER_THRESHOLD))
+        self.ui.upper_threshold_input.setPlaceholderText(
+            str(global_vars.UPPER_THRESHOLD)
+        )
+        global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(
+            global_vars.UPPER_THRESHOLD
+        )
 
-        smooth_slice: sitk.Image = get_curr_smooth_slice()
+    def render_curr_slice(self) -> Union[np.ndarray, None]:
+        """Resamples the currently selected image using its rotation and slice settings,
+        then renders the resulting slice in the GUI.
 
-        slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
+        DOES NOT set text for `image_num_label` and file path labels.
+
+        If `not SETTINGS_VIEW_ENABLED`, also calls `imgproc.contour()` and outlines
+        the contour of the QImage (mutating it).
+
+        Additionally, also returns a view of the binary contoured slice if `not SETTINGS_VIEW_ENABLED`.
+        This saves work when computing circumference.
+
+        :return: np.ndarray if `not SETTINGS_VIEW_ENABLED` else None
+        :rtype: np.ndarray or None"""
+
+        if not SETTINGS_VIEW_ENABLED:
+            self.set_view_z()
+
+        rotated_slice: sitk.Image = get_curr_rotated_slice()
+
+        slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
         q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
 
+        rv_dummy_var: np.ndarray = np.zeros(0)
+
+        if not SETTINGS_VIEW_ENABLED:
+            if self.ui.otsu_radio_button.isChecked():
+                binary_contour_slice: np.ndarray = imgproc.contour(
+                    rotated_slice, ThresholdFilter.Otsu
+                )
+            else:
+                binary_contour_slice: np.ndarray = imgproc.contour(
+                    rotated_slice, ThresholdFilter.Binary
+                )
+            rv_dummy_var = binary_contour_slice
+            mask_QImage(
+                q_img,
+                np.transpose(binary_contour_slice),
+                string_to_QColor(user_settings.CONTOUR_COLOR),
+            )
+
+        elif global_vars.VIEW != constants.View.Z:
+            z_indicator: np.ndarray = np.zeros(slice_np.shape)
+            z_indicator[get_curr_image_size()[2] - global_vars.SLICE - 1, :] = 1
+            mask_QImage(
+                q_img,
+                np.transpose(z_indicator),
+                string_to_QColor(user_settings.CONTOUR_COLOR),
+            )
+
         q_pixmap: QPixmap = QPixmap(q_img)
 
+        self.ui.image.setPixmap(q_pixmap)
+
+        if not SETTINGS_VIEW_ENABLED:
+            return rv_dummy_var
+
+    def render_smooth_slice(self) -> None:
+        """Renders smooth slice in GUI. Allows user to preview result of smoothing settings."""
+        self.update_smoothing_settings()
+        self.set_view_z()
+        smooth_slice: sitk.Image = get_curr_smooth_slice()
+        slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
+        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
+        q_pixmap: QPixmap = QPixmap(q_img)
+        self.ui.image.setPixmap(q_pixmap)
+
+    def render_threshold(self) -> None:
+        """Render filtered image slice on UI."""
+        # Preview should apply filter only on the axial slice
+        self.set_view_z()
+        if self.ui.otsu_radio_button.isChecked():
+            filter_img: sitk.Image = get_curr_otsu_slice()
+        else:
+            self.update_binary_filter_settings()
+            filter_img: sitk.Image = get_curr_binary_thresholded_slice()
+        slice_np: np.ndarray = sitk.GetArrayFromImage(filter_img)
+        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
+        q_pixmap: QPixmap = QPixmap(q_img)
         self.ui.image.setPixmap(q_pixmap)
 
     def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
@@ -479,10 +553,8 @@ class MainWindow(QMainWindow):
         :type binary_contour_slice: np.ndarray
         :return: None
         :rtype: None"""
-        if global_vars.SETTINGS_VIEW_ENABLED:
-            raise Exception(
-                "Rendering circumference label when global_vars.SETTINGS_VIEW_ENABLED"
-            )
+        if SETTINGS_VIEW_ENABLED:
+            raise Exception("Rendering circumference label when SETTINGS_VIEW_ENABLED")
         units: Union[str, None] = get_curr_physical_units()
         circumference: float = imgproc.length_of_contour(binary_contour_slice)
         self.ui.circumference_label.setText(
@@ -522,54 +594,8 @@ class MainWindow(QMainWindow):
         self.ui.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
         self.ui.z_rotation_label.setText(f"Z rotation: {global_vars.THETA_Z}°")
         self.ui.slice_num_label.setText(f"Slice: {global_vars.SLICE}")
-
-    # TODO: Due to the images now being a dict, we can
-    # easily let the user remove a range of images if they want
-    def remove_curr_img(self) -> None:
-        """Called after File > Remove File.
-
-        Removes current image from `IMAGE_DICT`.
-
-        :returns: None"""
-        img_helpers.del_curr_img()
-
-        if len(global_vars.IMAGE_DICT) == 0:
-            self.disable_elements()
-            return
-
-        binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
-        self.render_image_num_and_path()
-
-        if not global_vars.SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
-            self.render_circumference(binary_contour_or_none)
-
-    def next_img(self):
-        """Called when Next button is clicked.
-
-        Advance index and render."""
-        img_helpers.next_img()
-        self.orient_curr_image(global_vars.VIEW)
-        binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
-        self.render_image_num_and_path()
-
-        if not global_vars.SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
-            self.render_circumference(binary_contour_or_none)
-
-    def previous_img(self):
-        """Called when Previous button is clicked.
-
-        Decrement index and render."""
-        img_helpers.previous_img()
-        self.orient_curr_image(global_vars.VIEW)
-        binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
-        self.render_image_num_and_path()
-
-        if not global_vars.SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
-            self.render_circumference(binary_contour_or_none)
-
+        
+        
     def rotate_x(self):
         """Called when the user updates the x slider.
 
@@ -618,6 +644,54 @@ class MainWindow(QMainWindow):
         self.render_curr_slice()
         self.render_all_sliders()
 
+    def next_img(self):
+        """Called when Next button is clicked.
+
+        Advance index and render."""
+        img_helpers.next_img()
+        self.orient_curr_image(global_vars.VIEW)
+        binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
+        self.render_image_num_and_path()
+
+        if not SETTINGS_VIEW_ENABLED:
+            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            self.render_circumference(binary_contour_or_none)
+
+    def previous_img(self):
+        """Called when Previous button is clicked.
+
+        Decrement index and render."""
+        img_helpers.previous_img()
+        self.orient_curr_image(global_vars.VIEW)
+        binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
+        self.render_image_num_and_path()
+
+        if not SETTINGS_VIEW_ENABLED:
+            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            self.render_circumference(binary_contour_or_none)
+
+    # TODO: Due to the images now being a dict, we can
+    # easily let the user remove a range of images if they want
+    def remove_curr_img(self) -> None:
+        """Called after File > Remove File.
+
+        Removes current image from `IMAGE_DICT`. Since `IMAGE_DICT` is a reference to an image dict
+        in `IMAGE_GROUPS`, it's removed from `IMAGE_GROUPS` as well.
+
+        :returns: None"""
+        img_helpers.del_curr_img()
+
+        if len(global_vars.IMAGE_DICT) == 0:
+            self.disable_elements()
+            return
+
+        binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
+        self.render_image_num_and_path()
+
+        if not SETTINGS_VIEW_ENABLED:
+            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            self.render_circumference(binary_contour_or_none)
+
     def test_stuff(self) -> None:
         """Connected to Debug > Test stuff. Dummy button and function for easily testing stuff.
 
@@ -652,7 +726,7 @@ class MainWindow(QMainWindow):
         )
         path: str = str(
             user_settings.IMG_DIR
-            / f"{file_name}_{'contoured_' if not global_vars.SETTINGS_VIEW_ENABLED else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
+            / f"{file_name}_{'contoured_' if not SETTINGS_VIEW_ENABLED else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
         )
         self.ui.image.pixmap().save(path, extension)
 
@@ -664,6 +738,7 @@ class MainWindow(QMainWindow):
         img_helpers.orient_curr_image(view)
 
 
+# TODO: Broken?
 def print_metadata() -> None:
     """Print current image's metadata to terminal. Internally, uses sitk.GetMetaData, which doesn't return
     all metadata (e.g., doesn't return spacing values whereas sitk.GetSpacing does).
@@ -730,12 +805,13 @@ def main() -> None:
 
     app = QApplication(sys.argv)
 
-    # TODO: This puts arrow buttons on the left and right endpoints of the sliders
-    # If the QSS below isn't loaded (i.e., comment out the below two lines)
+    # TODO: Put arrow buttons on the left and right endpoints of the sliders
+    # These arrow buttons already show up if commenting in app.setStyle("Fusion")
+    # And commenting out with open stylesheet and app.setStyleSheet
     # We should figure out how to get arrow buttons on sliders for (+, -) 1 precise adjustments.
-    # Currently, the sliders allow this (left click on the left or right end), but it's not obvious in the GUI.
-
-    # app.setStyle('Fusion')
+    # Currently, the sliders allow this (left click on the left or right end), but the arrow buttons
+    # are not in the GUI.
+    # app.setStyle("Fusion")
 
     with open(
         constants.THEME_DIR / user_settings.THEME_NAME / f"stylesheet.qss", "r"
