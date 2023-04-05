@@ -22,9 +22,9 @@ from enum import Enum
 import SimpleITK as sitk
 import numpy as np
 
-from PySide6 import QtGui, QtCore
-from PySide6.QtGui import QPixmap, QAction
-from PySide6.QtWidgets import (
+from PyQt6 import QtGui, QtCore
+from PyQt6.QtGui import QPixmap, QAction
+from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
     QFileDialog,
@@ -33,10 +33,8 @@ from PySide6.QtWidgets import (
     QWidgetAction,
     QWidget,
 )
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import Qt
-
-from src.GUI.ui_mainwindow import Ui_MainWindow
+from PyQt6.uic.load_ui import loadUi
+from PyQt6.QtCore import Qt
 
 import qimage2ndarray
 import pprint
@@ -78,7 +76,6 @@ from src.utils.img_helpers import (
 import src.utils.img_helpers as img_helpers
 
 
-LOADER: QUiLoader = QUiLoader()
 PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
 
 SETTINGS_VIEW_ENABLED: bool = True
@@ -103,63 +100,62 @@ class MainWindow(QMainWindow):
     Settings mode and circumference mode."""
 
     def __init__(self):
-        """Load main.ui file and connect GUI events to methods/functions.
+        """Load main file and connect GUI events to methods/functions.
 
         Sets window title and icon."""
         super(MainWindow, self).__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
+        loadUi(str(Path("src") / "GUI" / "mainwindow.ui"), self)
 
         self.setWindowTitle("Head Circumference Tool")
         self.setWindowIcon(QtGui.QIcon(str(PATH_TO_HCT_LOGO)))
 
-        self.ui.action_open.triggered.connect(lambda: self.browse_files(False))
-        self.ui.action_add_images.triggered.connect(lambda: self.browse_files(True))
-        self.ui.action_remove_image.triggered.connect(self.remove_curr_img)
-        self.ui.action_exit.triggered.connect(exit)
-        self.ui.action_github.triggered.connect(lambda: webbrowser.open(GITHUB_LINK))
-        self.ui.action_documentation.triggered.connect(
+        self.action_open.triggered.connect(lambda: self.browse_files(False))
+        self.action_add_images.triggered.connect(lambda: self.browse_files(True))
+        self.action_remove_image.triggered.connect(self.remove_curr_img)
+        self.action_exit.triggered.connect(exit)
+        self.action_github.triggered.connect(lambda: webbrowser.open(GITHUB_LINK))
+        self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
-        self.ui.action_test_stuff.triggered.connect(self.test_stuff)
-        self.ui.action_print_metadata.triggered.connect(print_metadata)
-        self.ui.action_print_dimensions.triggered.connect(print_dimensions)
-        self.ui.action_print_properties.triggered.connect(print_properties)
-        self.ui.action_print_direction.triggered.connect(print_direction)
-        self.ui.action_print_spacing.triggered.connect(print_spacing)
-        self.ui.action_export_png.triggered.connect(
+        self.action_test_stuff.triggered.connect(self.test_stuff)
+        self.action_print_metadata.triggered.connect(print_metadata)
+        self.action_print_dimensions.triggered.connect(print_dimensions)
+        self.action_print_properties.triggered.connect(print_properties)
+        self.action_print_direction.triggered.connect(print_direction)
+        self.action_print_spacing.triggered.connect(print_spacing)
+        self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
-        self.ui.action_export_jpg.triggered.connect(
+        self.action_export_jpg.triggered.connect(
             lambda: self.export_curr_slice_as_img("jpg")
         )
-        self.ui.action_export_bmp.triggered.connect(
+        self.action_export_bmp.triggered.connect(
             lambda: self.export_curr_slice_as_img("bmp")
         )
-        self.ui.action_export_ppm.triggered.connect(
+        self.action_export_ppm.triggered.connect(
             lambda: self.export_curr_slice_as_img("ppm")
         )
-        self.ui.action_export_xbm.triggered.connect(
+        self.action_export_xbm.triggered.connect(
             lambda: self.export_curr_slice_as_img("xbm")
         )
-        self.ui.action_export_xpm.triggered.connect(
+        self.action_export_xpm.triggered.connect(
             lambda: self.export_curr_slice_as_img("xpm")
         )
-        self.ui.next_button.clicked.connect(self.next_img)
-        self.ui.previous_button.clicked.connect(self.previous_img)
-        self.ui.apply_button.clicked.connect(self.settings_export_view_toggle)
-        self.ui.x_slider.valueChanged.connect(self.rotate_x)
-        self.ui.y_slider.valueChanged.connect(self.rotate_y)
-        self.ui.z_slider.valueChanged.connect(self.rotate_z)
-        self.ui.slice_slider.valueChanged.connect(self.slice_update)
-        self.ui.reset_button.clicked.connect(self.reset_settings)
-        self.ui.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
-        self.ui.otsu_radio_button.clicked.connect(self.disable_binary_threshold_inputs)
-        self.ui.binary_radio_button.clicked.connect(self.enable_binary_threshold_inputs)
-        self.ui.threshold_preview_button.clicked.connect(self.render_threshold)
-        self.ui.x_view_radio_button.clicked.connect(self.update_view)
-        self.ui.y_view_radio_button.clicked.connect(self.update_view)
-        self.ui.z_view_radio_button.clicked.connect(self.update_view)
+        self.next_button.clicked.connect(self.next_img)
+        self.previous_button.clicked.connect(self.previous_img)
+        self.apply_button.clicked.connect(self.settings_export_view_toggle)
+        self.x_slider.valueChanged.connect(self.rotate_x)
+        self.y_slider.valueChanged.connect(self.rotate_y)
+        self.z_slider.valueChanged.connect(self.rotate_z)
+        self.slice_slider.valueChanged.connect(self.slice_update)
+        self.reset_button.clicked.connect(self.reset_settings)
+        self.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
+        self.otsu_radio_button.clicked.connect(self.disable_binary_threshold_inputs)
+        self.binary_radio_button.clicked.connect(self.enable_binary_threshold_inputs)
+        self.threshold_preview_button.clicked.connect(self.render_threshold)
+        self.x_view_radio_button.clicked.connect(self.update_view)
+        self.y_view_radio_button.clicked.connect(self.update_view)
+        self.z_view_radio_button.clicked.connect(self.update_view)
         self.show()
 
     def enable_elements(self) -> None:
@@ -176,7 +172,7 @@ class MainWindow(QMainWindow):
         for widget in self.findChildren(QAction):
             widget.setEnabled(True)
 
-        self.ui.action_export_csv.setEnabled(not SETTINGS_VIEW_ENABLED)
+        self.action_export_csv.setEnabled(not SETTINGS_VIEW_ENABLED)
         self.disable_binary_threshold_inputs()
 
     def enable_binary_threshold_inputs(self) -> None:
@@ -184,8 +180,8 @@ class MainWindow(QMainWindow):
 
         Restore binary input box.
         """
-        self.ui.upper_threshold_input.setEnabled(True)
-        self.ui.lower_threshold_input.setEnabled(True)
+        self.upper_threshold_input.setEnabled(True)
+        self.lower_threshold_input.setEnabled(True)
 
     def settings_export_view_toggle(self) -> None:
         """Called when clicking Apply (in settings mode) or Adjust (in circumference mode).
@@ -199,14 +195,14 @@ class MainWindow(QMainWindow):
         SETTINGS_VIEW_ENABLED = not SETTINGS_VIEW_ENABLED
         settings_view_enabled = SETTINGS_VIEW_ENABLED
         if settings_view_enabled:
-            self.ui.apply_button.setText("Apply")
-            self.ui.circumference_label.setText(DEFAULT_CIRCUMFERENCE_LABEL_TEXT)
+            self.apply_button.setText("Apply")
+            self.circumference_label.setText(DEFAULT_CIRCUMFERENCE_LABEL_TEXT)
             # Render uncontoured slice after pressing adjust
             self.render_curr_slice()
         else:
             self.update_smoothing_settings()
             self.update_binary_filter_settings()
-            self.ui.apply_button.setText("Adjust")
+            self.apply_button.setText("Adjust")
             # Ignore the type annotation error here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
@@ -214,44 +210,44 @@ class MainWindow(QMainWindow):
 
         # TODO: Call enable_elements and then a disable method (code another one, and it'd be short)
         # If not settings_view_enabled
-        self.ui.action_open.setEnabled(settings_view_enabled)
-        self.ui.action_add_images.setEnabled(settings_view_enabled)
-        self.ui.action_remove_image.setEnabled(settings_view_enabled)
-        self.ui.x_slider.setEnabled(settings_view_enabled)
-        self.ui.y_slider.setEnabled(settings_view_enabled)
-        self.ui.z_slider.setEnabled(settings_view_enabled)
-        self.ui.slice_slider.setEnabled(settings_view_enabled)
-        self.ui.x_rotation_label.setEnabled(settings_view_enabled)
-        self.ui.y_rotation_label.setEnabled(settings_view_enabled)
-        self.ui.z_rotation_label.setEnabled(settings_view_enabled)
-        self.ui.slice_num_label.setEnabled(settings_view_enabled)
-        self.ui.reset_button.setEnabled(settings_view_enabled)
-        self.ui.smoothing_preview_button.setEnabled(settings_view_enabled)
-        self.ui.otsu_radio_button.setEnabled(settings_view_enabled)
-        self.ui.binary_radio_button.setEnabled(settings_view_enabled)
-        self.ui.lower_threshold.setEnabled(settings_view_enabled)
-        self.ui.lower_threshold_input.setEnabled(settings_view_enabled)
-        self.ui.upper_threshold.setEnabled(settings_view_enabled)
-        self.ui.upper_threshold_input.setEnabled(settings_view_enabled)
-        self.ui.threshold_preview_button.setEnabled(settings_view_enabled)
-        self.ui.action_export_csv.setEnabled(not settings_view_enabled)
-        self.ui.circumference_label.setEnabled(not settings_view_enabled)
-        self.ui.export_button.setEnabled(not settings_view_enabled)
-        self.ui.smoothing_preview_button.setEnabled(settings_view_enabled)
-        self.ui.conductance_parameter_label.setEnabled(settings_view_enabled)
-        self.ui.conductance_parameter_input.setEnabled(settings_view_enabled)
-        self.ui.smoothing_iterations_label.setEnabled(settings_view_enabled)
-        self.ui.smoothing_iterations_input.setEnabled(settings_view_enabled)
-        self.ui.time_step_label.setEnabled(settings_view_enabled)
-        self.ui.time_step_input.setEnabled(settings_view_enabled)
-        self.ui.x_view_radio_button.setEnabled(settings_view_enabled)
-        self.ui.y_view_radio_button.setEnabled(settings_view_enabled)
-        self.ui.z_view_radio_button.setEnabled(settings_view_enabled)
-        self.ui.lower_threshold_input.setEnabled(
-            settings_view_enabled and self.ui.binary_radio_button.isChecked()
+        self.action_open.setEnabled(settings_view_enabled)
+        self.action_add_images.setEnabled(settings_view_enabled)
+        self.action_remove_image.setEnabled(settings_view_enabled)
+        self.x_slider.setEnabled(settings_view_enabled)
+        self.y_slider.setEnabled(settings_view_enabled)
+        self.z_slider.setEnabled(settings_view_enabled)
+        self.slice_slider.setEnabled(settings_view_enabled)
+        self.x_rotation_label.setEnabled(settings_view_enabled)
+        self.y_rotation_label.setEnabled(settings_view_enabled)
+        self.z_rotation_label.setEnabled(settings_view_enabled)
+        self.slice_num_label.setEnabled(settings_view_enabled)
+        self.reset_button.setEnabled(settings_view_enabled)
+        self.smoothing_preview_button.setEnabled(settings_view_enabled)
+        self.otsu_radio_button.setEnabled(settings_view_enabled)
+        self.binary_radio_button.setEnabled(settings_view_enabled)
+        self.lower_threshold.setEnabled(settings_view_enabled)
+        self.lower_threshold_input.setEnabled(settings_view_enabled)
+        self.upper_threshold.setEnabled(settings_view_enabled)
+        self.upper_threshold_input.setEnabled(settings_view_enabled)
+        self.threshold_preview_button.setEnabled(settings_view_enabled)
+        self.action_export_csv.setEnabled(not settings_view_enabled)
+        self.circumference_label.setEnabled(not settings_view_enabled)
+        self.export_button.setEnabled(not settings_view_enabled)
+        self.smoothing_preview_button.setEnabled(settings_view_enabled)
+        self.conductance_parameter_label.setEnabled(settings_view_enabled)
+        self.conductance_parameter_input.setEnabled(settings_view_enabled)
+        self.smoothing_iterations_label.setEnabled(settings_view_enabled)
+        self.smoothing_iterations_input.setEnabled(settings_view_enabled)
+        self.time_step_label.setEnabled(settings_view_enabled)
+        self.time_step_input.setEnabled(settings_view_enabled)
+        self.x_view_radio_button.setEnabled(settings_view_enabled)
+        self.y_view_radio_button.setEnabled(settings_view_enabled)
+        self.z_view_radio_button.setEnabled(settings_view_enabled)
+        self.lower_threshold_input.setEnabled(
+            settings_view_enabled and self.binary_radio_button.isChecked()
         )
-        self.ui.upper_threshold_input.setEnabled(
-            settings_view_enabled and self.ui.binary_radio_button.isChecked()
+        self.upper_threshold_input.setEnabled(
+            settings_view_enabled and self.binary_radio_button.isChecked()
         )
 
     def disable_binary_threshold_inputs(self) -> None:
@@ -259,8 +255,8 @@ class MainWindow(QMainWindow):
 
         Disable binary threshold input boxes.
         """
-        self.ui.upper_threshold_input.setEnabled(False)
-        self.ui.lower_threshold_input.setEnabled(False)
+        self.upper_threshold_input.setEnabled(False)
+        self.lower_threshold_input.setEnabled(False)
 
     def disable_elements(self) -> None:
         """Called when the list is now empty, i.e. just removed from list of length 1.
@@ -278,16 +274,16 @@ class MainWindow(QMainWindow):
             for action in menu.actions():
                 action.setEnabled(False)
 
-        self.ui.action_open.setEnabled(True)
-        self.ui.circumference_label.setText(DEFAULT_CIRCUMFERENCE_LABEL_TEXT)
-        self.ui.image.setEnabled(True)
-        self.ui.image.clear()
-        self.ui.image.setText(DEFAULT_IMAGE_TEXT)
-        self.ui.image.setStatusTip(DEFAULT_IMAGE_STATUS_TEXT)
-        self.ui.image_path_label.setText(DEFAULT_IMAGE_PATH_LABEL_TEXT)
-        self.ui.image_num_label.setText(DEFAULT_IMAGE_NUM_LABEL_TEXT)
-        self.ui.apply_button.setText("Apply")
-        self.ui.z_view_radio_button.setChecked(True)
+        self.action_open.setEnabled(True)
+        self.circumference_label.setText(DEFAULT_CIRCUMFERENCE_LABEL_TEXT)
+        self.image.setEnabled(True)
+        self.image.clear()
+        self.image.setText(DEFAULT_IMAGE_TEXT)
+        self.image.setStatusTip(DEFAULT_IMAGE_STATUS_TEXT)
+        self.image_path_label.setText(DEFAULT_IMAGE_PATH_LABEL_TEXT)
+        self.image_num_label.setText(DEFAULT_IMAGE_NUM_LABEL_TEXT)
+        self.apply_button.setText("Apply")
+        self.z_view_radio_button.setChecked(True)
 
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
@@ -346,11 +342,11 @@ class MainWindow(QMainWindow):
 
         Sets global_vars.VIEW to the correct value. Then orients the current image and renders.
         """
-        # The three buttons are in a button group in the .ui file
+        # The three buttons are in a button group in the  file
         # And all have autoExclusive=True
-        if self.ui.x_view_radio_button.isChecked():
+        if self.x_view_radio_button.isChecked():
             global_vars.VIEW = constants.View.X
-        elif self.ui.y_view_radio_button.isChecked():
+        elif self.y_view_radio_button.isChecked():
             global_vars.VIEW = constants.View.Y
         else:
             global_vars.VIEW = constants.View.Z
@@ -360,78 +356,70 @@ class MainWindow(QMainWindow):
 
     def set_view_z(self) -> None:
         global_vars.VIEW = constants.View.Z
-        self.ui.x_view_radio_button.setChecked(False)
-        self.ui.y_view_radio_button.setChecked(False)
-        self.ui.z_view_radio_button.setChecked(True)
+        self.x_view_radio_button.setChecked(False)
+        self.y_view_radio_button.setChecked(False)
+        self.z_view_radio_button.setChecked(True)
 
     def update_smoothing_settings(self) -> None:
         """Updates global smoothing settings."""
-        conductance: str = self.ui.conductance_parameter_input.displayText()
+        conductance: str = self.conductance_parameter_input.displayText()
         try:
             global_vars.CONDUCTANCE_PARAMETER = float(conductance)
         except ValueError:
             if user_settings.DEBUG:
                 print("Conductance must be a float!")
-        self.ui.conductance_parameter_input.setText(
-            str(global_vars.CONDUCTANCE_PARAMETER)
-        )
-        self.ui.conductance_parameter_input.setPlaceholderText(
+        self.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
+        self.conductance_parameter_input.setPlaceholderText(
             str(global_vars.CONDUCTANCE_PARAMETER)
         )
         global_vars.SMOOTHING_FILTER.SetConductanceParameter(
             global_vars.CONDUCTANCE_PARAMETER
         )
 
-        iterations: str = self.ui.smoothing_iterations_input.displayText()
+        iterations: str = self.smoothing_iterations_input.displayText()
         try:
             global_vars.CONDUCTANCE_PARAMETER = int(iterations)
         except ValueError:
             if user_settings.DEBUG:
                 print("Iterations must be an integer!")
-        self.ui.smoothing_iterations_input.setText(
-            str(global_vars.SMOOTHING_ITERATIONS)
-        )
-        self.ui.smoothing_iterations_input.setPlaceholderText(
+        self.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
+        self.smoothing_iterations_input.setPlaceholderText(
             str(global_vars.SMOOTHING_ITERATIONS)
         )
         global_vars.SMOOTHING_FILTER.SetNumberOfIterations(
             global_vars.SMOOTHING_ITERATIONS
         )
 
-        time_step: str = self.ui.time_step_input.displayText()
+        time_step: str = self.time_step_input.displayText()
         try:
             global_vars.TIME_STEP = float(time_step)
         except ValueError:
             if user_settings.DEBUG:
                 print("Time step must be a float!")
-        self.ui.time_step_input.setText(str(global_vars.TIME_STEP))
-        self.ui.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
+        self.time_step_input.setText(str(global_vars.TIME_STEP))
+        self.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
         global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
 
     def update_binary_filter_settings(self) -> None:
         """Updates global binary filter settings."""
-        lower_threshold: str = self.ui.lower_threshold_input.displayText()
+        lower_threshold: str = self.lower_threshold_input.displayText()
         try:
             global_vars.LOWER_THRESHOLD = float(lower_threshold)
         except ValueError:
             pass
-        self.ui.lower_threshold_input.setText(str(global_vars.LOWER_THRESHOLD))
-        self.ui.lower_threshold_input.setPlaceholderText(
-            str(global_vars.LOWER_THRESHOLD)
-        )
+        self.lower_threshold_input.setText(str(global_vars.LOWER_THRESHOLD))
+        self.lower_threshold_input.setPlaceholderText(str(global_vars.LOWER_THRESHOLD))
         global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
             global_vars.LOWER_THRESHOLD
         )
 
-        upper_threshold: str = self.ui.upper_threshold_input.displayText()
+        upper_threshold: str = self.upper_threshold_input.displayText()
         try:
             global_vars.UPPER_THRESHOLD = float(upper_threshold)
         except ValueError:
             pass
-        self.ui.upper_threshold_input.setText(str(global_vars.UPPER_THRESHOLD))
-        self.ui.upper_threshold_input.setPlaceholderText(
-            str(global_vars.UPPER_THRESHOLD)
-        )
+        self.upper_threshold_input.setText(str(global_vars.UPPER_THRESHOLD))
+        self.upper_threshold_input.setPlaceholderText(str(global_vars.UPPER_THRESHOLD))
         global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(
             global_vars.UPPER_THRESHOLD
         )
@@ -463,7 +451,7 @@ class MainWindow(QMainWindow):
         rv_dummy_var: np.ndarray = np.zeros(0)
 
         if not SETTINGS_VIEW_ENABLED:
-            if self.ui.otsu_radio_button.isChecked():
+            if self.otsu_radio_button.isChecked():
                 binary_contour_slice: np.ndarray = imgproc.contour(
                     rotated_slice, ThresholdFilter.Otsu
                 )
@@ -489,7 +477,14 @@ class MainWindow(QMainWindow):
 
         q_pixmap: QPixmap = QPixmap(q_img)
 
-        self.ui.image.setPixmap(q_pixmap)
+        # Attempt to fix aspect ratio of image
+        # w = self.image.size().width()
+        # h = self.image.size().height()
+        # print(w, h)
+
+        # self.image.setPixmap(q_pixmap.scaled(w, h, Qt.AspectRatioMode))
+
+        self.image.setPixmap(q_pixmap)
 
         if not SETTINGS_VIEW_ENABLED:
             return rv_dummy_var
@@ -502,13 +497,13 @@ class MainWindow(QMainWindow):
         slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
         q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
         q_pixmap: QPixmap = QPixmap(q_img)
-        self.ui.image.setPixmap(q_pixmap)
+        self.image.setPixmap(q_pixmap)
 
     def render_threshold(self) -> None:
         """Render filtered image slice on UI."""
         # Preview should apply filter only on the axial slice
         self.set_view_z()
-        if self.ui.otsu_radio_button.isChecked():
+        if self.otsu_radio_button.isChecked():
             filter_img: sitk.Image = get_curr_otsu_slice()
         else:
             self.update_binary_filter_settings()
@@ -516,7 +511,7 @@ class MainWindow(QMainWindow):
         slice_np: np.ndarray = sitk.GetArrayFromImage(filter_img)
         q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
         q_pixmap: QPixmap = QPixmap(q_img)
-        self.ui.image.setPixmap(q_pixmap)
+        self.image.setPixmap(q_pixmap)
 
     def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
         """Called after pressing Apply or when
@@ -535,7 +530,7 @@ class MainWindow(QMainWindow):
             raise Exception("Rendering circumference label when SETTINGS_VIEW_ENABLED")
         units: Union[str, None] = get_curr_physical_units()
         circumference: float = imgproc.length_of_contour(binary_contour_slice)
-        self.ui.circumference_label.setText(
+        self.circumference_label.setText(
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )
 
@@ -547,12 +542,12 @@ class MainWindow(QMainWindow):
         Also called when removing an image.
 
         :return: None"""
-        self.ui.image_num_label.setText(
+        self.image_num_label.setText(
             f"Image {global_vars.CURR_IMAGE_INDEX + 1} of {len(global_vars.IMAGE_DICT)}"
         )
-        self.ui.image_path_label.setText(str(get_curr_path().name))
-        self.ui.image_path_label.setStatusTip(str(get_curr_path()))
-        self.ui.image.setStatusTip(str(get_curr_path()))
+        self.image_path_label.setText(str(get_curr_path().name))
+        self.image_path_label.setStatusTip(str(get_curr_path()))
+        self.image.setStatusTip(str(get_curr_path()))
 
     def render_all_sliders(self) -> None:
         """Sets all slider values to the global rotation and slice values.
@@ -563,51 +558,51 @@ class MainWindow(QMainWindow):
         Not called when the user updates a slider.
 
         Also updates rotation and slice num labels."""
-        self.ui.x_slider.setValue(global_vars.THETA_X)
-        self.ui.y_slider.setValue(global_vars.THETA_Y)
-        self.ui.z_slider.setValue(global_vars.THETA_Z)
-        self.ui.slice_slider.setMaximum(get_curr_image().GetSize()[2] - 1)
-        self.ui.slice_slider.setValue(global_vars.SLICE)
-        self.ui.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
-        self.ui.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
-        self.ui.z_rotation_label.setText(f"Z rotation: {global_vars.THETA_Z}°")
-        self.ui.slice_num_label.setText(f"Slice: {global_vars.SLICE}")
+        self.x_slider.setValue(global_vars.THETA_X)
+        self.y_slider.setValue(global_vars.THETA_Y)
+        self.z_slider.setValue(global_vars.THETA_Z)
+        self.slice_slider.setMaximum(get_curr_image().GetSize()[2] - 1)
+        self.slice_slider.setValue(global_vars.SLICE)
+        self.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
+        self.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
+        self.z_rotation_label.setText(f"Z rotation: {global_vars.THETA_Z}°")
+        self.slice_num_label.setText(f"Slice: {global_vars.SLICE}")
 
     def rotate_x(self):
         """Called when the user updates the x slider.
 
         Render image and set `x_rotation_label`."""
-        x_slider_val: int = self.ui.x_slider.value()
+        x_slider_val: int = self.x_slider.value()
         global_vars.THETA_X = x_slider_val
         self.render_curr_slice()
-        self.ui.x_rotation_label.setText(f"X rotation: {x_slider_val}°")
+        self.x_rotation_label.setText(f"X rotation: {x_slider_val}°")
 
     def rotate_y(self):
         """Called when the user updates the y slider.
 
         Render image and set `y_rotation_label`."""
-        y_slider_val: int = self.ui.y_slider.value()
+        y_slider_val: int = self.y_slider.value()
         global_vars.THETA_Y = y_slider_val
         self.render_curr_slice()
-        self.ui.y_rotation_label.setText(f"Y rotation: {y_slider_val}°")
+        self.y_rotation_label.setText(f"Y rotation: {y_slider_val}°")
 
     def rotate_z(self):
         """Called when the user updates the z slider.
 
         Render image and set `z_rotation_label`."""
-        z_slider_val: int = self.ui.z_slider.value()
+        z_slider_val: int = self.z_slider.value()
         global_vars.THETA_Z = z_slider_val
         self.render_curr_slice()
-        self.ui.z_rotation_label.setText(f"Z rotation: {z_slider_val}°")
+        self.z_rotation_label.setText(f"Z rotation: {z_slider_val}°")
 
     def slice_update(self):
         """Called when the user updates the slice slider.
 
         Render image and set `slice_num_label`."""
-        slice_slider_val: int = self.ui.slice_slider.value()
+        slice_slider_val: int = self.slice_slider.value()
         global_vars.SLICE = slice_slider_val
         self.render_curr_slice()
-        self.ui.slice_num_label.setText(f"Slice: {slice_slider_val}")
+        self.slice_num_label.setText(f"Slice: {slice_slider_val}")
 
     def reset_settings(self):
         """Called when Reset is clicked.
@@ -673,8 +668,8 @@ class MainWindow(QMainWindow):
         """Connected to Debug > Test stuff. Dummy button and function for easily testing stuff.
 
         Assume that anything you put here will be overwritten freely."""
-        self.ui.image.setPixmap(QPixmap(f":/{user_settings.THEME_NAME}/help.svg"))
-        self.ui.image.setStatusTip(
+        self.image.setPixmap(QPixmap(f":/{user_settings.THEME_NAME}/help.svg"))
+        self.image.setStatusTip(
             "This is intentional, if it's a question mark then that's good :), means we can display icons"
         )
 
@@ -705,7 +700,7 @@ class MainWindow(QMainWindow):
             user_settings.IMG_DIR
             / f"{file_name}_{'contoured_' if not SETTINGS_VIEW_ENABLED else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
         )
-        self.ui.image.pixmap().save(path, extension)
+        self.image.pixmap().save(path, extension)
 
     def orient_curr_image(self, view: Enum) -> None:
         """Mutate the current image by applying ORIENT_FILTER on it.

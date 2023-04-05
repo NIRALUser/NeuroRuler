@@ -6,8 +6,8 @@ import string
 from typing import Union
 
 import numpy as np
-from PySide6.QtGui import QImage, QColor, QPixmap
-from PySide6 import QtWidgets
+from PyQt6.QtGui import QImage, QColor, QPixmap
+from PyQt6 import QtWidgets
 
 import src.utils.exceptions as exceptions
 import src.utils.user_settings as settings
