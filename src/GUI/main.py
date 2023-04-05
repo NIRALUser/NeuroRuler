@@ -424,6 +424,10 @@ class MainWindow(QMainWindow):
             global_vars.UPPER_THRESHOLD
         )
 
+    def set_pixmap(pixmap: QPixmap) -> None:
+        scaled_q_pixmap = pixmap.scaled(self.ui.image.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
+        self.ui.image.setPixmap(scaled_q_pixmap)
+
     def render_curr_slice(self) -> Union[np.ndarray, None]:
         """Resamples the currently selected image using its rotation and slice settings,
         then renders the resulting slice in the GUI.
