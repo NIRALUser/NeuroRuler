@@ -26,11 +26,12 @@ from PySide6 import QtGui, QtCore
 from PySide6.QtGui import QPixmap, QAction
 from PySide6.QtWidgets import (
     QApplication,
+    QDialog,
+    QLabel,
     QMainWindow,
     QFileDialog,
     QMenu,
-    QMenuBar,
-    QWidgetAction,
+    QVBoxLayout,
     QWidget,
 )
 from PySide6.QtUiTools import QUiLoader
@@ -55,13 +56,14 @@ import src.utils.global_vars as global_vars
 import src.utils.imgproc as imgproc
 import src.utils.user_settings as user_settings
 from src.GUI.helpers import (
+    ErrorDialog,
     string_to_QColor,
     mask_QImage,
 )
 
 from src.utils.img_helpers import (
     initialize_globals,
-    update_image_groups,
+    update_images,
     get_curr_image,
     get_curr_image_size,
     get_curr_rotated_slice,
@@ -292,21 +294,19 @@ class MainWindow(QMainWindow):
     def browse_files(self, extend: bool) -> None:
         """Called after File > Open or File > Add Images.
 
-        If `extend`, then `IMAGE_GROUPS` will be updated with new images.
+        If `extend`, then `IMAGE_DICT` will be updated with new images.
 
-        Else, `IMAGE_GROUPS` will be cleared and
+        Else, `IMAGE_DICT` will be cleared and
         (re)initialized (e.g. when choosing files for the first time or re-opening).
-
-        Since IMAGE_DICT is a reference to an image dict in IMAGE_GROUPS, IMAGE_DICT is also cleared and
-        (re)initialized.
 
         Opens file menu.
 
         Renders various elements depending on the value of `extend`.
 
-        :param extend: Whether to clear IMAGE_GROUPS and (re)initialize or add images to it. Determines which GUI elements are rendered.
+        :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
         :type extend: bool
-        :return: None"""
+        :return: None
+        :rtype: None"""
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
             "'", ""
         ).replace(",", "")
@@ -323,23 +323,48 @@ class MainWindow(QMainWindow):
         # Convert to list[Path]. Slight inefficiency but worth.
         path_list = list(map(Path, path_list))
 
+        differing_images: list[Path]
+
         if not extend:
-            initialize_globals(path_list)
+            differing_images = initialize_globals(path_list)
+            # Set view to z because initialize_globals calls update_images, which orients loaded images
+            # for the axial view
+            self.set_view_z()
             self.render_all_sliders()
             self.enable_elements()
-            self.render_image_num_and_path()
-            self.orient_curr_image(global_vars.VIEW)
             self.render_curr_slice()
+            if differing_images:
+                newline: str = "\n"
+                self.raise_error(
+                    f"The image(s) you uploaded have differing properties.\n"
+                    f"The first one and all images with properties matching the first one have been loaded.\n"
+                    f"The name(s) of the ones with differing properties are\n\n"
+                    f"{newline.join([path.name for path in differing_images])}"
+                )
         else:
             # Doesn't need to re-render sliders to set max value of slice slider.
-            # update_image_groups does not change the batch.
-            # Therefore, max value of slice slider does not change.
-            # Must render image_num.
+            # update_images won't change max value of slice slicer.
             # Does not need to render current slice. Images are added to the end of the dict.
             # And adding duplicate key doesn't change key order.
-            self.enable_elements()
-            update_image_groups(path_list)
-            self.render_image_num_and_path()
+            differing_images = update_images(path_list)
+            if differing_images:
+                newline: str = "\n"
+                self.raise_error(
+                    f"You have uploaded image(s) with properties that differ from those of the currently loaded ones.\n"
+                    f"These image(s) have not been loaded:\n\n"
+                    f"{newline.join([path.name for path in differing_images])}"
+                )
+        # When extending, image num must be updated
+        self.render_image_num_and_path()
+
+    def raise_error(self, msg: str) -> None:
+        """Creates a dialog with an error message.
+
+        :param msg: the error message to be displayed
+        :type msg: str
+        :return: None
+        :rtype: None"""
+        ErrorDialog(msg).exec_()
 
     def update_view(self) -> None:
         """Called when clicking on any of the three view radio buttons.
@@ -359,7 +384,10 @@ class MainWindow(QMainWindow):
         self.render_curr_slice()
 
     def set_view_z(self) -> None:
+        """Set global_vars.VIEW to View.Z and set the z radio button to checked."""
         global_vars.VIEW = constants.View.Z
+        # TODO: Uncheck x and y technically unnecessary since these 3 buttons in the view_button_group have
+        # autoExclusive=True
         self.ui.x_view_radio_button.setChecked(False)
         self.ui.y_view_radio_button.setChecked(False)
         self.ui.z_view_radio_button.setChecked(True)
@@ -566,7 +594,7 @@ class MainWindow(QMainWindow):
         self.ui.x_slider.setValue(global_vars.THETA_X)
         self.ui.y_slider.setValue(global_vars.THETA_Y)
         self.ui.z_slider.setValue(global_vars.THETA_Z)
-        self.ui.slice_slider.setMaximum(get_curr_image().GetSize()[2] - 1)
+        self.ui.slice_slider.setMaximum(get_curr_image().GetSize()[View.Z.value] - 1)
         self.ui.slice_slider.setValue(global_vars.SLICE)
         self.ui.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
         self.ui.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
@@ -626,6 +654,7 @@ class MainWindow(QMainWindow):
 
         Advance index and render."""
         img_helpers.next_img()
+        # TODO: This feels inefficient...
         self.orient_curr_image(global_vars.VIEW)
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
@@ -639,6 +668,7 @@ class MainWindow(QMainWindow):
 
         Decrement index and render."""
         img_helpers.previous_img()
+        # TODO: This feels inefficient...
         self.orient_curr_image(global_vars.VIEW)
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()

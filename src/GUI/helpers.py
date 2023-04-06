@@ -6,6 +6,16 @@ import string
 from typing import Union
 
 import numpy as np
+from PySide6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QLabel,
+    QMainWindow,
+    QFileDialog,
+    QMenu,
+    QVBoxLayout,
+    QWidget,
+)
 from PySide6.QtGui import QImage, QColor, QPixmap
 from PySide6 import QtWidgets
 
@@ -13,10 +23,31 @@ import src.utils.exceptions as exceptions
 import src.utils.user_settings as settings
 
 
-def string_to_QColor(name_or_hex: str) -> QColor:
-    """Convert a name (e.g. red) or 6-hexit rrggbb or 8-hexit rrggbbaa string to a `QColor`.
+class ErrorDialog(QDialog):
+    def __init__(self, msg: str):
+        """:param msg: Error message
+        :type msg: str"""
+        super().__init__()
+        self.setWindowTitle("Error")
+        layout = QVBoxLayout()
+        message = QLabel(msg)
+        layout.addWidget(message)
+        self.setLayout(layout)
 
-    :param name_or_hex: name of color or rrggbb or rrggbbaa
+
+# tl;dr QColor can have alpha (e.g., if we wanted contour color to be transparent)
+# but we don't have a need for it so don't support it
+
+
+# QColor supports alpha values (e.g., if we wanted to make the contour color alpha not 1).
+# However, if we call hasAlphaChannel() on many of the QImage's we're working with, the result would
+# be False.
+# qimage2ndarray supports scalar/gray + alpha and RGB + alpha, but perhaps the numpy arrays
+# we get from sitk.Image don't have alpha. We don't need to go to the effort of adding alpha.
+def string_to_QColor(name_or_hex: str) -> QColor:
+    """Convert a name (e.g. red) or 6-hexit rrggbb string to a `QColor`.
+
+    :param name_or_hex: name of color or rrggbb
     :type name_or_hex: str
     :return: QColor
     :rtype: QColor
@@ -29,11 +60,6 @@ def string_to_QColor(name_or_hex: str) -> QColor:
     channels: bytes = bytes.fromhex(name_or_hex)
     if len(channels) == 3:
         return QColor(channels[0], channels[1], channels[2])
-    elif len(channels) == 4:
-        color = QColor(channels[0], channels[1], channels[2], alpha=channels[3])
-        if settings.DEBUG:
-            print(f"string_to_QColor received 8-hexit str, alpha = {color.alpha()}")
-        return color
     else:
         raise exceptions.InvalidColor(name_or_hex)
 
