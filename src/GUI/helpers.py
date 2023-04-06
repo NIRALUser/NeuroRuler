@@ -98,15 +98,3 @@ def mask_QImage(
                 base.setPixelColor(i, j, color)
     if not mutate:
         return base
-
-
-def list_to_str_newline_separated(l: list) -> str:
-    """Given a list, return the str representation where each element is separated by newlines.
-
-    For example, ['a', 'b', 'c'] becomes 'a\nb\nc'
-
-    :param l:
-    :type l: list
-    :return: str representation of l with newlines
-    :rtype: str"""
-    return "\n".join(l)

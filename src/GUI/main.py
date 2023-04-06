@@ -59,7 +59,6 @@ from src.GUI.helpers import (
     ErrorDialog,
     string_to_QColor,
     mask_QImage,
-    list_to_str_newline_separated,
 )
 
 from src.utils.img_helpers import (
@@ -306,7 +305,8 @@ class MainWindow(QMainWindow):
 
         :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
         :type extend: bool
-        :return: None"""
+        :return: None
+        :rtype: None"""
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
             "'", ""
         ).replace(",", "")
@@ -334,8 +334,12 @@ class MainWindow(QMainWindow):
             self.enable_elements()
             self.render_curr_slice()
             if differing_images:
+                newline: str = "\n"
                 self.raise_error(
-                    f"The image(s) you uploaded have differing properties.\nThe first one and all images with properties matching the first one have been loaded.\nThe name(s) of the ones with differing properties are\n\n{list_to_str_newline_separated([path.name for path in differing_images])}."
+                    f"The image(s) you uploaded have differing properties.\n"
+                    f"The first one and all images with properties matching the first one have been loaded.\n"
+                    f"The name(s) of the ones with differing properties are\n\n"
+                    f"{newline.join([path.name for path in differing_images])}"
                 )
         else:
             # Doesn't need to re-render sliders to set max value of slice slider.
@@ -344,8 +348,11 @@ class MainWindow(QMainWindow):
             # And adding duplicate key doesn't change key order.
             differing_images = update_images(path_list)
             if differing_images:
+                newline: str = "\n"
                 self.raise_error(
-                    f"You have uploaded image(s) with differing properties from the currently loaded ones.\nThese image(s) have not been loaded:\n\n{list_to_str_newline_separated([path.name for path in differing_images])}."
+                    f"You have uploaded image(s) with properties that differ from those of the currently loaded ones.\n"
+                    f"These image(s) have not been loaded:\n\n"
+                    f"{newline.join([path.name for path in differing_images])}"
                 )
         # When extending, image num must be updated
         self.render_image_num_and_path()
@@ -354,8 +361,9 @@ class MainWindow(QMainWindow):
         """Creates a dialog with an error message.
 
         :param msg: the error message to be displayed
-        :type param: str
-        :return: None"""
+        :type msg: str
+        :return: None
+        :rtype: None"""
         ErrorDialog(msg).exec_()
 
     def update_view(self) -> None:
@@ -376,7 +384,10 @@ class MainWindow(QMainWindow):
         self.render_curr_slice()
 
     def set_view_z(self) -> None:
+        """Set global_vars.VIEW to View.Z and set the z radio button to checked."""
         global_vars.VIEW = constants.View.Z
+        # TODO: Uncheck x and y technically unnecessary since these 3 buttons in the view_button_group have
+        # autoExclusive=True
         self.ui.x_view_radio_button.setChecked(False)
         self.ui.y_view_radio_button.setChecked(False)
         self.ui.z_view_radio_button.setChecked(True)
