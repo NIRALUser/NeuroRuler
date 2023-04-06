@@ -23,7 +23,7 @@ import SimpleITK as sitk
 import numpy as np
 
 from PyQt6 import QtGui, QtCore
-from PyQt6.QtGui import QPixmap, QAction
+from PyQt6.QtGui import QPixmap, QAction, QImage
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -55,6 +55,7 @@ import src.utils.user_settings as user_settings
 from src.GUI.helpers import (
     string_to_QColor,
     mask_QImage,
+    sitk_slice_to_qimage,
 )
 
 from src.utils.img_helpers import (
@@ -92,6 +93,15 @@ DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 
 # We assume units are millimeters if we can't find units in metadata
 MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "millimeters (mm)"
+
+UNSCALED_QPIXMAP: QPixmap
+"""Unscaled QPixmap from which the scaled version is rendered in the GUI.
+
+When any slice (rotated, smoothed, previewed) is rendered from an unscaled QImage, this variable is set to the
+QPixmap generated from that unscaled QImage.
+
+This variable will not change on resizeEvent. resizeEvent will scale this. Otherwise, if scaling
+self.image's pixmap (which is already scaled), there would be loss of detail."""
 
 
 class MainWindow(QMainWindow):
@@ -424,13 +434,42 @@ class MainWindow(QMainWindow):
             global_vars.UPPER_THRESHOLD
         )
 
-    def set_pixmap(pixmap: QPixmap) -> None:
-        scaled_q_pixmap = pixmap.scaled(self.ui.image.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.FastTransformation)
-        self.ui.image.setPixmap(scaled_q_pixmap)
+    def render_scaled_qpixmap_from_qimage(self, q_img: QImage) -> None:
+        """Convert q_img to QPixmap and set self.image's pixmap to that pixmap scaled to self.image's size.
+
+        Sets UNSCALED_PIXMAP to the unscaled pixmap generated from the q_img.
+
+        :param q_img:
+        :type q_img: QImage
+        :return None:
+        :rtype None:"""
+        global UNSCALED_QPIXMAP
+        UNSCALED_QPIXMAP = QPixmap(q_img)
+        self.image.setPixmap(
+            UNSCALED_QPIXMAP.scaled(
+                self.image.size(),
+                aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                transformMode=Qt.TransformationMode.SmoothTransformation,
+            )
+        )
+
+    def resizeEvent(self, event) -> None:
+        """This method is called every time the window is resized. Overrides PyQt6's resizeEvent.
+
+        Sets pixmap to UNSCALED_QPIXMAP scaled to self.image's size."""
+        if global_vars.IMAGE_DICT:
+            self.image.setPixmap(
+                UNSCALED_QPIXMAP.scaled(
+                    self.image.size(),
+                    aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio,
+                    transformMode=Qt.TransformationMode.SmoothTransformation,
+                )
+            )
+        QMainWindow.resizeEvent(self, event)
 
     def render_curr_slice(self) -> Union[np.ndarray, None]:
         """Resamples the currently selected image using its rotation and slice settings,
-        then renders the resulting slice in the GUI.
+        then renders the resulting slice (scaled to the size of self.image) in the GUI.
 
         DOES NOT set text for `image_num_label` and file path labels.
 
@@ -447,11 +486,7 @@ class MainWindow(QMainWindow):
             self.set_view_z()
 
         rotated_slice: sitk.Image = get_curr_rotated_slice()
-
-        slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
-
-        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
-
+        q_img: QImage = sitk_slice_to_qimage(rotated_slice)
         rv_dummy_var: np.ndarray = np.zeros(0)
 
         if not SETTINGS_VIEW_ENABLED:
@@ -471,7 +506,9 @@ class MainWindow(QMainWindow):
             )
 
         elif global_vars.VIEW != constants.View.Z:
-            z_indicator: np.ndarray = np.zeros(slice_np.shape)
+            z_indicator: np.ndarray = np.zeros(
+                (rotated_slice.GetSize()[1], rotated_slice.GetSize()[0])
+            )
             z_indicator[get_curr_image_size()[2] - global_vars.SLICE - 1, :] = 1
             mask_QImage(
                 q_img,
@@ -479,16 +516,7 @@ class MainWindow(QMainWindow):
                 string_to_QColor(user_settings.CONTOUR_COLOR),
             )
 
-        q_pixmap: QPixmap = QPixmap(q_img)
-
-        # Attempt to fix aspect ratio of image
-        # w = self.image.size().width()
-        # h = self.image.size().height()
-        # print(w, h)
-
-        # self.image.setPixmap(q_pixmap.scaled(w, h, Qt.AspectRatioMode))
-
-        self.image.setPixmap(q_pixmap)
+        self.render_scaled_qpixmap_from_qimage(q_img)
 
         if not SETTINGS_VIEW_ENABLED:
             return rv_dummy_var
@@ -496,26 +524,23 @@ class MainWindow(QMainWindow):
     def render_smooth_slice(self) -> None:
         """Renders smooth slice in GUI. Allows user to preview result of smoothing settings."""
         self.update_smoothing_settings()
+        # Preview should apply filter only on axial slice
         self.set_view_z()
         smooth_slice: sitk.Image = get_curr_smooth_slice()
-        slice_np: np.ndarray = sitk.GetArrayFromImage(smooth_slice)
-        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
-        q_pixmap: QPixmap = QPixmap(q_img)
-        self.image.setPixmap(q_pixmap)
+        q_img: QImage = sitk_slice_to_qimage(smooth_slice)
+        self.render_scaled_qpixmap_from_qimage(q_img)
 
     def render_threshold(self) -> None:
         """Render filtered image slice on UI."""
-        # Preview should apply filter only on the axial slice
+        # Preview should apply filter only on axial slice
         self.set_view_z()
         if self.otsu_radio_button.isChecked():
             filter_img: sitk.Image = get_curr_otsu_slice()
         else:
             self.update_binary_filter_settings()
             filter_img: sitk.Image = get_curr_binary_thresholded_slice()
-        slice_np: np.ndarray = sitk.GetArrayFromImage(filter_img)
-        q_img = qimage2ndarray.array2qimage(slice_np, normalize=True)
-        q_pixmap: QPixmap = QPixmap(q_img)
-        self.image.setPixmap(q_pixmap)
+        q_img: QImage = sitk_slice_to_qimage(filter_img)
+        self.render_scaled_qpixmap_from_qimage(q_img)
 
     def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
         """Called after pressing Apply or when

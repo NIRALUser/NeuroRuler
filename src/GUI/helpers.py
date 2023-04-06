@@ -5,9 +5,14 @@ Note, importing PyQt6 in any file that's imported by a test file will cause an e
 import string
 from typing import Union
 
+import SimpleITK as sitk
 import numpy as np
 from PyQt6.QtGui import QImage, QColor, QPixmap
 from PyQt6 import QtWidgets
+from PyQt6.QtCore import QSize
+from PyQt6.QtCore import Qt
+
+import qimage2ndarray
 
 import src.utils.exceptions as exceptions
 import src.utils.user_settings as settings
@@ -38,11 +43,9 @@ def string_to_QColor(name_or_hex: str) -> QColor:
         raise exceptions.InvalidColor(name_or_hex)
 
 
-def mask_QImage(
-    q_img: QImage, binary_mask: np.ndarray, color: QColor, mutate: bool = True
-) -> Union[None, QImage]:
+def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor) -> None:
     """Given 2D `q_img` and 2D `binary_mask` of the same shape, apply `binary_mask` on `q_img`
-    to change `q_img` pixels corresponding to `binary_mask`=1 to `color`.
+    to change `q_img` pixels corresponding to `binary_mask`=1 to `color`. Mutates `q_img`.
 
     QImage and numpy use [reversed w,h order](https://stackoverflow.com/a/68220805/18479243).
 
@@ -55,20 +58,30 @@ def mask_QImage(
     :type binary_mask: np.ndarray
     :param color:
     :type color: QColor
-    :param mutate: Whether to mutate `q_img` or operate on a clone
-    :type mutate: bool
     :raise: exceptions.ArraysDifferentShape if the arrays are of different shape
     :return: None (if `mutate`) or cloned QImage (if not `mutate`)
     :rtype: None or QImage"""
-    base: QImage = q_img if mutate else q_img.copy()
     if (
-        base.size().width() != binary_mask.shape[0]
-        or base.size().height() != binary_mask.shape[1]
+        q_img.size().width() != binary_mask.shape[0]
+        or q_img.size().height() != binary_mask.shape[1]
     ):
         raise exceptions.ArraysDifferentShape
     for i in range(binary_mask.shape[0]):
         for j in range(binary_mask.shape[1]):
             if binary_mask[i][j]:
-                base.setPixelColor(i, j, color)
-    if not mutate:
-        return base
+                q_img.setPixelColor(i, j, color)
+
+
+def sitk_slice_to_qimage(sitk_slice: sitk.Image) -> QImage:
+    """Convert a 2D sitk.Image slice to a QImage.
+
+    This function calls sitk.GetArrayFromImage, which returns the transpose.
+    It also calls qimage2ndarray.array2qimage with normalize=True, normalizing
+    the pixels to 0..255.
+
+    :param sitk_slice: 2D slice
+    :type sitk_slice: sitk.Image
+    :return: Normalized QImage
+    :rtype: QImage"""
+    slice_np: np.ndarray = sitk.GetArrayFromImage(sitk_slice)
+    return qimage2ndarray.array2qimage(slice_np, normalize=True)

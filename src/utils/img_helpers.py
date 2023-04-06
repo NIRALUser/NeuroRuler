@@ -90,6 +90,14 @@ def clear_globals() -> None:
     global_vars.SLICE = 0
 
 
+def image_dict_is_empty() -> bool:
+    """
+    :return: True if IMAGE_DICT is empty, else False
+    :rtype: bool
+    """
+    return bool(global_vars.IMAGE_DICT)
+
+
 def get_curr_path() -> Path:
     """Return the current Path in IMAGE_DICT. That is, the key at index CURR_IMAGE_INDEX.
 
