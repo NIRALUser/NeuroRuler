@@ -3,8 +3,6 @@
 from src.utils.constants import deprecated, ROTATION_MAX, ROTATION_MIN, JSON_CONFIG_PATH
 
 
-# TODO: Make __init__ accept theta_x, theta_y, theta_z, slice_num as parameters to display those to the user?
-# Probably not necessary because those will be displayed in the GUI.
 class ComputeCircumferenceOfInvalidSlice(Exception):
     """User attempted to compute circumference of an invalid slice.
 

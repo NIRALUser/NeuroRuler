@@ -2720,3 +2720,7 @@ ads--CDockOverlayCross
     qproperty-iconShadowColor: transparent;
 }
 
+/* To make QMessageBox font not bold */
+QMessageBox QLabel {
+	font-weight: normal;
+}
