@@ -1,6 +1,6 @@
 """Image helper functions that don't quite fit into the main algorithm, unlike imgproc.py.
 
-Mostly holds helper functions for working with IMAGE_GROUPS and IMAGE_DICT in global_vars.py."""
+Mostly holds helper functions for working with IMAGE_DICT in global_vars.py."""
 
 from typing import Union
 import SimpleITK as sitk
@@ -11,51 +11,76 @@ from src.utils.constants import degrees_to_radians, View
 import src.utils.constants as constants
 
 
-def update_image_groups(path_list: list[Path]) -> None:
-    """Initialize IMAGE_GROUPS. See the docstring for IMAGE_GROUPS in global_vars.py for more info.
+def update_images(path_list: list[Path]) -> list[Path]:
+    """Initialize IMAGE_DICT. See the docstring for IMAGE_DICT in global_vars.py for more info.
 
-    NOTE: Does not set IMAGE_DICT to be the CURR_BATCH_INDEX image group in IMAGE_GROUPS.
-    IMAGE_DICT is a pointer to an images dict in IMAGE_GROUPS, so this function can
-    mutate (as you would probably want) IMAGE_DICT.
+    All images are oriented for the axial view when loaded. When calling this, make sure global_vars.VIEW = Z.
+
+    If the images at path(s) in path_list don't match the properties of previously saved images,
+    then this method returns the paths of the images that don't match, and
+    IMAGE_DICT is updated only with the non-differing images.
 
     :param path_list:
-    :type path_list: list[Path]"""
+    :type path_list: list[Path]
+    :raise: Exception if path_list is empty (disallow this in GUI)
+    :return: List of paths of images with properties that differ from those of the images currently in IMAGE_DICT
+    :rtype: list[Path]"""
+    if not path_list:
+        raise Exception("update_images assumes path_list isn't empty.")
+
     # On load, orient the image for Z view by default
     # If we don't do this, then the misaligned image's GetSize()[2] won't actually be the inferior-superior axis
     # Then the max slice value would not be correct because it would use some other axis
     global_vars.ORIENT_FILTER.SetDesiredCoordinateOrientation(
         constants.Z_ORIENTATION_STR
     )
+
+    comparison_properties_tuple: tuple
+    if global_vars.IMAGE_DICT:
+        comparison_properties_tuple = get_curr_properties_tuple()
+    else:
+        first_path: Path = path_list[0]
+        comparison_properties_tuple = get_properties_from_path(first_path)
+        global_vars.READER.SetFileName(str(first_path))
+        first_img: sitk.Image = global_vars.READER.Execute()
+        first_img_axial: sitk.Image = global_vars.ORIENT_FILTER.Execute(first_img)
+        global_vars.IMAGE_DICT[first_path] = first_img_axial
+        # Don't need to look at first image again
+        path_list = path_list[1:]
+
+    differing_image_paths: list[Path] = []
+
     for path in path_list:
         global_vars.READER.SetFileName(str(path))
         new_img: sitk.Image = global_vars.READER.Execute()
         new_img = global_vars.ORIENT_FILTER.Execute(new_img)
-        new_img_properties: tuple = get_properties(new_img)
-        if new_img_properties in global_vars.IMAGE_GROUPS:
-            # Duplicate path will get here, but reassign the sitk.Image anyway
-            # Already needed to do READER.Execute() to get properties anyway, might as well reassign
-            global_vars.IMAGE_GROUPS[new_img_properties][path] = new_img
+        new_img_properties: tuple = get_properties_from_sitk_image(new_img)
+        if comparison_properties_tuple != new_img_properties:
+            differing_image_paths.append(path)
         else:
-            global_vars.IMAGE_GROUPS[new_img_properties] = {path: new_img}
+            new_img_axial: sitk.Image = global_vars.ORIENT_FILTER.Execute(new_img)
+            global_vars.IMAGE_DICT[path] = new_img_axial
+    return differing_image_paths
 
 
-def initialize_globals(path_list: list[Path]) -> None:
+def initialize_globals(path_list: list[Path]) -> list[Path]:
     """After pressing File > Open, the global variables need to be cleared and (re)initialized.
 
-    Mutated global variables: IMAGE_GROUPS, IMAGE_DICT, CURR_IMAGE_INDEX, CURR_BATCH_INDEX,
+    If loading images with different properties, then this method returns
+    False, and IMAGE_DICT isn't updated with the differing images.
+
+    Mutated global variables: IMAGE_DICT, CURR_IMAGE_INDEX,
     READER, THETA_X, THETA_Y, THETA_Z, SLICE, EULER_3D_TRANSFORM.
 
-    Specifically, clears IMAGE_GROUPS and then populates it. IMAGE_DICT is then the first group of images.
+    Specifically, clears IMAGE_DICT and then populates it.
 
     :param path_list:
-    :type path_list: list[Path]"""
-    global_vars.IMAGE_GROUPS.clear()
+    :type path_list: list[Path]
+    :return: List of paths of images with properties that differ from those of the images currently in IMAGE_DICT
+    :rtype: list[Path]"""
     global_vars.CURR_IMAGE_INDEX = 0
-    global_vars.CURR_BATCH_INDEX = 0
-    update_image_groups(path_list)
-    global_vars.IMAGE_DICT = global_vars.IMAGE_GROUPS[
-        list(global_vars.IMAGE_GROUPS.keys())[0]
-    ]
+    global_vars.IMAGE_DICT.clear()
+    differing_image_paths: list[Path] = update_images(path_list)
     global_vars.THETA_X = 0
     global_vars.THETA_Y = 0
     global_vars.THETA_Z = 0
@@ -72,16 +97,15 @@ def initialize_globals(path_list: list[Path]) -> None:
     global_vars.VIEW = constants.View.Z
     global_vars.X_CENTER = get_middle_dimension(curr_img, View.X)
     global_vars.Y_CENTER = get_middle_dimension(curr_img, View.Y)
-
     global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(100)
     global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(200)
+    return differing_image_paths
 
 
 def clear_globals() -> None:
     """Clear global variables for unit testing in test_img_helpers.
 
     Don't need to reset Euler3DTransform since that's not used in the tests there."""
-    global_vars.IMAGE_GROUPS.clear()
     global_vars.IMAGE_DICT.clear()
     global_vars.CURR_IMAGE_INDEX = 0
     global_vars.THETA_X = 0
@@ -116,7 +140,7 @@ def get_curr_image() -> sitk.Image:
 
 # TODO: Add more properties?
 # TODO: Implement tolerance for spacing
-def get_properties(img: sitk.Image) -> tuple:
+def get_properties_from_sitk_image(img: sitk.Image) -> tuple:
     """Tuple of properties of a sitk.Image.
 
     TODO: Add more properties
@@ -132,6 +156,18 @@ def get_properties(img: sitk.Image) -> tuple:
         get_center_of_rotation(img),
         img.GetSpacing(),
     )
+
+
+def get_properties_from_path(path: Path) -> tuple:
+    """Tuple of properties of the sitk.Image we get from path. Uses global_vars.READER.
+
+    :param path: Path from which we can get a sitk.Image
+    :type path: Path
+    :return: (dimensions, center of rotation used in EULER_3D_TRANSFORM, spacing)
+    :rtype: tuple"""
+    global_vars.READER.SetFileName(str(path))
+    img: sitk.Image = global_vars.READER.Execute()
+    return get_properties_from_sitk_image(img)
 
 
 def get_middle_dimension(img: sitk.Image, axis: View) -> int:
@@ -295,11 +331,11 @@ def get_curr_properties_tuple() -> tuple:
 
     :return: current properties tuple
     :rtype: tuple"""
-    return list(global_vars.IMAGE_GROUPS.keys())[global_vars.CURR_BATCH_INDEX]
+    return get_properties_from_sitk_image(list(global_vars.IMAGE_DICT.values())[0])
 
 
 def del_curr_img() -> None:
-    """Remove currently displayed image from IMAGE_DICT and IMAGE_GROUPS.
+    """Remove currently displayed image from IMAGE_DICT.
 
     Decrements CURR_IMAGE_INDEX if removing the last element.
 

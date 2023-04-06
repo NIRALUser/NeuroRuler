@@ -23,7 +23,7 @@ will be raised."""
 SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """File formats supported. Must be a subset of the file formats supported by SimpleITK.
 
-TODO: Support .txt for loading image paths from text file (which we can quite easily export using global_vars.IMAGE_GROUPS)."""
+TODO: Support .txt for loading image paths from text file (which we can quite easily export using global_vars.IMAGE_DICT)."""
 EXAMPLE_DATA_DIR: Path = Path("ExampleData")
 """Directory for storing example data."""
 
