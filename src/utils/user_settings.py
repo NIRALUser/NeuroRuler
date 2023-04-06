@@ -69,3 +69,6 @@ MAX_WIDTH_RATIO: float = 0.6
 """Max GUI width as fraction of primary monitor width. Configurable in JSON"""
 MAX_HEIGHT_RATIO: float = 0.6
 """Max GUI height as fraction of primary monitor height. Configurable in JSON"""
+
+DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL: bool = False
+"""Whether the advanced menu messages display in terminal or new window"""
