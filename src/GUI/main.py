@@ -23,7 +23,7 @@ import SimpleITK as sitk
 import numpy as np
 
 from PyQt6 import QtGui, QtCore
-from PyQt6.QtGui import QPixmap, QAction, QImage
+from PyQt6.QtGui import QPixmap, QAction, QImage, QIcon
 from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
@@ -33,6 +33,7 @@ from PyQt6.QtWidgets import (
     QMenu,
     QVBoxLayout,
     QWidget,
+    QMessageBox,
 )
 from PyQt6.uic.load_ui import loadUi
 from PyQt6.QtCore import Qt
@@ -54,11 +55,14 @@ import src.utils.global_vars as global_vars
 import src.utils.imgproc as imgproc
 import src.utils.user_settings as user_settings
 from src.GUI.helpers import (
-    ErrorDialog,
     string_to_QColor,
     mask_QImage,
     sitk_slice_to_qimage,
+    ErrorMessageBox,
+    InformationMessageBox,
+    InformationDialog,
 )
+import src.GUI.helpers
 
 from src.utils.img_helpers import (
     initialize_globals,
@@ -130,11 +134,11 @@ class MainWindow(QMainWindow):
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
         self.action_test_stuff.triggered.connect(self.test_stuff)
-        self.action_print_metadata.triggered.connect(print_metadata)
-        self.action_print_dimensions.triggered.connect(print_dimensions)
-        self.action_print_properties.triggered.connect(print_properties)
-        self.action_print_direction.triggered.connect(print_direction)
-        self.action_print_spacing.triggered.connect(print_spacing)
+        self.action_print_metadata.triggered.connect(metadata_dialog)
+        self.action_print_dimensions.triggered.connect(dimensions_dialog)
+        self.action_print_properties.triggered.connect(properties_dialog)
+        self.action_print_direction.triggered.connect(direction_dialog)
+        self.action_print_spacing.triggered.connect(spacing_dialog)
         self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -341,7 +345,7 @@ class MainWindow(QMainWindow):
             self.render_curr_slice()
             if differing_images:
                 newline: str = "\n"
-                self.raise_error(
+                self.error_dialog(
                     f"The image(s) you uploaded have differing properties.\n"
                     f"The first one and all images with properties matching the first one have been loaded.\n"
                     f"The name(s) of the ones with differing properties are\n\n"
@@ -355,7 +359,7 @@ class MainWindow(QMainWindow):
             differing_images = update_images(path_list)
             if differing_images:
                 newline: str = "\n"
-                self.raise_error(
+                self.error_dialog(
                     f"You have uploaded image(s) with properties that differ from those of the currently loaded ones.\n"
                     f"These image(s) have not been loaded:\n\n"
                     f"{newline.join([path.name for path in differing_images])}"
@@ -363,14 +367,14 @@ class MainWindow(QMainWindow):
         # When extending, image num must be updated
         self.render_image_num_and_path()
 
-    def raise_error(self, msg: str) -> None:
+    def error_dialog(self, message: str) -> None:
         """Creates a dialog with an error message.
 
-        :param msg: the error message to be displayed
-        :type msg: str
+        :param message: the error message to be displayed
+        :type message: str
         :return: None
         :rtype: None"""
-        ErrorDialog(msg).exec()
+        ErrorMessageBox(message).exec()
 
     def update_view(self) -> None:
         """Called when clicking on any of the three view radio buttons.
@@ -769,29 +773,40 @@ class MainWindow(QMainWindow):
         img_helpers.orient_curr_image(view)
 
 
-# TODO: Broken?
-def print_metadata() -> None:
+def information_dialog(title: str, message: str) -> None:
+    """Create an informational dialog QDialog window with title and message.
+
+    :param title:
+    :type title: str
+    :param message:
+    :type message: str
+    :return: None
+    :rtype: None"""
+    InformationDialog(title, message).exec()
+
+
+# TODO: Broken
+def metadata_dialog() -> None:
     """Print current image's metadata to terminal. Internally, uses sitk.GetMetaData, which doesn't return
     all metadata (e.g., doesn't return spacing values whereas sitk.GetSpacing does).
 
     Typically, this returns less metadata for NRRD than for NIfTI."""
-
     if not len(global_vars.IMAGE_DICT):
         print("Can't print metadata when there's no image!")
         return
-    pprint.pprint(get_curr_metadata())
+    information_dialog("Metadata", pprint.pformat(get_curr_metadata()))
 
 
-def print_dimensions() -> None:
+def dimensions_dialog() -> None:
     """Print currently displayed image's dimensions to terminal."""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print dimensions when there's no image!")
         return
-    print(get_curr_image().GetSize())
+    information_dialog("Dimensions", pprint.pformat(get_curr_image().GetSize()))
 
 
 # TODO: If updating img_helpers.get_properties(), this needs to be slightly adjusted!
-def print_properties() -> None:
+def properties_dialog() -> None:
     """Print current batch's properties to terminal.
 
     Internally, the properties tuple is a tuple of values only and doesn't contain
@@ -801,28 +816,29 @@ def print_properties() -> None:
         print("No loaded image!")
         return
     curr_properties: tuple = get_curr_properties_tuple()
-    fields: tuple = ("dimensions", "center of rotation", "spacing")
+    fields: tuple = ("center of rotation", "dimensions", "spacing")
     if len(fields) != len(curr_properties):
         print(
             "Update src/GUI/main.print_properties() !\nNumber of fields and number of properties don't match."
         )
         exit(1)
-    pprint.pprint(OrderedDict(zip(fields, curr_properties)))
+    # Pretty sure the dict(zip(...)) goes through fields in alphabetical order
+    information_dialog("Properties", pprint.pformat(dict(zip(fields, curr_properties))))
 
 
-def print_direction() -> None:
+def direction_dialog() -> None:
     """Print current image's dimensions to terminal."""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print direction when there's no image!")
         return
-    print(get_curr_image().GetDirection())
+    information_dialog("Direction", pprint.pformat(get_curr_image().GetDirection()))
 
 
-def print_spacing() -> None:
+def spacing_dialog() -> None:
     if not len(global_vars.IMAGE_DICT):
         print("Can't print spacing when there's no image!")
         return
-    print(get_curr_image().GetSpacing())
+    information_dialog("Spacing", pprint.pformat(get_curr_image().GetSpacing()))
 
 
 def main() -> None:

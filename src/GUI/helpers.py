@@ -2,13 +2,15 @@
 
 Note, importing PyQt6 in any file that's imported by a test file will cause an error."""
 
+import platform
 import string
 from typing import Union
 
 import SimpleITK as sitk
 import numpy as np
+import importlib
 
-from PyQt6.QtGui import QImage, QColor, QPixmap
+from PyQt6.QtGui import QImage, QColor, QPixmap, QIcon, QFont
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import (
     QApplication,
@@ -19,36 +21,27 @@ from PyQt6.QtWidgets import (
     QMenu,
     QVBoxLayout,
     QWidget,
+    QMessageBox,
 )
 from PyQt6.QtCore import QSize
 from PyQt6.QtCore import Qt
 
 import qimage2ndarray
 
-
 import src.utils.exceptions as exceptions
-import src.utils.user_settings as settings
+import src.utils.user_settings as user_settings
+from src.utils.constants import deprecated
 
+MACOS: bool = "macOS" in platform.platform()
+FONT_SIZE: int = 12
+"""Idk if this is actually the font size across multiple platforms...
 
-class ErrorDialog(QDialog):
-    def __init__(self, msg: str):
-        """:param msg: Error message
-        :type msg: str"""
-        super().__init__()
-        self.setWindowTitle("Error")
-        layout = QVBoxLayout()
-        message = QLabel(msg)
-        layout.addWidget(message)
-        self.setLayout(layout)
+It's used in InformationDialog to add width to the dialog to prevent the window title from being truncated."""
 
 
 # tl;dr QColor can have alpha (e.g., if we wanted contour color to be transparent)
-# but we don't have a need for it so don't support it
-
-
-# QColor supports alpha values (e.g., if we wanted to make the contour color alpha not 1).
-# However, if we call hasAlphaChannel() on many of the QImage's we're working with, the result would
-# be False.
+# but we don't have a need for it so don't support it.
+# Call hasAlphaChannel() on many of the QImage's we're working with results in False.
 # qimage2ndarray supports scalar/gray + alpha and RGB + alpha, but perhaps the numpy arrays
 # we get from sitk.Image don't have alpha. We don't need to go to the effort of adding alpha.
 def string_to_QColor(name_or_hex: str) -> QColor:
@@ -113,3 +106,58 @@ def sitk_slice_to_qimage(sitk_slice: sitk.Image) -> QImage:
     :rtype: QImage"""
     slice_np: np.ndarray = sitk.GetArrayFromImage(sitk_slice)
     return qimage2ndarray.array2qimage(slice_np, normalize=True)
+
+
+class ErrorMessageBox(QMessageBox):
+    def __init__(self, message: str):
+        """:param message: Error message
+        :type message: str"""
+        super().__init__()
+        # Window title is ignored on macOS.
+        # QDialog's window title is not ignored on macOS, but I'm pretty sure QDialog doesn't
+        # support icons.
+        self.setWindowTitle("Error")
+        self.setIconPixmap(
+            QPixmap(f":/{user_settings.THEME_NAME}/message_critical.svg")
+        )
+        self.setText(message)
+
+
+# adjustSize adjusts size based on message, not window title (+ window buttons)
+# So for some menu options, the window title would be truncated if some width isn't added
+# However, QDialog does show window title on macOS (unlike QMessageBox)
+class InformationDialog(QDialog):
+    def __init__(self, title: str, message: str):
+        """:param title: Title of window
+        :type title: str
+        :param message: Informational message
+        :type message: str"""
+        super().__init__()
+        self.setWindowTitle(title)
+        layout: QVBoxLayout = QVBoxLayout()
+        message_label: QLabel = QLabel(message)
+        layout.addWidget(message_label)
+        self.setLayout(layout)
+        self.adjustSize()
+        # Add width to prevent truncation of the window title
+        self.setFixedSize(
+            self.size().width() + FONT_SIZE * len(title), self.size().height()
+        )
+
+
+# Deprecated because QMessageBox's window title doesn't show up on macOS
+@deprecated
+class InformationMessageBox(QMessageBox):
+    def __init__(self, title: str, message: str):
+        """:param title: Title of window (on macOS, QMessageBox window title doesn't show up so is instead prepended to the message)
+        :type title: str
+        :param message: Informational message
+        :type message: str"""
+        super().__init__()
+        self.setWindowTitle(title)
+        self.setIconPixmap(
+            QPixmap(f":/{user_settings.THEME_NAME}/message_information.svg")
+        )
+        if MACOS:
+            title += "\n\n"
+        self.setText(f"{title if MACOS else ''} {message}")

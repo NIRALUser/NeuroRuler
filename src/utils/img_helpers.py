@@ -149,11 +149,11 @@ def get_properties_from_sitk_image(img: sitk.Image) -> tuple:
 
     :param img:
     :type img: sitk.Image
-    :return: (dimensions, center of rotation used in EULER_3D_TRANSFORM, spacing)
+    :return: (center of rotation used in EULER_3D_TRANSFORM, dimensions, spacing)
     :rtype: tuple"""
     return (
-        img.GetSize(),
         get_center_of_rotation(img),
+        img.GetSize(),
         img.GetSpacing(),
     )
 
