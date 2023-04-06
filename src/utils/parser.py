@@ -59,6 +59,9 @@ def parse_json() -> None:
     user_settings.MIN_HEIGHT_RATIO = parse_float("MIN_HEIGHT_RATIO")
     user_settings.MAX_WIDTH_RATIO = parse_float("MAX_WIDTH_RATIO")
     user_settings.MAX_HEIGHT_RATIO = parse_float("MAX_HEIGHT_RATIO")
+    user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL = parse_bool(
+        "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL"
+    )
 
 
 # Source: https://github.com/Alexhuszagh/BreezeStyleSheets/blob/main/configure.py#L82

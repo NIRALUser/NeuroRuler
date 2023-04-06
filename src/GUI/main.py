@@ -17,7 +17,6 @@ import sys
 import webbrowser
 from pathlib import Path
 from typing import Union
-from enum import Enum
 
 import SimpleITK as sitk
 import numpy as np
@@ -38,13 +37,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.uic.load_ui import loadUi
 from PyQt6.QtCore import Qt
 
-import qimage2ndarray
 import pprint
-
-# The regular Python 3.7+ dict maintains insertion order.
-# This is used only in print_properties()
-from collections import OrderedDict
-
 from src.utils.constants import View, ThresholdFilter
 import src.utils.constants as constants
 
@@ -62,7 +55,6 @@ from src.GUI.helpers import (
     InformationMessageBox,
     InformationDialog,
 )
-import src.GUI.helpers
 
 from src.utils.img_helpers import (
     initialize_globals,
@@ -134,11 +126,11 @@ class MainWindow(QMainWindow):
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
         self.action_test_stuff.triggered.connect(self.test_stuff)
-        self.action_print_metadata.triggered.connect(metadata_dialog)
-        self.action_print_dimensions.triggered.connect(dimensions_dialog)
-        self.action_print_properties.triggered.connect(properties_dialog)
-        self.action_print_direction.triggered.connect(direction_dialog)
-        self.action_print_spacing.triggered.connect(spacing_dialog)
+        self.action_print_metadata.triggered.connect(display_metadata)
+        self.action_print_dimensions.triggered.connect(display_dimensions)
+        self.action_print_properties.triggered.connect(display_properties)
+        self.action_print_direction.triggered.connect(display_direction)
+        self.action_print_spacing.triggered.connect(display_spacing)
         self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -390,7 +382,7 @@ class MainWindow(QMainWindow):
         else:
             global_vars.VIEW = constants.View.Z
 
-        self.orient_curr_image(global_vars.VIEW)
+        self.orient_curr_image()
         self.render_curr_slice()
 
     def set_view_z(self) -> None:
@@ -683,7 +675,7 @@ class MainWindow(QMainWindow):
         Advance index and render."""
         img_helpers.next_img()
         # TODO: This feels inefficient...
-        self.orient_curr_image(global_vars.VIEW)
+        self.orient_curr_image()
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
 
@@ -697,7 +689,7 @@ class MainWindow(QMainWindow):
         Decrement index and render."""
         img_helpers.previous_img()
         # TODO: This feels inefficient...
-        self.orient_curr_image(global_vars.VIEW)
+        self.orient_curr_image()
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
 
@@ -765,12 +757,11 @@ class MainWindow(QMainWindow):
         )
         self.image.pixmap().save(path, extension)
 
-    def orient_curr_image(self, view: Enum) -> None:
-        """Mutate the current image by applying ORIENT_FILTER on it.
+    def orient_curr_image(self) -> None:
+        """Orient the current image for the current view (global_vars.VIEW) by applying ORIENT_FILTER on it.
 
-        The orientation applied depends on the view. See img_helpers.orient_curr_image.
-        """
-        img_helpers.orient_curr_image(view)
+        This mutates the image."""
+        img_helpers.orient_curr_image(global_vars.VIEW)
 
 
 def information_dialog(title: str, message: str) -> None:
@@ -786,28 +777,36 @@ def information_dialog(title: str, message: str) -> None:
 
 
 # TODO: Broken
-def metadata_dialog() -> None:
-    """Print current image's metadata to terminal. Internally, uses sitk.GetMetaData, which doesn't return
+def display_metadata() -> None:
+    """Display metadata in window or terminal. Internally, uses sitk.GetMetaData, which doesn't return
     all metadata (e.g., doesn't return spacing values whereas sitk.GetSpacing does).
 
     Typically, this returns less metadata for NRRD than for NIfTI."""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print metadata when there's no image!")
         return
-    information_dialog("Metadata", pprint.pformat(get_curr_metadata()))
+    message: str = pprint.pformat(get_curr_metadata())
+    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+        print(message)
+    else:
+        information_dialog("Metadata", message)
 
 
-def dimensions_dialog() -> None:
-    """Print currently displayed image's dimensions to terminal."""
+def display_dimensions() -> None:
+    """Display current image's dimensions in window or terminal."""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print dimensions when there's no image!")
         return
-    information_dialog("Dimensions", pprint.pformat(get_curr_image().GetSize()))
+    message: str = pprint.pformat(get_curr_image().GetSize())
+    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+        print(message)
+    else:
+        information_dialog("Dimensions", message)
 
 
 # TODO: If updating img_helpers.get_properties(), this needs to be slightly adjusted!
-def properties_dialog() -> None:
-    """Print current batch's properties to terminal.
+def display_properties() -> None:
+    """Display properties in window or terminal.
 
     Internally, the properties tuple is a tuple of values only and doesn't contain
     field names. This function creates a dictionary with field names for printing. But the dictionary
@@ -823,22 +822,35 @@ def properties_dialog() -> None:
         )
         exit(1)
     # Pretty sure the dict(zip(...)) goes through fields in alphabetical order
-    information_dialog("Properties", pprint.pformat(dict(zip(fields, curr_properties))))
+    message: str = pprint.pformat(dict(zip(fields, curr_properties)))
+    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+        print(message)
+    else:
+        information_dialog("Properties", message)
 
 
-def direction_dialog() -> None:
-    """Print current image's dimensions to terminal."""
+def display_direction() -> None:
+    """Display current image's direction in window or terminal."""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print direction when there's no image!")
         return
-    information_dialog("Direction", pprint.pformat(get_curr_image().GetDirection()))
+    message: str = pprint.pformat(get_curr_image().GetDirection())
+    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+        print(message)
+    else:
+        information_dialog("Direction", message)
 
 
-def spacing_dialog() -> None:
+def display_spacing() -> None:
+    """Display current image's spacing in window or terminal."""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print spacing when there's no image!")
         return
-    information_dialog("Spacing", pprint.pformat(get_curr_image().GetSpacing()))
+    message: str = pprint.pformat(get_curr_image().GetSpacing())
+    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+        print(message)
+    else:
+        information_dialog("Spacing", message)
 
 
 def main() -> None:

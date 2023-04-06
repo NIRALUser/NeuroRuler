@@ -8,7 +8,6 @@ from typing import Union
 
 import SimpleITK as sitk
 import numpy as np
-import importlib
 
 from PyQt6.QtGui import QImage, QColor, QPixmap, QIcon, QFont
 from PyQt6 import QtWidgets
@@ -123,7 +122,7 @@ class ErrorMessageBox(QMessageBox):
         self.setText(message)
 
 
-# adjustSize adjusts size based on message, not window title (+ window buttons)
+# adjustSize adjusts size based on window content, not window title (+ window buttons)
 # So for some menu options, the window title would be truncated if some width isn't added
 # However, QDialog does show window title on macOS (unlike QMessageBox)
 class InformationDialog(QDialog):
@@ -146,6 +145,8 @@ class InformationDialog(QDialog):
 
 
 # Deprecated because QMessageBox's window title doesn't show up on macOS
+# However, QMessageBox can display an icon, whereas QDialog can't (I think)
+# The icon provides some additional width that ill cause the window title to not be truncated, unlike QDialog
 @deprecated
 class InformationMessageBox(QMessageBox):
     def __init__(self, title: str, message: str):

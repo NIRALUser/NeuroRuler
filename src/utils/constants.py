@@ -16,7 +16,7 @@ from enum import Enum
 
 JSON_CONFIG_PATH: Path = Path("config.json")
 """Settings that configure user_settings.py"""
-EXPECTED_NUM_FIELDS_IN_JSON: int = 10
+EXPECTED_NUM_FIELDS_IN_JSON: int = 11
 """Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
 will be raised."""
 
