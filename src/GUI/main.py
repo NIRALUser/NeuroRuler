@@ -56,8 +56,10 @@ import src.utils.global_vars as global_vars
 import src.utils.imgproc as imgproc
 import src.utils.user_settings as user_settings
 from src.GUI.helpers import (
+    ErrorDialog,
     string_to_QColor,
     mask_QImage,
+    list_to_str_newline_separated,
 )
 
 from src.utils.img_helpers import (
@@ -97,16 +99,6 @@ DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 # We assume units are millimeters if we can't find units in metadata
 MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "millimeters (mm)"
 
-
-class ErrorDiag(QDialog):
-    def __init__(self, msg: str):
-        super().__init__()
-
-        self.setWindowTitle("Error")
-        self.layout = QVBoxLayout()
-        message = QLabel(msg)
-        self.layout.addWidget(message)
-        self.setLayout(self.layout)
 
 class MainWindow(QMainWindow):
     """Main window of the application.
@@ -331,28 +323,32 @@ class MainWindow(QMainWindow):
         # Convert to list[Path]. Slight inefficiency but worth.
         path_list = list(map(Path, path_list))
 
-        all_added = True
+        differing_images: list[Path]
 
         if not extend:
-            all_added = initialize_globals(path_list)
+            differing_images = initialize_globals(path_list)
+            # Set view to z because initialize_globals calls update_images, which orients loaded images
+            # for the axial view
+            self.set_view_z()
             self.render_all_sliders()
             self.enable_elements()
-            self.render_image_num_and_path()
-            self.orient_curr_image(global_vars.VIEW)
             self.render_curr_slice()
+            if differing_images:
+                self.raise_error(
+                    f"The image(s) you uploaded have differing properties.\nThe first one and all images with properties matching the first one have been loaded.\nThe name(s) of the ones with differing properties are\n\n{list_to_str_newline_separated([path.name for path in differing_images])}."
+                )
         else:
             # Doesn't need to re-render sliders to set max value of slice slider.
-            # update_images does not change the batch.
-            # Therefore, max value of slice slider does not change.
-            # Must render image_num.
+            # update_images won't change max value of slice slicer.
             # Does not need to render current slice. Images are added to the end of the dict.
             # And adding duplicate key doesn't change key order.
-            self.enable_elements()
-            all_added = update_images(path_list)
-            self.render_image_num_and_path()
-
-        if not all_added:
-            self.raise_error("It appears you have uploaded an image with differing properties from the image(s) uploaded before. This image has not been loaded into the tool.")
+            differing_images = update_images(path_list)
+            if differing_images:
+                self.raise_error(
+                    f"You have uploaded image(s) with differing properties from the currently loaded ones.\nThese image(s) have not been loaded:\n\n{list_to_str_newline_separated([path.name for path in differing_images])}."
+                )
+        # When extending, image num must be updated
+        self.render_image_num_and_path()
 
     def raise_error(self, msg: str) -> None:
         """Creates a dialog with an error message.
@@ -360,8 +356,7 @@ class MainWindow(QMainWindow):
         :param msg: the error message to be displayed
         :type param: str
         :return: None"""
-        dlg = ErrorDiag(msg)
-        dlg.exec_()
+        ErrorDialog(msg).exec_()
 
     def update_view(self) -> None:
         """Called when clicking on any of the three view radio buttons.
@@ -588,14 +583,13 @@ class MainWindow(QMainWindow):
         self.ui.x_slider.setValue(global_vars.THETA_X)
         self.ui.y_slider.setValue(global_vars.THETA_Y)
         self.ui.z_slider.setValue(global_vars.THETA_Z)
-        self.ui.slice_slider.setMaximum(get_curr_image().GetSize()[2] - 1)
+        self.ui.slice_slider.setMaximum(get_curr_image().GetSize()[View.Z.value] - 1)
         self.ui.slice_slider.setValue(global_vars.SLICE)
         self.ui.x_rotation_label.setText(f"X rotation: {global_vars.THETA_X}°")
         self.ui.y_rotation_label.setText(f"Y rotation: {global_vars.THETA_Y}°")
         self.ui.z_rotation_label.setText(f"Z rotation: {global_vars.THETA_Z}°")
         self.ui.slice_num_label.setText(f"Slice: {global_vars.SLICE}")
-        
-        
+
     def rotate_x(self):
         """Called when the user updates the x slider.
 
@@ -649,6 +643,7 @@ class MainWindow(QMainWindow):
 
         Advance index and render."""
         img_helpers.next_img()
+        # TODO: This feels inefficient...
         self.orient_curr_image(global_vars.VIEW)
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
@@ -662,6 +657,7 @@ class MainWindow(QMainWindow):
 
         Decrement index and render."""
         img_helpers.previous_img()
+        # TODO: This feels inefficient...
         self.orient_curr_image(global_vars.VIEW)
         binary_contour_or_none: Union[np.ndarray, None] = self.render_curr_slice()
         self.render_image_num_and_path()
