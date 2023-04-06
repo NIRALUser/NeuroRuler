@@ -114,6 +114,14 @@ def clear_globals() -> None:
     global_vars.SLICE = 0
 
 
+def image_dict_is_empty() -> bool:
+    """
+    :return: True if IMAGE_DICT is empty, else False
+    :rtype: bool
+    """
+    return bool(global_vars.IMAGE_DICT)
+
+
 def get_curr_path() -> Path:
     """Return the current Path in IMAGE_DICT. That is, the key at index CURR_IMAGE_INDEX.
 
@@ -141,11 +149,11 @@ def get_properties_from_sitk_image(img: sitk.Image) -> tuple:
 
     :param img:
     :type img: sitk.Image
-    :return: (dimensions, center of rotation used in EULER_3D_TRANSFORM, spacing)
+    :return: (center of rotation used in EULER_3D_TRANSFORM, dimensions, spacing)
     :rtype: tuple"""
     return (
-        img.GetSize(),
         get_center_of_rotation(img),
+        img.GetSize(),
         img.GetSpacing(),
     )
 

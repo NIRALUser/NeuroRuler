@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
+    <width>1308</width>
     <height>864</height>
    </rect>
   </property>
@@ -958,27 +958,20 @@
        </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer_17">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <widget class="QLabel" name="image">
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>500</height>
+          <height>0</height>
          </size>
         </property>
         <property name="sizeIncrement">
@@ -994,7 +987,7 @@
          <string>Select images using File &gt; Open!</string>
         </property>
         <property name="scaledContents">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -1070,19 +1063,6 @@
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer_16">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <widget class="QPushButton" name="export_button">
         <property name="enabled">
          <bool>false</bool>
@@ -1101,7 +1081,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1000</width>
+     <width>1308</width>
      <height>24</height>
     </rect>
    </property>
@@ -1152,7 +1132,7 @@
      <string>Tools for debugging.</string>
     </property>
     <property name="title">
-     <string>Debug</string>
+     <string>Advanced</string>
     </property>
     <addaction name="action_test_stuff"/>
     <addaction name="action_print_metadata"/>
@@ -1382,7 +1362,7 @@
   </action>
   <action name="action_print_metadata">
    <property name="text">
-    <string>Print metadata</string>
+    <string>Print metadata (broken)</string>
    </property>
    <property name="toolTip">
     <string>Print metadata to terminal.</string>
