@@ -63,8 +63,11 @@ This will be run automatically before each commit.
 
 ## Modify pre-commit git hook
 
-Edit `.pre-commit-config.yaml`.
+Edit [`.pre-commit-config.yaml`](.pre-commit-config.yaml).
 
-`pre-commit install`
+Then run `pre-commit install`.
 
 More instructions [here](https://pre-commit.com).
+
+Do not name any source code files `ui_mainwindow.py|stylesheet.qss|resources.py|gui|gui.pyw`.
+These files are ignored in [`.pre-commit-config.yaml`](.pre-commit-config.yaml).
