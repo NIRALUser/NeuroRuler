@@ -4,7 +4,6 @@ JSON, GUI, CLI, etc.
 Default values are what's in the config.json file, which should match what's in this file."""
 
 from pathlib import Path
-from screeninfo import get_monitors, ScreenInfoError
 import src.utils.constants as constants
 
 DEBUG: bool = False
@@ -48,26 +47,9 @@ Internally, this is converted to a QColor using imgproc.string_to_QColor().
 
 QColor supports 8-hexit rrggbbaa but doesn't work in our GUI, i.e. aa=00 appears fully bright in the GUI."""
 
-PRIMARY_MONITOR_DIMENSIONS: list[int] = [500, 500]
-"""Set to user's primary monitor's dimensions. 500, 500 are dummy values"""
-
-try:
-    for m in get_monitors():
-        if m.is_primary:
-            PRIMARY_MONITOR_DIMENSIONS[0] = m.width
-            PRIMARY_MONITOR_DIMENSIONS[1] = m.height
-            break
-except ScreenInfoError:
-    # This will occur on GH automated tests.
-    pass
-
-MIN_WIDTH_RATIO: float = 0.6
-"""Min GUI width as fraction of primary monitor width. Configurable in JSON"""
-MIN_HEIGHT_RATIO: float = 0.5
-"""Min GUI height as fraction of primary monitor height. Configurable in JSON"""
-MAX_WIDTH_RATIO: float = 0.6
+STARTUP_WIDTH_RATIO: float = 0.6
 """Max GUI width as fraction of primary monitor width. Configurable in JSON"""
-MAX_HEIGHT_RATIO: float = 0.6
+STARTUP_HEIGHT_RATIO: float = 0.6
 """Max GUI height as fraction of primary monitor height. Configurable in JSON"""
 
 DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL: bool = False

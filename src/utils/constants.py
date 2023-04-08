@@ -10,13 +10,14 @@ This file should not import any module in this repo to avoid circular imports.""
 from pathlib import Path
 import warnings
 import functools
+from screeninfo import get_monitors, ScreenInfoError
 from numpy import pi
 from typing import Union
 from enum import Enum
 
 JSON_CONFIG_PATH: Path = Path("config.json")
 """Settings that configure user_settings.py"""
-EXPECTED_NUM_FIELDS_IN_JSON: int = 11
+EXPECTED_NUM_FIELDS_IN_JSON: int = 9
 """Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
 will be raised."""
 
@@ -133,6 +134,18 @@ VIEW_TO_ORIENTATION_STR: dict = {
     View.Z: Z_ORIENTATION_STR,
 }
 """Map View enum to its orientation string."""
+
+PRIMARY_MONITOR_DIMENSIONS: tuple[int, int] = (500, 500)
+"""Set to user's primary monitor's dimensions. 500, 500 are dummy values"""
+
+try:
+    for monitor in get_monitors():
+        if monitor.is_primary:
+            PRIMARY_MONITOR_DIMENSIONS = (monitor.width, monitor.height)
+            break
+except ScreenInfoError:
+    # This will occur in GH automated tests.
+    pass
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically

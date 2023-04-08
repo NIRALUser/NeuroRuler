@@ -75,6 +75,7 @@ from src.utils.img_helpers import (
 import src.utils.img_helpers as img_helpers
 
 
+PATH_TO_UI_FILE: Path = Path("src") / "GUI" / "mainwindow.ui"
 PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
 
 SETTINGS_VIEW_ENABLED: bool = True
@@ -112,10 +113,12 @@ class MainWindow(QMainWindow):
 
         Sets window title and icon."""
         super(MainWindow, self).__init__()
-        loadUi(str(Path("src") / "GUI" / "mainwindow.ui"), self)
+        loadUi(str(PATH_TO_UI_FILE), self)
 
         self.setWindowTitle("Head Circumference Tool")
-        self.setWindowIcon(QtGui.QIcon(str(PATH_TO_HCT_LOGO)))
+
+        # TODO: Remove if not needed (since main() now has a line that does this)
+        # self.setWindowIcon(QIcon(str(PATH_TO_HCT_LOGO)))
 
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(lambda: self.browse_files(True))
@@ -863,6 +866,8 @@ def main() -> None:
         user_settings.IMG_DIR.mkdir()
 
     app = QApplication(sys.argv)
+    # On macOS (maybe Windows too, idk), sets the application logo in the dock
+    app.setWindowIcon(QIcon(str(PATH_TO_HCT_LOGO)))
 
     # TODO: Put arrow buttons on the left and right endpoints of the sliders
     # These arrow buttons already show up if commenting in app.setStyle("Fusion")
@@ -878,22 +883,14 @@ def main() -> None:
         app.setStyleSheet(f.read())
 
     MAIN_WINDOW = MainWindow()
-    MAIN_WINDOW.setMinimumWidth(
-        int(user_settings.MIN_WIDTH_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[0])
-    )
-    MAIN_WINDOW.setMinimumHeight(
-        int(
-            user_settings.MIN_HEIGHT_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[1]
-        )
-    )
 
-    MAIN_WINDOW.setMaximumWidth(
-        int(user_settings.MAX_WIDTH_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[0])
-    )
-    MAIN_WINDOW.setMaximumHeight(
+    MAIN_WINDOW.resize(
         int(
-            user_settings.MAX_HEIGHT_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[1]
-        )
+            user_settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]
+        ),
+        int(
+            user_settings.STARTUP_HEIGHT_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[1]
+        ),
     )
 
     try:
