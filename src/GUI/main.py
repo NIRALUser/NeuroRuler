@@ -181,6 +181,7 @@ class MainWindow(QMainWindow):
             widget.setEnabled(True)
 
         self.action_export_csv.setEnabled(not SETTINGS_VIEW_ENABLED)
+        self.export_button.setEnabled(not SETTINGS_VIEW_ENABLED)
         self.disable_binary_threshold_inputs()
 
     def enable_binary_threshold_inputs(self) -> None:
