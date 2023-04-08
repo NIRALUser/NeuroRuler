@@ -19,7 +19,7 @@
     "CONTOUR_COLOR": "",
     // Startup width and height of the GUI as a ratio of primary monitor size.
     // Enter a number between 0 (not inclusive) and 1.
-    "STARTUP_WIDTH_RATIO": 0.65,
-    "STARTUP_HEIGHT_RATIO": 0.6,
+    "STARTUP_WIDTH_RATIO": 0.75,
+    "STARTUP_HEIGHT_RATIO": 0.7,
     "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL": "False"
 }

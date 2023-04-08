@@ -885,7 +885,10 @@ def main() -> None:
 
     MAIN_WINDOW = MainWindow()
 
-    MAIN_WINDOW.setMinimumSize(QSize(0, 0))
+    # Non-zero min width and height is needed to prevent
+    # this bug https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/42
+    # However, this also seems to affect startup GUI size or at least GUI element spacing
+    MAIN_WINDOW.setMinimumSize(QSize(1, 1))
     MAIN_WINDOW.resize(
         int(
             user_settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]
