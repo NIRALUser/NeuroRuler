@@ -55,10 +55,8 @@ def parse_json() -> None:
             "to set a default color based on theme",
         )
 
-    user_settings.MIN_WIDTH_RATIO = parse_float("MIN_WIDTH_RATIO")
-    user_settings.MIN_HEIGHT_RATIO = parse_float("MIN_HEIGHT_RATIO")
-    user_settings.MAX_WIDTH_RATIO = parse_float("MAX_WIDTH_RATIO")
-    user_settings.MAX_HEIGHT_RATIO = parse_float("MAX_HEIGHT_RATIO")
+    user_settings.STARTUP_WIDTH_RATIO = parse_float("STARTUP_WIDTH_RATIO")
+    user_settings.STARTUP_HEIGHT_RATIO = parse_float("STARTUP_HEIGHT_RATIO")
     user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL = parse_bool(
         "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL"
     )

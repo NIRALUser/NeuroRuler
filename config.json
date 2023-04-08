@@ -17,13 +17,9 @@
     // Defaults to "" (empty string) to be automatically set by THEME_NAME.
     // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that
     "CONTOUR_COLOR": "",
-    // Minimum width and height of the GUI as a ratio of primary monitor size.
+    // Startup width and height of the GUI as a ratio of primary monitor size.
     // Enter a number between 0 (not inclusive) and 1.
-    "MIN_WIDTH_RATIO": 0.6,
-    "MIN_HEIGHT_RATIO": 0.5,
-    // Maximum width and height of the GUI as a ratio of primary monitor size.
-    // Enter a number between 0 (not inclusive) and 1.
-    "MAX_WIDTH_RATIO": 1,
-    "MAX_HEIGHT_RATIO": 1,
+    "STARTUP_WIDTH_RATIO": 0.65,
+    "STARTUP_HEIGHT_RATIO": 0.6,
     "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL": "False"
 }
