@@ -35,7 +35,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
 )
 from PyQt6.uic.load_ui import loadUi
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 
 import pprint
 from src.utils.constants import View, ThresholdFilter
@@ -117,9 +117,6 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Head Circumference Tool")
 
-        # TODO: Remove if not needed (since main() now has a line that does this)
-        # self.setWindowIcon(QIcon(str(PATH_TO_HCT_LOGO)))
-
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(lambda: self.browse_files(True))
         self.action_remove_image.triggered.connect(self.remove_curr_img)
@@ -184,6 +181,7 @@ class MainWindow(QMainWindow):
             widget.setEnabled(True)
 
         self.action_export_csv.setEnabled(not SETTINGS_VIEW_ENABLED)
+        self.export_button.setEnabled(not SETTINGS_VIEW_ENABLED)
         self.disable_binary_threshold_inputs()
 
     def enable_binary_threshold_inputs(self) -> None:
@@ -860,13 +858,17 @@ def main() -> None:
     """Main entrypoint of GUI."""
     # This import can't go at the top of the file
     # because gui.py.parse_gui_cli() has to set THEME_NAME before the import occurs
+    # This imports globally
+    # For example, src/GUI/helpers.py can access resource files without having to import there
     importlib.import_module(f"src.GUI.themes.{user_settings.THEME_NAME}.resources")
 
     if not user_settings.IMG_DIR.exists():
         user_settings.IMG_DIR.mkdir()
 
     app = QApplication(sys.argv)
-    # On macOS (maybe Windows too, idk), sets the application logo in the dock
+
+    # On macOS, sets the application logo in the dock (but no window icon on macOS)
+    # On Windows, sets the window icon at the top left of the window (but no dock icon on Eric's Windows computer)
     app.setWindowIcon(QIcon(str(PATH_TO_HCT_LOGO)))
 
     # TODO: Put arrow buttons on the left and right endpoints of the sliders
@@ -884,6 +886,10 @@ def main() -> None:
 
     MAIN_WINDOW = MainWindow()
 
+    # Non-zero min width and height is needed to prevent
+    # this bug https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/42
+    # However, this also seems to affect startup GUI size or at least GUI element spacing
+    MAIN_WINDOW.setMinimumSize(QSize(1, 1))
     MAIN_WINDOW.resize(
         int(
             user_settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]
