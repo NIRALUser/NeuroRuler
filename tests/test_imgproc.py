@@ -16,7 +16,7 @@ from src.utils.constants import (
     degrees_to_radians,
 )
 from src.utils.global_vars import READER
-from src.utils.img_helpers import get_rotated_slice_hardcoded
+from src.utils.img_helpers import get_rotated_slice_hardcoded, get_center_of_rotation
 
 EPSILON: float = 0.001
 """Used for `float` comparisons."""
