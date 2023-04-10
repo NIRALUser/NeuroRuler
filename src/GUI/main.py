@@ -125,6 +125,7 @@ class MainWindow(QMainWindow):
         self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
+        self.action_show_credits.triggered.connect(display_credits)
         self.action_test_stuff.triggered.connect(self.test_stuff)
         self.action_print_metadata.triggered.connect(display_metadata)
         self.action_print_dimensions.triggered.connect(display_dimensions)
@@ -776,6 +777,10 @@ def information_dialog(title: str, message: str) -> None:
     :rtype: None"""
     InformationDialog(title, message).exec()
 
+
+def display_credits() -> None:
+    """Display authors name in dialog."""
+    information_dialog("Credits", "Credit to Jesse Wei, Madison Lester, Peifeng \"Hank\" He, Eric Schneider, and Martin Styner.")
 
 # TODO: Broken
 def display_metadata() -> None:
