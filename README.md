@@ -13,7 +13,7 @@ If you want ;) format is bibtex.
 ```bibtex
 @online{hct,
   title={Head Circumference Tool},
-  author={Wei, Jesse and Lester, Madison and He, Peifang and Schneider, Eric and Styner, Martin},
+  author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
   url={https://github.com/COMP523TeamD/HeadCircumferenceTool}
 }
 ```
