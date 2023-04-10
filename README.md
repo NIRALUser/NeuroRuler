@@ -8,6 +8,16 @@
 
 We are currently working on the algorithm and GUI.
 
+## Cite this tool
+If you want ;) format is bibtex.
+```bibtex
+@online{hct,
+  title={Head Circumference Tool},
+  author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
+  url={https://github.com/COMP523TeamD/HeadCircumferenceTool}
+}
+```
+
 ## Setup
 
 Your Python version needs to be 3.8+. Check with `python --version`. Then run these commands.
