@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Have a question how to use HeadCircumferenceTool?
+about: Have a question about HeadCircumferenceTool?
 title: "[QUESTION]"
 labels: question
 assignees: jesse-wei

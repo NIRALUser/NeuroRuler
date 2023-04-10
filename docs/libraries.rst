@@ -81,6 +81,9 @@ File formats supported
 
 `<https://simpleitk.readthedocs.io/en/master/IO.html>`_
 
+You probably won't have to worry about this since all common image formats are supported, and
+`sitk.ImageFileReader` automatically detects the file extension, so you don't have to handle it.
+
 .. _SimpleITKFiji:
 
 Fiji & tutorial notebooks
@@ -155,26 +158,14 @@ QtDesigner lets you assign names to elements. Then these variables are accessibl
 See `MainWindow.__init__ <_modules/src/GUI/main.html#MainWindow>`_ for an example of
 connecting GUI events to functions.
 
+Use :code:`lambda` functions to pass arguments.
+
 See `rotate_x()` for an example of getting and setting values in the GUI.
 
 .. currentmodule:: src.GUI.main.MainWindow
 .. autofunction:: rotate_x
 
 `[source] <_modules/src/GUI/main.html#MainWindow.rotate_x>`_
-
-.. _PyQt6QStackedWidget:
-
-QStackedWidget
-==============
-
-For switching between the two windows :code:`MAIN_WINDOW` and :code:`CIRCUMFERENCE_WINDOW`.
-Though it's not in the :code:`.ui` files, :code:`MAIN_WINDOW` and :code:`CIRCUMFERENCE_WINDOW`
-are inside a top-level :code:`QStackedWidget`.
-
-.. currentmodule:: src.GUI.main
-.. autofunction:: main
-
-`QStackedWidget documentation <https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QStackedWidget.html>`_
 
 .. _PyQt6Layout:
 
@@ -210,13 +201,13 @@ See this short `YouTube video <https://www.youtube.com/watch?v=LG4QgG9AZkE>`_ ab
 :ref:`BreezeStyleSheets` generates QRC files and compiled Python resource files that we can use. That section of
 this page is very closely related. Read that next if you're working on styling the GUI.
 
-.. currentmodule:: src.GUI.main.MainWindow
-.. autofunction:: test_show_resource
+.. currentmodule:: src.GUI.helpers.ErrorMessageBox
+.. autofunction:: __init__
 
-`[source] <_modules/src/GUI/main.html#MainWindow.test_show_resource>`_
+`[source] <_modules/src/GUI/helpers.html#ErrorMessageBox>`_
 
-.. See the `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
-.. for how to access resources once imported.
+Also see the `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
+for how to access resources once imported.
 
 .. _PyQt6Resources:
 
@@ -238,8 +229,14 @@ Alternatives
 
 `No major differences <https://www.pythonguis.com/faq/pyqt5-vs-pyqt6/#:~:text=As%20we've%20discovered%2C%20there,d%20suggest%20starting%20with%20PyQt6>`_ between PyQt5 and PyQt6.
 
-`Also no major differences <https://www.pythonguis.com/faq/pyqt6-vs-pyside6/>`_ between PySide6 and PyQt6. PySide6 is more official than PyQt6, and official documentation always references PySide6.
-However, switching to PySide6 broke window switching, and I couldn't figure it out.
+`Also no major differences <https://www.pythonguis.com/faq/pyqt6-vs-pyside6/>`_ between PySide6 and PyQt6.
+PySide6 is more official than PyQt6, and official documentation always references PySide6.
+
+Mostly everything in PySide6 and PyQt6 is exactly the same, but there are some annoying differences.
+
+* When we had multiple windows, switching to PySide6 broke window switching, and I couldn't figure it out.
+* There are minor naming differences, such as QImage.Format.Format_Grayscale16 (PyQt6) vs. QImage.Format_Grayscale16 (PySide6).
+* Loading a :code:`.ui` file is `different <https://github.com/COMP523TeamD/HeadCircumferenceTool/pull/26>`_.
 
 .. warning:: Note QImage and :ref:`numpy` treat width and height differently!
 
@@ -298,17 +295,26 @@ BreezeStyleSheets
 
 Used to generate our GUI's :code:`.qss` stylesheets and corresponding :code:`resources.py` files.
 
+We have a custom `fork <https://github.com/COMP523TeamD/BreezeStyleSheets>`_ with a script
+that automates the process.
+
 .. _BreezeStyleSheetsHowItWorks:
 
 How it works
 ============
 
-Skim the README in the `BreezeStyleSheets repo <https://github.com/Alexhuszagh/BreezeStyleSheets.git>`_.
+Read the brief README in our `BSS fork <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
+
+Though it probably won't be necessary, you can also
+skim the README in the `BreezeStyleSheets repo <https://github.com/Alexhuszagh/BreezeStyleSheets.git>`_.
 
 In a nutshell, we edit a JSON file with hex color codes (the JSON controls only the colors of elements)
-and compile to a :code:`.qss` stylesheet that we can
-use in our program. BSS also generates a :ref:`QRC <PyQt6QRC>` resource file
-for managing resources (icons), which is then converted to a compiled and importable :code:`resources.py` file.
+and compile the JSON to a :code:`.qss` stylesheet that we import in
+our project. BSS also generates a :ref:`QRC <PyQt6QRC>` resource file
+for managing resources (icons), which is then converted to a compiled :code:`resources.py` file
+that's also imported in our project.
+
+This is done automatically in the `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ script.
 
 .. _BreezeStyleSheetsInstallation:
 
@@ -328,11 +334,13 @@ Installation instructions
 Configuration instructions
 ==========================
 
-First, copy and paste one of the existing theme JSON's in :code:`theme/`. Rename it, and I'll refer
-to the new name as :code:`theme_name`.
+See the instructions in our BSS fork's `README <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
 
-As mentioned in the BSS `README <https://github.com/Alexhuszagh/BreezeStyleSheets#customization>`_, there's a lot of fields, but we should modify only a few.
-I ran :code:`diff theme/dark.json theme/dark-green.json` [#diff]_, and the only fields that changed were these:
+There are a lot of JSON fields, but as mentioned in the BSS `README <https://github.com/COMP523TeamD/BreezeStyleSheets>`_,
+only a few should be modified.
+
+I ran :code:`diff theme/dark.json theme/dark-green.json` [#diff_dark_dark_green]_ (between the original files, i.e. BSS commit `69d2e74 <https://github.com/Alexhuszagh/BreezeStyleSheets/commit/69d2e7476428216e66143ff7b5c99553d7a2784f>`_), and
+the only fields that changed between the two were these:
 
 * :code:`"highlight"`
 * :code:`"highlight:dark"`
@@ -343,39 +351,13 @@ I ran :code:`diff theme/dark.json theme/dark-green.json` [#diff]_, and the only 
 * :code:`"checkbox:light"`
 * :code:`"scrollbar:hover"`
 
-.. note:: In the repo, there are scripts :code:`hex-convert.py` and :code:`dec-convert.py` that multiply hex or decimal
-    color codes by a ratio to assist with modifying colors. The code is shoddy but functional because I just needed
-    something working.
+There are a lot more differences between `theme/dark.json` and `theme.light.json`.
+See the diff output [#diff_dark_light]_.
 
-.. note:: You can skip a lot of the rest of this section. In our BreezeStyleSheets fork, there's a script
-    `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ that does the rest of this.
+.. _BreezeStyleSheetsResource:
 
-    First, open `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ and modify
-    :code:`PATH_TO_HCT_REPO_THEMES_DIR` to be the :code:`.../themes` directory in your local HCT directory.
-
-    Then run :code:`python hct.py <theme_name>`.
-    This will run the BSS commands that compile the JSON and then move the compiled files to the HCT repo.
-
-    You should now be able to run the HCT GUI with the new theme.
-    For now, you would just do :code:`python -m src.GUI.main -t <theme_name>`.
-
-    If something changes and this documentation hasn't been updated, apply the :code:`-h` option to see how to
-    apply the theme.
-
-After making edits, run these commands to build the stylesheet, icons, and resource file for a single theme.
-
-.. code-block:: text
-
-    python configure.py --styles=<name of JSON> --resource custom.qrc
-    python configure.py --styles=<name of JSON> --extensions=all --pyqt6 --resource custom.qrc --compiled-resource resources.py
-
-:code:`dist/qrc/{theme_name}` should now exist. In the HCT repo, create
-a new folder :code:`src/GUI/themes/{theme_name}`. Drag in :code:`dist/qrc/{theme_name}/stylesheet.qss` and :code:`resources.py`.
-
-In :code:`resources.py`, change :code:`from PyQt5 import QtCore` to :code:`from PyQt6 import QtCore`.
-
-Run the HCT GUI with the :code:`-t {theme_name}` option to test.
-Push changes to the HCT repo and BreezeStyleSheets fork if it looks good 😊.
+Accessing resources
+===================
 
 See :ref:`QRC file <PyQt6QRC>` for an example of how to access a resource from within code.
 Since we're using compiled :code:`resource.py` files, we don't have the :code:`.svg` files in our HCT repo.
@@ -435,6 +417,10 @@ python-black
     :target: https://github.com/psf/black
 
 This autoformatter is awesome 😳
+
+This is run automatically before each commit (see
+`.pre-commit-config.yaml <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/.pre-commit-config.yaml>`_)
+with some excluded files. To run manually, run
 
 .. code-block:: text
 
@@ -611,7 +597,7 @@ based on the theme :code:`.json`.
 
 Took a while to install...
 
-.. [#diff]
+.. [#diff_dark_dark_green] Ran on BSS commit `69d2e74 <https://github.com/Alexhuszagh/BreezeStyleSheets/commit/69d2e7476428216e66143ff7b5c99553d7a2784f>`_.
 
 .. code-block:: bash
 
@@ -642,6 +628,104 @@ Took a while to install...
     <     "scrollbar:hover": "#3daee9",
     ---
     >     "scrollbar:hover": "#33b833",
+
+.. [#diff_dark_light] Ran on BSS commit `69d2e74 <https://github.com/Alexhuszagh/BreezeStyleSheets/commit/69d2e7476428216e66143ff7b5c99553d7a2784f>`_.
+
+.. code-block:: bash
+
+    ❯ diff theme/dark.json theme/light.json
+    4,41c4,41
+    <     "foreground": "#eff0f1",
+    <     "foreground:light": "#ffffff",
+    <     "background": "#31363b",
+    <     "background:alternate": "#31363b",
+    <     "highlight": "#3daee9",
+    <     "highlight:dark": "#2a79a3",
+    <     "highlight:alternate": "#2f88b7",
+    <     "midtone": "#76797c",
+    <     "midtone:light": "#b0b0b0",
+    <     "midtone:dark": "#626568",
+    <     "midtone:hover": "#8a8d8f",
+    <     "view:checked": "#334e5e",
+    <     "view:hover": "rgba(61, 173, 232, 0.1)",
+    <     "toolbar:horizontal:background": "#31363b",
+    <     "toolbar:vertical:background": "#31363b",
+    <     "view:corner": "#31363b",
+    <     "view:header:border": "#76797c",
+    <     "view:header": "#31363b",
+    <     "view:border": "#31363b",
+    <     "view:background": "#1d2023",
+    <     "text:background": "#1d2023",
+    <     "tab:background:selected": "#31363b",
+    <     "tab:background": "#2c3034",
+    <     "tree": "#afafaf",
+    <     "slider:foreground": "#3daee9",
+    <     "slider:handle:background": "#1d2023",
+    <     "menu:disabled": "#76797c",
+    <     "checkbox:light": "#58d3ff",
+    <     "checkbox:disabled": "#c8c9ca",
+    <     "scrollbar:hover": "#3daee9",
+    <     "scrollbar:background": "#1d2023",
+    <     "scrollbar:background:hover": "#76797c",
+    <     "button:background": "#31363b",
+    <     "button:background:pressed": "#454a4f",
+    <     "button:border": "#76797c",
+    <     "button:checked": "#626568",
+    <     "button:disabled": "#454545",
+    <     "close:hover": "#eff0f1",
+    ---
+    >     "foreground": "#31363b",
+    >     "foreground:light": "#272b2f",
+    >     "background": "#eff0f1",
+    >     "background:alternate": "#eaebec",
+    >     "highlight": "rgba(51, 164, 223, 0.5)",
+    >     "highlight:dark": "rgba(45, 147, 200, 0.5)",
+    >     "highlight:alternate": "rgba(71, 184, 243, 0.6)",
+    >     "midtone": "#bab9b8",
+    >     "midtone:light": "#bab9b8",
+    >     "midtone:dark": "rgba(106, 105, 105, 0.7)",
+    >     "midtone:hover": "#787876",
+    >     "view:checked": "#b9dae7",
+    >     "view:hover": "rgba(61, 173, 232, 0.2)",
+    >     "toolbar:horizontal:background": "#eff0f1",
+    >     "toolbar:vertical:background": "#eff0f1",
+    >     "view:corner": "#eff0f1",
+    >     "view:header": "#eff0f1",
+    >     "view:header:border": "#bab9b8",
+    >     "view:border": "#bab9b8",
+    >     "view:background": "#eff0f1",
+    >     "text:background": "#eff0f1",
+    >     "tab:background:selected": "#eff0f1",
+    >     "tab:background": "#d9d8d7",
+    >     "tree": "#4b4b4b",
+    >     "slider:foreground": "#3daef3",
+    >     "slider:handle:background": "#eff0f1",
+    >     "menu:disabled": "#bab9b8",
+    >     "checkbox:light": "#272b2f",
+    >     "checkbox:disabled": "#6a6e71",
+    >     "scrollbar:hover": "rgba(51, 164, 223, 0.8)",
+    >     "scrollbar:background": "#eff0f1",
+    >     "scrollbar:background:hover": "#c7c7c6",
+    >     "button:background": "#eaebec",
+    >     "button:background:pressed": "#bedfec",
+    >     "button:border": "#bab9b8",
+    >     "button:checked": "#c7c7c6",
+    >     "button:disabled": "#b4b4b4",
+    >     "close:hover": "#31363b",
+    43c43
+    <     "dock:background": "#31363b",
+    ---
+    >     "dock:background": "#eaebec",
+    45,48c45,48
+    <     "critical": "#80404a",
+    <     "information": "#406880",
+    <     "question": "#634d80",
+    <     "warning": "#99995C"
+    ---
+    >     "critical": "#ff8c9f",
+    >     "information": "#8cd5ff",
+    >     "question": "#c08cff",
+    >     "warning": "#ffff8c"
 
 .. [#sphinx] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
 .. [#venv] Thanks to the teammate who suggested this to me!
