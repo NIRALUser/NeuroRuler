@@ -2724,3 +2724,19 @@ ads--CDockOverlayCross
 QMessageBox QLabel {
 	font-weight: normal;
 }
+
+/**
+ *  Add arrow buttons to QScrollBars
+ *  Source: https://doc.qt.io/qt-6/stylesheet-examples.html#customizing-qscrollbar
+ */
+
+QScrollBar:left-arrow:horizontal, QScrollBar::right-arrow:horizontal {
+    border: 2px solid grey;
+    width: 4px;
+    height: 4px;
+    background: #b55162;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}

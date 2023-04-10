@@ -877,12 +877,12 @@ def main() -> None:
     # We should figure out how to get arrow buttons on sliders for (+, -) 1 precise adjustments.
     # Currently, the sliders allow this (left click on the left or right end), but the arrow buttons
     # are not in the GUI.
-    app.setStyle("Fusion")
+    # app.setStyle("Fusion")
 
-    # with open(
-    #     constants.THEME_DIR / user_settings.THEME_NAME / f"stylesheet.qss", "r"
-    # ) as f:
-    #     app.setStyleSheet(f.read())
+    with open(
+        constants.THEME_DIR / user_settings.THEME_NAME / f"stylesheet.qss", "r"
+    ) as f:
+        app.setStyleSheet(f.read())
 
     MAIN_WINDOW = MainWindow()
 
