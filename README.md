@@ -15,10 +15,11 @@
 If you want 😉 format is bibtex.
 
 ```bibtex
-@online{hct,
+@misc{hct,
   title={Head Circumference Tool},
   author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
-  url={https://github.com/COMP523TeamD/HeadCircumferenceTool}
+  howpublished={\url{https://github.com/COMP523TeamD/HeadCircumferenceTool}},
+  year={2023}
 }
 ```
 
