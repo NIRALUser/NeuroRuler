@@ -1,8 +1,10 @@
 setuptools>=67.6.0
 #################
-# For auto-documentation. User does not need, remove later
+# For auto-documentation. User does not need
+# Later, create docs/requirements.txt with these two themes
+# And then link to it in .readthedocs.yaml
 sphinx
-python-docs-theme
+sphinx_rtd_theme
 #################
 SimpleITK==2.2.1
 numpy>=1.24.0
