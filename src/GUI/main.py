@@ -780,7 +780,11 @@ def information_dialog(title: str, message: str) -> None:
 
 def display_credits() -> None:
     """Display authors name in dialog."""
-    information_dialog("Credits", "Credit to Jesse Wei, Madison Lester, Peifeng \"Hank\" He, Eric Schneider, and Martin Styner.")
+    information_dialog(
+        "Credits",
+        'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.',
+    )
+
 
 # TODO: Broken
 def display_metadata() -> None:
@@ -914,6 +918,6 @@ def main() -> None:
 if __name__ == "__main__":
     import src.utils.parser as parser
 
-    parser.parse_json()
+    parser.parse_config_json()
     parser.parse_gui_cli()
     main()

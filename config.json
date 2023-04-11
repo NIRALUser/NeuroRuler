@@ -12,7 +12,7 @@
     "FILE_BROWSER_START_DIR": "ExampleData",
     // Whether exported file names use the image number in the program or the original file name
     "EXPORTED_FILE_NAMES_USE_INDEX": "False",
-    // Options: dark, dark-hct, light, light-hct
+    // Run ./gui.py -h to see options
     "THEME_NAME": "dark-hct",
     // Defaults to "" (empty string) to be automatically set by THEME_NAME.
     // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that
