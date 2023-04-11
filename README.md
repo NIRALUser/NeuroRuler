@@ -6,11 +6,13 @@
 
 > A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).
 
-We are currently working on the algorithm and GUI.
+<p align="center">
+  <img src="docs/_static/hct_demo.gif" alt="Head Circumference Tool GUI demo"/>
+</p>
 
 ## Cite this tool
 
-If you want ;) format is bibtex.
+If you want 😉 format is bibtex.
 
 ```bibtex
 @online{hct,

@@ -155,7 +155,7 @@ that are then loaded into Python code.
     :alt: QtDesigner
 
 `Install it <https://build-system.fman.io/qt-designer-download>`_. In QtDesigner, open
-`main.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/mainwindow.ui>`_.
+`mainwindow.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/mainwindow.ui>`_.
 You'll get the idea.
 
 .. _PyQt6Controller:
