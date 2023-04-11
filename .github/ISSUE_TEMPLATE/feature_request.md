@@ -3,7 +3,7 @@ name: Feature request
 about: Suggest an idea for this project.
 title: "[FEATURE]"
 labels: enhancement
-assignees: jesse-wei
+assignees:
 ---
 
 ## Problem
@@ -19,7 +19,7 @@ A clear and concise description of what you want to happen.
 If applicable to the feature request, please describe the theme or Python version the feature should be added to.
 
 - Python version: [3.9, 3.10, 3.11, ...]
-- Theme: [dark-hct, light-hct, dark, light]
+- Theme: [dark-hct, light-hct, dark, light, ...]
 
 ## Alternatives
 

@@ -3,7 +3,7 @@ name: Bug report
 about: Create a report to help us improve.
 title: "[BUG]"
 labels: bug
-assignees: jesse-wei
+assignees:
 ---
 
 ## Description
@@ -17,7 +17,7 @@ Although very unlikely due to the nature of the project, if the bug includes a s
 If applicable to the issue, here are a few things you should provide to help us understand the issue:
 
 - Python version: [3.9, 3.10, 3.11, ...]
-- Theme: [dark-hct, light-hct, dark, light]
+- Theme: [dark-hct, light-hct, dark, light, ...]
 
 ## Test case
 

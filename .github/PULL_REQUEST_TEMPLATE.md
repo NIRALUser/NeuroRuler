@@ -1,11 +1,12 @@
----
-name: Pull request template
-about: Pull request template for miscellaneous changes.
-title: "[OTHER]"
-labels: ''
-assignees: jesse-wei
----
+# Please check if the PR fulfills these requirements
 
-## Description
+* [ ] Tests for the changes have been added (for bug fixes/features)
+* [ ] Docs have been added/updated (if applicable)
 
-Please include a clear and concise description of the changes.
+## What kind of change does this PR introduce? (Bug fix, feature, docs update, ...)
+
+## What is the current behavior? (You can also link to an open issue here)
+
+## What is the new behavior (if this is a feature change)?
+
+## Other information
