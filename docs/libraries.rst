@@ -82,15 +82,17 @@ File formats supported
 `<https://simpleitk.readthedocs.io/en/master/IO.html>`_
 
 You probably won't have to worry about this since all common image formats are supported, and
-`sitk.ImageFileReader` automatically detects the file extension, so you don't have to handle it.
+:code:`sitk.ImageFileReader` automatically detects the file extension, so you don't have to handle it.
 
 .. _SimpleITKFiji:
 
 Fiji & tutorial notebooks
 =========================
 
+Not in use anymore.
+
 See `<https://simpleitk.org/TUTORIAL>`_ for setup instructions (installing the external image viewer Fiji
-used in some of our :code:`.ipynb` files) and a bunch of tutorial Jupyter notebook files, most of which
+used in some of our old :code:`.ipynb` files) and a bunch of tutorial Jupyter notebook files, most of which
 are too advanced for this project. What's already in `src/ <src.html>`_ should suffice for this project.
 
 .. _SimpleITKResources:
@@ -132,7 +134,7 @@ PyQt6
 
 For GUI. Serves the purpose of View and Controller. Drag-and-drop GUI design using :ref:`PyQt6QtDesigner`.
 Easy styling with :code:`.qss` stylesheets and resource (icon) management with :code:`.qrc` files, both of
-which can be even more easily managed using :ref:`BreezeStyleSheets`.
+which are even more easily managed using :ref:`BreezeStyleSheets`.
 
 .. _PyQt6QtDesigner:
 
@@ -155,12 +157,16 @@ There isn't a Controller class. Controller stuff is done in `src/GUI/main.py <_m
 
 QtDesigner lets you assign names to elements. Then these variables are accessible from code.
 
+For an example of connecting GUI events (signals) to functions,
+
 .. currentmodule:: src.GUI.main.MainWindow
 .. autofunction:: __init__
 
-`[source] <_modules/src/GUI/main.html#MainWindow>`_
+`[source] <_modules/src/GUI/main.html#MainWindow.__init__>`_
 
-Use :code:`lambda` functions to pass arguments.
+.. note::
+
+    Use :code:`lambda` functions to pass arguments.
 
 See `rotate_x()` for an example of getting and setting values in the GUI.
 
@@ -287,10 +293,10 @@ as the name implies. This circumvented difficulties [#npqimage]_ with converting
 .. currentmodule:: src.GUI.main.MainWindow
 .. autofunction:: render_curr_slice
 
+`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
+
 .. warning:: In :code:`src/GUI/main.py`, if :code:`import qimage2ndarray` goes before the PyQt imports (which an
     autoformatter might do), there will be a :code:`ModuleNotFoundError`.
-
-`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
 
 .. _BreezeStyleSheets:
 

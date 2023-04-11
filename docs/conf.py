@@ -35,7 +35,7 @@ html_theme = "python_docs_theme"
 html_static_path = ["_static"]
 
 
-# Prevents __init__ from being ignored by .. autofunction::
+# Prevents __init__ from being ignored
 # Source: https://stackoverflow.com/questions/5599254/how-to-use-sphinxs-autodoc-to-document-a-classs-init-self-method
 def skip(app, what, name, obj, would_skip, options):
     if name == "__init__":
