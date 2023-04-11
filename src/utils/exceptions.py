@@ -1,4 +1,4 @@
-"""Custom exceptions, most of which aren't actually in use rn."""
+"""Custom exceptions"""
 
 from src.utils.constants import deprecated, ROTATION_MAX, ROTATION_MIN, JSON_CONFIG_PATH
 
@@ -47,10 +47,6 @@ class RotationOutOfBounds(Exception):
 
 
 class InvalidJSONField(Exception):
-    """`field` is the name of the invalid field
-
-    `expected` is some information about what the expected value should be"""
-
     def __init__(self, field: str, expected: str):
         """`field` is the name of the invalid field
 

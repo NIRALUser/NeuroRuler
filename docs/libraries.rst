@@ -7,7 +7,6 @@ Libraries
 .. topic:: Overview
 
     This page describes what the libraries we use are for and how to use them.
-    Links to our related source code are provided.
 
 .. contents::
     :depth: 3
@@ -23,9 +22,6 @@ For image processing.
 
 I/O, 3D rotation, and slicing
 =============================
-
-Most of this code is in `mri_image.py <_modules/src/utils/mri_image.html>`_. A lot of it is scattered
-throughout the project though.
 
 .. code-block:: python
     :linenos:
@@ -60,11 +56,14 @@ throughout the project though.
     # NOTE: GetArrayFromImage returns the transpose of the sitk representation!
     slice_np: np.ndarray = sitk.GetArrayFromImage(rotated_slice)
 
-    # Retranspose
-    # This returns a view of the array with axes transposed but doesn't modify the internal memory
-    slice_np = np.transpose(slice_np)
-
 .. warning:: :code:`sitk.GetArrayFromImage()` returns the transpose of the :code:`sitk` representation!
+
+Code involving :code:`sitk` is scattered throughout our project. Here's a specific example:
+
+.. seealso::
+
+    .. currentmodule:: src.utils.img_helpers
+    .. autofunction:: get_curr_rotated_slice
 
 .. _SimpleITKFiltering:
 
@@ -112,7 +111,7 @@ numpy (:code:`np`)
 For image processing and arc length calculation.
 
 In the :ref:`SimpleITK` section, we converted the :code:`sitk` representation to a :code:`np`
-array. We also re-transposed the :code:`np` array to match the :code:`sitk` representation.
+array.
 
 From here, we do two things: :ref:`PyQt6ImageVisualization` and :ref:`arc length computation <opencv>`.
 
@@ -140,16 +139,23 @@ For GUI. Serves the purpose of View and Controller. Drag-and-drop GUI design usi
 Easy styling with :code:`.qss` stylesheets and resource (icon) management with :code:`.qrc` files, both of
 which are even more easily managed using :ref:`BreezeStyleSheets`.
 
+According to Eric, it's pronounced "pie-cute" (we all say "pie-cue-tee" though).
+
 .. _PyQt6QtDesigner:
 
 QtDesigner
 ==========
 
-For drag-and-drop GUI design. Generates :code:`.ui` files (pretty much XML) which are then loaded into Python code.
+For drag-and-drop GUI design. Generates :code:`.ui` files (pretty much XML)
+that are then loaded into Python code.
+
+.. image:: _static/QtDesigner.jpg
+    :width: 700px
+    :align: center
+    :alt: QtDesigner
 
 `Install it <https://build-system.fman.io/qt-designer-download>`_. In QtDesigner, open
-`main.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/main.ui>`_ and
-`circumference.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/circumference.ui>`_.
+`main.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/mainwindow.ui>`_.
 You'll get the idea.
 
 .. _PyQt6Controller:
@@ -161,22 +167,18 @@ There isn't a Controller class. Controller stuff is done in `src/GUI/main.py <_m
 
 QtDesigner lets you assign names to elements. Then these variables are accessible from code.
 
-For an example of connecting GUI events (signals) to functions,
-
-.. seealso::
+.. seealso:: How to connect GUI events (signals) to functions
 
     .. currentmodule:: src.GUI.main.MainWindow
     .. autofunction:: __init__
 
     `[source] <_modules/src/GUI/main.html#MainWindow>`_
 
-.. note::
+    .. note::
 
-    Use :code:`lambda` functions to pass arguments.
+        Use :code:`lambda` functions to pass arguments.
 
-See :code:`rotate_x()` for an example of getting and setting values in the GUI.
-
-.. seealso::
+.. seealso:: How to get and set values in the GUI
 
     .. currentmodule:: src.GUI.main.MainWindow
     .. autofunction:: rotate_x
@@ -219,16 +221,14 @@ See this short `YouTube video <https://www.youtube.com/watch?v=LG4QgG9AZkE>`_ ab
 :ref:`BreezeStyleSheets` generates QRC files and compiled Python resource files that we can use. That section of
 this page is very closely related. Read that next if you're working on styling the GUI.
 
-To see how to access a resource, see this code snippet.
-
-.. seealso::
+.. seealso:: How to access a resource
 
     .. currentmodule:: src.GUI.helpers.ErrorMessageBox
     .. autofunction:: __init__
 
     `[source] <_modules/src/GUI/helpers.html#ErrorMessageBox>`_
 
-Also see the `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
+There's also `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
 about how to access resources once imported.
 
 .. _PyQt6Resources:
@@ -285,7 +285,7 @@ Mostly everything in PySide6 and PyQt6 is exactly the same, but there are some a
 
             # Rest of the code omitted
 
-    .. image:: _static/qimage_numpy.png
+    .. image:: _static/qimage_numpy.jpg
         :width: 300px
         :align: center
         :alt: Reversed width and height between QImage and numpy
@@ -298,7 +298,7 @@ qimage2ndarray
 For :ref:`PyQt6ImageVisualization` in PyQt GUI.
 
 Specifically, qimage2ndarray converts a :code:`np` array to a :code:`QImage` that can be displayed in a PyQt GUI,
-as the name implies. This circumvented difficulties [#npqimage]_ with converting :code:`np` array to :code:`QImage`.
+as the name implies. This circumvents difficulties [#npqimage]_ with converting :code:`np` array to :code:`QImage`.
 
 `GitHub <https://github.com/hmeine/qimage2ndarray>`_ and `Documentation <http://hmeine.github.io/qimage2ndarray/>`_ (very brief).
 
@@ -320,7 +320,7 @@ BreezeStyleSheets
 Used to generate our GUI's :code:`.qss` stylesheets and corresponding :code:`resources.py` files.
 
 We have a custom `fork <https://github.com/COMP523TeamD/BreezeStyleSheets>`_ with a script
-that automates the process.
+(`hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_) that automates the process.
 
 .. _BreezeStyleSheetsHowItWorks:
 
@@ -329,8 +329,8 @@ How it works
 
 Read the brief README in our `BSS fork <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
 
-Though it probably won't be necessary, you can also
-skim the README in the `BreezeStyleSheets repo <https://github.com/Alexhuszagh/BreezeStyleSheets.git>`_.
+Then see the `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_
+script, which automates everything below.
 
 In a nutshell, we edit a JSON file with hex color codes (the JSON controls only the colors of elements)
 and compile the JSON to a :code:`.qss` stylesheet that we import in
@@ -339,7 +339,9 @@ for managing resources (icons), which is then converted to a compiled :code:`res
 that's also imported in our project. Lastly, the JSON file is copied over to our project, though we
 parse only the main color from the :code:`"highlight"` field for now.
 
-This is all done automatically in the `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ script.
+Though it probably won't be necessary, you can also
+skim the README in the `BreezeStyleSheets repo <https://github.com/Alexhuszagh/BreezeStyleSheets.git>`_
+for more information.
 
 .. _BreezeStyleSheetsInstallation:
 
@@ -375,7 +377,7 @@ Check the BreezeStyleSheets repo for `resource names <https://github.com/Alexhus
 pathlib
 #######
 
-For maintaining cross-platformness when working with paths.
+For maintaining cross-platformness when working with paths, easy iteration, globbing, etc.
 
 Specifically, Posix paths look like :code:`Users/jesse/Documents/GitHub/...`,
 whereas Windows paths look like :code:`C:\\idk\\how\\Windows\\works\\...`.
@@ -389,7 +391,6 @@ See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example
     :linenos:
 
     from pathlib import Path
-    from src.utils.mri_image import MRIImageList, MRIImage
 
     THEME_DIR: Path = Path('src') / 'GUI' / 'themes'
     """themes/ directory where .qss stylesheets and resources.py files are stored."""
@@ -570,7 +571,7 @@ for this page and `<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.ht
 .. _sphinxResources:
 
 Resources
-===============
+=========
 
 `YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx where I got a lot of these steps from.
 
@@ -597,9 +598,24 @@ However, if :code:`THEME_NAME` is :code:`'light'`, then the import statement wou
 
     import src.GUI.styles.light.resources
 
-Therefore, we use importlib to control the import name there. Alternatively, we could have just one
-resources file for every theme, but I think BreezeStyleSheets might re-compile resource :code:`.svg` files
-based on the theme :code:`.json`.
+Therefore, we use importlib to control the import name there [#why_importlib]_.
+
+.. _pre-commit:
+
+pre-commit
+##########
+
+Configures pre-commit git hook.
+
+Modify `.pre-commit-config.yaml <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/.pre-commit-config.yaml>`_
+to configure. Then run :code:`pre-commit install`.
+
+More instructions `here <https://pre-commit.com/>`_.
+
+.. warning::
+
+    Don't name any source code files any of the excluded names in :code:`.pre-commit-config.yaml`.
+    Those files are excluded from auto-formatting because they're they're automatically generated.
 
 .. rubric:: Footnotes
 
@@ -613,136 +629,8 @@ based on the theme :code:`.json`.
 
 Took a while to install...
 
-.. [#diff_dark_dark_green] Ran on BSS commit `69d2e74 <https://github.com/Alexhuszagh/BreezeStyleSheets/commit/69d2e7476428216e66143ff7b5c99553d7a2784f>`_.
-
-.. code-block:: bash
-
-    ❯ diff theme/dark.json theme/dark-green.json
-    8,10c8,10
-    <     "highlight": "#3daee9",
-    <     "highlight:dark": "#2a79a3",
-    <     "highlight:alternate": "#2f88b7",
-    ---
-    >     "highlight": "#33b833",
-    >     "highlight:dark": "#2b992b",
-    >     "highlight:alternate": "#1f991f",
-    15,16c15,16
-    <     "view:checked": "#334e5e",
-    <     "view:hover": "rgba(61, 173, 232, 0.1)",
-    ---
-    >     "view:checked": "#325c32",
-    >     "view:hover": "rgba(63, 232, 63, 0.1)",
-    28c28
-    <     "slider:foreground": "#3daee9",
-    ---
-    >     "slider:foreground": "#33b833",
-    31c31
-    <     "checkbox:light": "#58d3ff",
-    ---
-    >     "checkbox:light": "#40e640",
-    33c33
-    <     "scrollbar:hover": "#3daee9",
-    ---
-    >     "scrollbar:hover": "#33b833",
-
-.. [#diff_dark_light] Ran on BSS commit `69d2e74 <https://github.com/Alexhuszagh/BreezeStyleSheets/commit/69d2e7476428216e66143ff7b5c99553d7a2784f>`_.
-
-.. code-block:: bash
-
-    ❯ diff theme/dark.json theme/light.json
-    4,41c4,41
-    <     "foreground": "#eff0f1",
-    <     "foreground:light": "#ffffff",
-    <     "background": "#31363b",
-    <     "background:alternate": "#31363b",
-    <     "highlight": "#3daee9",
-    <     "highlight:dark": "#2a79a3",
-    <     "highlight:alternate": "#2f88b7",
-    <     "midtone": "#76797c",
-    <     "midtone:light": "#b0b0b0",
-    <     "midtone:dark": "#626568",
-    <     "midtone:hover": "#8a8d8f",
-    <     "view:checked": "#334e5e",
-    <     "view:hover": "rgba(61, 173, 232, 0.1)",
-    <     "toolbar:horizontal:background": "#31363b",
-    <     "toolbar:vertical:background": "#31363b",
-    <     "view:corner": "#31363b",
-    <     "view:header:border": "#76797c",
-    <     "view:header": "#31363b",
-    <     "view:border": "#31363b",
-    <     "view:background": "#1d2023",
-    <     "text:background": "#1d2023",
-    <     "tab:background:selected": "#31363b",
-    <     "tab:background": "#2c3034",
-    <     "tree": "#afafaf",
-    <     "slider:foreground": "#3daee9",
-    <     "slider:handle:background": "#1d2023",
-    <     "menu:disabled": "#76797c",
-    <     "checkbox:light": "#58d3ff",
-    <     "checkbox:disabled": "#c8c9ca",
-    <     "scrollbar:hover": "#3daee9",
-    <     "scrollbar:background": "#1d2023",
-    <     "scrollbar:background:hover": "#76797c",
-    <     "button:background": "#31363b",
-    <     "button:background:pressed": "#454a4f",
-    <     "button:border": "#76797c",
-    <     "button:checked": "#626568",
-    <     "button:disabled": "#454545",
-    <     "close:hover": "#eff0f1",
-    ---
-    >     "foreground": "#31363b",
-    >     "foreground:light": "#272b2f",
-    >     "background": "#eff0f1",
-    >     "background:alternate": "#eaebec",
-    >     "highlight": "rgba(51, 164, 223, 0.5)",
-    >     "highlight:dark": "rgba(45, 147, 200, 0.5)",
-    >     "highlight:alternate": "rgba(71, 184, 243, 0.6)",
-    >     "midtone": "#bab9b8",
-    >     "midtone:light": "#bab9b8",
-    >     "midtone:dark": "rgba(106, 105, 105, 0.7)",
-    >     "midtone:hover": "#787876",
-    >     "view:checked": "#b9dae7",
-    >     "view:hover": "rgba(61, 173, 232, 0.2)",
-    >     "toolbar:horizontal:background": "#eff0f1",
-    >     "toolbar:vertical:background": "#eff0f1",
-    >     "view:corner": "#eff0f1",
-    >     "view:header": "#eff0f1",
-    >     "view:header:border": "#bab9b8",
-    >     "view:border": "#bab9b8",
-    >     "view:background": "#eff0f1",
-    >     "text:background": "#eff0f1",
-    >     "tab:background:selected": "#eff0f1",
-    >     "tab:background": "#d9d8d7",
-    >     "tree": "#4b4b4b",
-    >     "slider:foreground": "#3daef3",
-    >     "slider:handle:background": "#eff0f1",
-    >     "menu:disabled": "#bab9b8",
-    >     "checkbox:light": "#272b2f",
-    >     "checkbox:disabled": "#6a6e71",
-    >     "scrollbar:hover": "rgba(51, 164, 223, 0.8)",
-    >     "scrollbar:background": "#eff0f1",
-    >     "scrollbar:background:hover": "#c7c7c6",
-    >     "button:background": "#eaebec",
-    >     "button:background:pressed": "#bedfec",
-    >     "button:border": "#bab9b8",
-    >     "button:checked": "#c7c7c6",
-    >     "button:disabled": "#b4b4b4",
-    >     "close:hover": "#31363b",
-    43c43
-    <     "dock:background": "#31363b",
-    ---
-    >     "dock:background": "#eaebec",
-    45,48c45,48
-    <     "critical": "#80404a",
-    <     "information": "#406880",
-    <     "question": "#634d80",
-    <     "warning": "#99995C"
-    ---
-    >     "critical": "#ff8c9f",
-    >     "information": "#8cd5ff",
-    >     "question": "#c08cff",
-    >     "warning": "#ffff8c"
-
 .. [#sphinx] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
 .. [#venv] Thanks to the teammate who suggested this to me!
 .. [#npqimage] https://github.com/COMP523TeamD/HeadCircumferenceTool/pull/3#issuecomment-1468075389
+.. [#why_importlib] We can't just use a single :code:`resources.py` file because BreezeStyleSheets generates
+icons based on theme color.
