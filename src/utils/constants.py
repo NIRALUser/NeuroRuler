@@ -1,8 +1,7 @@
-"""Constant values and functions. DO NOT MUTATE ANY VARIABLE IN THIS FILE!
+"""Constant values and functions. DO NOT MUTATE ANY VARIABLE IN THIS FILE FROM OUTSIDE OF THIS FILE!
 
-This file holds values that will never change after program setup, unlike global_vars.py.
-No values here should be modifiable by the user, unlike user_settings.py.
-But things like THEMES, a mutable set that will never change after initial setup, can go here.
+This file holds values that will never change outside of this file, unlike global_vars.py.
+No values here should be directly modifiable by the user, unlike user_settings.py.
 
 This file should not import any module in this repo to avoid circular imports."""
 
@@ -29,7 +28,6 @@ EXAMPLE_DATA_DIR: Path = Path("ExampleData")
 """Directory for storing example data."""
 
 UI_FILE_PATH: Path = Path("src") / "GUI" / "mainwindow.ui"
-COMPILED_UI_FILE_PATH: Path = Path("src") / "GUI" / "ui_mainwindow.py"
 
 THEME_DIR: Path = Path("src") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
@@ -43,16 +41,6 @@ if len(list(THEME_DIR.glob("*"))) != 0:
 else:
     # Without this, autodocumentation crashes
     pass
-
-HCT_MAIN_COLOR: str = "b55162"
-"""HCT's copyrighted color :P
-
-The pink-ish color used in the midterm presentation. Imperceptibly different from the website logo color."""
-
-DARK_THEME_COLOR: str = "3daee9"
-"""Blue that's the main color in dark theme"""
-LIGHT_THEME_COLOR: str = "3daef3"
-"""Blue that's the main color in light theme"""
 
 
 class View(Enum):
@@ -73,6 +61,8 @@ class ThresholdFilter(Enum):
 
 
 class BinaryColor(Enum):
+    """Self-explanatory"""
+
     Black = 0
     White = 1
 
@@ -127,13 +117,14 @@ Y_ORIENTATION_STR: str = "LPI"
 # First 2 are the important ones
 Z_ORIENTATION_STR: str = "LPS"
 """Orientation string to pass into sitk.DICOMOrientImageFilter to orient Z view correctly."""
+ORIENTATION_STRINGS: tuple[str, str, str] = (
+    X_ORIENTATION_STR,
+    Y_ORIENTATION_STR,
+    Z_ORIENTATION_STR,
+)
+"""(X_ORIENTATION_STR, Y_ORIENTATION_STR, Z_ORIENTATION_STR)
 
-VIEW_TO_ORIENTATION_STR: dict = {
-    View.X: X_ORIENTATION_STR,
-    View.Y: Y_ORIENTATION_STR,
-    View.Z: Z_ORIENTATION_STR,
-}
-"""Map View enum to its orientation string."""
+Intended to be indexed using View.X.value, View.Y.value, and View.Z.value."""
 
 PRIMARY_MONITOR_DIMENSIONS: tuple[int, int] = (500, 500)
 """Set to user's primary monitor's dimensions. 500, 500 are dummy values"""

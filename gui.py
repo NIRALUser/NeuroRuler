@@ -36,7 +36,7 @@ except:
     pass
 
 from src.GUI.main import main
-from src.utils.parser import parse_json, parse_gui_cli
-parse_json()
+from src.utils.parser import parse_config_json, parse_gui_cli
+parse_config_json()
 parse_gui_cli()
 main()

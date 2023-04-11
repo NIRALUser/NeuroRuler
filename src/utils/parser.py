@@ -13,8 +13,8 @@ SETTINGS: dict = dict()
 """Dict of settings resulting from JSON file parsing. Global within this file."""
 
 
-def parse_json() -> None:
-    """Parse JSON and set user settings in user_settings.py.
+def parse_config_json() -> None:
+    """Parse config JSON and set user settings in user_settings.py.
 
     load_json will load constants.JSON_CONFIG_PATH."""
     global SETTINGS
@@ -41,7 +41,8 @@ def parse_json() -> None:
 
     contour_color: str = SETTINGS["CONTOUR_COLOR"]
     if contour_color == "":
-        user_settings.CONTOUR_COLOR = default_contour_color()
+        user_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
+    # A name, e.g. red, green, blue. etc., which can be converted to a QColor
     elif contour_color.isalpha():
         user_settings.CONTOUR_COLOR = contour_color
     elif len(contour_color) == 6 and all(
@@ -60,6 +61,35 @@ def parse_json() -> None:
     user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL = parse_bool(
         "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL"
     )
+
+
+def parse_main_color_from_theme_json() -> str:
+    """Parse the main color from the theme JSON file (user_settings.THEME_NAME) in the highlight field.
+
+    Uses user_settings.THEME_NAME so must be called after parse_config_json sets user_settings.THEME_NAME
+    (i.e. can be called within parse_config_json).
+
+    :return: main color rrggbb (hexits)
+    :rtype: str"""
+    path_to_theme_json: Path = (
+        constants.THEME_DIR
+        / user_settings.THEME_NAME
+        / (user_settings.THEME_NAME + ".json")
+    )
+    theme_json: dict = load_json(path_to_theme_json)
+    color: str = theme_json["highlight"]
+    if len(color) == 7:
+        return color[1:]
+    else:
+        if "rgba(" not in color:
+            raise Exception(
+                f"{path_to_theme_json} has an invalid highlight field. Must be #rrggbb or rgba(r, g, b, a) (decimal)"
+            )
+        color = color.replace("rgba(", "").replace(")", "")
+        channels: list[str] = color.split(",")
+        r, g, b = int(channels[0]), int(channels[1]), int(channels[2])
+        r, g, b = hex(r)[2:].zfill(2), hex(g)[2:].zfill(2), hex(b)[2:].zfill(2)
+        return r + g + b
 
 
 # Source: https://github.com/Alexhuszagh/BreezeStyleSheets/blob/main/configure.py#L82
@@ -176,7 +206,7 @@ def parse_gui_cli() -> None:
             exit(1)
 
         user_settings.THEME_NAME = args.theme
-        user_settings.CONTOUR_COLOR = default_contour_color()
+        user_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
         print(f"Theme {args.theme} specified.")
 
     if args.color:
@@ -194,18 +224,3 @@ def list_of_options_to_str(strs: list[str]) -> str:
     s = str(strs)[1:-1].replace("'", '"')
     final_comma_position: int = s.rfind(",")
     return s[: final_comma_position + 1] + " or " + s[final_comma_position + 2 :]
-
-
-def default_contour_color() -> str:
-    """Uses theme name to determine a default contour color.
-
-    Only call after validating theme name so that a str (not None) must be returned.
-
-    :return: color code "RRGGBB"
-    :rtype: str"""
-    if "hct" in user_settings.THEME_NAME:
-        return constants.HCT_MAIN_COLOR
-    elif user_settings.THEME_NAME == "dark":
-        return constants.DARK_THEME_COLOR
-    elif user_settings.THEME_NAME == "light":
-        return constants.LIGHT_THEME_COLOR

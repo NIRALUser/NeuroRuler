@@ -9,7 +9,9 @@
 We are currently working on the algorithm and GUI.
 
 ## Cite this tool
+
 If you want ;) format is bibtex.
+
 ```bibtex
 @online{hct,
   title={Head Circumference Tool},
@@ -50,11 +52,15 @@ options:
   -h, --help            show this help message and exit
   -d, --debug           print debug info
   -s, --smooth          smooth image before rendering
-  -e, --export-index    exported file names use the index displayed in the GUI instead of the original file name
+  -e, --export-index    exported file names use the index displayed in the GUI
+                        instead of the original file name
   -t THEME, --theme THEME
-                        configure theme, options are dark, dark-hct, light, or light-hct
+                        configure theme, options are dark, dark-green, dark-
+                        hct, dark-purple, light, light-green, light-hct, or
+                        light-purple
   -c COLOR, --color COLOR
-                        contour color as name (e.g. red) or hex color code rrggbb
+                        contour color as name (e.g. red) or hex color code
+                        rrggbb
 ```
 
 ## Run tests

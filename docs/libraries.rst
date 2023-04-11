@@ -82,15 +82,17 @@ File formats supported
 `<https://simpleitk.readthedocs.io/en/master/IO.html>`_
 
 You probably won't have to worry about this since all common image formats are supported, and
-`sitk.ImageFileReader` automatically detects the file extension, so you don't have to handle it.
+:code:`sitk.ImageFileReader` automatically detects the file extension, so you don't have to handle it.
 
 .. _SimpleITKFiji:
 
 Fiji & tutorial notebooks
 =========================
 
+Not in use anymore.
+
 See `<https://simpleitk.org/TUTORIAL>`_ for setup instructions (installing the external image viewer Fiji
-used in some of our :code:`.ipynb` files) and a bunch of tutorial Jupyter notebook files, most of which
+used in some of our old :code:`.ipynb` files) and a bunch of tutorial Jupyter notebook files, most of which
 are too advanced for this project. What's already in `src/ <src.html>`_ should suffice for this project.
 
 .. _SimpleITKResources:
@@ -132,7 +134,7 @@ PyQt6
 
 For GUI. Serves the purpose of View and Controller. Drag-and-drop GUI design using :ref:`PyQt6QtDesigner`.
 Easy styling with :code:`.qss` stylesheets and resource (icon) management with :code:`.qrc` files, both of
-which can be even more easily managed using :ref:`BreezeStyleSheets`.
+which are even more easily managed using :ref:`BreezeStyleSheets`.
 
 .. _PyQt6QtDesigner:
 
@@ -155,10 +157,16 @@ There isn't a Controller class. Controller stuff is done in `src/GUI/main.py <_m
 
 QtDesigner lets you assign names to elements. Then these variables are accessible from code.
 
-See `MainWindow.__init__ <_modules/src/GUI/main.html#MainWindow>`_ for an example of
-connecting GUI events to functions.
+For an example of connecting GUI events (signals) to functions,
 
-Use :code:`lambda` functions to pass arguments.
+.. currentmodule:: src.GUI.main.MainWindow
+.. autofunction:: __init__
+
+`[source] <_modules/src/GUI/main.html#MainWindow.__init__>`_
+
+.. note::
+
+    Use :code:`lambda` functions to pass arguments.
 
 See `rotate_x()` for an example of getting and setting values in the GUI.
 
@@ -201,13 +209,15 @@ See this short `YouTube video <https://www.youtube.com/watch?v=LG4QgG9AZkE>`_ ab
 :ref:`BreezeStyleSheets` generates QRC files and compiled Python resource files that we can use. That section of
 this page is very closely related. Read that next if you're working on styling the GUI.
 
+To see how to access a resource, see this code snippet.
+
 .. currentmodule:: src.GUI.helpers.ErrorMessageBox
 .. autofunction:: __init__
 
 `[source] <_modules/src/GUI/helpers.html#ErrorMessageBox>`_
 
 Also see the `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
-for how to access resources once imported.
+about how to access resources once imported.
 
 .. _PyQt6Resources:
 
@@ -283,10 +293,10 @@ as the name implies. This circumvented difficulties [#npqimage]_ with converting
 .. currentmodule:: src.GUI.main.MainWindow
 .. autofunction:: render_curr_slice
 
+`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
+
 .. warning:: In :code:`src/GUI/main.py`, if :code:`import qimage2ndarray` goes before the PyQt imports (which an
     autoformatter might do), there will be a :code:`ModuleNotFoundError`.
-
-`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
 
 .. _BreezeStyleSheets:
 
@@ -312,9 +322,10 @@ In a nutshell, we edit a JSON file with hex color codes (the JSON controls only 
 and compile the JSON to a :code:`.qss` stylesheet that we import in
 our project. BSS also generates a :ref:`QRC <PyQt6QRC>` resource file
 for managing resources (icons), which is then converted to a compiled :code:`resources.py` file
-that's also imported in our project.
+that's also imported in our project. Lastly, the JSON file is copied over to our project, though we
+parse only the main color from the :code:`"highlight"` field for now.
 
-This is done automatically in the `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ script.
+This is all done automatically in the `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_ script.
 
 .. _BreezeStyleSheetsInstallation:
 
@@ -334,25 +345,7 @@ Installation instructions
 Configuration instructions
 ==========================
 
-See the instructions in our BSS fork's `README <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
-
-There are a lot of JSON fields, but as mentioned in the BSS `README <https://github.com/COMP523TeamD/BreezeStyleSheets>`_,
-only a few should be modified.
-
-I ran :code:`diff theme/dark.json theme/dark-green.json` [#diff_dark_dark_green]_ (between the original files, i.e. BSS commit `69d2e74 <https://github.com/Alexhuszagh/BreezeStyleSheets/commit/69d2e7476428216e66143ff7b5c99553d7a2784f>`_), and
-the only fields that changed between the two were these:
-
-* :code:`"highlight"`
-* :code:`"highlight:dark"`
-* :code:`"highlight:alternate"`
-* :code:`"view:checked"`
-* :code:`"view:hover"`
-* :code:`"slider:foreground"`
-* :code:`"checkbox:light"`
-* :code:`"scrollbar:hover"`
-
-There are a lot more differences between `theme/dark.json` and `theme.light.json`.
-See the diff output [#diff_dark_light]_.
+See the instructions in our BSS fork's brief `README <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
 
 .. _BreezeStyleSheetsResource:
 
