@@ -15,8 +15,8 @@ sys.path.insert(0, os.path.abspath(".."))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "Head Circumference Tool"
-copyright = "2023, COMP523 Team D"
-author = "COMP523 Team D"
+copyright = '2023 Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider'
+author = 'Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider'
 release = "0.0"
 
 # -- General configuration ---------------------------------------------------
@@ -31,7 +31,8 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "python_docs_theme"
+# Good themes: python_docs_theme and sphinx_rtd_theme (looks amazing but has ads)
+html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 

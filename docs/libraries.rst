@@ -71,8 +71,10 @@ throughout the project though.
 Filtering
 =========
 
-.. currentmodule:: src.utils.imgproc
-.. autofunction:: contour
+.. seealso::
+
+    .. currentmodule:: src.utils.imgproc
+    .. autofunction:: contour
 
 .. _SimpleITKFileFormats:
 
@@ -124,8 +126,10 @@ For arc length calculation from a :code:`np` array representing a binary contour
 First, read through `Contours: Getting Started <https://docs.opencv.org/4.x/d4/d73/tutorial_py_contours_begin.html>`_ (easy to understand)
 and `findContours <https://docs.opencv.org/4.x/d3/dc0/group__imgproc__shape.html#gadf1ad6a0b82947fa1fe3c3d497f260e0>`_ (full documentation).
 
-.. currentmodule:: src.utils.imgproc
-.. autofunction:: length_of_contour
+.. seealso::
+
+    .. currentmodule:: src.utils.imgproc
+    .. autofunction:: length_of_contour
 
 .. _PyQt6:
 
@@ -159,21 +163,25 @@ QtDesigner lets you assign names to elements. Then these variables are accessibl
 
 For an example of connecting GUI events (signals) to functions,
 
-.. currentmodule:: src.GUI.main.MainWindow
-.. autofunction:: __init__
+.. seealso::
 
-`[source] <_modules/src/GUI/main.html#MainWindow.__init__>`_
+    .. currentmodule:: src.GUI.main.MainWindow
+    .. autofunction:: __init__
+
+    `[source] <_modules/src/GUI/main.html#MainWindow>`_
 
 .. note::
 
     Use :code:`lambda` functions to pass arguments.
 
-See `rotate_x()` for an example of getting and setting values in the GUI.
+See :code:`rotate_x()` for an example of getting and setting values in the GUI.
 
-.. currentmodule:: src.GUI.main.MainWindow
-.. autofunction:: rotate_x
+.. seealso::
 
-`[source] <_modules/src/GUI/main.html#MainWindow.rotate_x>`_
+    .. currentmodule:: src.GUI.main.MainWindow
+    .. autofunction:: rotate_x
+
+    `[source] <_modules/src/GUI/main.html#MainWindow.rotate_x>`_
 
 .. _PyQt6Layout:
 
@@ -192,10 +200,12 @@ This will allow you to lay out all elements.
 Image visualization
 ===================
 
-.. currentmodule:: src.GUI.main.MainWindow
-.. autofunction:: render_curr_slice
+.. seealso::
 
-`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
+    .. currentmodule:: src.GUI.main.MainWindow
+    .. autofunction:: render_curr_slice
+
+    `[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
 
 .. _PyQt6QRC:
 
@@ -211,10 +221,12 @@ this page is very closely related. Read that next if you're working on styling t
 
 To see how to access a resource, see this code snippet.
 
-.. currentmodule:: src.GUI.helpers.ErrorMessageBox
-.. autofunction:: __init__
+.. seealso::
 
-`[source] <_modules/src/GUI/helpers.html#ErrorMessageBox>`_
+    .. currentmodule:: src.GUI.helpers.ErrorMessageBox
+    .. autofunction:: __init__
+
+    `[source] <_modules/src/GUI/helpers.html#ErrorMessageBox>`_
 
 Also see the `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
 about how to access resources once imported.
@@ -290,10 +302,12 @@ as the name implies. This circumvented difficulties [#npqimage]_ with converting
 
 `GitHub <https://github.com/hmeine/qimage2ndarray>`_ and `Documentation <http://hmeine.github.io/qimage2ndarray/>`_ (very brief).
 
-.. currentmodule:: src.GUI.main.MainWindow
-.. autofunction:: render_curr_slice
+.. seealso::
 
-`[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
+    .. currentmodule:: src.GUI.main.MainWindow
+    .. autofunction:: render_curr_slice
+
+    `[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
 
 .. warning:: In :code:`src/GUI/main.py`, if :code:`import qimage2ndarray` goes before the PyQt imports (which an
     autoformatter might do), there will be a :code:`ModuleNotFoundError`.
@@ -395,8 +409,10 @@ argparse
 
 For parsing CLI arguments.
 
-.. currentmodule:: src.utils.parse_cli
-.. autofunction:: parse_gui_cli
+.. seealso::
+
+    .. currentmodule:: src.utils.parser
+    .. autofunction:: parse_gui_cli
 
 Virtual environment
 ###################
@@ -435,6 +451,11 @@ pytest
 
 For unit testing.
 
+All unit tests run automatically on push and PR using `tox <https://tox.wiki/en/latest/>`_, which runs
+all tests on several Python versions.
+
+This is handled in the `tests.yml <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/.github/workflows/tests.yml>`_ file.
+
 .. _warningsfunctools:
 
 warnings, functools
@@ -442,8 +463,10 @@ warnings, functools
 
 Allow us to mark functions :code:`@deprecated`.
 
-.. currentmodule:: src.utils.constants
-.. autofunction:: deprecated
+.. seealso::
+
+    .. currentmodule:: src.utils.constants
+    .. autofunction:: deprecated
 
 .. _sphinxsetuptools:
 
@@ -452,7 +475,7 @@ sphinx, setuptools
 
 For automatically generating these documentation pages.
 
-.. note:: This website is automatically updated on push, PR, etc. in the HCT repo, so you don't need to follow these steps unless you're making a change to a webpage and want to be able to build the website locally to review changes before pushing.
+.. note:: This website is automatically updated on push to HCT's main branch, so you don't need to follow these steps unless you're making a change to a webpage and want to be able to build the website locally to review changes before pushing.
 
 `Read the Docs tutorial <https://docs.readthedocs.io/en/stable/tutorial/>`_ (some steps caused deployment errors 💀)
 and `YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx.
