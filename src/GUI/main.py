@@ -125,7 +125,12 @@ class MainWindow(QMainWindow):
         self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK)
         )
-        self.action_show_credits.triggered.connect(display_credits)
+        self.action_show_credits.triggered.connect(
+            lambda: information_dialog(
+                "Credits",
+                'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.',
+            )
+        )
         self.action_test_stuff.triggered.connect(self.test_stuff)
         self.action_print_metadata.triggered.connect(display_metadata)
         self.action_print_dimensions.triggered.connect(display_dimensions)
@@ -213,7 +218,7 @@ class MainWindow(QMainWindow):
             self.update_smoothing_settings()
             self.update_binary_filter_settings()
             self.apply_button.setText("Adjust")
-            # Ignore the type annotation error here.
+            # Ignore the type annotation warning here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
             self.render_circumference(binary_contour_slice)
@@ -339,7 +344,7 @@ class MainWindow(QMainWindow):
             self.render_curr_slice()
             if differing_images:
                 newline: str = "\n"
-                self.error_dialog(
+                error_message_box(
                     f"The image(s) you uploaded have differing properties.\n"
                     f"The first one and all images with properties matching the first one have been loaded.\n"
                     f"The name(s) of the ones with differing properties are\n\n"
@@ -353,22 +358,13 @@ class MainWindow(QMainWindow):
             differing_images = update_images(path_list)
             if differing_images:
                 newline: str = "\n"
-                self.error_dialog(
+                error_message_box(
                     f"You have uploaded image(s) with properties that differ from those of the currently loaded ones.\n"
                     f"These image(s) have not been loaded:\n\n"
                     f"{newline.join([path.name for path in differing_images])}"
                 )
         # When extending, image num must be updated
         self.render_image_num_and_path()
-
-    def error_dialog(self, message: str) -> None:
-        """Creates a dialog with an error message.
-
-        :param message: the error message to be displayed
-        :type message: str
-        :return: None
-        :rtype: None"""
-        ErrorMessageBox(message).exec()
 
     def update_view(self) -> None:
         """Called when clicking on any of the three view radio buttons.
@@ -682,7 +678,7 @@ class MainWindow(QMainWindow):
         self.render_image_num_and_path()
 
         if not SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation warning. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     def previous_img(self):
@@ -696,7 +692,7 @@ class MainWindow(QMainWindow):
         self.render_image_num_and_path()
 
         if not SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation warning. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     # TODO: Due to the images now being a dict, we can
@@ -718,7 +714,7 @@ class MainWindow(QMainWindow):
         self.render_image_num_and_path()
 
         if not SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation warning. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     def test_stuff(self) -> None:
@@ -766,6 +762,16 @@ class MainWindow(QMainWindow):
         img_helpers.orient_curr_image(global_vars.VIEW)
 
 
+def error_message_box(message: str) -> None:
+    """Creates a message box with an error message and red warning icon.
+
+    :param message: the error message to be displayed
+    :type message: str
+    :return: None
+    :rtype: None"""
+    ErrorMessageBox(message).exec()
+
+
 def information_dialog(title: str, message: str) -> None:
     """Create an informational dialog QDialog window with title and message.
 
@@ -776,14 +782,6 @@ def information_dialog(title: str, message: str) -> None:
     :return: None
     :rtype: None"""
     InformationDialog(title, message).exec()
-
-
-def display_credits() -> None:
-    """Display authors name in dialog."""
-    information_dialog(
-        "Credits",
-        'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.',
-    )
 
 
 # TODO: Broken
@@ -877,7 +875,8 @@ def main() -> None:
     app = QApplication(sys.argv)
 
     # On macOS, sets the application logo in the dock (but no window icon on macOS)
-    # On Windows, sets the window icon at the top left of the window (but no dock icon on Eric's Windows computer)
+    # TODO
+    # On Windows, sets the window icon at the top left of the window (but no dock icon on Windows)
     app.setWindowIcon(QIcon(str(PATH_TO_HCT_LOGO)))
 
     # TODO: Put arrow buttons on the left and right endpoints of the sliders
