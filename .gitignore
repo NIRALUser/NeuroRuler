@@ -1,5 +1,5 @@
-# You should upload new data into your local ExampleData/, but don't commit it to the repo
-# Data will be downloaded into ExampleData/ during GitHub CI tests
+# You should upload new data into your local data/, but don't commit it to the repo
+# Data will be downloaded into data/ during GitHub CI tests
 # See .github/workflows/tests.yml
 data/*.nrrd
 data/*.nii.gz
