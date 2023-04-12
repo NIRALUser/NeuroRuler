@@ -7,14 +7,15 @@ The values in this file don't matter since they'll be overwritten by what's in c
 if any. But the values here should match the values in config.json for consistency."""
 
 from pathlib import Path
+import src.utils.constants as constants
 
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
 
-FILE_BROWSER_START_DIR: Path = Path("data")
+FILE_BROWSER_START_DIR: Path = constants.DATA_DIR
 """The starting directory that is opened in the file browser.
 
-Defaults to data/ during development, for now.
+Defaults to DATA_DIR during development, for now.
 
 Should default to user's home directory later."""
 
