@@ -5,7 +5,6 @@ Mostly holds helper functions for working with IMAGE_DICT in global_vars.py."""
 from typing import Union
 import SimpleITK as sitk
 from pathlib import Path
-from enum import Enum
 import src.utils.global_vars as global_vars
 from src.utils.constants import degrees_to_radians, View
 import src.utils.constants as constants
@@ -105,7 +104,10 @@ def initialize_globals(path_list: list[Path]) -> list[Path]:
 def clear_globals() -> None:
     """Clear global variables for unit testing in test_img_helpers.
 
-    Don't need to reset Euler3DTransform since that's not used in the tests there."""
+    Don't need to reset Euler3DTransform since that's not used in the tests there.
+
+    :return: None
+    :rtype: None"""
     global_vars.IMAGE_DICT.clear()
     global_vars.CURR_IMAGE_INDEX = 0
     global_vars.THETA_X = 0
@@ -117,8 +119,7 @@ def clear_globals() -> None:
 def image_dict_is_empty() -> bool:
     """
     :return: True if IMAGE_DICT is empty, else False
-    :rtype: bool
-    """
+    :rtype: bool"""
     return bool(global_vars.IMAGE_DICT)
 
 
@@ -212,19 +213,19 @@ def set_curr_image(image: sitk.Image) -> None:
     global_vars.IMAGE_DICT[get_curr_path()] = image
 
 
-def orient_curr_image(view: Enum) -> None:
+def orient_curr_image(view: View) -> None:
     """Given a view enum, set the current image to the oriented version for that view.
 
-    :param image: not mutated
-    :type image: sitk.Image
     :param view:
-    :type view: View.X, View.Y, or View.Z"""
-    if view not in constants.VIEW_TO_ORIENTATION_STR:
+    :type view: View.X, View.Y, or View.Z
+    :return: None
+    :rtype: None"""
+    if not isinstance(view, View):
         raise Exception(
             "Expected View.X, View.Y, or View.Z but did not get one of those."
         )
     global_vars.ORIENT_FILTER.SetDesiredCoordinateOrientation(
-        constants.VIEW_TO_ORIENTATION_STR[view]
+        constants.ORIENTATION_STRINGS[view.value]
     )
     oriented: sitk.Image = global_vars.ORIENT_FILTER.Execute(get_curr_image())
     set_curr_image(oriented)
@@ -271,9 +272,10 @@ def get_curr_smooth_slice() -> sitk.Image:
 
 
 def get_curr_binary_thresholded_slice() -> sitk.Image:
-    """Return filtered slice of the current image based on binary filter determined by global threshold settings.
+    """Return binary thresholded slice of the current image based on binary filter determined by
+    global threshold settings.
 
-    :return: filtered 2D rotated slice
+    :return: binary thresholded 2D rotated slice using global binary threshold settings
     :rtype: sitk.Image"""
     rotated_slice: sitk.Image = get_curr_rotated_slice()
     filter_slice: sitk.Image = global_vars.BINARY_THRESHOLD_FILTER.Execute(
@@ -283,9 +285,9 @@ def get_curr_binary_thresholded_slice() -> sitk.Image:
 
 
 def get_curr_otsu_slice() -> sitk.Image:
-    """Return filtered slice of the current image based on Otsu filter.
+    """Return Otsu filtered slice of the current image.
 
-    :return: filtered 2D rotated slice
+    :return: Otsu filtered 2D rotated slice
     :rtype: sitk.Image"""
     rotated_slice: sitk.Image = get_curr_rotated_slice()
     filter_slice: sitk.Image = global_vars.OTSU_THRESHOLD_FILTER.Execute(
@@ -340,7 +342,10 @@ def del_curr_img() -> None:
     Decrements CURR_IMAGE_INDEX if removing the last element.
 
     Will not check for IMAGE_DICT being empty after the deletion (GUI should be disabled).
-    This happens in the GUI."""
+    This happens in the GUI.
+
+    :return: None
+    :rtype: None"""
     if len(global_vars.IMAGE_DICT) == 0:
         print("Can't remove from empty list!")
         return
@@ -353,14 +358,20 @@ def del_curr_img() -> None:
 
 
 def next_img() -> None:
-    """Increment CURR_IMAGE_INDEX, wrapping if necessary."""
+    """Increment CURR_IMAGE_INDEX, wrapping if necessary.
+
+    :return: None
+    :rtype: None"""
     global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX + 1) % len(
         global_vars.IMAGE_DICT
     )
 
 
 def previous_img() -> None:
-    """Decrement CURR_IMAGE_INDEX, wrapping if necessary."""
+    """Decrement CURR_IMAGE_INDEX, wrapping if necessary.
+
+    :return: None
+    :rtype: None"""
     global_vars.CURR_IMAGE_INDEX = (global_vars.CURR_IMAGE_INDEX - 1) % len(
         global_vars.IMAGE_DICT
     )
@@ -372,7 +383,7 @@ def get_rotated_slice_hardcoded(
     theta_y: int = 0,
     theta_z: int = 0,
     slice_num: int = 0,
-):
+) -> sitk.Image:
     """Get 2D rotated slice of mri_img_3d from hardcoded values. Rotation values are in degrees, slice_num is an int.
 
     For unit testing. Sets center of global EULER_3D_TRANSFORM to center of rotation of mri_img_3d.
@@ -386,7 +397,9 @@ def get_rotated_slice_hardcoded(
     :param theta_z:
     :type theta_z: int
     :param slice_num:
-    :type slice_num: int"""
+    :type slice_num: int
+    :return: 2D rotated slice using hardcoded settings
+    :rtype: sitk.Image"""
     global_vars.EULER_3D_TRANSFORM.SetCenter(get_center_of_rotation(mri_img_3d))
     global_vars.EULER_3D_TRANSFORM.SetRotation(
         degrees_to_radians(theta_x),

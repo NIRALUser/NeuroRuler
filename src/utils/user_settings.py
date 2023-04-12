@@ -1,28 +1,23 @@
 """Global settings that the user should be able to modify directly, unlike global_vars.py and constants.py, via
 JSON, GUI, CLI, etc.
 
-Default values are what's in the config.json file, which should match what's in this file."""
+Default values are what's in the config.json file.
+
+The values in this file don't matter since they'll be overwritten by what's in config.json and then by CLI options,
+if any. But the values here should match the values in config.json for consistency."""
 
 from pathlib import Path
-from screeninfo import get_monitors, ScreenInfoError
 import src.utils.constants as constants
 
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
 
-IMG_DIR: Path = Path("img")
-"""Directory for storing images. Defaults to `img/`.
-
-TODO: Warn the user that images here may be overwritten in our documentation. It is not a safe directory
-to use for file storage and should only be used by the program."""
-
-FILE_BROWSER_START_DIR: Path = Path("ExampleData")
+FILE_BROWSER_START_DIR: Path = constants.DATA_DIR
 """The starting directory that is opened in the file browser.
 
-Defaults to ExampleData/ during development, for now.
+Defaults to DATA_DIR during development, for now.
 
-Should default to the home directory for the user."""
-
+Should default to user's home directory later."""
 
 EXPORTED_FILE_NAMES_USE_INDEX: bool = False
 """If True, then exported files will be named using the index in the program.
@@ -39,35 +34,17 @@ THEME_NAME: str = "dark-hct"
 
 The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
 
-CONTOUR_COLOR: str = constants.HCT_MAIN_COLOR
-"""Color of the contour. See parser.py for how the default contour color is determined.
+CONTOUR_COLOR: str = ""
+"""Color of the contour. "" means it will be automatically determined by the value of THEME_NAME.
 
 This can be a 6-hexit string rrggbb (don't prepend 0x) or a name (e.g. red, blue, etc.).
 
 Internally, this is converted to a QColor using imgproc.string_to_QColor().
-
 QColor supports 8-hexit rrggbbaa but doesn't work in our GUI, i.e. aa=00 appears fully bright in the GUI."""
 
-PRIMARY_MONITOR_DIMENSIONS: list[int] = [500, 500]
-"""Set to user's primary monitor's dimensions. 500, 500 are dummy values"""
-
-try:
-    for m in get_monitors():
-        if m.is_primary:
-            PRIMARY_MONITOR_DIMENSIONS[0] = m.width
-            PRIMARY_MONITOR_DIMENSIONS[1] = m.height
-            break
-except ScreenInfoError:
-    # This will occur on GH automated tests.
-    pass
-
-MIN_WIDTH_RATIO: float = 0.6
-"""Min GUI width as fraction of primary monitor width. Configurable in JSON"""
-MIN_HEIGHT_RATIO: float = 0.5
-"""Min GUI height as fraction of primary monitor height. Configurable in JSON"""
-MAX_WIDTH_RATIO: float = 0.6
+STARTUP_WIDTH_RATIO: float = 0.65
 """Max GUI width as fraction of primary monitor width. Configurable in JSON"""
-MAX_HEIGHT_RATIO: float = 0.6
+STARTUP_HEIGHT_RATIO: float = 0.6
 """Max GUI height as fraction of primary monitor height. Configurable in JSON"""
 
 DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL: bool = False

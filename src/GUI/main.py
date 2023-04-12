@@ -35,7 +35,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
 )
 from PyQt6.uic.load_ui import loadUi
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 
 import pprint
 from src.utils.constants import View, ThresholdFilter
@@ -75,6 +75,7 @@ from src.utils.img_helpers import (
 import src.utils.img_helpers as img_helpers
 
 
+PATH_TO_UI_FILE: Path = Path("src") / "GUI" / "mainwindow.ui"
 PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
 
 SETTINGS_VIEW_ENABLED: bool = True
@@ -112,10 +113,9 @@ class MainWindow(QMainWindow):
 
         Sets window title and icon."""
         super(MainWindow, self).__init__()
-        loadUi(str(Path("src") / "GUI" / "mainwindow.ui"), self)
+        loadUi(str(PATH_TO_UI_FILE), self)
 
         self.setWindowTitle("Head Circumference Tool")
-        self.setWindowIcon(QtGui.QIcon(str(PATH_TO_HCT_LOGO)))
 
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(lambda: self.browse_files(True))
@@ -124,6 +124,12 @@ class MainWindow(QMainWindow):
         self.action_github.triggered.connect(lambda: webbrowser.open(GITHUB_LINK))
         self.action_documentation.triggered.connect(
             lambda: webbrowser.open(DOCUMENTATION_LINK)
+        )
+        self.action_show_credits.triggered.connect(
+            lambda: information_dialog(
+                "Credits",
+                'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.',
+            )
         )
         self.action_test_stuff.triggered.connect(self.test_stuff)
         self.action_print_metadata.triggered.connect(display_metadata)
@@ -181,6 +187,7 @@ class MainWindow(QMainWindow):
             widget.setEnabled(True)
 
         self.action_export_csv.setEnabled(not SETTINGS_VIEW_ENABLED)
+        self.export_button.setEnabled(not SETTINGS_VIEW_ENABLED)
         self.disable_binary_threshold_inputs()
 
     def enable_binary_threshold_inputs(self) -> None:
@@ -211,9 +218,8 @@ class MainWindow(QMainWindow):
             self.apply_button.setText("Adjust")
             self.update_smoothing_settings()
             self.update_binary_filter_settings()
-            global_vars.VIEW = View.Z
-            self.orient_curr_image()
-            # Ignore the type annotation error here.
+            self.apply_button.setText("Adjust")
+            # Ignore the type annotation warning here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
             self.render_circumference(binary_contour_slice)
@@ -339,7 +345,7 @@ class MainWindow(QMainWindow):
             self.render_curr_slice()
             if differing_images:
                 newline: str = "\n"
-                self.error_dialog(
+                error_message_box(
                     f"The image(s) you uploaded have differing properties.\n"
                     f"The first one and all images with properties matching the first one have been loaded.\n"
                     f"The name(s) of the ones with differing properties are\n\n"
@@ -353,22 +359,13 @@ class MainWindow(QMainWindow):
             differing_images = update_images(path_list)
             if differing_images:
                 newline: str = "\n"
-                self.error_dialog(
+                error_message_box(
                     f"You have uploaded image(s) with properties that differ from those of the currently loaded ones.\n"
                     f"These image(s) have not been loaded:\n\n"
                     f"{newline.join([path.name for path in differing_images])}"
                 )
         # When extending, image num must be updated
         self.render_image_num_and_path()
-
-    def error_dialog(self, message: str) -> None:
-        """Creates a dialog with an error message.
-
-        :param message: the error message to be displayed
-        :type message: str
-        :return: None
-        :rtype: None"""
-        ErrorMessageBox(message).exec()
 
     def update_view(self) -> None:
         """Called when clicking on any of the three view radio buttons.
@@ -414,7 +411,7 @@ class MainWindow(QMainWindow):
 
         iterations: str = self.smoothing_iterations_input.displayText()
         try:
-            global_vars.CONDUCTANCE_PARAMETER = int(iterations)
+            global_vars.SMOOTHING_ITERATIONS = int(iterations)
         except ValueError:
             if user_settings.DEBUG:
                 print("Iterations must be an integer!")
@@ -696,7 +693,7 @@ class MainWindow(QMainWindow):
         self.render_image_num_and_path()
 
         if not SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation warning. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     def previous_img(self):
@@ -710,7 +707,7 @@ class MainWindow(QMainWindow):
         self.render_image_num_and_path()
 
         if not SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation warning. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     # TODO: Due to the images now being a dict, we can
@@ -732,7 +729,7 @@ class MainWindow(QMainWindow):
         self.render_image_num_and_path()
 
         if not SETTINGS_VIEW_ENABLED:
-            # Ignore the type annotation error. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
+            # Ignore the type annotation warning. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
     def test_stuff(self) -> None:
@@ -748,7 +745,7 @@ class MainWindow(QMainWindow):
     def export_curr_slice_as_img(self, extension: str):
         """Called when an Export as image menu item is clicked.
 
-        Exports `self.image` to `settings.IMG_DIR`. Thus, calling this when `SETTINGS_VIEW_ENABLED` will
+        Exports `self.image` to `settings.OUTPUT_DIR/img/`. Thus, calling this when `SETTINGS_VIEW_ENABLED` will
         save a non-contoured image. Calling this when `not SETTINGS_VIEW_ENABLED` will save a contoured
         image.
 
@@ -768,7 +765,7 @@ class MainWindow(QMainWindow):
             else get_curr_path().name
         )
         path: str = str(
-            user_settings.IMG_DIR
+            constants.IMG_DIR
             / f"{file_name}_{'contoured_' if not SETTINGS_VIEW_ENABLED else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
         )
         self.image.pixmap().save(path, extension)
@@ -778,6 +775,16 @@ class MainWindow(QMainWindow):
 
         This mutates the image."""
         img_helpers.orient_curr_image(global_vars.VIEW)
+
+
+def error_message_box(message: str) -> None:
+    """Creates a message box with an error message and red warning icon.
+
+    :param message: the error message to be displayed
+    :type message: str
+    :return: None
+    :rtype: None"""
+    ErrorMessageBox(message).exec()
 
 
 def information_dialog(title: str, message: str) -> None:
@@ -873,12 +880,16 @@ def main() -> None:
     """Main entrypoint of GUI."""
     # This import can't go at the top of the file
     # because gui.py.parse_gui_cli() has to set THEME_NAME before the import occurs
+    # This imports globally
+    # For example, src/GUI/helpers.py can access resource files without having to import there
     importlib.import_module(f"src.GUI.themes.{user_settings.THEME_NAME}.resources")
 
-    if not user_settings.IMG_DIR.exists():
-        user_settings.IMG_DIR.mkdir()
-
     app = QApplication(sys.argv)
+
+    # On macOS, sets the application logo in the dock (but no window icon on macOS)
+    # TODO
+    # On Windows, sets the window icon at the top left of the window (but no dock icon on Windows)
+    app.setWindowIcon(QIcon(str(PATH_TO_HCT_LOGO)))
 
     # TODO: Put arrow buttons on the left and right endpoints of the sliders
     # These arrow buttons already show up if commenting in app.setStyle("Fusion")
@@ -894,22 +905,18 @@ def main() -> None:
         app.setStyleSheet(f.read())
 
     MAIN_WINDOW = MainWindow()
-    MAIN_WINDOW.setMinimumWidth(
-        int(user_settings.MIN_WIDTH_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[0])
-    )
-    MAIN_WINDOW.setMinimumHeight(
-        int(
-            user_settings.MIN_HEIGHT_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[1]
-        )
-    )
 
-    MAIN_WINDOW.setMaximumWidth(
-        int(user_settings.MAX_WIDTH_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[0])
-    )
-    MAIN_WINDOW.setMaximumHeight(
+    # Non-zero min width and height is needed to prevent
+    # this bug https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/42
+    # However, this also seems to affect startup GUI size or at least GUI element spacing
+    MAIN_WINDOW.setMinimumSize(QSize(1, 1))
+    MAIN_WINDOW.resize(
         int(
-            user_settings.MAX_HEIGHT_RATIO * user_settings.PRIMARY_MONITOR_DIMENSIONS[1]
-        )
+            user_settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]
+        ),
+        int(
+            user_settings.STARTUP_HEIGHT_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[1]
+        ),
     )
 
     try:
@@ -922,6 +929,6 @@ def main() -> None:
 if __name__ == "__main__":
     import src.utils.parser as parser
 
-    parser.parse_json()
+    parser.parse_config_json()
     parser.parse_gui_cli()
     main()

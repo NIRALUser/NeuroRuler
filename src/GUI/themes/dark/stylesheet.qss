@@ -1025,7 +1025,7 @@ QComboBox QAbstractItemView
 {
     /* This happens for the drop-down menu always, whether editable or not.*/
     background-color: #1d2023;
-    selection-background-color: #2a79a3;
+    selection-background-color: #3392c4;
     outline-color: 0em;
     border-radius: 0.09em;
 }
@@ -1388,7 +1388,7 @@ QTabBar::tab:top:next-selected
 
 QTabBar::tab:top:!selected:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     border-radius: 0.09em;
     border-bottom-left-radius: 0em;
     border-bottom-right-radius: 0em;
@@ -1396,7 +1396,7 @@ QTabBar::tab:top:!selected:hover
 
 QTabBar::tab:top:!selected:first:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     border-radius: 0.09em;
     border-bottom-left-radius: 0em;
     border-bottom-right-radius: 0em;
@@ -1441,7 +1441,7 @@ QTabBar::tab:bottom:next-selected
 
 QTabBar::tab:bottom:!selected:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     border-radius: 0.09em;
     border-top-left-radius: 0em;
     border-top-right-radius: 0em;
@@ -1449,7 +1449,7 @@ QTabBar::tab:bottom:!selected:hover
 
 QTabBar::tab:bottom:!selected:first:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     border-radius: 0.09em;
     border-top-left-radius: 0em;
     border-top-right-radius: 0em;
@@ -1494,7 +1494,7 @@ QTabBar::tab:left:previous-selected
 
 QTabBar::tab:left:!selected:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     border-radius: 0.09em;
     border-top-right-radius: 0em;
     border-bottom-right-radius: 0em;
@@ -1502,7 +1502,7 @@ QTabBar::tab:left:!selected:hover
 
 QTabBar::tab:left:!selected:first:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     border-radius: 0.09em;
     border-top-right-radius: 0em;
     border-bottom-right-radius: 0em;
@@ -1547,7 +1547,7 @@ QTabBar::tab:right:previous-selected
 
 QTabBar::tab:right:!selected:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     border-radius: 0.09em;
     border-top-left-radius: 0em;
     border-bottom-left-radius: 0em;
@@ -1555,7 +1555,7 @@ QTabBar::tab:right:!selected:hover
 
 QTabBar::tab:right:!selected:first:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     border-radius: 0.09em;
     border-top-left-radius: 0em;
     border-bottom-left-radius: 0em;
@@ -1842,7 +1842,7 @@ QTableView::item:!selected:hover,
 QListView::item:!selected:hover,
 QTreeView::item:!selected:hover
 {
-    background-color: rgba(61, 173, 232, 0.1);
+    background-color: rgba(61, 174, 233, 0.1);
     outline: 0;
     color: #eff0f1;
     padding: 0.13em;
@@ -2179,13 +2179,13 @@ QAbstractItemView::item
 
 QAbstractItemView::item:pressed
 {
-    background: #2a79a3;
+    background: #3392c4;
     color: #eff0f1;
 }
 
 QAbstractItemView::item:selected:!active
 {
-    background: rgba(61, 173, 232, 0.1);
+    background: rgba(61, 174, 233, 0.1);
 }
 
 /* Use background with qlineargradient to avoid ugly border on widget. */
@@ -2194,8 +2194,8 @@ QAbstractItemView::item:selected:active
     background: qlineargradient(
         x1: 0.5, y1: 0.5
         x2: 0.5, y2: 1,
-        stop: 0 #2a79a3,
-        stop: 1 #2a79a3
+        stop: 0 #3392c4,
+        stop: 1 #3392c4
     );
     color: #eff0f1;
 }
@@ -2205,8 +2205,8 @@ QAbstractItemView::item:selected:hover
     background: qlineargradient(
         x1: 0.5, y1: 0.5
         x2: 0.5, y2: 1,
-        stop: 0 #2f88b7,
-        stop: 1 #2f88b7
+        stop: 0 #25698d,
+        stop: 1 #25698d
     );
     color: #eff0f1;
 }
@@ -2261,7 +2261,7 @@ QHeaderView[showSortIndicator="true"]::section::horizontal
 QHeaderView::section:checked
 {
     color: #ffffff;
-    background-color: #334e5e;
+    background-color: #3daee9;
 }
 
 /* Note that this doesn't work for QTreeView unless the header is clickable */
@@ -2720,7 +2720,9 @@ ads--CDockOverlayCross
     qproperty-iconShadowColor: transparent;
 }
 
+/* These lines are appended to the compiled stylesheets by the hct.py script */
+
 /* To make QMessageBox font not bold */
 QMessageBox QLabel {
-	font-weight: normal;
+    font-weight: normal;
 }

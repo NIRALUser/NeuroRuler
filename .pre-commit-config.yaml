@@ -1,6 +1,6 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
-exclude: ui_mainwindow.py|stylesheet.qss|resources.py
+exclude: stylesheet.qss|resources.py|gui.py|gui.pyw|docs/_static/QtDesigner.jpg|docs/_static/hct_demo.gif
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0

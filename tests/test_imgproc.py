@@ -10,7 +10,7 @@ from pathlib import Path
 from src.utils.imgproc import contour, length_of_contour
 import src.utils.exceptions as exceptions
 from src.utils.constants import (
-    EXAMPLE_DATA_DIR,
+    DATA_DIR,
     NUM_CONTOURS_IN_INVALID_SLICE,
     SUPPORTED_EXTENSIONS,
     degrees_to_radians,
@@ -23,7 +23,7 @@ EPSILON: float = 0.001
 
 EXAMPLE_IMAGES: dict[Path, sitk.Image] = dict()
 for extension in SUPPORTED_EXTENSIONS:
-    for path in EXAMPLE_DATA_DIR.glob(extension):
+    for path in DATA_DIR.glob(extension):
         READER.SetFileName(str(path))
         EXAMPLE_IMAGES[path] = READER.Execute()
 
@@ -201,7 +201,7 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
     f.write("From test_arc_length_of_transposed_matrix_is_same\n\n")
 
     for img in EXAMPLE_IMAGES.values():
-        f.write(f"{EXAMPLE_DATA_DIR.name}/{img.path.name}\n")
+        f.write(f"{DATA_DIR.name}/{img.path.name}\n")
         for theta_x in range(0, 31, 15):
             for theta_y in range(0, 31, 15):
                 for theta_z in range(0, 31, 15):

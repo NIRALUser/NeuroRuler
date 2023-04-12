@@ -32,7 +32,7 @@ def contour(
 ) -> np.ndarray:
     """Generate the contour of a 2D slice by applying smoothing, Otsu threshold or binary threshold,
     hole filling, and island removal (select largest component). Return a binary (0|1) numpy
-    array with only the points on the contour=1.
+    array with only the points within the contour=1.
 
     Calls sitk.GetArrayFromImage() at the end, which will return the transpose of the sitk.Image.
     Consider whether to re-transpose the result or not.
@@ -98,10 +98,12 @@ def length_of_contour(
 ) -> float:
     """Given a 2D binary slice, return the arc length of the parent contour.
 
-    cv2 will find all contours if there is more than one. Most valid brain slices have 2 or 3.
+    `cv2.findContours` will find all contours if there is more than one. Most valid brain slices have 2 or 3.
 
-    The binary slice passed into this function should be processed by `contour()` to contain
-    just one contour (except in edge cases that we don't need to worry about) to guarantee an accurate result.
+    The binary slice passed into this function should be processed by `contour()`
+    (i.e., hole-filling, island removal, threshold, etc.)
+    to contain just one contour (except in edge cases that we don't need to worry about)
+    to guarantee an accurate result.
 
     This function assumes the contour is a closed curve.
 
