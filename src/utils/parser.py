@@ -27,7 +27,6 @@ def parse_config_json() -> None:
     user_settings.DEBUG = parse_bool("DEBUG")
     if user_settings.DEBUG:
         print("Printing debug messages.")
-    user_settings.IMG_DIR = parse_path("IMG_DIR")
     user_settings.FILE_BROWSER_START_DIR = parse_path("FILE_BROWSER_START_DIR")
     user_settings.EXPORTED_FILE_NAMES_USE_INDEX = parse_bool(
         "EXPORTED_FILE_NAMES_USE_INDEX"

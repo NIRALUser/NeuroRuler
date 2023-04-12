@@ -14,9 +14,19 @@ from numpy import pi
 from typing import Union
 from enum import Enum
 
+OUTPUT_DIR: Path = Path("output")
+"""Directory for storing output."""
+if not OUTPUT_DIR.exists():
+    OUTPUT_DIR.mkdir()
+
+IMG_DIR: Path = OUTPUT_DIR / "img"
+"""Directory for storing outputted images."""
+if not IMG_DIR.exists():
+    IMG_DIR.mkdir()
+
 JSON_CONFIG_PATH: Path = Path("config.json")
 """Settings that configure user_settings.py"""
-EXPECTED_NUM_FIELDS_IN_JSON: int = 9
+EXPECTED_NUM_FIELDS_IN_JSON: int = 8
 """Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
 will be raised."""
 
@@ -24,7 +34,7 @@ SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """File formats supported. Must be a subset of the file formats supported by SimpleITK.
 
 TODO: Support .txt for loading image paths from text file (which we can quite easily export using global_vars.IMAGE_DICT)."""
-EXAMPLE_DATA_DIR: Path = Path("ExampleData")
+DATA_DIR: Path = Path("data")
 """Directory for storing example data."""
 
 UI_FILE_PATH: Path = Path("src") / "GUI" / "mainwindow.ui"

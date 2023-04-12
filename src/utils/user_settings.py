@@ -7,23 +7,17 @@ The values in this file don't matter since they'll be overwritten by what's in c
 if any. But the values here should match the values in config.json for consistency."""
 
 from pathlib import Path
+import src.utils.constants as constants
 
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
 
-IMG_DIR: Path = Path("img")
-"""Directory for storing images. Defaults to `img/`.
-
-TODO: Warn the user that images here may be overwritten in our documentation. It is not a safe directory
-to use for file storage and should only be used by the program."""
-
-FILE_BROWSER_START_DIR: Path = Path("ExampleData")
+FILE_BROWSER_START_DIR: Path = constants.DATA_DIR
 """The starting directory that is opened in the file browser.
 
-Defaults to ExampleData/ during development, for now.
+Defaults to DATA_DIR during development, for now.
 
-Should default to the home directory for the user."""
-
+Should default to user's home directory later."""
 
 EXPORTED_FILE_NAMES_USE_INDEX: bool = False
 """If True, then exported files will be named using the index in the program.

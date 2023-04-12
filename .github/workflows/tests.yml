@@ -5,23 +5,43 @@ on:
   - pull_request
 
 jobs:
+  download-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          sudo apt-get install curl
+          sudo apt-get install unzip
+      - name: Download Head Circumference Data
+        # Source: https://stackoverflow.com/questions/21322614/use-curl-to-download-a-dropbox-folder-via-shared-link-not-public-link
+        # Also https://stackoverflow.com/questions/21322416/unzip-warning-and-mapname
+        run: |
+          curl -L -o data.zip https://www.dropbox.com/sh/3k3p0o14rdwrx7p/AAAGSpXdVkyBXAnanPZgwRP4a/?dl/=1
+          unzip data.zip -x / -d data/
+      - name: Print contents of data/
+        run: ls -R
+        working-directory: data
+      - name: Cleanup
+        run: rm data.zip
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ["3.9", "3.10", "3.11"]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install -r requirements.txt
-        pip install tox tox-gh-actions
-    - name: Test with tox
-      run: tox
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          pip install tox tox-gh-actions
+      - name: Test with tox
+        run: tox

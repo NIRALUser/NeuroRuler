@@ -7,10 +7,8 @@
 {
     // Print debugging messages during execution
     "DEBUG": "False",
-    // Directory to store exported images in
-    "IMG_DIR": "img",
     // Directory that the file browser (File > Open/Add images) should start searching from
-    "FILE_BROWSER_START_DIR": "ExampleData",
+    "FILE_BROWSER_START_DIR": "data",
     // Whether exported file names use the image number in the program or the original file name
     "EXPORTED_FILE_NAMES_USE_INDEX": "False",
     // Run ./gui.py -h to see options
