@@ -2,7 +2,8 @@
 // Use "True" or "False" for binary options
 // For other field types, the comments specify what the allowed values are.
 // Do not add or remove fields in this file if you're a user
-// If you're a developer who's adding or removing options, modify parser.py and constants.EXPECTED_NUM_FIELDS_IN_JSON
+// If you're a developer who's adding or removing options,
+// modify parser.py and constants.EXPECTED_NUM_FIELDS_IN_JSON
 {
     // Print debugging messages during execution
     "DEBUG": "False",
@@ -18,7 +19,7 @@
     // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that
     "CONTOUR_COLOR": "",
     // Startup width and height of the GUI as a ratio of primary monitor size.
-    // Enter a number between 0 (not inclusive) and 1.
+    // Enter a number between 0 (not inclusive) and 1
     "STARTUP_WIDTH_RATIO": 0.65,
     "STARTUP_HEIGHT_RATIO": 0.6,
     "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL": "False"
