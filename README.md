@@ -25,7 +25,11 @@ If you want 😉 format is bibtex.
 
 ## Setup
 
-Your Python version needs to be 3.8+. Check with `python --version`. Then run these commands.
+Your Python version needs to be 3.8+. Check with `python --version`. If that doesn't work, you need to [install Python](https://www.python.org), and make sure to add it to `PATH`.
+
+You will also need [git](https://git-scm.com), and make sure to add git to `PATH` too.
+
+Then run these commands in your terminal.
 
 ```text
 git clone https://github.com/COMP523TeamD/HeadCircumferenceTool.git
@@ -35,12 +39,11 @@ pip install -r requirements.txt
 
 ## Start GUI
 
-Windows users can double-click on `gui.pyw` to start the application. Or if that doesn't work, just enter `python gui.py` in Windows Terminal.
+Your current working directory needs to be `.../HeadCircumferenceTool`.
 
-On any OS, you can start the GUI by running `./gui.py`.
+macOS/Linux users can start the GUI by running `./gui.py`. You may need to run `chmod +x gui.py`.
 
-Your current working directory should be `.../HeadCircumferenceTool`.
-You may need to run `chmod +x gui.py`.
+Windows users can double-click on `gui.pyw` to start the application. If that doesn't work, run `python gui.py` in Windows Terminal.
 
 ## Configure settings
 

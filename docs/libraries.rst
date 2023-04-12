@@ -385,23 +385,24 @@ whereas Windows paths look like :code:`C:\\idk\\how\\Windows\\works\\...`.
 Always build up a :code:`Path` using the :code:`Path` capabilities (:code:`/` operator).
 Then when a :code:`str` is needed, apply :code:`str()` to convert at the end.
 
-See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example code. Also see this code from `src/utils/global_vars.py <_modules/src/utils/global_vars.html>`_.
+See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example code.
+Also see this code from `src/utils/global_vars.py <_modules/src/utils/constants.html>`_.
 
 .. code-block:: python
     :linenos:
 
-    from pathlib import Path
-
-    THEME_DIR: Path = Path('src') / 'GUI' / 'themes'
+    THEME_DIR: Path = Path("src") / "GUI" / "themes"
     """themes/ directory where .qss stylesheets and resources.py files are stored."""
-    THEMES: set[str] = set()
+    THEMES: list[str] = []
     """List of themes, i.e. the names of the directories in THEME_DIR."""
-    if len(list(THEME_DIR.glob('*'))) != 0:
+    if len(list(THEME_DIR.glob("*"))) != 0:
         for path in THEME_DIR.iterdir():
             if path.is_dir():
-                THEMES.add(path.name)
+                THEMES.append(path.name)
+        THEMES = sorted(THEMES)
     else:
-        print(f'No themes discovered in {str(THEME_DIR)}. Make sure to run from .../HeadCircumferenceTool .')
+        # Without this, autodocumentation crashes
+        pass
 
 .. _argparse:
 
@@ -486,12 +487,11 @@ and `YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx.
 Build HCT docs site locally
 ===========================
 
-Your current working directory should be the HCT repo.
+Your current working directory should be :code:`.../HeadCircumferenceTool`, and
+you should have already installed dependencies via pip.
 
 .. code-block:: text
 
-    pip install sphinx
-    pip install python-docs-theme
     cd docs
     make html
 
@@ -499,10 +499,11 @@ Your current working directory should be the HCT repo.
 
 .. note:: :code:`docs/_build` is gitignored.
 
-You can open :code:`docs/_build/html/index.html` in a web browser to check out the site before pushing, which will automatically update the
+You can open :code:`docs/_build/html/index.html` in a web browser #[macos_open_html]_ to check out the site before pushing, which
+will automatically update the
 website. From now on, you can just run :code:`make html` to update the html pages.
 
-However, you will need to run :code:`sphinx-apidoc -o . ../src` from the :code:`docs/` directory
+However, you may need to run :code:`sphinx-apidoc -o . ../src` from the :code:`docs/` directory
 if a new package is created. Make sure :code:`__init__.py` files exist for any package you want
 to be discovered.
 
@@ -522,6 +523,7 @@ Steps for building from scratch
 Your current working directory should be whatever repo you want to automatically generate documentation for.
 
 .. code-block:: text
+    :linenos:
 
     pip install sphinx
     pip install python-docs-theme
@@ -544,6 +546,7 @@ you want to auto-generate documentation for.
 .. note:: Current working directory should still be :code:`docs/`
 
 .. code-block:: text
+    :linenos:
 
     sphinx-apidoc -o . ../src       # Generate files from ../src and put in . (docs/)
     make html
@@ -553,7 +556,9 @@ You can open it in a web browser to check it out before pushing, which will auto
 website. From now on, you can just run :code:`make html` to update the html pages. You don't need to run
 :code:`sphinx-apidoc` unless you create a new package.
 
-You can edit :code:`docs/index.rst`, which is the homepage.
+You can edit `docs/index.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/index.rst>`_,
+which is the homepage, or `docs/libraries.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/libraries.rst>`_, which
+is this page. `Documentation <modules.html>`_ for `source code <_modules/index.html>`_ is automatically generated.
 
 Now follow the Read the Docs tutorial starting from `Sign up for Read the Docs <https://docs.readthedocs.io/en/stable/tutorial/#sign-up-for-read-the-docs>`_.
 You can end at Checking the first build. To set up CDD (continuous documentation deployment), check
@@ -582,8 +587,7 @@ importlib
 
 For importing modules using strings.
 
-Specifically, if supporting multiple themes and stylesheets, then import statements will change depending
-on :code:`src.utils.settings.THEME_NAME`.
+Specifically, import statements depend on :code:`src.utils.user_settings.THEME_NAME`.
 
 For example, in :code:`src.GUI.main()`, if :code:`THEME_NAME` is :code:`'dark'`, then
 the resources import statement would be
@@ -619,18 +623,17 @@ More instructions `here <https://pre-commit.com/>`_.
 
 .. rubric:: Footnotes
 
-.. [#macpyqt] These are the the commands I ran to install PyQt5 on macOS.
+.. [#macpyqt] These are the the commands I ran to install PyQt5 on macOS. Took a while to install...
 
 .. code-block:: text
+    :linenos:
 
     brew install qt5
     brew link qt5 --force
     pip3 install pyqt5 --config-settings --confirm-license= --verbose
 
-Took a while to install...
-
 .. [#sphinx] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
+.. [#macos_open_html] On macOS, you can open an HTML document using :code:`open -a "Safari" _build/html/index.html"`
 .. [#venv] Thanks to the teammate who suggested this to me!
 .. [#npqimage] https://github.com/COMP523TeamD/HeadCircumferenceTool/pull/3#issuecomment-1468075389
-.. [#why_importlib] We can't just use a single :code:`resources.py` file because BreezeStyleSheets generates
-icons based on theme color.
+.. [#why_importlib] We can't just use a single :code:`resources.py` file because BreezeStyleSheets generates icons based on theme color.
