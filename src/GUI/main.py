@@ -410,7 +410,7 @@ class MainWindow(QMainWindow):
 
         iterations: str = self.smoothing_iterations_input.displayText()
         try:
-            global_vars.CONDUCTANCE_PARAMETER = int(iterations)
+            global_vars.SMOOTHING_ITERATIONS = int(iterations)
         except ValueError:
             if user_settings.DEBUG:
                 print("Iterations must be an integer!")
