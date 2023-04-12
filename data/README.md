@@ -1,6 +1,6 @@
 # README
 
-If this directory name changes, it needs to change in user_settings.py and constants.py.
+If this directory name changes, it needs to change in user_settings.py and constants.py and in .github/workflows/tests.yml.
 
 Note: All .nrrd, .nii.gz, .nii, and .tsv files in this directory are ignored.
 

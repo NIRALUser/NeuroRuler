@@ -215,6 +215,17 @@ class MainWindow(QMainWindow):
             # Render uncontoured slice after pressing adjust
             self.render_curr_slice()
         else:
+            self.apply_button.setText("Adjust")
+
+            # When clicking Apply, the circumference should be calculated only for the axial slice.
+            # Edge case: If the user does a huge rotation, then switching to axial view may not display an
+            # axial slice. For example, after clicking coronal and setting X rotation to 90,
+            # clicking axial will not show an axial slice.
+            # We could just not change the view and re-orient when clicking Apply if this is a valid use case (probably isn't).
+            # TODO: Check with Styner
+            self.set_view_z()
+            self.orient_curr_image()
+
             self.update_smoothing_settings()
             self.update_binary_filter_settings()
             self.apply_button.setText("Adjust")
