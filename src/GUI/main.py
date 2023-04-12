@@ -730,7 +730,7 @@ class MainWindow(QMainWindow):
     def export_curr_slice_as_img(self, extension: str):
         """Called when an Export as image menu item is clicked.
 
-        Exports `self.image` to `settings.IMG_DIR`. Thus, calling this when `SETTINGS_VIEW_ENABLED` will
+        Exports `self.image` to `settings.OUTPUT_DIR/img/`. Thus, calling this when `SETTINGS_VIEW_ENABLED` will
         save a non-contoured image. Calling this when `not SETTINGS_VIEW_ENABLED` will save a contoured
         image.
 
@@ -750,7 +750,7 @@ class MainWindow(QMainWindow):
             else get_curr_path().name
         )
         path: str = str(
-            user_settings.IMG_DIR
+            constants.IMG_DIR
             / f"{file_name}_{'contoured_' if not SETTINGS_VIEW_ENABLED else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
         )
         self.image.pixmap().save(path, extension)
@@ -868,9 +868,6 @@ def main() -> None:
     # This imports globally
     # For example, src/GUI/helpers.py can access resource files without having to import there
     importlib.import_module(f"src.GUI.themes.{user_settings.THEME_NAME}.resources")
-
-    if not user_settings.IMG_DIR.exists():
-        user_settings.IMG_DIR.mkdir()
 
     app = QApplication(sys.argv)
 
