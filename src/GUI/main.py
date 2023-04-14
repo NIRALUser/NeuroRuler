@@ -23,7 +23,7 @@ import SimpleITK as sitk
 import numpy as np
 
 from PyQt6 import QtGui, QtCore
-from PyQt6.QtGui import QPixmap, QAction, QImage, QIcon
+from PyQt6.QtGui import QPixmap, QAction, QImage, QIcon, QResizeEvent
 from PyQt6.QtWidgets import (
     QApplication,
     QDialog,
@@ -177,6 +177,8 @@ class MainWindow(QMainWindow):
 
         Enables GUI elements. Explicitly disables some (e.g., Export CSV menu item and
         binary threshold inputs, since Otsu is default).
+
+        :return: None
         """
         # findChildren searches recursively by default
         for widget in self.findChildren(QWidget):
@@ -194,6 +196,8 @@ class MainWindow(QMainWindow):
         """Called when Binary filter button is clicked.
 
         Restore binary input box.
+
+        :return: None
         """
         self.upper_threshold_input.setEnabled(True)
         self.lower_threshold_input.setEnabled(True)
@@ -204,6 +208,8 @@ class MainWindow(QMainWindow):
         Toggle SETTINGS_VIEW_ENABLED, change apply button text, render stuff depending on the current mode.
 
         Enables/disables GUI elements depending on the value of SETTINGS_VIEW_ENABLED.
+
+        :return: None
         """
         # Unsure sure why this is necessary here but nowhere else...
         global SETTINGS_VIEW_ENABLED
@@ -280,6 +286,8 @@ class MainWindow(QMainWindow):
         """Called when Otsu filter button is clicked.
 
         Disable binary threshold input boxes.
+
+        :return: None
         """
         self.upper_threshold_input.setEnabled(False)
         self.lower_threshold_input.setEnabled(False)
@@ -288,6 +296,8 @@ class MainWindow(QMainWindow):
         """Called when the list is now empty, i.e. just removed from list of length 1.
 
         Explicitly enables elements that should never be disabled and sets default text.
+
+        :return: None
         """
         central_widget = self.findChildren(QWidget, "centralwidget")[0]
         menubar = self.menuBar()
@@ -325,8 +335,7 @@ class MainWindow(QMainWindow):
 
         :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
         :type extend: bool
-        :return: None
-        :rtype: None"""
+        :return: None"""
         file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
             "'", ""
         ).replace(",", "")
@@ -381,6 +390,8 @@ class MainWindow(QMainWindow):
         """Called when clicking on any of the three view radio buttons.
 
         Sets global_vars.VIEW to the correct value. Then orients the current image and renders.
+
+        :return: None
         """
         # The three buttons are in a button group in the  file
         # And all have autoExclusive=True
@@ -395,7 +406,10 @@ class MainWindow(QMainWindow):
         self.render_curr_slice()
 
     def set_view_z(self) -> None:
-        """Set global_vars.VIEW to View.Z and set the z radio button to checked."""
+        """Set global_vars.VIEW to View.Z and set the z radio button to checked.
+
+        :return: None
+        """
         global_vars.VIEW = constants.View.Z
         # TODO: Uncheck x and y are technically unnecessary since these 3 buttons in the view_button_group have
         # autoExclusive=True
@@ -404,7 +418,10 @@ class MainWindow(QMainWindow):
         self.z_view_radio_button.setChecked(True)
 
     def update_smoothing_settings(self) -> None:
-        """Updates global smoothing settings."""
+        """Updates global smoothing settings.
+
+        :return: None
+        """
         conductance: str = self.conductance_parameter_input.displayText()
         try:
             global_vars.CONDUCTANCE_PARAMETER = float(conductance)
@@ -444,7 +461,10 @@ class MainWindow(QMainWindow):
         global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
 
     def update_binary_filter_settings(self) -> None:
-        """Updates global binary filter settings."""
+        """Updates global binary filter settings.
+
+        :return: None
+        """
         lower_threshold: str = self.lower_threshold_input.displayText()
         try:
             global_vars.LOWER_THRESHOLD = float(lower_threshold)
@@ -474,8 +494,7 @@ class MainWindow(QMainWindow):
 
         :param q_img:
         :type q_img: QImage
-        :return None:
-        :rtype None:"""
+        :return: None"""
         global UNSCALED_QPIXMAP
         UNSCALED_QPIXMAP = QPixmap(q_img)
         self.image.setPixmap(
@@ -486,10 +505,14 @@ class MainWindow(QMainWindow):
             )
         )
 
-    def resizeEvent(self, event) -> None:
+    def resizeEvent(self, event: QResizeEvent) -> None:
         """This method is called every time the window is resized. Overrides PyQt6's resizeEvent.
 
-        Sets pixmap to UNSCALED_QPIXMAP scaled to self.image's size."""
+        Sets pixmap to UNSCALED_QPIXMAP scaled to self.image's size.
+
+        :param event:
+        :type event: QResizeEvent
+        :return: None"""
         if global_vars.IMAGE_DICT:
             self.image.setPixmap(
                 UNSCALED_QPIXMAP.scaled(
@@ -555,7 +578,9 @@ class MainWindow(QMainWindow):
             return rv_dummy_var
 
     def render_smooth_slice(self) -> None:
-        """Renders smooth slice in GUI. Allows user to preview result of smoothing settings."""
+        """Renders smooth slice in GUI. Allows user to preview result of smoothing settings.
+
+        :return: None"""
         self.update_smoothing_settings()
         # Preview should apply filter only on axial slice
         self.set_view_z()
@@ -564,7 +589,9 @@ class MainWindow(QMainWindow):
         self.render_scaled_qpixmap_from_qimage(q_img)
 
     def render_threshold(self) -> None:
-        """Render filtered image slice on UI."""
+        """Render filtered image slice on UI.
+
+        :return: None"""
         # Preview should apply filter only on axial slice
         self.set_view_z()
         if self.otsu_radio_button.isChecked():
@@ -586,8 +613,7 @@ class MainWindow(QMainWindow):
 
         :param binary_contour_slice: Result of previously calling render_curr_slice when `not SETTINGS_VIEW_ENABLED`
         :type binary_contour_slice: np.ndarray
-        :return: None
-        :rtype: None"""
+        :return: None"""
         if SETTINGS_VIEW_ENABLED:
             raise Exception("Rendering circumference label when SETTINGS_VIEW_ENABLED")
         units: Union[str, None] = get_curr_physical_units()
@@ -619,7 +645,9 @@ class MainWindow(QMainWindow):
 
         Not called when the user updates a slider.
 
-        Also updates rotation and slice num labels."""
+        Also updates rotation and slice num labels.
+
+        :return: None"""
         self.x_slider.setValue(global_vars.THETA_X)
         self.y_slider.setValue(global_vars.THETA_Y)
         self.z_slider.setValue(global_vars.THETA_Z)
@@ -630,47 +658,57 @@ class MainWindow(QMainWindow):
         self.z_rotation_label.setText(f"Z rotation: {global_vars.THETA_Z}°")
         self.slice_num_label.setText(f"Slice: {global_vars.SLICE}")
 
-    def rotate_x(self):
+    def rotate_x(self) -> None:
         """Called when the user updates the x slider.
 
-        Render image and set `x_rotation_label`."""
+        Render image and set `x_rotation_label`.
+
+        :return: None"""
         x_slider_val: int = self.x_slider.value()
         global_vars.THETA_X = x_slider_val
         self.render_curr_slice()
         self.x_rotation_label.setText(f"X rotation: {x_slider_val}°")
 
-    def rotate_y(self):
+    def rotate_y(self) -> None:
         """Called when the user updates the y slider.
 
-        Render image and set `y_rotation_label`."""
+        Render image and set `y_rotation_label`.
+
+        :return: None"""
         y_slider_val: int = self.y_slider.value()
         global_vars.THETA_Y = y_slider_val
         self.render_curr_slice()
         self.y_rotation_label.setText(f"Y rotation: {y_slider_val}°")
 
-    def rotate_z(self):
+    def rotate_z(self) -> None:
         """Called when the user updates the z slider.
 
-        Render image and set `z_rotation_label`."""
+        Render image and set `z_rotation_label`.
+
+        :return: None"""
         z_slider_val: int = self.z_slider.value()
         global_vars.THETA_Z = z_slider_val
         self.render_curr_slice()
         self.z_rotation_label.setText(f"Z rotation: {z_slider_val}°")
 
-    def slice_update(self):
+    def slice_update(self) -> None:
         """Called when the user updates the slice slider.
 
-        Render image and set `slice_num_label`."""
+        Render image and set `slice_num_label`.
+
+        :return: None"""
         slice_slider_val: int = self.slice_slider.value()
         global_vars.SLICE = slice_slider_val
         self.render_curr_slice()
         self.slice_num_label.setText(f"Slice: {slice_slider_val}")
 
-    def reset_settings(self):
+    def reset_settings(self) -> None:
         """Called when Reset is clicked.
 
         Resets rotation values to 0 and slice num to the default `int((z-1)/2)`
-        for the current image, then renders current image and sliders."""
+        for the current image, then renders current image and sliders.
+
+        :return: None"""
         global_vars.THETA_X = 0
         global_vars.THETA_Y = 0
         global_vars.THETA_Z = 0
@@ -678,10 +716,12 @@ class MainWindow(QMainWindow):
         self.render_curr_slice()
         self.render_all_sliders()
 
-    def next_img(self):
+    def next_img(self) -> None:
         """Called when Next button is clicked.
 
-        Advance index and render."""
+        Advance index and render.
+
+        :return: None"""
         img_helpers.next_img()
         # TODO: This feels inefficient...
         self.orient_curr_image()
@@ -692,10 +732,12 @@ class MainWindow(QMainWindow):
             # Ignore the type annotation warning. binary_contour_or_none must be binary_contour since not SETTINGS_VIEW_ENABLED
             self.render_circumference(binary_contour_or_none)
 
-    def previous_img(self):
+    def previous_img(self) -> None:
         """Called when Previous button is clicked.
 
-        Decrement index and render."""
+        Decrement index and render.
+
+        :return: None"""
         img_helpers.previous_img()
         # TODO: This feels inefficient...
         self.orient_curr_image()
@@ -714,7 +756,7 @@ class MainWindow(QMainWindow):
         Removes current image from `IMAGE_DICT`. Since `IMAGE_DICT` is a reference to an image dict
         in `IMAGE_GROUPS`, it's removed from `IMAGE_GROUPS` as well.
 
-        :returns: None"""
+        :return: None"""
         img_helpers.del_curr_img()
 
         if len(global_vars.IMAGE_DICT) == 0:
@@ -731,14 +773,16 @@ class MainWindow(QMainWindow):
     def test_stuff(self) -> None:
         """Connected to Debug > Test stuff. Dummy button and function for easily testing stuff.
 
-        Assume that anything you put here will be overwritten freely."""
+        Assume that anything you put here will be overwritten freely.
+
+        :return: None"""
         self.image.setPixmap(QPixmap(f":/{user_settings.THEME_NAME}/help.svg"))
         self.image.setStatusTip(
             "This is intentional, if it's a question mark then that's good :), means we can display icons"
         )
 
     # TODO: File name should also include circumference when not SETTINGS_VIEW_ENABLED?
-    def export_curr_slice_as_img(self, extension: str):
+    def export_curr_slice_as_img(self, extension: str) -> None:
         """Called when an Export as image menu item is clicked.
 
         Exports `self.image` to `settings.OUTPUT_DIR/img/`. Thus, calling this when `SETTINGS_VIEW_ENABLED` will
@@ -769,7 +813,9 @@ class MainWindow(QMainWindow):
     def orient_curr_image(self) -> None:
         """Orient the current image for the current view (global_vars.VIEW) by applying ORIENT_FILTER on it.
 
-        This mutates the image."""
+        This mutates the image.
+
+        :return: None"""
         img_helpers.orient_curr_image(global_vars.VIEW)
 
 
@@ -778,8 +824,7 @@ def error_message_box(message: str) -> None:
 
     :param message: the error message to be displayed
     :type message: str
-    :return: None
-    :rtype: None"""
+    :return: None"""
     ErrorMessageBox(message).exec()
 
 
@@ -790,8 +835,7 @@ def information_dialog(title: str, message: str) -> None:
     :type title: str
     :param message:
     :type message: str
-    :return: None
-    :rtype: None"""
+    :return: None"""
     InformationDialog(title, message).exec()
 
 
@@ -800,7 +844,9 @@ def display_metadata() -> None:
     """Display metadata in window or terminal. Internally, uses sitk.GetMetaData, which doesn't return
     all metadata (e.g., doesn't return spacing values whereas sitk.GetSpacing does).
 
-    Typically, this returns less metadata for NRRD than for NIfTI."""
+    Typically, this returns less metadata for NRRD than for NIfTI.
+
+    :return: None"""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print metadata when there's no image!")
         return
@@ -812,7 +858,9 @@ def display_metadata() -> None:
 
 
 def display_dimensions() -> None:
-    """Display current image's dimensions in window or terminal."""
+    """Display current image's dimensions in window or terminal.
+
+    :return: None"""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print dimensions when there's no image!")
         return
@@ -829,7 +877,9 @@ def display_properties() -> None:
 
     Internally, the properties tuple is a tuple of values only and doesn't contain
     field names. This function creates a dictionary with field names for printing. But the dictionary
-    doesn't exist in the program."""
+    doesn't exist in the program.
+
+    :return: None"""
     if not len(global_vars.IMAGE_DICT):
         print("No loaded image!")
         return
@@ -849,7 +899,9 @@ def display_properties() -> None:
 
 
 def display_direction() -> None:
-    """Display current image's direction in window or terminal."""
+    """Display current image's direction in window or terminal.
+
+    :return: None"""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print direction when there's no image!")
         return
@@ -861,7 +913,9 @@ def display_direction() -> None:
 
 
 def display_spacing() -> None:
-    """Display current image's spacing in window or terminal."""
+    """Display current image's spacing in window or terminal.
+
+    :return: None"""
     if not len(global_vars.IMAGE_DICT):
         print("Can't print spacing when there's no image!")
         return

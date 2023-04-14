@@ -43,13 +43,13 @@ THEME_DIR: Path = Path("src") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
 THEMES: list[str] = []
 """List of themes, i.e. the names of the directories in THEME_DIR."""
-if len(list(THEME_DIR.glob("*"))) != 0:
+if THEME_DIR.exists():
     for path in THEME_DIR.iterdir():
         if path.is_dir():
             THEMES.append(path.name)
     THEMES = sorted(THEMES)
+# Without this, autodocumentation crashes
 else:
-    # Without this, autodocumentation crashes
     pass
 
 
