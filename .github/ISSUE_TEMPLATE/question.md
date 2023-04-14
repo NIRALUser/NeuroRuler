@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Have a question about HeadCircumferenceTool?
+about: Have a question about NeuroRuler?
 title: "[QUESTION]"
 labels: question
 assignees:
