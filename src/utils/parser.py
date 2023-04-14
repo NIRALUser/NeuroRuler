@@ -167,9 +167,6 @@ def parse_gui_cli() -> None:
     )
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
     parser.add_argument(
-        "-s", "--smooth", help="smooth image before rendering", action="store_true"
-    )
-    parser.add_argument(
         "-e",
         "--export-index",
         help="exported file names use the index displayed in the GUI instead of the \
