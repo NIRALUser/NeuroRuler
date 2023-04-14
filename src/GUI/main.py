@@ -14,6 +14,7 @@ then you will need to modify those."""
 
 import importlib
 import sys
+import os
 import webbrowser
 from pathlib import Path
 from typing import Union
@@ -170,7 +171,6 @@ class MainWindow(QMainWindow):
         self.x_view_radio_button.clicked.connect(self.update_view)
         self.y_view_radio_button.clicked.connect(self.update_view)
         self.z_view_radio_button.clicked.connect(self.update_view)
-        self.show()
 
     def enable_elements(self) -> None:
         """Called after File > Open.
@@ -895,12 +895,12 @@ def main() -> None:
     # are not in the GUI.
     # app.setStyle("Fusion")
 
-    with open(
-        constants.THEME_DIR / user_settings.THEME_NAME / f"stylesheet.qss", "r"
-    ) as f:
-        app.setStyleSheet(f.read())
+    MAIN_WINDOW: MainWindow = MainWindow()
 
-    MAIN_WINDOW = MainWindow()
+    with open(
+        constants.THEME_DIR / user_settings.THEME_NAME / "stylesheet.qss", "r"
+    ) as f:
+        MAIN_WINDOW.setStyleSheet(f.read())
 
     # Non-zero min width and height is needed to prevent
     # this bug https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/42
@@ -915,8 +915,14 @@ def main() -> None:
         ),
     )
 
+    MAIN_WINDOW.show()
+
     try:
-        sys.exit(app.exec())
+        # sys.exit will cause a bug when running from terminal
+        # After importing the GUI runner function from __init__, clicking the close window button
+        # (not the menu button) will not close the window
+        # because the Python process wouldn't end
+        os._exit(app.exec())
     except:
         if user_settings.DEBUG:
             print("Exiting")
