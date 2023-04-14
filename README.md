@@ -1,4 +1,4 @@
-# Head Circumference Tool
+# NeuroRuler
 
 ![Tests](https://github.com/COMP523TeamD/HeadCircumferenceTool/actions/workflows/tests.yml/badge.svg)
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
@@ -16,7 +16,7 @@ If you want 😉 format is bibtex.
 
 ```bibtex
 @misc{hct,
-  title={Head Circumference Tool},
+  title={NeuroRuler},
   author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
   howpublished={\url{https://github.com/COMP523TeamD/HeadCircumferenceTool}},
   year={2023}
