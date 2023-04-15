@@ -1,13 +1,13 @@
 [project]
-name = "HeadCircumferenceTool"
-version = "0.0"
+name = "NeuroRuler"
+version = "0.5"
 authors = [
     { name="Peifeng He", email="hankhe@ad.unc.edu" },
     { name="Madison Lester", email="madiali@email.unc.edu" },
     { name="Eric Schneider", email="eric@cs.unc.edu" },
     { name="Jesse Wei", email="jesse@cs.unc.edu" },
 ]
-description = "TODO"
+description = "A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`)."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

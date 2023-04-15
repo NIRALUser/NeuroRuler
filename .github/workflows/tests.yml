@@ -13,7 +13,7 @@ jobs:
         run: |
           sudo apt-get install curl
           sudo apt-get install unzip
-      - name: Download Head Circumference Tool data into data/
+      - name: Download NeuroRuler data into data/
         # Source: https://stackoverflow.com/questions/21322614/use-curl-to-download-a-dropbox-folder-via-shared-link-not-public-link
         # Also https://stackoverflow.com/questions/21322416/unzip-warning-and-mapname
         run: |

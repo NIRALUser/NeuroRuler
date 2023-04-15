@@ -1,4 +1,4 @@
-# Head Circumference Tool
+# NeuroRuler
 
 ![Tests](https://github.com/COMP523TeamD/HeadCircumferenceTool/actions/workflows/tests.yml/badge.svg)
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
@@ -7,7 +7,7 @@
 > A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).
 
 <p align="center">
-  <img src="docs/_static/hct_demo.gif" alt="Head Circumference Tool GUI demo"/>
+  <img src="https://i.imgur.com/nqwqHq8.gif" alt="GUI demo"/>
 </p>
 
 ## Cite this tool
@@ -15,35 +15,37 @@
 If you want 😉 format is bibtex.
 
 ```bibtex
-@misc{hct,
-  title={Head Circumference Tool},
+@misc{neuroruler,
+  title={NeuroRuler},
   author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
   howpublished={\url{https://github.com/COMP523TeamD/HeadCircumferenceTool}},
   year={2023}
 }
 ```
 
-## Setup
+## Install
 
-Your Python version needs to be 3.8+. Check with `python --version`. If that doesn't work, you need to [install Python](https://www.python.org), and make sure to add it to `PATH`.
+Your Python version needs to be 3.8+. Check with `python --version`. Clone this repo, and install the Python dependencies.
 
-You will also need [git](https://git-scm.com), and make sure to add git to `PATH` too.
-
-Then run these commands in your terminal.
-
-```text
-git clone https://github.com/COMP523TeamD/HeadCircumferenceTool.git
-cd HeadCircumferenceTool
+```sh
 pip install -r requirements.txt
+pip install -i https://test.pypi.org/simple/ NeuroRuler==0.4
 ```
+
+If `pip` doesn't work, try `pip3` or `python3 -m pip`.
+
+If contributing to this repo, please also run `pre-commit install` to run pre-commit actions (i.e., autoformat) on your code before commits.
 
 ## Start GUI
 
-Your current working directory needs to be `.../HeadCircumferenceTool`.
+Run these commands in a Python terminal:
 
-macOS/Linux users can start the GUI by running `./gui.py`. You may need to run `chmod +x gui.py`.
+```py
+from GUI import gui
+gui()
+```
 
-Windows users can double-click on `gui.pyw` to start the application. If that doesn't work, run `python gui.py` in Windows Terminal.
+Note: If you make changes to the repo, then use the [`gui.py`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPi.
 
 ## Configure settings
 
@@ -52,21 +54,17 @@ Edit [`config.json`](config.json).
 You can also supply CLI arguments, which override settings in `config.json`.
 
 ```text
-usage: ./gui.py [-h] [-d] [-s] [-e] [-t THEME] [-c COLOR]
+usage: gui.py [-h] [-d] [-e] [-t THEME] [-c COLOR]
 
 options:
   -h, --help            show this help message and exit
   -d, --debug           print debug info
-  -s, --smooth          smooth image before rendering
-  -e, --export-index    exported file names use the index displayed in the GUI
-                        instead of the original file name
+  -e, --export-index    exported file names use the index displayed in the GUI instead of the original file name
   -t THEME, --theme THEME
-                        configure theme, options are dark, dark-green, dark-
-                        hct, dark-purple, light, light-green, light-hct, or
+                        configure theme, options are dark, dark-green, dark-hct, dark-purple, light, light-green, light-hct, or
                         light-purple
   -c COLOR, --color COLOR
-                        contour color as name (e.g. red) or hex color code
-                        rrggbb
+                        contour color as name (e.g. red) or hex color code rrggbb
 ```
 
 ## Run tests
@@ -77,11 +75,10 @@ options:
 
 [https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
 
-## Autoformat code
+See [`.readthedocs.yaml`](.readthedocs.yaml) and [`docs/`](docs/).
 
-`black .`
+## Pre-commit actions
 
-This will be run automatically before each commit due to our [pre-commit git hook](.pre-commit-config.yaml).
+Run `pre-commit install` to enable pre-commit actions.
 
-Don't name any source code files `stylesheet.qss|resources.py|gui.py|gui.pyw`.
-These files are excluded from auto-formatting.
+Before each commit, the actions in [`.pre-commit-config.yaml`](.pre-commit-config.yaml) will be run. Specifically, code will be reformatted with `black`. Note that some file names are excluded, so don't name any source code files those names.
