@@ -45,6 +45,22 @@
        </widget>
       </item>
       <item>
+       <spacer name="verticalSpacer_10">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::MinimumExpanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>10</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -588,6 +604,22 @@
              </layout>
             </item>
             <item>
+             <spacer name="verticalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::MinimumExpanding</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QPushButton" name="smoothing_preview_button">
               <property name="enabled">
                <bool>false</bool>
@@ -815,6 +847,22 @@
              </layout>
             </item>
             <item>
+             <spacer name="verticalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::MinimumExpanding</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <widget class="QPushButton" name="threshold_preview_button">
               <property name="enabled">
                <bool>false</bool>
@@ -829,6 +877,22 @@
          </layout>
         </item>
        </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_20">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::MinimumExpanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QPushButton" name="apply_button">
@@ -1077,8 +1141,15 @@
     <addaction name="action_print_direction"/>
     <addaction name="action_print_spacing"/>
    </widget>
+   <widget class="QMenu" name="menu_view">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="action_show_credits"/>
+   </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
+   <addaction name="menu_view"/>
    <addaction name="menu_debug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -1361,6 +1432,16 @@
   <action name="action_print_spacing">
    <property name="text">
     <string>Print spacing</string>
+   </property>
+  </action>
+  <action name="actionCredits">
+   <property name="text">
+    <string>Credits</string>
+   </property>
+  </action>
+  <action name="action_show_credits">
+   <property name="text">
+    <string>Show Credits</string>
    </property>
   </action>
  </widget>

@@ -1,21 +1,22 @@
 setuptools>=67.6.0
 #################
-# For auto-documentation. User does not need, remove later
+# For auto-documentation. User does not need
+# Later, could create a separate docs/requirements.txt with these two themes
+# And then link to it in .readthedocs.yaml
 sphinx
-python-docs-theme
+sphinx_rtd_theme
 #################
 SimpleITK==2.2.1
-numpy>=1.24.0
+numpy==1.24.2
 ipywidgets==7.7.0
 argparse==1.4.0
 opencv-python==4.7.0.72
 pytest==6.2.5
-PySide6==6.4.3
 PyQt6==6.4.2
 qimage2ndarray==1.10.0
 screeninfo==0.8.1
 ##############
-# Autoformatting. User does not need, remove later
+# Autoformatting. User does not need. Developers would need.
 black==23.1.0
 black[jupyter]==23.1.0
 ##############

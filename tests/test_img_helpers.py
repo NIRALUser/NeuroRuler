@@ -11,9 +11,7 @@ IMAGE_NAMES: list[str] = [
     "MicroBiome_1month_T1w.nii.gz",  # Group 3: 6
 ]
 
-IMAGE_PATHS: list[Path] = [
-    constants.EXAMPLE_DATA_DIR / path_str for path_str in IMAGE_NAMES
-]
+IMAGE_PATHS: list[Path] = [constants.DATA_DIR / path_str for path_str in IMAGE_NAMES]
 
 IMAGE_DICT: dict[Path, sitk.Image] = dict()
 

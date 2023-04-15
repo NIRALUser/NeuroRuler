@@ -32,10 +32,8 @@ import src.utils.user_settings as user_settings
 from src.utils.constants import deprecated
 
 MACOS: bool = "macOS" in platform.platform()
-FONT_SIZE: int = 12
-"""Idk if this is actually the font size across multiple platforms...
-
-It's used in InformationDialog to add width to the dialog to prevent the window title from being truncated."""
+WINDOW_TITLE_PADDING: int = 12
+"""Used in InformationDialog to add width to the dialog to prevent the window title from being truncated."""
 
 
 # tl;dr QColor can have alpha (e.g., if we wanted contour color to be transparent)
@@ -46,7 +44,7 @@ It's used in InformationDialog to add width to the dialog to prevent the window 
 def string_to_QColor(name_or_hex: str) -> QColor:
     """Convert a name (e.g. red) or 6-hexit rrggbb string to a `QColor`.
 
-    :param name_or_hex: name of color or rrggbb
+    :param name_or_hex: name of color (e.g. blue) or rrggbb (hexits)
     :type name_or_hex: str
     :return: QColor
     :rtype: QColor
@@ -79,8 +77,8 @@ def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor) -> None:
     :param color:
     :type color: QColor
     :raise: exceptions.ArraysDifferentShape if the arrays are of different shape
-    :return: None (if `mutate`) or cloned QImage (if not `mutate`)
-    :rtype: None or QImage"""
+    :return: None
+    :rtype: None"""
     if (
         q_img.size().width() != binary_mask.shape[0]
         or q_img.size().height() != binary_mask.shape[1]
@@ -101,7 +99,7 @@ def sitk_slice_to_qimage(sitk_slice: sitk.Image) -> QImage:
 
     :param sitk_slice: 2D slice
     :type sitk_slice: sitk.Image
-    :return: Normalized QImage
+    :return: 0..255 normalized QImage
     :rtype: QImage"""
     slice_np: np.ndarray = sitk.GetArrayFromImage(sitk_slice)
     return qimage2ndarray.array2qimage(slice_np, normalize=True)
@@ -140,7 +138,8 @@ class InformationDialog(QDialog):
         self.adjustSize()
         # Add width to prevent truncation of the window title
         self.setFixedSize(
-            self.size().width() + FONT_SIZE * len(title), self.size().height()
+            self.size().width() + WINDOW_TITLE_PADDING * len(title),
+            self.size().height(),
         )
 
 

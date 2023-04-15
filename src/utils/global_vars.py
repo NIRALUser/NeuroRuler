@@ -38,14 +38,7 @@ Y_CENTER: int = 0
 """Used for changing views."""
 
 EULER_3D_TRANSFORM: sitk.Euler3DTransform = sitk.Euler3DTransform()
-"""Global sitk.Euler3DTransform for 3D rotations.
-
-It is assumed that all currently loaded images have the same center of rotation. The center won't change
-for the currently loaded batch of images.
-
-Switching the batch will change the center. Make sure to set it. Or encapsulate an Euler3DTransform for each batch?
-
-Rotation values are the global rotation values in global_vars.py."""
+"""Global sitk.Euler3DTransform for 3D rotations."""
 THETA_X: int = 0
 """In degrees"""
 THETA_Y: int = 0
@@ -91,12 +84,3 @@ LOWER_THRESHOLD: float = 0.0
 """Threshold option for binary threshold."""
 UPPER_THRESHOLD: float = 200.0
 """Threshold option for binary threshold."""
-
-
-def main():
-    """For testing."""
-    pass
-
-
-if __name__ == "__main__":
-    main()
