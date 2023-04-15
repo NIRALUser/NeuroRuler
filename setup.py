@@ -7,11 +7,6 @@ except ImportError:
 
 from pathlib import Path
 
-# TODO: Modify path when refactoring
-for line in open(Path("src") / "GUI" / "__init__.py"):
-    if line.startswith("__version__"):
-        exec(line)
-
 install_requires: list[str] = [
     "setuptools",
     "SimpleITK",
@@ -29,7 +24,7 @@ Non-functional (e.g., formatting, documentation) dependencies listed in requirem
 
 setup(
     name="NeuroRuler",
-    version=__version__,
+    version="0.0.0",
     description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
     # Cannot use multiple authors
     # https://stackoverflow.com/questions/9999829/how-to-specify-multiple-authors-emails-in-setup-py

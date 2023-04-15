@@ -19,3 +19,4 @@ black[jupyter]
 pre-commit
 build
 twine
+bump
