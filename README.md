@@ -15,7 +15,7 @@
 If you want 😉 format is bibtex.
 
 ```bibtex
-@misc{hct,
+@misc{neuroruler,
   title={NeuroRuler},
   author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
   howpublished={\url{https://github.com/COMP523TeamD/HeadCircumferenceTool}},
@@ -27,7 +27,7 @@ If you want 😉 format is bibtex.
 
 Your Python version needs to be 3.8+. Check with `python --version`. Clone this repo, and install the Python dependencies.
 
-```text
+```sh
 pip install -r requirements.txt
 pip install -i https://test.pypi.org/simple/ NeuroRuler==0.4
 ```
@@ -40,7 +40,7 @@ We've purposely uploaded only to TestPyPi, not the real PyPi, for now.
 
 Run these commands in a Python terminal:
 
-```text
+```py
 from GUI import gui
 gui()
 ```
