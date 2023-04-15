@@ -116,7 +116,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         loadUi(str(PATH_TO_UI_FILE), self)
 
-        self.setWindowTitle("Head Circumference Tool")
+        self.setWindowTitle("NeuroRuler")
 
         self.action_open.triggered.connect(lambda: self.browse_files(False))
         self.action_add_images.triggered.connect(lambda: self.browse_files(True))
