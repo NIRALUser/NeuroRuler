@@ -32,9 +32,9 @@ pip install -r requirements.txt
 pip install -i https://test.pypi.org/simple/ NeuroRuler==0.4
 ```
 
-If `pip` doesn't work, use `python -m pip` or `python3 -m pip`.
+If `pip` doesn't work, try `pip3` or `python3 -m pip`.
 
-We've purposely uploaded only to TestPyPi, not the real PyPi, for now.
+If contributing to this repo, please also run `pre-commit install` to run pre-commit actions (i.e., autoformat) on your code before commits.
 
 ## Start GUI
 
@@ -54,7 +54,7 @@ Edit [`config.json`](config.json).
 You can also supply CLI arguments, which override settings in `config.json`.
 
 ```text
-usage: ./gui.py [-h] [-d] [-s] [-e] [-t THEME] [-c COLOR]
+usage: gui.py [-h] [-d] [-e] [-t THEME] [-c COLOR]
 
 options:
   -h, --help            show this help message and exit
@@ -79,8 +79,6 @@ See [`.readthedocs.yaml`](.readthedocs.yaml) and [`docs/`](docs/).
 
 ## Pre-commit actions
 
-This will be run automatically before each commit due to our [pre-commit git hook](.pre-commit-config.yaml).
+Run `pre-commit install` to enable pre-commit actions.
 
-Before each commit, the actions in `.pre-commit-config.yaml` will be run. Specifically, code will be reformatted with `black`. Note that some file names are excluded, so don't name any source code files those names.
-
-If modifying the configuration, you will need to run `pre-commit install`.
+Before each commit, the actions in [`.pre-commit-config.yaml`](.pre-commit-config.yaml) will be run. Specifically, code will be reformatted with `black`. Note that some file names are excluded, so don't name any source code files those names.

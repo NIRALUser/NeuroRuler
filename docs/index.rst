@@ -6,9 +6,9 @@
 .. role:: raw-html(raw)
     :format: html
 
-#######################
+##########
 NeuroRuler
-#######################
+##########
 
 .. topic:: Overview
 

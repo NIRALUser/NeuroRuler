@@ -9,19 +9,71 @@ import src.utils.user_settings as user_settings
 import src.utils.constants as constants
 import src.utils.exceptions as exceptions
 
-SETTINGS: dict = dict()
+JSON_SETTINGS: dict = dict()
 """Dict of settings resulting from JSON file parsing. Global within this file."""
+
+
+def parse_gui_cli() -> None:
+    """Parse GUI CLI args and set global settings in `user_settings.py`.
+
+    :return: None"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
+    parser.add_argument(
+        "-e",
+        "--export-index",
+        help="exported file names use the index displayed in the GUI instead of the \
+                        original file name",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-t",
+        "--theme",
+        help="configure theme, options are "
+        + list_of_options_to_str(constants.THEMES).replace('"', ""),
+    )
+    parser.add_argument(
+        "-c",
+        "--color",
+        help="contour color as name (e.g. red) or hex color code rrggbb",
+    )
+    args = parser.parse_args()
+
+    if args.debug:
+        user_settings.DEBUG = True
+        print("Debug CLI option supplied.")
+
+    if args.export_index:
+        user_settings.EXPORTED_FILE_NAMES_USE_INDEX = True
+        print("Exported files will use the index displayed in the GUI.")
+
+    if args.theme:
+        if args.theme not in constants.THEMES:
+            print(
+                f"Invalid theme specified. Options are {list_of_options_to_str(constants.THEMES)}"
+            )
+            exit(1)
+
+        user_settings.THEME_NAME = args.theme
+        user_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
+        print(f"Theme {args.theme} specified.")
+
+    if args.color:
+        user_settings.CONTOUR_COLOR = args.color
+        print(
+            f"Contour color is {'#' if not args.color.isalpha() else ''}{args.color}."
+        )
 
 
 def parse_config_json() -> None:
     """Parse config JSON and set user settings in user_settings.py.
 
     load_json will load constants.JSON_CONFIG_PATH."""
-    global SETTINGS
-    SETTINGS = load_json(constants.JSON_CONFIG_PATH)
-    if len(SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_JSON:
+    global JSON_SETTINGS
+    JSON_SETTINGS = load_json(constants.JSON_CONFIG_PATH)
+    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_JSON:
         raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_JSON} rows in JSON file but found {len(SETTINGS)}."
+            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_JSON} rows in JSON file but found {len(JSON_SETTINGS)}."
         )
 
     user_settings.DEBUG = parse_bool("DEBUG")
@@ -32,13 +84,13 @@ def parse_config_json() -> None:
         "EXPORTED_FILE_NAMES_USE_INDEX"
     )
 
-    user_settings.THEME_NAME = SETTINGS["THEME_NAME"]
+    user_settings.THEME_NAME = JSON_SETTINGS["THEME_NAME"]
     if user_settings.THEME_NAME not in constants.THEMES:
         raise exceptions.InvalidJSONField(
             "THEME_NAME", list_of_options_to_str(constants.THEMES)
         )
 
-    contour_color: str = SETTINGS["CONTOUR_COLOR"]
+    contour_color: str = JSON_SETTINGS["CONTOUR_COLOR"]
     if contour_color == "":
         user_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
     # A name, e.g. red, green, blue. etc., which can be converted to a QColor
@@ -96,6 +148,11 @@ def load_json(path: Path) -> dict:
     """Load config.json file, ignoring comments //.
 
     Source: https://github.com/Alexhuszagh/BreezeStyleSheets/blob/main/configure.py#L82
+
+    :param path: path to JSON configuration file
+    :type path: Path
+    :return: JSON represented as dict
+    :rtype: dict
     """
     with open(path) as f:
         lines = f.read().splitlines()
@@ -111,11 +168,11 @@ def parse_bool(field: str) -> bool:
     :raise: exceptions.InvalidJSONField if s is not "True" or "False"
     :return: True or False
     :rtype: bool"""
-    if SETTINGS[field] != "True" and SETTINGS[field] != "False":
+    if JSON_SETTINGS[field] != "True" and JSON_SETTINGS[field] != "False":
         raise exceptions.InvalidJSONField(
             field, 'bool ("True" or "False", with quotation marks)'
         )
-    return True if SETTINGS[field] == "True" else False
+    return True if JSON_SETTINGS[field] == "True" else False
 
 
 def parse_path(field: str) -> Path:
@@ -127,7 +184,7 @@ def parse_path(field: str) -> Path:
     :return:
     :rtype: Path"""
     try:
-        return Path(SETTINGS[field])
+        return Path(JSON_SETTINGS[field])
     except:
         raise exceptions.InvalidJSONField(field, "path")
 
@@ -141,7 +198,7 @@ def parse_int(field: str) -> int:
     :return:
     :rtype: int"""
     try:
-        return int(SETTINGS[field])
+        return int(JSON_SETTINGS[field])
     except:
         raise exceptions.InvalidJSONField(field, "int")
 
@@ -155,66 +212,19 @@ def parse_float(field: str) -> float:
     :return:
     :rtype: float"""
     try:
-        return float(SETTINGS[field])
+        return float(JSON_SETTINGS[field])
     except:
         raise exceptions.InvalidJSONField(field, "float")
 
 
-def parse_gui_cli() -> None:
-    """Parse GUI CLI args and set global settings in `user_settings.py`."""
-    parser = argparse.ArgumentParser(
-        usage="./gui.py [-h] [-d] [-s] [-e] [-t THEME] [-c COLOR]"
-    )
-    parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
-    parser.add_argument(
-        "-e",
-        "--export-index",
-        help="exported file names use the index displayed in the GUI instead of the \
-                        original file name",
-        action="store_true",
-    )
-    parser.add_argument(
-        "-t",
-        "--theme",
-        help="configure theme, options are "
-        + list_of_options_to_str(constants.THEMES).replace('"', ""),
-    )
-    parser.add_argument(
-        "-c",
-        "--color",
-        help="contour color as name (e.g. red) or hex color code rrggbb",
-    )
-    args = parser.parse_args()
-
-    if args.debug:
-        user_settings.DEBUG = True
-        print("Debug CLI option supplied.")
-
-    if args.export_index:
-        user_settings.EXPORTED_FILE_NAMES_USE_INDEX = True
-        print("Exported files will use the index displayed in the GUI.")
-
-    if args.theme:
-        if args.theme not in constants.THEMES:
-            print(
-                f"Invalid theme specified. Options are {list_of_options_to_str(constants.THEMES)}"
-            )
-            exit(1)
-
-        user_settings.THEME_NAME = args.theme
-        user_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
-        print(f"Theme {args.theme} specified.")
-
-    if args.color:
-        user_settings.CONTOUR_COLOR = args.color
-        print(
-            f"Contour color is {'#' if not args.color.isalpha() else ''}{args.color}."
-        )
-
-
 def list_of_options_to_str(strs: list[str]) -> str:
     r"""Convert list[str] of options of the form ['a', 'b', 'c', 'd'] to str representation
-    "a", "b", "c", or "d" """
+    "a", "b", "c", or "d"
+
+    :param strs:
+    :type strs: list[str]
+    :return: str representation "a", "b", "c", or "d"
+    :rtype: str"""
     # Need at least 1 comma in the list
     assert len(strs) > 2
     s = str(strs)[1:-1].replace("'", '"')

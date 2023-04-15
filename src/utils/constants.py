@@ -25,7 +25,7 @@ if not IMG_DIR.exists():
     IMG_DIR.mkdir()
 
 JSON_CONFIG_PATH: Path = Path("config.json")
-"""Settings that configure user_settings.py"""
+"""Settings that configure user_settings.py."""
 EXPECTED_NUM_FIELDS_IN_JSON: int = 8
 """Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
 will be raised."""

@@ -35,7 +35,8 @@ def gui() -> None:
 
     myappid = "mycompany.myproduct.subproduct.version"  # arbitrary string
     try:
-        # For Windows. App icon works without this on macOS.
+        # For Windows.
+        # App icon works without this on macOS.
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     except:
         pass
