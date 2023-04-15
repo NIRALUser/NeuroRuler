@@ -10,6 +10,8 @@ import src.GUI.main as main
 import src.utils.parser as parser
 
 # TODO: Modify when refactoring
+# Be very careful with this! If you modify this to an unused version number, tag the commit,
+# and push to the main branch, then a release will be created on PyPI (and TestPyPI)!
 __version__ = "0.0"
 
 

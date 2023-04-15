@@ -1,6 +1,9 @@
 # Source: https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-# Publishes to TestPyPI on every push (to main branch, I assume)
-# Publishes to PyPI when the commit is tagged
+# This job runs only when pushing to main
+# Attempts upload to TestPyPI and PyPI only when the commit is tagged
+# Additionally, version number must differ from the current version numbers for the upload to succeed
+# https://pypi.org/project/NeuroRuler/
+# https://test.pypi.org/project/NeuroRuler/
 
 name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
 
@@ -8,6 +11,7 @@ on:
   push:
     branches:
       - 'main'
+  if: startsWith(github.ref, 'refs/tags')
 
 jobs:
   build-and-publish:
@@ -37,6 +41,7 @@ jobs:
         .
 
     - name: Publish distribution 📦 to Test PyPI
+      if: startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
