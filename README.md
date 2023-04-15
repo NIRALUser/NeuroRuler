@@ -25,27 +25,33 @@ If you want 😉 format is bibtex.
 
 ## Install
 
-Your Python version needs to be 3.8+. Check with `python --version`. Clone this repo, and install the Python dependencies.
+Your Python version needs to be 3.8+. Check with `python --version`. Install via pip.
 
 ```sh
-pip install -r requirements.txt
-pip install -i https://test.pypi.org/simple/ NeuroRuler==0.4
+pip install NeuroRuler
 ```
 
 If `pip` doesn't work, try `pip3` or `python3 -m pip`.
 
-If contributing to this repo, please also run `pre-commit install` to run pre-commit actions (i.e., autoformat) on your code before commits.
+If contributing to this repo, please also run `pip install -r requirements.txt` to install additional development dependencies (e.g., formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
 
-## Start GUI
+## Run GUI
 
 Run these commands in a Python terminal:
 
 ```py
-from GUI import gui
+from src.GUI import gui
 gui()
 ```
 
-Note: If you make changes to the repo, then use the [`gui.py`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPi.
+TODO: Refactor name(s) (e.g., src -> NeuroRuler) later.
+
+Note: If you make changes to the repo, then use the [`gui.py`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPI.
+
+There should be an attempt to upload this project to PyPI and TestPyPI on every push to the `main` branch. See [`publish_to_pypi.yaml`](.github/workflows/publish_to_pypi.yml). However, the upload to PyPI requires the commit to be tagged. Additionally, the version number (currently in src/GUI/__init__.py) must be updated for a successful upload to either PyPI or TestPyPI.
+
+* [PyPI page](https://pypi.org/project/NeuroRuler/)
+* [TestPyPI page](https://test.pypi.org/project/NeuroRuler/)
 
 ## Configure settings
 

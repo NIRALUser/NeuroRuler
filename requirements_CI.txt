@@ -1,0 +1,17 @@
+# These dependencies are used in GitHub CI tox tests (see tox.ini and .github/workflows/tests.yml)
+
+# Source: https://stackoverflow.com/a/49684835
+# requirements.txt
+#
+# installs required functional dependencies for all users from ./setup.py, and the package itself,
+# in editable mode
+-e .
+
+# (the -e above is optional). you could also just install the package
+# normally with just the line below (after uncommenting)
+# .
+
+# Additional dependencies specifically for testing
+tox
+pytest
+pytest-cov

@@ -9,6 +9,9 @@ import os
 import src.GUI.main as main
 import src.utils.parser as parser
 
+# TODO: Modify when refactoring
+__version__ = "0.0"
+
 
 def gui() -> None:
     """Start GUI."""

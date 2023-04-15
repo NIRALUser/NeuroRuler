@@ -24,10 +24,10 @@ NeuroRuler
 
    The theme we're using for this site has ads 😔. Use adblock.
 
-Setup
-#####
+Install
+#######
 
-See our `GitHub README <https://github.com/COMP523TeamD/HeadCircumferenceTool#setup>`_.
+See our `GitHub README <https://github.com/COMP523TeamD/HeadCircumferenceTool#install>`_.
 
 Contents
 ########
