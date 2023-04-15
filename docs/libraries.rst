@@ -537,7 +537,7 @@ Copy over :code:`docs/conf.py` (install another theme with pip and modify :code:
 :code:`docs/requirements.txt`, :code:`.readthedocs.yaml`, :code:`pyproject.toml`, and :code:`setup.py` from the
 `HCT repo <https://github.com/COMP523TeamD/HeadCircumferenceTool>`_,
 overwriting if necessary. Modify the info inside for your purposes.
-The root :code:`requirements.txt` and :code:`requirements_dev.txt` might also need to include
+The root :code:`requirements.txt` and :code:`requirements_CI.txt` might also need to include
 setuptools, but I'm not certain.
 
 Make sure :code:`src/__init__.py` exists, along with :code:`.../__init__.py` files for any package that

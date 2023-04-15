@@ -1,23 +1,21 @@
-setuptools>=67.6.0
-#################
-# For auto-documentation. User does not need
-# Later, could create a separate docs/requirements.txt with these two themes
-# And then link to it in .readthedocs.yaml
+ # Source: https://stackoverflow.com/a/49684835
+ # requirements.txt
+ #
+ # installs required functional dependencies for all users from ./setup.py, and the package itself,
+ # in editable mode
+ -e .
+
+ # (the -e above is optional). you could also just install the package
+ # normally with just the line below (after uncommenting)
+ # .
+
+# Additional non-functional dependencies (e.g., formatting, documentation) for developers
+
 sphinx
 sphinx_rtd_theme
-#################
-SimpleITK==2.2.1
-numpy==1.24.2
-ipywidgets==7.7.0
-argparse==1.4.0
-opencv-python==4.7.0.72
-pytest==6.2.5
-PyQt6==6.4.2
-qimage2ndarray==1.10.0
-screeninfo==0.8.1
-##############
-# Autoformatting. User does not need. Developers would need.
-black==23.1.0
-black[jupyter]==23.1.0
-##############
-pre-commit==3.2.1
+ipywidgets
+black
+black[jupyter]
+pre-commit
+build
+twine
