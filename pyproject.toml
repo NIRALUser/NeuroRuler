@@ -1,20 +1,28 @@
 [project]
 name = "NeuroRuler"
-version = "0.5"
 authors = [
     { name="Peifeng He", email="hankhe@ad.unc.edu" },
     { name="Madison Lester", email="madiali@email.unc.edu" },
     { name="Eric Schneider", email="eric@cs.unc.edu" },
     { name="Jesse Wei", email="jesse@cs.unc.edu" },
 ]
-description = "A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`)."
+description = "A program that calculates head circumference from MRI data (.nii, .nii.gz, .nrrd)."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+
+# dependencies set in setup.py
+# version set in src/GUI/__init__.py
+# keywords set in setup.py
+dynamic = ["dependencies", "version", "keywords"]
 
 [project.urls]
 "Homepage" = "https://github.com/COMP523TeamD/HeadCircumferenceTool"
@@ -28,17 +36,3 @@ build-backend = "setuptools.build_meta"
 testpaths = [
     "tests",
 ]
-
-[tool.mypy]
-mypy_path = "src"
-check_untyped_defs = true
-disallow_any_generics = true
-ignore_missing_imports = true
-no_implicit_optional = true
-show_error_codes = true
-strict_equality = true
-warn_redundant_casts = true
-warn_return_any = true
-warn_unreachable = true
-warn_unused_configs = true
-no_implicit_reexport = true
