@@ -17,7 +17,11 @@ install_requires: list[str] = [
     "SimpleITK",
     "numpy",
     "argparse",
-    "opencv-python",
+    # Instead headless for GitHub CI tests to work
+    # opencv-python uses Qt dependencies, which conflicts with CI unit tests that import PyQt6
+    # See https://pytest-qt.readthedocs.io/en/latest/troubleshooting.html#using-with-other-qt-related-packages
+    # (even though we're using QTest/unittest, not pytest-qt)
+    "opencv-python-headless",
     "pytest",
     "PyQt6",
     "qimage2ndarray",
