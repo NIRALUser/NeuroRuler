@@ -1,22 +1,19 @@
 # Source: https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-# This job runs only when pushing to release-pypi/** or release-testpypi/**
-# Additionally, attempts upload to PyPI only when the commit is tagged
-# Version number (manually set in setup.py)
-# must differ from the current version number for the upload to succeed
-# https://pypi.org/project/NeuroRuler/
+# This job runs only when pushing to release-testpypi/**
+# Version number (manually set in setup.py) must differ from the current version number
+# for the upload to succeed
 # https://test.pypi.org/project/NeuroRuler/
 
-name: Publish to PyPI or Test PyPI
+name: Publish to Test PyPI
 
 on:
   push:
     branches:
-      - 'release-pypi/**'
       - 'release-testpypi/**'
 
 jobs:
   build-and-publish:
-    name: Build and publish to PyPI or Test PyPI
+    name: Build and publish to Test PyPI
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -42,21 +39,7 @@ jobs:
         .
 
     - name: Publish to Test PyPI
-      on:
-        push:
-          branches:
-            - 'release-testpypi/**'
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository-url: https://test.pypi.org/legacy/
-
-    - name: Publish to PyPI
-      on:
-        push:
-          branches:
-            - 'release-pypi/**'
-      if: startsWith(github.ref, 'refs/tags')
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
