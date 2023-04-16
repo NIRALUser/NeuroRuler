@@ -91,6 +91,8 @@ Before each commit, the actions in [`.pre-commit-config.yaml`](.pre-commit-confi
 
 ## Release
 
-To create a release on TestPyPI, simply push to `main` branch (preferably via pull request). The version number will be bumped automatically.
+To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). Then create a branch named `release-pypi/version-num`. Push a tagged (use the version number) commit to that branch to run the `pypi.yml` action, which will publish to PyPI.
 
-To create a release on PyPI, ask Jesse.
+The version number on PyPI will be the one in `setup.py`, so make sure it's correct!
+
+Follow a similar process to publish to TestPyPI.
