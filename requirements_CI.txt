@@ -15,4 +15,3 @@
 tox
 pytest
 pytest-cov
-unittest

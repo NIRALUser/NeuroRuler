@@ -44,7 +44,7 @@ setup(
     # We don't need extras_require
     # See https://stackoverflow.com/questions/41268863/what-is-the-difference-between-extras-require-and-install-requires-in-se
     # extras_require=dict(),
-    tests_require=install_requires + ["tox", "pytest", "pytest-cov", "unittest"],
+    tests_require=install_requires + ["tox", "pytest", "pytest-cov"],
     # TODO: Change after refactoring
     packages=["NeuroRuler.GUI"],
     classifiers=[
