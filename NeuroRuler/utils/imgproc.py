@@ -4,14 +4,14 @@ import SimpleITK as sitk
 import cv2
 import numpy as np
 
-import src.utils.exceptions as exceptions
-from src.utils.constants import (
+import NeuroRuler.utils.exceptions as exceptions
+from NeuroRuler.utils.constants import (
     NUM_CONTOURS_IN_INVALID_SLICE,
     ThresholdFilter,
     BinaryColor,
 )
-import src.utils.user_settings as settings
-from src.utils.global_vars import (
+import NeuroRuler.utils.user_settings as settings
+from NeuroRuler.utils.global_vars import (
     SMOOTHING_FILTER,
     OTSU_THRESHOLD_FILTER,
     BINARY_THRESHOLD_FILTER,

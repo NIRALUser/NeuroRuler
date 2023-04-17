@@ -37,9 +37,9 @@ TODO: Support .txt for loading image paths from text file (which we can quite ea
 DATA_DIR: Path = Path("data")
 """Directory for storing example data."""
 
-UI_FILE_PATH: Path = Path("src") / "GUI" / "mainwindow.ui"
+UI_FILE_PATH: Path = Path("NeuroRuler") / "GUI" / "mainwindow.ui"
 
-THEME_DIR: Path = Path("src") / "GUI" / "themes"
+THEME_DIR: Path = Path("NeuroRuler") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
 THEMES: list[str] = []
 """List of themes, i.e. the names of the directories in THEME_DIR."""

@@ -1,5 +1,5 @@
-from src.utils.img_helpers import *
-import src.utils.global_vars as global_vars
+from NeuroRuler.utils.img_helpers import *
+import NeuroRuler.utils.global_vars as global_vars
 
 IMAGE_NAMES: list[str] = [
     "BCP_Dataset_2month_T1w.nrrd",

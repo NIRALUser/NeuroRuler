@@ -20,7 +20,7 @@ venv/
 Playground/imgproc/contour_numpy.txt
 Playground/imgproc/contour_sitk.txt
 Playground/imgproc/numpy_array_255.png
-src/HeadCircumferenceTool.egg-info
+NeuroRuler/HeadCircumferenceTool.egg-info
 tests/noise_vals.txt
 tests/noise_vals_copy.txt
 out/
@@ -32,7 +32,7 @@ etc/
 include/
 share/
 pyvenv.cfg
-src/GUI/np_array_slice.txt
+NeuroRuler/GUI/np_array_slice.txt
 test.txt
 docs/_build
 

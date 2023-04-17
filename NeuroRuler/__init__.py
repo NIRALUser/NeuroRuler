@@ -1,13 +1,13 @@
 """After installing NeuroRuler via pip, the functions here are importable like so
 
-from {package_name} import gui
+from NeuroRuler import {function}
 
-Currently, the package name is GUI (TODO: Change this)"""
+where NeuroRuler is the name of the package this __init__.py file is in."""
 
 import sys
 import os
-import src.GUI.main as main
-import src.utils.parser as parser
+import NeuroRuler.GUI.main as main
+import NeuroRuler.utils.parser as parser
 
 
 def gui() -> None:

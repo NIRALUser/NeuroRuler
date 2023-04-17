@@ -7,7 +7,7 @@ The values in this file don't matter since they'll be overwritten by what's in c
 if any. But the values here should match the values in config.json for consistency."""
 
 from pathlib import Path
-import src.utils.constants as constants
+import NeuroRuler.utils.constants as constants
 
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
@@ -30,7 +30,7 @@ If False (default), then exported files will be named using the file name of the
 E.g. MicroBiome_1month_T1w_0_0_0_0.png, MicroBiome_1month_T1w_90_180_0_60.csv."""
 
 THEME_NAME: str = "dark-hct"
-"""Name of theme in src/GUI/themes.
+"""Name of theme in NeuroRuler/GUI/themes.
 
 The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
 

@@ -40,18 +40,14 @@ If contributing to this repo, please also run `pip install -r requirements.txt` 
 Run these commands in a Python terminal:
 
 ```py
-from src.GUI import gui
+from NeuroRuler import gui
+
 gui()
 ```
 
-TODO: Refactor name(s) (e.g., src -> NeuroRuler) later.
-
 Note: If you make changes to the repo, then use the [`gui.py`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPI.
 
-There should be an attempt to upload this project to PyPI and TestPyPI on every push to the `main` branch. See [`publish_to_test_pypi.yaml`](.github/workflows/publish_to_test_pypi.yml). However, the upload to PyPI must be done manually.
-
-* [PyPI page](https://pypi.org/project/NeuroRuler/)
-* [TestPyPI page](https://test.pypi.org/project/NeuroRuler/)
+See [release](#release) for how to upload to PyPI or Test PyPI.
 
 ## Configure settings
 
@@ -90,6 +86,9 @@ Run `pre-commit install` to enable pre-commit actions.
 Before each commit, the actions in [`.pre-commit-config.yaml`](.pre-commit-config.yaml) will be run. Specifically, code will be reformatted with `black`. Note that some file names are excluded, so don't name any source code files those names.
 
 ## Release
+
+* [PyPI page](https://pypi.org/project/NeuroRuler/)
+* [TestPyPI page](https://test.pypi.org/project/NeuroRuler/)
 
 To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). Then create a branch named `release-pypi/version-num`. Push a tagged (use the version number) commit to that branch to run the `pypi.yml` action, which will publish to PyPI.
 

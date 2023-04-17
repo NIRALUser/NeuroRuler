@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 import string
 
-import src.utils.user_settings as user_settings
-import src.utils.constants as constants
-import src.utils.exceptions as exceptions
+import NeuroRuler.utils.user_settings as user_settings
+import NeuroRuler.utils.constants as constants
+import NeuroRuler.utils.exceptions as exceptions
 
 JSON_SETTINGS: dict = dict()
 """Dict of settings resulting from JSON file parsing. Global within this file."""

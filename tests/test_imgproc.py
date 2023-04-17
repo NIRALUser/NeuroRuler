@@ -7,15 +7,15 @@ import numpy as np
 import cv2
 import pytest
 from pathlib import Path
-from src.utils.imgproc import contour, length_of_contour
-import src.utils.exceptions as exceptions
-from src.utils.constants import (
+from NeuroRuler.utils.imgproc import contour, length_of_contour
+import NeuroRuler.utils.exceptions as exceptions
+from NeuroRuler.utils.constants import (
     DATA_DIR,
     NUM_CONTOURS_IN_INVALID_SLICE,
     SUPPORTED_EXTENSIONS,
 )
-from src.utils.global_vars import READER
-from src.utils.img_helpers import get_rotated_slice_hardcoded
+from NeuroRuler.utils.global_vars import READER
+from NeuroRuler.utils.img_helpers import get_rotated_slice_hardcoded
 
 EPSILON: float = 0.001
 """Used for `float` comparisons."""
