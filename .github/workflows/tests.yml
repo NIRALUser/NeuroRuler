@@ -31,16 +31,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: |
-          sudo apt-get install libegl1-mesa
-          sudo apt-get install libegl1
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
+          wget https://gitlab.com/trivoxel-utils/deb-pacman/uploads/460d83f8711c1ab5e16065e57e7eeabc/deb-pacman-2.0-0.deb
+          sudo dpkg -i deb-pacman-2.0-0.deb
+          sudo pacman -S mingw-w64-x86_64-python-pyqt6
+          sudo pacman -S mingw-w64-x86_64-python-pyqt6-sip
           python -m pip install --upgrade pip
           python -m pip install -r requirements_CI.txt
           pip install tox tox-gh-actions
