@@ -13,7 +13,7 @@ import NeuroRuler.utils.parser as parser
 
 def cli() -> None:
     """Run CLI."""
-    parser.parse_config_json()
+    parser.parse_gui_config()
     parser.parse_cli()
     climain.main()
 
@@ -49,6 +49,6 @@ def gui() -> None:
     except:
         pass
 
-    parser.parse_config_json()
+    parser.parse_gui_config()
     parser.parse_gui_cli()
     guimain.main()
