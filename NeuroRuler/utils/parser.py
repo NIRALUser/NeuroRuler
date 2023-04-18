@@ -89,6 +89,9 @@ def parse_cli_config() -> None:
             f"Expected {constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
         )
     # WIP obviously -Eric
+    user_settings.DEBUG = parse_bool("DEBUG")
+    if user_settings.DEBUG:
+        print("Printing debug messages.")
 
 
 def parse_gui_config() -> None:
