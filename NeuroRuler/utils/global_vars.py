@@ -3,7 +3,7 @@ that the user should not be able to modify directly, unlike user_settings.py."""
 
 import SimpleITK as sitk
 from pathlib import Path
-from src.utils.constants import View
+from NeuroRuler.utils.constants import View
 
 IMAGE_DICT: dict[Path, sitk.Image] = dict()
 """The group of images that have been loaded.

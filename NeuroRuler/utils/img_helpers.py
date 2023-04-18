@@ -5,9 +5,9 @@ Mostly holds helper functions for working with IMAGE_DICT in global_vars.py."""
 from typing import Union
 import SimpleITK as sitk
 from pathlib import Path
-import src.utils.global_vars as global_vars
-from src.utils.constants import degrees_to_radians, View
-import src.utils.constants as constants
+import NeuroRuler.utils.global_vars as global_vars
+from NeuroRuler.utils.constants import degrees_to_radians, View
+import NeuroRuler.utils.constants as constants
 
 
 def update_images(path_list: list[Path]) -> list[Path]:
@@ -146,7 +146,7 @@ def get_properties_from_sitk_image(img: sitk.Image) -> tuple:
 
     TODO: Add more properties
 
-    If modifying this, src/GUI/main.py print_properties also has to be modified slightly.
+    If modifying this, NeuroRuler/GUI/main.py print_properties also has to be modified slightly.
 
     :param img:
     :type img: sitk.Image

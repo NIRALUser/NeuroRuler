@@ -27,9 +27,9 @@ from PyQt6.QtCore import Qt
 
 import qimage2ndarray
 
-import src.utils.exceptions as exceptions
-import src.utils.user_settings as user_settings
-from src.utils.constants import deprecated
+import NeuroRuler.utils.exceptions as exceptions
+import NeuroRuler.utils.user_settings as user_settings
+from NeuroRuler.utils.constants import deprecated
 
 MACOS: bool = "macOS" in platform.platform()
 WINDOW_TITLE_PADDING: int = 12

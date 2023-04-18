@@ -7,11 +7,6 @@ except ImportError:
 
 from pathlib import Path
 
-# TODO: Modify path when refactoring
-for line in open(Path("src") / "GUI" / "__init__.py"):
-    if line.startswith("__version__"):
-        exec(line)
-
 install_requires: list[str] = [
     "setuptools",
     "SimpleITK",
@@ -33,7 +28,7 @@ Non-functional (e.g., formatting, documentation) dependencies listed in requirem
 
 setup(
     name="NeuroRuler",
-    version=__version__,
+    version="0.0",
     description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
     # Cannot use multiple authors
     # https://stackoverflow.com/questions/9999829/how-to-specify-multiple-authors-emails-in-setup-py
@@ -53,9 +48,9 @@ setup(
     # We don't need extras_require
     # See https://stackoverflow.com/questions/41268863/what-is-the-difference-between-extras-require-and-install-requires-in-se
     # extras_require=dict(),
-    tests_require="pytest",
+    tests_require=install_requires + ["tox", "pytest", "pytest-cov"],
     # TODO: Change after refactoring
-    packages=["src.GUI"],
+    packages=["NeuroRuler.GUI"],
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

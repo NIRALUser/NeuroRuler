@@ -1,0 +1,45 @@
+# Source: https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+# This job runs only when pushing to release-testpypi/**
+# Version number (manually set in setup.py) must differ from the current version number
+# for the upload to succeed
+# https://test.pypi.org/project/NeuroRuler/
+
+name: Publish to Test PyPI
+
+on:
+  push:
+    branches:
+      - 'release-testpypi/**'
+
+jobs:
+  build-and-publish:
+    name: Build and publish to Test PyPI
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.x"
+
+    - name: Install pypa/build
+      run: >-
+        python -m
+        pip install
+        build
+        --user
+
+    - name: Build a binary wheel and a source tarball
+      run: >-
+        python -m
+        build
+        --sdist
+        --wheel
+        --outdir dist/
+        .
+
+    - name: Publish to Test PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        repository-url: https://test.pypi.org/legacy/

@@ -1,13 +1,18 @@
 """Custom exceptions"""
 
-from src.utils.constants import deprecated, ROTATION_MAX, ROTATION_MIN, JSON_CONFIG_PATH
+from NeuroRuler.utils.constants import (
+    deprecated,
+    ROTATION_MAX,
+    ROTATION_MIN,
+    JSON_CONFIG_PATH,
+)
 
 
 class ComputeCircumferenceOfInvalidSlice(Exception):
     """User attempted to compute circumference of an invalid slice.
 
     We detect this by noticing that the number of contours in the slice >= global_vars.NUM_CONTOURS_IN_INVALID_SLICE
-    AFTER processing (threshold, select largest component, etc.) in src.utils.imgproc.contour().
+    AFTER processing (threshold, select largest component, etc.) in NeuroRuler.utils.imgproc.contour().
 
     Most valid brain slices have only 2 or 3 detectable contours.
 

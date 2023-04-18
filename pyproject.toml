@@ -20,7 +20,7 @@ classifiers = [
 ]
 
 # dependencies set in setup.py
-# version set in src/GUI/__init__.py
+# version set in NeuroRuler/GUI/__init__.py
 # keywords set in setup.py
 dynamic = ["dependencies", "version", "keywords"]
 

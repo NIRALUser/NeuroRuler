@@ -1,6 +1,6 @@
 """Defines MainWindow and main(), the entrypoint of the GUI.
 
-Loads `src/GUI/mainwindow.ui`, made in QtDesigner.
+Loads `NeuroRuler/GUI/mainwindow.ui`, made in QtDesigner.
 
 Loads `.qss` stylesheets and `resources.py` (icons) files, generated
 by BreezeStyleSheets. Our fork of the repo: https://github.com/COMP523TeamD/BreezeStyleSheets.
@@ -39,16 +39,16 @@ from PyQt6.uic.load_ui import loadUi
 from PyQt6.QtCore import Qt, QSize
 
 import pprint
-from src.utils.constants import View, ThresholdFilter
-import src.utils.constants as constants
+from NeuroRuler.utils.constants import View, ThresholdFilter
+import NeuroRuler.utils.constants as constants
 
 # Note, do not use imports like
-# from src.utils.global_vars import IMAGE_DICT
+# from NeuroRuler.utils.global_vars import IMAGE_DICT
 # This would make the global variables not work
-import src.utils.global_vars as global_vars
-import src.utils.imgproc as imgproc
-import src.utils.user_settings as user_settings
-from src.GUI.helpers import (
+import NeuroRuler.utils.global_vars as global_vars
+import NeuroRuler.utils.imgproc as imgproc
+import NeuroRuler.utils.user_settings as user_settings
+from NeuroRuler.GUI.helpers import (
     string_to_QColor,
     mask_QImage,
     sitk_slice_to_qimage,
@@ -57,7 +57,7 @@ from src.GUI.helpers import (
     InformationDialog,
 )
 
-from src.utils.img_helpers import (
+from NeuroRuler.utils.img_helpers import (
     initialize_globals,
     update_images,
     get_curr_image,
@@ -73,11 +73,11 @@ from src.utils.img_helpers import (
     get_middle_dimension,
 )
 
-import src.utils.img_helpers as img_helpers
+import NeuroRuler.utils.img_helpers as img_helpers
 
 
-PATH_TO_UI_FILE: Path = Path("src") / "GUI" / "mainwindow.ui"
-PATH_TO_HCT_LOGO: Path = Path("src") / "GUI" / "static" / "hct_logo.png"
+PATH_TO_UI_FILE: Path = Path("NeuroRuler") / "GUI" / "mainwindow.ui"
+PATH_TO_HCT_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "hct_logo.png"
 
 SETTINGS_VIEW_ENABLED: bool = True
 """Whether the user is able to adjust settings (settings screen) or not
@@ -901,7 +901,7 @@ def display_properties() -> None:
     fields: tuple = ("center of rotation", "dimensions", "spacing")
     if len(fields) != len(curr_properties):
         print(
-            "Update src/GUI/main.print_properties() !\nNumber of fields and number of properties don't match."
+            "Update NeuroRuler/GUI/main.print_properties() !\nNumber of fields and number of properties don't match."
         )
         exit(1)
     # Pretty sure the dict(zip(...)) goes through fields in alphabetical order
@@ -945,8 +945,10 @@ def main() -> None:
     # This import can't go at the top of the file
     # because gui.py.parse_gui_cli() has to set THEME_NAME before the import occurs
     # This imports globally
-    # For example, src/GUI/helpers.py can access resource files without having to import there
-    importlib.import_module(f"src.GUI.themes.{user_settings.THEME_NAME}.resources")
+    # For example, NeuroRuler/GUI/helpers.py can access resource files without having to import there
+    importlib.import_module(
+        f"NeuroRuler.GUI.themes.{user_settings.THEME_NAME}.resources"
+    )
 
     app = QApplication(sys.argv)
 
@@ -997,7 +999,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    import src.utils.parser as parser
+    import NeuroRuler.utils.parser as parser
 
     parser.parse_config_json()
     parser.parse_gui_cli()
