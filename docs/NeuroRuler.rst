@@ -1,5 +1,5 @@
-src package
-===========
+NeuroRuler package
+==================
 
 Subpackages
 -----------
@@ -7,13 +7,13 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   src.GUI
-   src.utils
+   NeuroRuler.GUI
+   NeuroRuler.utils
 
 Module contents
 ---------------
 
-.. automodule:: src
+.. automodule:: NeuroRuler
    :members:
    :undoc-members:
    :show-inheritance:
