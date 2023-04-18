@@ -14,7 +14,7 @@ import NeuroRuler.utils.parser as parser
 def cli() -> None:
     """Run CLI."""
     parser.parse_config_json()
-    parser.parse_cli_cli()
+    parser.parse_cli()
     climain.main()
 
 
@@ -52,13 +52,3 @@ def gui() -> None:
     parser.parse_config_json()
     parser.parse_gui_cli()
     guimain.main()
-
-
-def CLI() -> None:
-    """Alias for cli()."""  # TODO: why do we need this?
-    cli()
-
-
-def GUI() -> None:
-    """Alias for gui()."""
-    gui()

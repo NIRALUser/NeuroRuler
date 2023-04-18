@@ -13,8 +13,8 @@ JSON_SETTINGS: dict = dict()
 """Dict of settings resulting from JSON file parsing. Global within this file."""
 
 
-def parse_cli_cli() -> None: # TODO: better name? lol -Eric
-    """Parse CLI CLI args and set global settings in `user_settings.py`.
+def parse_cli() -> None:
+    """Parse CLI (non-GUI) args and set global settings in `user_settings.py`.
 
     :return: None"""
     parser = argparse.ArgumentParser()
