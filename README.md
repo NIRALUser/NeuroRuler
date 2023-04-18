@@ -40,8 +40,7 @@ If contributing to this repo, please also run `pip install -r requirements.txt` 
 Run these commands in a Python terminal:
 
 ```py
-from NeuroRuler import gui
-
+from NeuroRuler.GUI import gui
 gui()
 ```
 
@@ -73,6 +72,8 @@ options:
 
 `pytest`
 
+Additionally, `tox` is used to run tests on multiple Python versions. See [`tests.yml`](.github/workflows/tests.yml) for the versions used.
+
 ## Documentation
 
 [https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
@@ -90,7 +91,7 @@ Before each commit, the actions in [`.pre-commit-config.yaml`](.pre-commit-confi
 * [PyPI page](https://pypi.org/project/NeuroRuler/)
 * [TestPyPI page](https://test.pypi.org/project/NeuroRuler/)
 
-To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). Then create a branch named `release-pypi/version-num`. Push a tagged (use the version number) commit to that branch to run the `pypi.yml` action, which will publish to PyPI.
+To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). Then create a branch named `release-pypi/version-num`. Push a tagged (use the version number) commit to that branch to run the [`pypi.yml`](.github/workflows/pypi.yml) action, which will publish to PyPI.
 
 The version number on PyPI will be the one in `setup.py`, so make sure it's correct!
 

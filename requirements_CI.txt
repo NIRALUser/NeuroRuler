@@ -15,5 +15,3 @@
 tox
 pytest
 pytest-cov
-PyQt6-sip
-PyQt6 PyQt6-tools

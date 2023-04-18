@@ -18,7 +18,7 @@ install_requires: list[str] = [
     # (even though we're using QTest/unittest, not pytest-qt)
     "opencv-python-headless",
     "pytest",
-    # "PyQt6",
+    "PyQt6",
     "qimage2ndarray",
     "screeninfo",
 ]

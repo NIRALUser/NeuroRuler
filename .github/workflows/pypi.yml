@@ -43,4 +43,6 @@ jobs:
       if: startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
+        # See https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository
+        # for how to add a secret
         password: ${{ secrets.PYPI_API_TOKEN }}
