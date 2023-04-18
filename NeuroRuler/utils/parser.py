@@ -65,6 +65,19 @@ def parse_gui_cli() -> None:
         )
 
 
+def parse_cli_cli() -> None: # TODO: better name? lol -Eric
+    """Parse CLI CLI args and set global settings in `user_settings.py`.
+
+    :return: None"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
+    args = parser.parse_args()
+
+    if args.debug:
+        user_settings.DEBUG = True
+        print("Debug CLI option supplied.")
+
+
 def parse_config_json() -> None:
     """Parse config JSON and set user settings in user_settings.py.
 

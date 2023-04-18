@@ -6,8 +6,16 @@ where NeuroRuler is the name of the package this __init__.py file is in."""
 
 import sys
 import os
-import NeuroRuler.GUI.main as main
+import NeuroRuler.CLI.main as climain
+import NeuroRuler.GUI.main as guimain
 import NeuroRuler.utils.parser as parser
+
+
+def cli() -> None:
+    """Run CLI."""
+    parser.parse_config_json()
+    parser.parse_cli_cli()
+    climain.main()
 
 
 def gui() -> None:
@@ -43,7 +51,12 @@ def gui() -> None:
 
     parser.parse_config_json()
     parser.parse_gui_cli()
-    main.main()
+    guimain.main()
+
+
+def CLI() -> None:
+    """Alias for cli()."""  # TODO: why do we need this?
+    cli()
 
 
 def GUI() -> None:
