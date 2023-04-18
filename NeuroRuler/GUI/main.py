@@ -987,6 +987,6 @@ def main() -> None:
 if __name__ == "__main__":
     import NeuroRuler.utils.parser as parser
 
-    parser.parse_config_json()
+    parser.parse_gui_config()
     parser.parse_gui_cli()
     main()

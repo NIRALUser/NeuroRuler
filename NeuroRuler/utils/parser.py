@@ -78,15 +78,28 @@ def parse_gui_cli() -> None:
         )
 
 
-def parse_config_json() -> None:
-    """Parse config JSON and set user settings in user_settings.py.
+def parse_cli_config() -> None:
+    """Parse CLI JSON config and set user settings in user_settings.py.
 
-    load_json will load constants.JSON_CONFIG_PATH."""
+    load_json will load constants.JSON_CLI_CONFIG_PATH."""
     global JSON_SETTINGS
-    JSON_SETTINGS = load_json(constants.JSON_CONFIG_PATH)
-    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_JSON:
+    JSON_SETTINGS = load_json(constants.JSON_CLI_CONFIG_PATH)
+    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG:
         raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_JSON} rows in JSON file but found {len(JSON_SETTINGS)}."
+            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
+        )
+    # WIP obviously -Eric
+
+
+def parse_gui_config() -> None:
+    """Parse GUI JSON config and set user settings in user_settings.py.
+
+    load_json will load constants.JSON_GUI_CONFIG_PATH."""
+    global JSON_SETTINGS
+    JSON_SETTINGS = load_json(constants.JSON_GUI_CONFIG_PATH)
+    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG:
+        raise Exception(
+            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
         )
 
     user_settings.DEBUG = parse_bool("DEBUG")

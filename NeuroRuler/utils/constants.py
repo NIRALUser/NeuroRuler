@@ -24,10 +24,16 @@ IMG_DIR: Path = OUTPUT_DIR / "img"
 if not IMG_DIR.exists():
     IMG_DIR.mkdir()
 
-JSON_CONFIG_PATH: Path = Path("config.json")
+JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
 """Settings that configure user_settings.py."""
-EXPECTED_NUM_FIELDS_IN_JSON: int = 8
-"""Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
+EXPECTED_NUM_FIELDS_IN_CLI_CONFIG: int = 0
+"""Number of expected fields in the CLI config file. If the number of fields discovered does not match this, an exception
+will be raised."""
+
+JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
+"""Settings that configure user_settings.py."""
+EXPECTED_NUM_FIELDS_IN_GUI_CONFIG: int = 8
+"""Number of expected fields in the GUI config file. If the number of fields discovered does not match this, an exception
 will be raised."""
 
 SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")

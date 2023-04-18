@@ -11,6 +11,6 @@ def main() -> None:
 if __name__ == "__main__":
     import NeuroRuler.utils.parser as parser
 
-    parser.parse_config_json()  # TODO: are these all basically GUI settings? -Eric
-    parser.parse_gui_cli()
+    parser.parse_cli_config()
+    parser.parse_cli()
     main()
