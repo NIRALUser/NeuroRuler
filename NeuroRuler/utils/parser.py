@@ -13,6 +13,19 @@ JSON_SETTINGS: dict = dict()
 """Dict of settings resulting from JSON file parsing. Global within this file."""
 
 
+def parse_cli_cli() -> None: # TODO: better name? lol -Eric
+    """Parse CLI CLI args and set global settings in `user_settings.py`.
+
+    :return: None"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
+    args = parser.parse_args()
+
+    if args.debug:
+        user_settings.DEBUG = True
+        print("Debug CLI option supplied.")
+
+
 def parse_gui_cli() -> None:
     """Parse GUI CLI args and set global settings in `user_settings.py`.
 
@@ -63,19 +76,6 @@ def parse_gui_cli() -> None:
         print(
             f"Contour color is {'#' if not args.color.isalpha() else ''}{args.color}."
         )
-
-
-def parse_cli_cli() -> None: # TODO: better name? lol -Eric
-    """Parse CLI CLI args and set global settings in `user_settings.py`.
-
-    :return: None"""
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
-    args = parser.parse_args()
-
-    if args.debug:
-        user_settings.DEBUG = True
-        print("Debug CLI option supplied.")
 
 
 def parse_config_json() -> None:
