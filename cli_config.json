@@ -5,5 +5,5 @@
 // If you're a developer who's adding or removing options,
 // modify parser.py and constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG
 {
-    // nada lol
+    "DEBUG": "False"
 }
