@@ -40,7 +40,7 @@ If contributing to this repo, please also run `pip install -r requirements.txt` 
 Run these commands in a Python terminal:
 
 ```py
-from NeuroRuler import gui
+from NeuroRuler.GUI import gui
 
 gui()
 ```
