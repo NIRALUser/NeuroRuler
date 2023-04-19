@@ -28,12 +28,12 @@ If you want 😉 format is bibtex.
 Your Python version needs to be 3.8+. Check with `python --version`. Install via pip.
 
 ```sh
-pip install NeuroRuler
+python -m pip install NeuroRuler
 ```
 
-If `pip` doesn't work, try `pip3` or `python3 -m pip`.
+If `python` doesn't work, try `python3`. Also, do not run `pip install NeuroRuler` without `python -m`, which may cause import issues.
 
-If contributing to this repo, please also run `pip install -r requirements.txt` to install additional development dependencies (e.g., formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
+If contributing to this repo, please also run `python -m pip install -r requirements.txt` to install additional development dependencies (for code formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
 
 ## Run GUI
 
@@ -41,7 +41,6 @@ Run these commands in a Python terminal:
 
 ```py
 from NeuroRuler.GUI import gui
-
 gui()
 ```
 
@@ -90,8 +89,8 @@ Before each commit, the actions in [`.pre-commit-config.yaml`](.pre-commit-confi
 * [PyPI page](https://pypi.org/project/NeuroRuler/)
 * [TestPyPI page](https://test.pypi.org/project/NeuroRuler/)
 
-To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). Then create a branch named `release-pypi/version-num`. Push a tagged (use the version number) commit to that branch to run the `pypi.yml` action, which will publish to PyPI.
+To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). If a branch named `release-pypi` doesn't exist, create it. Push a **tagged (use the version number) commit** to the `release-pypi` branch to publish to PyPI (these actions cause the [`pypi.yml`](.github/workflows/pypi.yml) action to run).
 
 The version number on PyPI will be the one in `setup.py`, so make sure it's correct!
 
-Follow a similar process to publish to TestPyPI.
+Follow a similar process to publish to TestPyPI, except the commit doesn't have to be tagged.
