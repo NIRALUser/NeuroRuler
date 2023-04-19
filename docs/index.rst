@@ -27,7 +27,7 @@ NeuroRuler
 Install
 #######
 
-See our `GitHub README <https://github.com/COMP523TeamD/HeadCircumferenceTool#install>`_.
+See our `GitHub README <https://github.com/COMP523TeamD/NeuroRuler#install>`_.
 
 Contents
 ########

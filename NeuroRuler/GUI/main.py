@@ -85,14 +85,14 @@ SETTINGS_VIEW_ENABLED: bool = True
 
 DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
 DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
-GITHUB_LINK: str = "https://github.com/COMP523TeamD/HeadCircumferenceTool"
-DOCUMENTATION_LINK: str = "https://headcircumferencetool.readthedocs.io/en/latest/"
+GITHUB_LINK: str = "https://github.com/COMP523TeamD/NeuroRuler"
+DOCUMENTATION_LINK: str = "https://NeuroRuler.readthedocs.io/en/latest/"
 DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 
-# We assume units are millimeters if we can't find units in metadata
 MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "millimeters (mm)"
+"""We assume units are millimeters if we can't find units in metadata"""
 
 UNSCALED_QPIXMAP: QPixmap
 """Unscaled QPixmap from which the scaled version is rendered in the GUI.
@@ -959,7 +959,7 @@ def main() -> None:
         MAIN_WINDOW.setStyleSheet(f.read())
 
     # Non-zero min width and height is needed to prevent
-    # this bug https://github.com/COMP523TeamD/HeadCircumferenceTool/issues/42
+    # this bug https://github.com/COMP523TeamD/NeuroRuler/issues/42
     # However, this also seems to affect startup GUI size or at least GUI element spacing
     MAIN_WINDOW.setMinimumSize(QSize(1, 1))
     MAIN_WINDOW.resize(

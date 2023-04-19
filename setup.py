@@ -30,8 +30,8 @@ setup(
     # https://stackoverflow.com/questions/9999829/how-to-specify-multiple-authors-emails-in-setup-py
     author="COMP523 Team D",
     author_email="comp523d@gmail.com",
-    url="https://github.com/COMP523TeamD/HeadCircumferenceTool",
-    download_url="https://github.com/COMP523TeamD/HeadCircumferenceTool/releases",
+    url="https://github.com/COMP523TeamD/NeuroRuler",
+    download_url="https://github.com/COMP523TeamD/NeuroRuler/releases",
     keywords=[
         "MRI",
         "NIfTI",

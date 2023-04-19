@@ -1,6 +1,6 @@
 # NeuroRuler
 
-![Tests](https://github.com/COMP523TeamD/HeadCircumferenceTool/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/COMP523TeamD/NeuroRuler/actions/workflows/tests.yml/badge.svg)
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Python](https://img.shields.io/badge/python-3670A0?style=plastic&logo=python&logoColor=ffdd54)
 
@@ -18,7 +18,7 @@ If you want 😉 format is bibtex.
 @misc{neuroruler,
   title={NeuroRuler},
   author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
-  howpublished={\url{https://github.com/COMP523TeamD/HeadCircumferenceTool}},
+  howpublished={\url{https://github.com/COMP523TeamD/NeuroRuler}},
   year={2023}
 }
 ```
@@ -45,7 +45,7 @@ from NeuroRuler.GUI import gui
 gui()
 ```
 
-Note: If you make changes to the repo, then use the [`gui.py`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPI.
+Note: If you make changes to the repo, then use the [`gui.py`](gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPI.
 
 See [release](#release) for how to upload to PyPI or Test PyPI.
 
@@ -75,7 +75,7 @@ options:
 
 ## Documentation
 
-[https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
+[https://NeuroRuler.readthedocs.io](https://NeuroRuler.readthedocs.io)
 
 See [`.readthedocs.yaml`](.readthedocs.yaml) and [`docs/`](docs/).
 
