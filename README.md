@@ -28,12 +28,12 @@ If you want 😉 format is bibtex.
 Your Python version needs to be 3.8+. Check with `python --version`. Install via pip.
 
 ```sh
-python -m pip install NeuroRuler
+pip install NeuroRuler
 ```
 
-If `python` doesn't work, try `python3`. Also, do not run `pip install NeuroRuler` without `python -m`, which may cause import issues.
+If `pip` doesn't work, try `pip3`.
 
-If contributing to this repo, please also run `python -m pip install -r requirements.txt` to install additional development dependencies (for code formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
+If contributing to this repo, please fork and run `pip install -r requirements.txt` to install additional development dependencies (for code formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
 
 ## Run GUI
 
@@ -71,6 +71,8 @@ options:
 ## Run tests
 
 `pytest`
+
+Our unit tests run on GitHub Actions on push and PR. The results are on GitHub.
 
 ## Documentation
 

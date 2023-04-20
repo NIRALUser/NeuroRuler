@@ -24,7 +24,7 @@ Non-functional (e.g., formatting, documentation) dependencies listed in requirem
 
 setup(
     name="NeuroRuler",
-    version="0.0.1",
+    version="0.0.4",
     description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
     # Cannot use multiple authors
     # https://stackoverflow.com/questions/9999829/how-to-specify-multiple-authors-emails-in-setup-py
@@ -45,8 +45,11 @@ setup(
     # See https://stackoverflow.com/questions/41268863/what-is-the-difference-between-extras-require-and-install-requires-in-se
     # extras_require=dict(),
     tests_require=install_requires + ["tox", "pytest", "pytest-cov"],
-    # TODO: Change after refactoring
-    packages=["NeuroRuler.GUI"],
+    # See https://docs.python.org/3/distutils/setupscript.html#listing-whole-packages
+    # for what these mean
+    package_dir={"NeuroRuler": "NeuroRuler"},
+    packages=["NeuroRuler", "NeuroRuler.GUI", "NeuroRuler.utils"],
+    package_data={"NeuroRuler":["GUI/*.ui", "GUI/static/*", "GUI/themes/*/*"]},
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
