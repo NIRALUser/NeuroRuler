@@ -5,8 +5,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-from pathlib import Path
-
 install_requires: list[str] = [
     "setuptools",
     "SimpleITK",
@@ -24,6 +22,7 @@ Non-functional (e.g., formatting, documentation) dependencies listed in requirem
 
 setup(
     name="NeuroRuler",
+    # Version number that appears on PyPI and Test PyPI
     version="0.0.4",
     description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
     # Cannot use multiple authors

@@ -1,6 +1,6 @@
 # Source: https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-# This job runs only when pushing to release-pypi/**
-# Additionally, the commit needs to be tagged
+# This job runs only when releasing (i.e., commit is tagged)
+# Additionally, the branch needs to be main
 # Version number (manually set in setup.py) must differ from the current version number
 # for the upload to succeed
 # https://pypi.org/project/NeuroRuler/
@@ -9,8 +9,8 @@ name: Publish to PyPI
 
 on:
   push:
-    branches:
-      - 'release-pypi'
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build-and-publish:

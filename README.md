@@ -91,8 +91,8 @@ Before each commit, the actions in [`.pre-commit-config.yaml`](.pre-commit-confi
 * [PyPI page](https://pypi.org/project/NeuroRuler/)
 * [TestPyPI page](https://test.pypi.org/project/NeuroRuler/)
 
-To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). If a branch named `release-pypi` doesn't exist, create it. Push a **tagged (use the version number) commit** to the `release-pypi` branch to publish to PyPI (these actions cause the [`pypi.yml`](.github/workflows/pypi.yml) action to run).
+To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). Push a **tagged (use the version number) commit** to the `main` branch (can be done through PR) to publish to PyPI (these actions cause the [`pypi.yml`](.github/workflows/pypi.yml) action to run).
 
 The version number on PyPI will be the one in `setup.py`, so make sure it's correct!
 
-Follow a similar process to publish to TestPyPI, except the commit doesn't have to be tagged.
+To publish on Test PyPI, edit the version number, and push to a branch called `release-testpypi` (create it if it doesn't exist).
