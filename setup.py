@@ -48,7 +48,7 @@ setup(
     # for what these mean
     package_dir={"NeuroRuler": "NeuroRuler"},
     packages=["NeuroRuler", "NeuroRuler.GUI", "NeuroRuler.utils"],
-    package_data={"NeuroRuler":["GUI/*.ui", "GUI/static/*", "GUI/themes/*/*"]},
+    package_data={"NeuroRuler":["GUI/*.ui", "GUI/static/*", "GUI/themes/*/*", "../*.json"]},
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",

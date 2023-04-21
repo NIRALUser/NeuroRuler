@@ -8,6 +8,7 @@ import string
 import NeuroRuler.utils.user_settings as user_settings
 import NeuroRuler.utils.constants as constants
 import NeuroRuler.utils.exceptions as exceptions
+import pkg_resources
 
 JSON_SETTINGS: dict = dict()
 """Dict of settings resulting from JSON file parsing. Global within this file."""

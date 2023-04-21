@@ -1,0 +1,9 @@
+#!/bin/zsh
+
+rm -r dist
+pip uninstall NeuroRuler
+python3 setup.py sdist
+# There will be only one file
+for file in dist/*; do
+    pip install $file;
+done

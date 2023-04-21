@@ -1,0 +1,8 @@
+#!/bin/zsh
+
+# If using this, you will need an API token for NeuroRuler on Test PyPI
+# Ask Jesse <jesse@cs.unc.edu> for it
+
+rm -r dist
+python3 -m build
+python3 -m twine upload --repository testpypi dist/*

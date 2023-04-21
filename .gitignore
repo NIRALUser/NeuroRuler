@@ -8,9 +8,7 @@ data/*.tsv
 
 output/
 scripts/pypi
-scripts/pypi_upload
 scripts/testpypi
-scripts/testpypi_upload
 
 .ipynb_checkpoints
 .DS_Store

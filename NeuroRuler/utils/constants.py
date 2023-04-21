@@ -13,6 +13,7 @@ from screeninfo import get_monitors, ScreenInfoError
 from numpy import pi
 from typing import Union
 from enum import Enum
+import pkg_resources
 
 OUTPUT_DIR: Path = Path("output")
 """Directory for storing output."""
