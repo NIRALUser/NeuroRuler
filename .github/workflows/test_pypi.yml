@@ -14,6 +14,7 @@ on:
 jobs:
   build-and-publish:
     name: Build and publish to Test PyPI
+    needs: tests
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
