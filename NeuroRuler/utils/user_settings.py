@@ -12,10 +12,10 @@ import pkg_resources
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
 
-FILE_BROWSER_START_DIR: Path = Path.home()
+FILE_BROWSER_START_DIR: Path = Path.cwd()
 """The starting directory that is opened in the file browser.
 
-Defaults to user's home directory."""
+Defaults to cwd."""
 
 EXPORTED_FILE_NAMES_USE_INDEX: bool = False
 """If True, then exported files will be named using the index in the program.
