@@ -5,17 +5,20 @@
 # for the upload to succeed
 # https://pypi.org/project/NeuroRuler/
 
-name: Publish to PyPI
+name: pypi
 
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - '*'
 
 jobs:
+  test:
+    uses: ./.github/workflows/test.yml    # Use the callable tests job to run tests
+
   build-and-publish:
     name: Build and publish to PyPI
-    needs: tests
+    needs: [test]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

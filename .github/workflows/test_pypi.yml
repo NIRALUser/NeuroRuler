@@ -4,7 +4,7 @@
 # for the upload to succeed
 # https://test.pypi.org/project/NeuroRuler/
 
-name: Publish to Test PyPI
+name: test_pypi
 
 on:
   push:
