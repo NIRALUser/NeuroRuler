@@ -62,7 +62,7 @@ Code involving :code:`sitk` is scattered throughout our project. Here's a specif
 
 .. seealso::
 
-    .. currentmodule:: src.utils.img_helpers
+    .. currentmodule:: NeuroRuler.utils.img_helpers
     .. autofunction:: get_curr_rotated_slice
 
 .. _SimpleITKFiltering:
@@ -72,7 +72,7 @@ Filtering
 
 .. seealso::
 
-    .. currentmodule:: src.utils.imgproc
+    .. currentmodule:: NeuroRuler.utils.imgproc
     .. autofunction:: contour
 
 .. _SimpleITKFileFormats:
@@ -94,7 +94,7 @@ Not in use anymore.
 
 See `<https://simpleitk.org/TUTORIAL>`_ for setup instructions (installing the external image viewer Fiji
 used in some of our old :code:`.ipynb` files) and a bunch of tutorial Jupyter notebook files, most of which
-are too advanced for this project. What's already in `src/ <src.html>`_ should suffice for this project.
+are too advanced for this project. What's already in `NeuroRuler/ <NeuroRuler.html>`_ should suffice for this project.
 
 .. _SimpleITKResources:
 
@@ -127,7 +127,7 @@ and `findContours <https://docs.opencv.org/4.x/d3/dc0/group__imgproc__shape.html
 
 .. seealso::
 
-    .. currentmodule:: src.utils.imgproc
+    .. currentmodule:: NeuroRuler.utils.imgproc
     .. autofunction:: length_of_contour
 
 .. _PyQt6:
@@ -155,7 +155,7 @@ that are then loaded into Python code.
     :alt: QtDesigner
 
 `Install it <https://build-system.fman.io/qt-designer-download>`_. In QtDesigner, open
-`mainwindow.ui <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/src/GUI/mainwindow.ui>`_.
+`mainwindow.ui <https://github.com/COMP523TeamD/NeuroRuler/blob/main/NeuroRuler/GUI/mainwindow.ui>`_.
 You'll get the idea.
 
 .. _PyQt6Controller:
@@ -163,16 +163,16 @@ You'll get the idea.
 Controller stuff
 ================
 
-There isn't a Controller class. Controller stuff is done in `src/GUI/main.py <_modules/src/GUI/main>`_.
+There isn't a Controller class. Controller stuff is done in `NeuroRuler/GUI/main.py <_modules/NeuroRuler/GUI/main>`_.
 
 QtDesigner lets you assign names to elements. Then these variables are accessible from code.
 
 .. seealso:: How to connect GUI events (signals) to functions
 
-    .. currentmodule:: src.GUI.main.MainWindow
+    .. currentmodule:: NeuroRuler.GUI.main.MainWindow
     .. autofunction:: __init__
 
-    `[source] <_modules/src/GUI/main.html#MainWindow>`_
+    `[source] <_modules/NeuroRuler/GUI/main.html#MainWindow>`_
 
     .. note::
 
@@ -180,10 +180,10 @@ QtDesigner lets you assign names to elements. Then these variables are accessibl
 
 .. seealso:: How to get and set values in the GUI
 
-    .. currentmodule:: src.GUI.main.MainWindow
+    .. currentmodule:: NeuroRuler.GUI.main.MainWindow
     .. autofunction:: rotate_x
 
-    `[source] <_modules/src/GUI/main.html#MainWindow.rotate_x>`_
+    `[source] <_modules/NeuroRuler/GUI/main.html#MainWindow.rotate_x>`_
 
 .. _PyQt6Layout:
 
@@ -204,10 +204,10 @@ Image visualization
 
 .. seealso::
 
-    .. currentmodule:: src.GUI.main.MainWindow
+    .. currentmodule:: NeuroRuler.GUI.main.MainWindow
     .. autofunction:: render_curr_slice
 
-    `[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
+    `[source] <_modules/NeuroRuler/GUI/main.html#MainWindow.render_curr_slice>`_
 
 .. _PyQt6QRC:
 
@@ -223,10 +223,10 @@ this page is very closely related. Read that next if you're working on styling t
 
 .. seealso:: How to access a resource
 
-    .. currentmodule:: src.GUI.helpers.ErrorMessageBox
+    .. currentmodule:: NeuroRuler.GUI.helpers.ErrorMessageBox
     .. autofunction:: __init__
 
-    `[source] <_modules/src/GUI/helpers.html#ErrorMessageBox>`_
+    `[source] <_modules/NeuroRuler/GUI/helpers.html#ErrorMessageBox>`_
 
 There's also `PyQt documentation <https://doc.qt.io/qtforpython/tutorials/basictutorial/qrcfiles.html#changes-in-the-code>`_
 about how to access resources once imported.
@@ -258,7 +258,7 @@ Mostly everything in PySide6 and PyQt6 is exactly the same, but there are some a
 
 * When we had multiple windows, switching to PySide6 broke window switching, and I couldn't figure it out.
 * There are minor naming differences, such as QImage.Format.Format_Grayscale16 (PyQt6) vs. QImage.Format_Grayscale16 (PySide6).
-* Loading a :code:`.ui` file is `different <https://github.com/COMP523TeamD/HeadCircumferenceTool/pull/26>`_.
+* Loading a :code:`.ui` file is `different <https://github.com/COMP523TeamD/NeuroRuler/pull/26>`_.
 
 .. warning:: Note QImage and :ref:`numpy` treat width and height differently!
 
@@ -304,12 +304,12 @@ as the name implies. This circumvents difficulties [#npqimage]_ with converting 
 
 .. seealso::
 
-    .. currentmodule:: src.GUI.main.MainWindow
+    .. currentmodule:: NeuroRuler.GUI.main.MainWindow
     .. autofunction:: render_curr_slice
 
-    `[source] <_modules/src/GUI/main.html#MainWindow.render_curr_slice>`_
+    `[source] <_modules/NeuroRuler/GUI/main.html#MainWindow.render_curr_slice>`_
 
-.. warning:: In :code:`src/GUI/main.py`, if :code:`import qimage2ndarray` goes before the PyQt imports (which an
+.. warning:: In :code:`NeuroRuler/GUI/main.py`, if :code:`import qimage2ndarray` goes before the PyQt imports (which an
     autoformatter might do), there will be a :code:`ModuleNotFoundError`.
 
 .. _BreezeStyleSheets:
@@ -386,12 +386,12 @@ Always build up a :code:`Path` using the :code:`Path` capabilities (:code:`/` op
 Then when a :code:`str` is needed, apply :code:`str()` to convert at the end.
 
 See the `documentation <https://pathlib.readthedocs.io/en/pep428/>`_ for example code.
-Also see this code from `src/utils/global_vars.py <_modules/src/utils/constants.html>`_.
+Also see this code from `NeuroRuler/utils/global_vars.py <_modules/NeuroRuler/utils/constants.html>`_.
 
 .. code-block:: python
     :linenos:
 
-    THEME_DIR: Path = Path("src") / "GUI" / "themes"
+    THEME_DIR: Path = Path("NeuroRuler") / "GUI" / "themes"
     """themes/ directory where .qss stylesheets and resources.py files are stored."""
     THEMES: list[str] = []
     """List of themes, i.e. the names of the directories in THEME_DIR."""
@@ -413,7 +413,7 @@ For parsing CLI arguments.
 
 .. seealso::
 
-    .. currentmodule:: src.utils.parser
+    .. currentmodule:: NeuroRuler.utils.parser
     .. autofunction:: parse_gui_cli
 
 Virtual environment
@@ -430,7 +430,7 @@ python-black
 This autoformatter is awesome 😳
 
 This is run automatically before each commit (see
-`.pre-commit-config.yaml <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/.pre-commit-config.yaml>`_)
+`.pre-commit-config.yaml <https://github.com/COMP523TeamD/NeuroRuler/blob/main/.pre-commit-config.yaml>`_)
 with some excluded files. To run manually, run
 
 .. code-block:: text
@@ -456,7 +456,7 @@ For unit testing.
 All unit tests run automatically on push and PR using `tox <https://tox.wiki/en/latest/>`_, which runs
 all tests on several Python versions.
 
-This is handled in the `tests.yml <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/.github/workflows/tests.yml>`_ file.
+This is handled in the `tests.yml <https://github.com/COMP523TeamD/NeuroRuler/blob/main/.github/workflows/tests.yml>`_ file.
 
 .. _warningsfunctools:
 
@@ -467,7 +467,7 @@ Allow us to mark functions :code:`@deprecated`.
 
 .. seealso::
 
-    .. currentmodule:: src.utils.constants
+    .. currentmodule:: NeuroRuler.utils.constants
     .. autofunction:: deprecated
 
 .. _sphinxsetuptools:
@@ -487,7 +487,7 @@ and `YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx.
 Build HCT docs site locally
 ===========================
 
-Your current working directory should be :code:`.../HeadCircumferenceTool`, and
+Your current working directory should be :code:`.../NeuroRuler`, and
 you should have already installed dependencies via pip.
 
 .. code-block:: text
@@ -503,12 +503,12 @@ You can open :code:`docs/_build/html/index.html` in a web browser #[macos_open_h
 will automatically update the
 website. From now on, you can just run :code:`make html` to update the html pages.
 
-However, you may need to run :code:`sphinx-apidoc -o . ../src` from the :code:`docs/` directory
+However, you may need to run :code:`sphinx-apidoc -o . ../NeuroRuler` from the :code:`docs/` directory
 if a new package is created. Make sure :code:`__init__.py` files exist for any package you want
 to be discovered.
 
-You can edit `docs/index.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/index.rst>`_,
-which is the homepage, or `docs/libraries.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/libraries.rst>`_, which
+You can edit `docs/index.rst <https://github.com/COMP523TeamD/NeuroRuler/blob/main/docs/index.rst>`_,
+which is the homepage, or `docs/libraries.rst <https://github.com/COMP523TeamD/NeuroRuler/blob/main/docs/libraries.rst>`_, which
 is this page. `Documentation <modules.html>`_ for `source code <_modules/index.html>`_ is automatically generated.
 
 .. _sphinxBuildFromScratch:
@@ -535,12 +535,12 @@ Type `n` for the first question, which asks about splitting source and build dir
 
 Copy over :code:`docs/conf.py` (install another theme with pip and modify :code:`html_theme` if you want),
 :code:`docs/requirements.txt`, :code:`.readthedocs.yaml`, :code:`pyproject.toml`, and :code:`setup.py` from the
-`HCT repo <https://github.com/COMP523TeamD/HeadCircumferenceTool>`_,
+`HCT repo <https://github.com/COMP523TeamD/NeuroRuler>`_,
 overwriting if necessary. Modify the info inside for your purposes.
 The root :code:`requirements.txt` and :code:`requirements_CI.txt` might also need to include
 setuptools, but I'm not certain.
 
-Make sure :code:`src/__init__.py` exists, along with :code:`.../__init__.py` files for any package that
+Make sure :code:`NeuroRuler/__init__.py` exists, along with :code:`.../__init__.py` files for any package that
 you want to auto-generate documentation for.
 
 .. note:: Current working directory should still be :code:`docs/`
@@ -548,7 +548,7 @@ you want to auto-generate documentation for.
 .. code-block:: text
     :linenos:
 
-    sphinx-apidoc -o . ../src       # Generate files from ../src and put in . (docs/)
+    sphinx-apidoc -o . ../NeuroRuler       # Generate files from ../NeuroRuler and put in . (docs/)
     make html
 
 :code:`docs/_build/html/index.html` will now contain the local version of the documentation pages.
@@ -556,8 +556,8 @@ You can open it in a web browser to check it out before pushing, which will auto
 website. From now on, you can just run :code:`make html` to update the html pages. You don't need to run
 :code:`sphinx-apidoc` unless you create a new package.
 
-You can edit `docs/index.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/index.rst>`_,
-which is the homepage, or `docs/libraries.rst <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/docs/libraries.rst>`_, which
+You can edit `docs/index.rst <https://github.com/COMP523TeamD/NeuroRuler/blob/main/docs/index.rst>`_,
+which is the homepage, or `docs/libraries.rst <https://github.com/COMP523TeamD/NeuroRuler/blob/main/docs/libraries.rst>`_, which
 is this page. `Documentation <modules.html>`_ for `source code <_modules/index.html>`_ is automatically generated.
 
 Now follow the Read the Docs tutorial starting from `Sign up for Read the Docs <https://docs.readthedocs.io/en/stable/tutorial/#sign-up-for-read-the-docs>`_.
@@ -587,20 +587,20 @@ importlib
 
 For importing modules using strings.
 
-Specifically, import statements depend on :code:`src.utils.user_settings.THEME_NAME`.
+Specifically, import statements depend on :code:`NeuroRuler.utils.user_settings.THEME_NAME`.
 
-For example, in :code:`src.GUI.main()`, if :code:`THEME_NAME` is :code:`'dark'`, then
+For example, in :code:`NeuroRuler.GUI.main()`, if :code:`THEME_NAME` is :code:`'dark'`, then
 the resources import statement would be
 
 .. code-block:: python
 
-    import src.GUI.styles.dark.resources
+    import NeuroRuler.GUI.styles.dark.resources
 
 However, if :code:`THEME_NAME` is :code:`'light'`, then the import statement would be
 
 .. code-block:: python
 
-    import src.GUI.styles.light.resources
+    import NeuroRuler.GUI.styles.light.resources
 
 Therefore, we use importlib to control the import name there [#why_importlib]_.
 
@@ -611,7 +611,7 @@ pre-commit
 
 Configures pre-commit git hook.
 
-Modify `.pre-commit-config.yaml <https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/.pre-commit-config.yaml>`_
+Modify `.pre-commit-config.yaml <https://github.com/COMP523TeamD/NeuroRuler/blob/main/.pre-commit-config.yaml>`_
 to configure. Then run :code:`pre-commit install`.
 
 More instructions `here <https://pre-commit.com/>`_.
@@ -635,5 +635,5 @@ More instructions `here <https://pre-commit.com/>`_.
 .. [#sphinx] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
 .. [#macos_open_html] On macOS, you can open an HTML document using :code:`open -a "Safari" _build/html/index.html"`
 .. [#venv] Thanks to the teammate who suggested this to me!
-.. [#npqimage] https://github.com/COMP523TeamD/HeadCircumferenceTool/pull/3#issuecomment-1468075389
+.. [#npqimage] https://github.com/COMP523TeamD/NeuroRuler/pull/3#issuecomment-1468075389
 .. [#why_importlib] We can't just use a single :code:`resources.py` file because BreezeStyleSheets generates icons based on theme color.

@@ -1,7 +1,7 @@
-src
-===
+NeuroRuler
+==========
 
 .. toctree::
    :maxdepth: 4
 
-   src
+   NeuroRuler
