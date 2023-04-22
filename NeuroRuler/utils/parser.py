@@ -31,10 +31,7 @@ def parse_cli() -> None:
         cli_settings.DEBUG = True
         print("Debug CLI option supplied.")
 
-    if args.otsu:
-        cli_settings.USE_OTSU = True
-    else:
-        cli_settings.USE_OTSU = False
+    cli_settings.USE_OTSU = args.otsu
 
     if args.lower:
         global_vars.LOWER_THRESHOLD = args.lower
