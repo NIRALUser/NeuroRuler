@@ -33,28 +33,11 @@ def main() -> None:
 
     initialize_globals([file_path])
 
-    #reader = sitk.ImageFileReader()
-    #reader.SetFileName(str(file_path))
-    #new_img: sitk.Image = reader.Execute()
-    #new_img: sitk.Image = sitk.DICOMOrientImageFilter().Execute(new_img)
-    ##new_img = sitk.DICOMOrientImageFilter().Execute(new_img)
-
-    #euler = sitk.Euler3DTransform()
-    #euler.SetRotation(0, 0, 0)
-    #rotated_image: sitk.Image = sitk.Resample(new_img, euler)
-    #rotated_slice = rotated_image[:, :, 79] # last is the slice
-
-    #binary_contour_slice: np.ndarray = imgproc.contour(
-    #    rotated_slice, ThresholdFilter.Binary
-    #)
-
-    #circumference: float = imgproc.length_of_contour(binary_contour_slice)
-    #print(circumference)
     global_vars.SLICE = 79
 
     rotated_slice: sitk.Image = get_curr_rotated_slice()
     binary_contour_slice: np.ndarray = imgproc.contour(
-        rotated_slice, ThresholdFilter.Binary
+        rotated_slice, ThresholdFilter.Otsu
     )
 
     units: Union[str, None] = get_curr_physical_units()
