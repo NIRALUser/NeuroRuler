@@ -53,7 +53,6 @@ from NeuroRuler.GUI.helpers import (
     mask_QImage,
     sitk_slice_to_qimage,
     ErrorMessageBox,
-    InformationMessageBox,
     InformationDialog,
 )
 
