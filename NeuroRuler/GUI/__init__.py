@@ -48,8 +48,3 @@ def gui() -> None:
         pass
     parser.parse_gui_cli()
     main.main()
-
-
-def GUI() -> None:
-    """Alias for gui()."""
-    gui()
