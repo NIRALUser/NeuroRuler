@@ -36,9 +36,20 @@ def main() -> None:
     global_vars.SLICE = 79
 
     rotated_slice: sitk.Image = get_curr_rotated_slice()
-    binary_contour_slice: np.ndarray = imgproc.contour(
-        rotated_slice, ThresholdFilter.Otsu
-    )
+
+    binary_contour_slice: np.ndarray = np.zeros(0)
+    if cli_settings.USE_OTSU:
+        binary_contour_slice: np.ndarray = imgproc.contour(
+            rotated_slice, ThresholdFilter.Otsu
+        )
+    else:  # this a bit convoluted obviously
+        global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
+            global_vars.LOWER_THRESHOLD
+        )
+
+        global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(
+            global_vars.UPPER_THRESHOLD
+        )
 
     units: Union[str, None] = get_curr_physical_units()
     circumference: float = imgproc.length_of_contour(binary_contour_slice)

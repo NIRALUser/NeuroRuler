@@ -6,6 +6,7 @@ from pathlib import Path
 import string
 
 import NeuroRuler.utils.cli_settings as cli_settings
+import NeuroRuler.utils.global_vars as global_vars
 import NeuroRuler.utils.user_settings as user_settings
 import NeuroRuler.utils.constants as constants
 import NeuroRuler.utils.exceptions as exceptions
@@ -20,12 +21,29 @@ def parse_cli() -> None:
     :return: None"""
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
+    parser.add_argument("-o", "--otsu", help="use Otsu instead of binary", action="store_true")
+    parser.add_argument("-l", "--lower", type=float, help="lower threshold for binary threshold")
+    parser.add_argument("-u", "--upper", type=float, help="upper threshold for binary threshold")
     parser.add_argument("file", help="file to compute")
     args = parser.parse_args()
 
     if args.debug:
         cli_settings.DEBUG = True
         print("Debug CLI option supplied.")
+
+    if args.otsu:
+        cli_settings.USE_OTSU = True
+    else:
+        cli_settings.USE_OTSU = False
+
+    if args.lower:
+        global_vars.LOWER_THRESHOLD = args.lower
+        global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
+            global_vars.LOWER_THRESHOLD
+        )
+
+    if args.upper:
+        global_vars.UPPER_THRESHOLD = args.upper
 
     cli_settings.FILE = args.file
 

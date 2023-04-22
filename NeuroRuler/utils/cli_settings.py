@@ -9,3 +9,6 @@ DEBUG: bool = False
 
 FILE: str = ""
 """The file."""
+
+USE_OTSU: bool = True
+"""Whether to use a otsu or a binary threshold."""  # values for binary are in global_vars.py
