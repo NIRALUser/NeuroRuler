@@ -1,7 +1,7 @@
 """Global settings that the user should be able to modify directly, unlike global_vars.py and constants.py, via
 JSON, GUI, CLI, etc.
 
-Default values are what's in the config.json file.
+Default values are what's in the gui_config.json file.
 
 The values in this file don't matter since they'll be overwritten by what's in config.json and then by CLI options,
 if any. But the values here should match the values in config.json for consistency."""
