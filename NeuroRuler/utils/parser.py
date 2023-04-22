@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import string
 
+import NeuroRuler.utils.cli_settings as cli_settings
 import NeuroRuler.utils.user_settings as user_settings
 import NeuroRuler.utils.constants as constants
 import NeuroRuler.utils.exceptions as exceptions
@@ -19,11 +20,14 @@ def parse_cli() -> None:
     :return: None"""
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
+    parser.add_argument("file", help="file to compute")
     args = parser.parse_args()
 
     if args.debug:
-        user_settings.DEBUG = True
+        cli_settings.DEBUG = True
         print("Debug CLI option supplied.")
+
+    cli_settings.FILE = args.file
 
 
 def parse_gui_cli() -> None:

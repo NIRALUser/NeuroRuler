@@ -234,7 +234,6 @@ class MainWindow(QMainWindow):
 
             self.update_smoothing_settings()
             self.update_binary_filter_settings()
-            self.apply_button.setText("Adjust")
             # Ignore the type annotation warning here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
