@@ -25,8 +25,16 @@ IMG_DIR: Path = OUTPUT_DIR / "img"
 if not IMG_DIR.exists():
     IMG_DIR.mkdir()
 
+# Moved this because pkg_resources needs it to be in a package
 JSON_CONFIG_PATH: Path = Path("config.json")
 """Settings that configure user_settings.py."""
+if not JSON_CONFIG_PATH.exists():
+    # __name__ will get to the utils module
+    # and config.json is at root directory
+    JSON_CONFIG_PATH = Path(pkg_resources.resource_filename(__name__, "../../config.json"))
+
+DATA_DIR: Path = Path("data")
+
 EXPECTED_NUM_FIELDS_IN_JSON: int = 8
 """Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
 will be raised."""
@@ -35,13 +43,11 @@ SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """File formats supported. Must be a subset of the file formats supported by SimpleITK.
 
 TODO: Support .txt for loading image paths from text file (which we can quite easily export using global_vars.IMAGE_DICT)."""
-DATA_DIR: Path = Path("data")
-"""Directory for storing example data."""
-
-UI_FILE_PATH: Path = Path("NeuroRuler") / "GUI" / "mainwindow.ui"
 
 THEME_DIR: Path = Path("NeuroRuler") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
+if not THEME_DIR.exists():
+    THEME_DIR = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "themes"))
 THEMES: list[str] = []
 """List of themes, i.e. the names of the directories in THEME_DIR."""
 if THEME_DIR.exists():

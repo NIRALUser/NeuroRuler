@@ -1,5 +1,5 @@
 # Source: https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-# This job runs only when pushing to release-testpypi/**
+# This job runs only when pushing to release-testpypi
 # Version number (manually set in setup.py) must differ from the current version number
 # for the upload to succeed
 # https://test.pypi.org/project/NeuroRuler/

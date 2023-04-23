@@ -1,13 +1,16 @@
 """Global settings that the user should be able to modify directly, unlike global_vars.py and constants.py, via
 JSON, GUI, CLI, etc.
 
-Default values are what's in the config.json file.
+Default values are mostly what's in the config.json file.
+
+However, there shouldn't be any blank values here (that could be set to a real default value in parser.py)
+because if parsing the GUI json fails (e.g., doesn't exist),
+then we need an actual working value here.
 
 The values in this file don't matter since they'll be overwritten by what's in config.json and then by CLI options,
 if any. But the values here should match the values in config.json for consistency."""
 
 from pathlib import Path
-import pkg_resources
 
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
@@ -32,8 +35,8 @@ THEME_NAME: str = "dark-hct"
 
 The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
 
-CONTOUR_COLOR: str = ""
-"""Color of the contour. "" means it will be automatically determined by the value of THEME_NAME.
+CONTOUR_COLOR: str = "b55162"
+"""Color of the contour.
 
 This can be a 6-hexit string rrggbb (don't prepend 0x) or a name (e.g. red, blue, etc.).
 

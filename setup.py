@@ -1,7 +1,7 @@
 # Source: https://github.com/hmeine/qimage2ndarray/blob/master/setup.py
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
@@ -23,7 +23,7 @@ Non-functional (e.g., formatting, documentation) dependencies listed in requirem
 setup(
     name="NeuroRuler",
     # Version number that appears on PyPI and Test PyPI
-    version="0.0.4",
+    version="0.0.5",
     description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
     # Cannot use multiple authors
     # https://stackoverflow.com/questions/9999829/how-to-specify-multiple-authors-emails-in-setup-py
@@ -40,14 +40,10 @@ setup(
         "PyQt6",
     ],
     install_requires=install_requires,
-    # We don't need extras_require
-    # See https://stackoverflow.com/questions/41268863/what-is-the-difference-between-extras-require-and-install-requires-in-se
-    # extras_require=dict(),
     tests_require=install_requires + ["tox", "pytest", "pytest-cov"],
-    # See https://docs.python.org/3/distutils/setupscript.html#listing-whole-packages
-    # for what these mean
+    # See https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
     package_dir={"NeuroRuler": "NeuroRuler"},
-    packages=["NeuroRuler", "NeuroRuler.GUI", "NeuroRuler.utils"],
+    packages=find_packages(),
     package_data={"NeuroRuler":["GUI/*.ui", "GUI/static/*", "GUI/themes/*/*", "../*.json"]},
     classifiers=[
         "Programming Language :: Python",
