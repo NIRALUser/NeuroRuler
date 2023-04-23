@@ -321,7 +321,7 @@ class MainWindow(QMainWindow):
         self.apply_button.setText("Apply")
         self.z_view_radio_button.setChecked(True)
 
-    def browse_files(self, extend: bool) -> None:
+    def browse_files(self, extend: bool, path = None) -> None:
         """Called after File > Open or File > Add Images.
 
         If `extend`, then `IMAGE_DICT` will be updated with new images.
@@ -336,19 +336,23 @@ class MainWindow(QMainWindow):
         :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
         :type extend: bool
         :return: None"""
-        file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
-            "'", ""
-        ).replace(",", "")
+        
+        if path == None:
+            file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
+                "'", ""
+            ).replace(",", "")
 
-        files = QFileDialog.getOpenFileNames(
-            self, "Open files", str(user_settings.FILE_BROWSER_START_DIR), file_filter
-        )
-
-        # list[str]
-        path_list = files[0]
-        if len(path_list) == 0:
-            return
-
+            files = QFileDialog.getOpenFileNames(
+                self, "Open files", str(user_settings.FILE_BROWSER_START_DIR), file_filter
+            )
+            # list[str]
+            path_list = files[0]
+            if len(path_list) == 0:
+                return
+        else:
+            path_list = [path]
+        
+        
         # Convert to list[Path]. Slight inefficiency but worth.
         path_list = list(map(Path, path_list))
 
@@ -602,7 +606,7 @@ class MainWindow(QMainWindow):
         q_img: QImage = sitk_slice_to_qimage(filter_img)
         self.render_scaled_qpixmap_from_qimage(q_img)
 
-    def render_circumference(self, binary_contour_slice: np.ndarray) -> None:
+    def render_circumference(self, binary_contour_slice: np.ndarray) -> float:
         """Called after pressing Apply or when
         (not SETTINGS_VIEW_ENABLED and (pressing Next or Previous or Remove Image))
 
@@ -621,6 +625,12 @@ class MainWindow(QMainWindow):
         self.circumference_label.setText(
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )
+        return circumference
+    
+    def disable_setting(self) -> None:
+        global SETTINGS_VIEW_ENABLED
+        if SETTINGS_VIEW_ENABLED:
+            SETTINGS_VIEW_ENABLED = not SETTINGS_VIEW_ENABLED
 
     def render_image_num_and_path(self) -> None:
         """Set image_num_label, image_path_label, and status tip of the image.
