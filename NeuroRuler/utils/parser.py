@@ -21,6 +21,10 @@ def parse_cli() -> None:
     :return: None"""
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
+    parser.add_argument("-x", "--x", type=int, help="x transformation (in degrees)")
+    parser.add_argument("-y", "--y", type=int, help="y transformation (in degrees)")
+    parser.add_argument("-z", "--z", type=int, help="z transformation (in degrees)")
+    parser.add_argument("-s", "--slice", type=int, help="slice (0-indexed)")
     parser.add_argument("-o", "--otsu", help="use Otsu instead of binary", action="store_true")
     parser.add_argument("-l", "--lower", type=float, help="lower threshold for binary threshold")
     parser.add_argument("-u", "--upper", type=float, help="upper threshold for binary threshold")
@@ -30,6 +34,18 @@ def parse_cli() -> None:
     if args.debug:
         cli_settings.DEBUG = True
         print("Debug CLI option supplied.")
+
+    if args.x:
+        cli_settings.THETA_X = args.x
+
+    if args.y:
+        cli_settings.THETA_Y = args.y
+
+    if args.z:
+        cli_settings.THETA_Z = args.z
+
+    if args.slice:
+        cli_settings.SLICE = args.slice
 
     cli_settings.USE_OTSU = args.otsu
 
