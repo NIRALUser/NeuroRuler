@@ -144,6 +144,71 @@ def length_of_contour(
     arc_length = cv2.arcLength(parent_contour, True)
     return arc_length
 
+def length_of_contour_with_spacing(
+    binary_contour_slice: np.ndarray, x_spacing: float, y_spacing: float
+) -> float:
+    """Given a 2D binary slice (i.e., RV of contour()), return arc length of parent contour,
+    accounting for x_spacing and y_spacing values.
+    MAKE SURE x_spacing and y_spacing values are passed in the correct order!
+    The binary slice passed into this function should be processed by `contour()`
+    to guarantee an accurate result.
+    Slices for which circumference is calculated are always parallel to z,
+    so the z spacing value is always ignored.
+    This function assumes the contour is a closed curve.
+    :param binary_contour_slice:
+    :type binary_contour_slice: np.ndarray
+    :param x_spacing:
+    :type x_spacing: float
+    :param y_spacing:
+    :type y_spacing: float
+    :raise: exceptions.ComputeCircumferenceOfInvalidSlice if contours detected >= constants.NUM_CONTOURS_IN_INVALID_SLICE
+    :return: arc length of parent contour
+    :rtype: float
+    """
+    contours, hierarchy = cv2.findContours(
+        binary_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1
+    )
+
+    num_contours: int = len(contours)
+    if settings.DEBUG:
+        print(
+            f"Number of contours detected after processing: {num_contours} (in imgproc.length_of_contour())"
+        )
+
+    if num_contours >= NUM_CONTOURS_IN_INVALID_SLICE:
+        raise exceptions.ComputeCircumferenceOfInvalidSlice(num_contours)
+
+    parent_contour: np.ndarray = contours[0]
+
+    arc_length: float = 0
+
+    for i in range(len(parent_contour) - 1):
+        # contours[0] would return [[x y]], so need to do an additional [0] index to just get [x y]
+        arc_length += distance_2d_with_spacing(
+            parent_contour[i][0], parent_contour[i + 1][0], x_spacing, y_spacing
+        )
+    # Get distance between first and last points
+    arc_length += distance_2d_with_spacing(
+        parent_contour[-1][0], parent_contour[0][0], x_spacing, y_spacing
+    )
+    return arc_length
+
+
+def distance_2d_with_spacing(p1, p2, x_spacing: float, y_spacing: float) -> float:
+    """Return the distance between two 2D iterables (list or tuple) given x and y spacing values.
+    :param p1: 2D point
+    :type p1: iterable
+    :param p2: 2D point
+    :type p2: iterable
+    :param x_spacing:
+    :type x_spacing: float
+    :param y_spacing:
+    :type y_spacing: float"""
+    assert len(p1) == 2 and len(p2) == 2
+    return np.sqrt(
+        (x_spacing * (p1[0] - p2[0])) ** 2 + (y_spacing * (p1[1] - p2[1])) ** 2
+    )
+
 
 # TODO: Super naive, but realistically will work fine
 def background_color_of_binary_thresholded_slice(img_2d: sitk.Image) -> BinaryColor:

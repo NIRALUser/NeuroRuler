@@ -621,7 +621,21 @@ class MainWindow(QMainWindow):
         if SETTINGS_VIEW_ENABLED:
             raise Exception("Rendering circumference label when SETTINGS_VIEW_ENABLED")
         units: Union[str, None] = get_curr_physical_units()
-        circumference: float = imgproc.length_of_contour(binary_contour_slice)
+
+        # Euler3D rotation has no effect on spacing (see unit test). This is the correct spacing
+        # This is also the same as get_curr_rotated_slice().GetSpacing(), just without index [2]
+        spacing: tuple = get_curr_image().GetSpacing()
+
+        if user_settings.DEBUG:
+            print(f"Computing circumference, and this is the spacing: {spacing}")
+
+        # TODO
+        # binary_contour_slice is the transpose of the rotated_slice
+        # Thus, should pass spacing values in the reverse order?
+        circumference: float = imgproc.length_of_contour_with_spacing(
+            binary_contour_slice, spacing[0], spacing[1]
+        )
+        # circumference: float = imgproc.length_of_contour(binary_contour_slice)
         self.circumference_label.setText(
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )

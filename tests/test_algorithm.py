@@ -50,8 +50,6 @@ def labeled_result(path) -> float:
         last_section = parts[-1]
         return float(last_section)
 
-
-
 def test_algorithm():
     labeled_data = []
     calculated_data = []
@@ -60,7 +58,7 @@ def test_algorithm():
     length = 0
 
     for file_name in os.listdir(data_folder):
-        if file_name.endswith('.nrrd'):
+        if file_name.endswith('w.nrrd'):
             nrrd_prefix = os.path.splitext(file_name)[0][:10] # remove the file extension to get the prefix
             for tsv_file_name in os.listdir(data_folder):
                 if nrrd_prefix in tsv_file_name and tsv_file_name.endswith('.tsv'):
