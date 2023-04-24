@@ -155,6 +155,10 @@ except ScreenInfoError:
     pass
 
 
+MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "millimeters (mm)"
+"""We assume units are millimeters if we can't find units in metadata"""
+
+
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 def deprecated(func):
     """This is a decorator which can be used to mark functions

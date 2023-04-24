@@ -6,6 +6,11 @@ import NeuroRuler.utils.global_vars as global_vars
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
 
+RAW: bool = False
+"""Whether to print the \"raw\" circumference.
+
+If false, it prints a \"pretty\", rounded output with units included."""
+
 FILE: str = ""
 """The file."""
 

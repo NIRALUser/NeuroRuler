@@ -2,6 +2,7 @@
 Defines main(), the entrypoint of the CLI (if you want to call it that).
 """
 from NeuroRuler.utils.constants import ThresholdFilter
+import NeuroRuler.utils.constants as constants
 import NeuroRuler.utils.global_vars as global_vars
 import NeuroRuler.utils.imgproc as imgproc
 import NeuroRuler.utils.cli_settings as cli_settings
@@ -65,8 +66,10 @@ def main() -> None:
     units: Union[str, None] = get_curr_physical_units()
     circumference: float = imgproc.length_of_contour(binary_contour_slice)
 
-    print(circumference)
-    print(units)
+    if cli_settings.RAW:
+        print(circumference)
+    else:
+        print(f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else constants.MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}")
 
 
 if __name__ == "__main__":
