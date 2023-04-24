@@ -33,7 +33,11 @@ def main() -> None:
 
     initialize_globals([file_path])
 
-    global_vars.SLICE = 79
+    global_vars.THETA_X = cli_settings.THETA_X
+    global_vars.THETA_Y = cli_settings.THETA_Y
+    global_vars.THETA_Z = cli_settings.THETA_Z
+    if cli_settings.SLICE != -1:  # initialize_globals will init it fine otherwise
+        global_vars.SLICE = cli_settings.SLICE
 
     rotated_slice: sitk.Image = get_curr_rotated_slice()
 
