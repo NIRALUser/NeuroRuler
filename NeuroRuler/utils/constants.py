@@ -1,7 +1,7 @@
 """Constant values and functions. DO NOT MUTATE ANY VARIABLE IN THIS FILE FROM OUTSIDE OF THIS FILE!
 
 This file holds values that will never change outside of this file, unlike global_vars.py.
-No values here should be directly modifiable by the user, unlike user_settings.py.
+No values here should be directly modifiable by the user, unlike gui_settings.py.
 
 This file should not import any module in this repo to avoid circular imports."""
 
@@ -25,13 +25,13 @@ if not IMG_DIR.exists():
     IMG_DIR.mkdir()
 
 JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
-"""Settings that configure user_settings.py."""
+"""Settings that configure gui_settings.py."""
 EXPECTED_NUM_FIELDS_IN_CLI_CONFIG: int = 1
 """Number of expected fields in the CLI config file. If the number of fields discovered does not match this, an exception
 will be raised."""
 
 JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
-"""Settings that configure user_settings.py."""
+"""Settings that configure gui_settings.py."""
 EXPECTED_NUM_FIELDS_IN_GUI_CONFIG: int = 8
 """Number of expected fields in the GUI config file. If the number of fields discovered does not match this, an exception
 will be raised."""

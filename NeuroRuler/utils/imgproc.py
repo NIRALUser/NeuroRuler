@@ -10,7 +10,7 @@ from NeuroRuler.utils.constants import (
     ThresholdFilter,
     BinaryColor,
 )
-import NeuroRuler.utils.user_settings as settings
+import NeuroRuler.utils.gui_settings as settings
 from NeuroRuler.utils.global_vars import (
     SMOOTHING_FILTER,
     OTSU_THRESHOLD_FILTER,

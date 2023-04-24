@@ -37,6 +37,7 @@ def main() -> None:
     global_vars.THETA_Z = cli_settings.THETA_Z
     if cli_settings.SLICE != -1:  # initialize_globals will init it fine otherwise
         global_vars.SLICE = cli_settings.SLICE
+    # TODO: smoothing
 
     rotated_slice: sitk.Image = get_curr_rotated_slice()
 
@@ -45,13 +46,13 @@ def main() -> None:
         binary_contour_slice: np.ndarray = imgproc.contour(
             rotated_slice, ThresholdFilter.Otsu
         )
-    else:  # this a bit convoluted obviously
+    else:  # != otsu => use binary
         global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
-            global_vars.LOWER_THRESHOLD
+            cli_settings.LOWER_THRESHOLD
         )
 
         global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(
-            global_vars.UPPER_THRESHOLD
+            cli_settings.UPPER_THRESHOLD
         )
 
         binary_contour_slice: np.ndarray = imgproc.contour(
