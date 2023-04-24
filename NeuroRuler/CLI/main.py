@@ -37,7 +37,10 @@ def main() -> None:
     global_vars.THETA_Z = cli_settings.THETA_Z
     if cli_settings.SLICE != -1:  # initialize_globals will init it fine otherwise
         global_vars.SLICE = cli_settings.SLICE
-    # TODO: smoothing
+
+    global_vars.CONDUCTANCE_PARAMETER = cli_settings.CONDUCTANCE_PARAMETER
+    global_vars.SMOOTHING_ITERATIONS = cli_settings.SMOOTHING_ITERATIONS
+    global_vars.TIME_STEP = cli_settings.TIME_STEP
 
     rotated_slice: sitk.Image = get_curr_rotated_slice()
 

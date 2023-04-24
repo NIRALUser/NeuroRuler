@@ -24,6 +24,9 @@ def parse_cli() -> None:
     parser.add_argument("-y", "--y", type=int, help="y transformation (in degrees)")
     parser.add_argument("-z", "--z", type=int, help="z transformation (in degrees)")
     parser.add_argument("-s", "--slice", type=int, help="slice (0-indexed)")
+    parser.add_argument("-c", "--conductance", type=float, help="conductance smoothing parameter")
+    parser.add_argument("-i", "--iterations", type=int, help="smoothing iterations")
+    parser.add_argument("-t", "--step", type=float, help="time step (smoothing parameter)")
     parser.add_argument("-o", "--otsu", help="use Otsu instead of binary", action="store_true")
     parser.add_argument("-l", "--lower", type=float, help="lower threshold for binary threshold")
     parser.add_argument("-u", "--upper", type=float, help="upper threshold for binary threshold")
@@ -45,6 +48,15 @@ def parse_cli() -> None:
 
     if args.slice:
         cli_settings.SLICE = args.slice
+
+    if args.conductance:
+        cli_settings.CONDUCTANCE_PARAMETER = args.conductance
+
+    if args.iterations:
+        cli_settings.SMOOTHING_ITERATIONS = args.iterations
+
+    if args.step:
+        cli_settings.TIME_STEP = args.step
 
     cli_settings.USE_OTSU = args.otsu
 

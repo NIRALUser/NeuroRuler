@@ -18,6 +18,13 @@ THETA_Z: int = global_vars.THETA_Z
 SLICE: int = -1
 """0-indexed. Overwritten later."""
 
+CONDUCTANCE_PARAMETER: float = global_vars.CONDUCTANCE_PARAMETER
+"""Smoothing option. See global_vars.CONDUCTANCE_PARAMETER."""
+SMOOTHING_ITERATIONS: int = global_vars.SMOOTHING_ITERATIONS
+"""Smoothing option. See global_vars.SMOOTHING_ITERATIONS."""
+TIME_STEP: float = global_vars.TIME_STEP
+"""Smoothing option. See global_vars.TIME_STEP."""
+
 USE_OTSU: bool = True
 """Whether to use a otsu or a binary threshold."""
 
