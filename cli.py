@@ -2,7 +2,7 @@
 
 """Runs the CLI.
 
-Run with ./cli.py. If that doesn't work, run however you normally run a Python script, fuckin' nerd."""
+Run with ./cli.py. If that doesn't work, run however you normally run a Python script."""
 
 # Imports from NeuroRuler/CLI/__init__.py
 # This is exactly what the user can access after installing via pip
