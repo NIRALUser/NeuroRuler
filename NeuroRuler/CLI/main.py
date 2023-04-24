@@ -1,5 +1,5 @@
 """
-Defines main(), the entrypoint of the CLI (if you want to call it that).
+Defines main(), the entrypoint of the CLI.
 """
 from NeuroRuler.utils.constants import ThresholdFilter
 import NeuroRuler.utils.constants as constants
@@ -24,18 +24,25 @@ def main() -> None:
 
     initialize_globals([file_path])
 
+    # slice options
     global_vars.THETA_X = cli_settings.THETA_X
     global_vars.THETA_Y = cli_settings.THETA_Y
     global_vars.THETA_Z = cli_settings.THETA_Z
     if cli_settings.SLICE != -1:  # initialize_globals will init it fine otherwise
         global_vars.SLICE = cli_settings.SLICE
 
-    global_vars.CONDUCTANCE_PARAMETER = cli_settings.CONDUCTANCE_PARAMETER
-    global_vars.SMOOTHING_ITERATIONS = cli_settings.SMOOTHING_ITERATIONS
-    global_vars.TIME_STEP = cli_settings.TIME_STEP
+    # smoothing options
+    global_vars.SMOOTHING_FILTER.SetConductanceParameter(
+        cli_settings.CONDUCTANCE_PARAMETER
+    )
+    global_vars.SMOOTHING_FILTER.SetNumberOfIterations(
+        cli_settings.SMOOTHING_ITERATIONS
+    )
+    global_vars.SMOOTHING_FILTER.SetTimeStep(cli_settings.TIME_STEP)
 
     rotated_slice: sitk.Image = get_curr_rotated_slice()
 
+    # threshold options/application
     binary_contour_slice: np.ndarray = np.zeros(0)
     if cli_settings.USE_OTSU:
         binary_contour_slice: np.ndarray = imgproc.contour(

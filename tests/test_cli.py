@@ -29,6 +29,6 @@ def test4():
 
 
 def test5():
-    command = "python cli.py --conductance=1.0 --iterations=20 --step=0.1 --otsu data/MicroBiome_1month_T1w.nii.gz"
+    command = "python cli.py --conductance=1.0 --iterations=20 --step=0.05 --otsu data/MicroBiome_1month_T1w.nii.gz"
     proc = subprocess.Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=False)
     assert proc.stdout.read().rstrip() == b"Calculated Circumference: 481.103 millimeters (mm)"

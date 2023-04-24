@@ -43,7 +43,7 @@ def gui() -> None:
 
     try:
         parser.parse_gui_config()
-    except:  # TODO bare except is really not a good idea
+    except FileNotFoundError:
         # If JSON doesn't exist, default settings in utils.user_settings will be used
         pass
     parser.parse_gui_cli()
