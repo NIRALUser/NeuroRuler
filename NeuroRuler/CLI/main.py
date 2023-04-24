@@ -12,7 +12,6 @@ from typing import Union
 
 from NeuroRuler.utils.img_helpers import (
     initialize_globals,
-    update_images,
     get_curr_image,
     get_curr_image_size,
     get_curr_rotated_slice,
@@ -53,6 +52,10 @@ def main() -> None:
 
         global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(
             global_vars.UPPER_THRESHOLD
+        )
+
+        binary_contour_slice: np.ndarray = imgproc.contour(
+            rotated_slice, ThresholdFilter.Binary
         )
 
     units: Union[str, None] = get_curr_physical_units()

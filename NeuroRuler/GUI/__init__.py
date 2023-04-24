@@ -42,8 +42,8 @@ def gui() -> None:
         pass
 
     try:
-        parser.parse_config_json()
-    except:
+        parser.parse_gui_config()
+    except:  # TODO bare except is really not a good idea
         # If JSON doesn't exist, default settings in utils.user_settings will be used
         pass
     parser.parse_gui_cli()

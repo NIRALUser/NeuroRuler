@@ -181,8 +181,8 @@ def parse_gui_config() -> None:
 def parse_main_color_from_theme_json() -> str:
     """Parse the main color from the theme JSON file (user_settings.THEME_NAME) in the highlight field.
 
-    Uses user_settings.THEME_NAME so must be called after parse_config_json sets user_settings.THEME_NAME
-    (i.e. can be called within parse_config_json).
+    Uses user_settings.THEME_NAME so must be called after parse_gui_config sets user_settings.THEME_NAME
+    (i.e. can be called within parse_gui_config).
 
     :return: main color rrggbb (hexits)
     :rtype: str"""
