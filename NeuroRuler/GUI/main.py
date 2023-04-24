@@ -334,6 +334,7 @@ class MainWindow(QMainWindow):
         Renders various elements depending on the value of `extend`.
 
         :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
+        :param path: Used for testing, when only one path is imported.
         :type extend: bool
         :return: None"""
         
@@ -642,6 +643,11 @@ class MainWindow(QMainWindow):
         return circumference
     
     def disable_setting(self) -> None:
+        """Used in testing.
+
+        Flipping the SETTINGS_VIEW_ENABLED
+
+        :return: None"""
         global SETTINGS_VIEW_ENABLED
         if SETTINGS_VIEW_ENABLED:
             SETTINGS_VIEW_ENABLED = not SETTINGS_VIEW_ENABLED
