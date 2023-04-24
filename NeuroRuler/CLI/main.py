@@ -13,17 +13,8 @@ from typing import Union
 
 from NeuroRuler.utils.img_helpers import (
     initialize_globals,
-    get_curr_image,
-    get_curr_image_size,
     get_curr_rotated_slice,
-    get_curr_smooth_slice,
-    get_curr_metadata,
-    get_curr_binary_thresholded_slice,
-    get_curr_otsu_slice,
     get_curr_physical_units,
-    get_curr_path,
-    get_curr_properties_tuple,
-    get_middle_dimension,
 )
 
 
@@ -50,7 +41,7 @@ def main() -> None:
         binary_contour_slice: np.ndarray = imgproc.contour(
             rotated_slice, ThresholdFilter.Otsu
         )
-    else:  # != otsu => use binary
+    else:  # !otsu => use binary
         global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
             cli_settings.LOWER_THRESHOLD
         )
