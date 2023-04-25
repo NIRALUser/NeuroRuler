@@ -321,7 +321,7 @@ class MainWindow(QMainWindow):
         self.apply_button.setText("Apply")
         self.z_view_radio_button.setChecked(True)
 
-    def browse_files(self, extend: bool, path = None) -> None:
+    def browse_files(self, extend: bool, path=None) -> None:
         """Called after File > Open or File > Add Images.
 
         If `extend`, then `IMAGE_DICT` will be updated with new images.
@@ -337,14 +337,17 @@ class MainWindow(QMainWindow):
         :param path: Used for testing, when only one path is imported.
         :type extend: bool
         :return: None"""
-        
+
         if path == None:
-            file_filter: str = "MRI images " + str(constants.SUPPORTED_EXTENSIONS).replace(
-                "'", ""
-            ).replace(",", "")
+            file_filter: str = "MRI images " + str(
+                constants.SUPPORTED_EXTENSIONS
+            ).replace("'", "").replace(",", "")
 
             files = QFileDialog.getOpenFileNames(
-                self, "Open files", str(user_settings.FILE_BROWSER_START_DIR), file_filter
+                self,
+                "Open files",
+                str(user_settings.FILE_BROWSER_START_DIR),
+                file_filter,
             )
             # list[str]
             path_list = files[0]
@@ -352,8 +355,7 @@ class MainWindow(QMainWindow):
                 return
         else:
             path_list = [path]
-        
-        
+
         # Convert to list[Path]. Slight inefficiency but worth.
         path_list = list(map(Path, path_list))
 
@@ -641,7 +643,7 @@ class MainWindow(QMainWindow):
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )
         return circumference
-    
+
     def toggle_setting_to_false(self) -> None:
         """Used in testing.
 

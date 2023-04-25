@@ -144,6 +144,7 @@ def length_of_contour(
     arc_length = cv2.arcLength(parent_contour, True)
     return arc_length
 
+
 def length_of_contour_with_spacing(
     binary_contour_slice: np.ndarray, x_spacing: float, y_spacing: float
 ) -> float:
