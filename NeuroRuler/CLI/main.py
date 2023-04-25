@@ -13,6 +13,7 @@ from typing import Union
 
 from NeuroRuler.utils.img_helpers import (
     initialize_globals,
+    get_curr_image,
     get_curr_rotated_slice,
     get_curr_physical_units,
 )
@@ -61,8 +62,9 @@ def main() -> None:
             rotated_slice, ThresholdFilter.Binary
         )
 
+    spacing: tuple = get_curr_image().GetSpacing()
     units: Union[str, None] = get_curr_physical_units()
-    circumference: float = imgproc.length_of_contour(binary_contour_slice)
+    circumference: float = imgproc.length_of_contour_with_spacing(binary_contour_slice, spacing[0], spacing[1])
 
     if cli_settings.RAW:
         print(circumference)
