@@ -47,13 +47,12 @@ import NeuroRuler.utils.constants as constants
 # This would make the global variables not work
 import NeuroRuler.utils.global_vars as global_vars
 import NeuroRuler.utils.imgproc as imgproc
-import NeuroRuler.utils.user_settings as user_settings
+import NeuroRuler.utils.gui_settings as settings
 from NeuroRuler.GUI.helpers import (
     string_to_QColor,
     mask_QImage,
     sitk_slice_to_qimage,
     ErrorMessageBox,
-    InformationMessageBox,
     InformationDialog,
 )
 
@@ -90,9 +89,6 @@ DOCUMENTATION_LINK: str = "https://NeuroRuler.readthedocs.io/en/latest/"
 DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
-
-MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "millimeters (mm)"
-"""We assume units are millimeters if we can't find units in metadata"""
 
 UNSCALED_QPIXMAP: QPixmap
 """Unscaled QPixmap from which the scaled version is rendered in the GUI.
@@ -234,7 +230,6 @@ class MainWindow(QMainWindow):
 
             self.update_smoothing_settings()
             self.update_binary_filter_settings()
-            self.apply_button.setText("Adjust")
             # Ignore the type annotation warning here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
@@ -346,7 +341,7 @@ class MainWindow(QMainWindow):
             files = QFileDialog.getOpenFileNames(
                 self,
                 "Open files",
-                str(user_settings.FILE_BROWSER_START_DIR),
+                str(settings.FILE_BROWSER_START_DIR),
                 file_filter,
             )
             # list[str]
@@ -433,7 +428,7 @@ class MainWindow(QMainWindow):
         try:
             global_vars.CONDUCTANCE_PARAMETER = float(conductance)
         except ValueError:
-            if user_settings.DEBUG:
+            if settings.DEBUG:
                 print("Conductance must be a float!")
         self.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
         self.conductance_parameter_input.setPlaceholderText(
@@ -447,7 +442,7 @@ class MainWindow(QMainWindow):
         try:
             global_vars.SMOOTHING_ITERATIONS = int(iterations)
         except ValueError:
-            if user_settings.DEBUG:
+            if settings.DEBUG:
                 print("Iterations must be an integer!")
         self.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
         self.smoothing_iterations_input.setPlaceholderText(
@@ -461,7 +456,7 @@ class MainWindow(QMainWindow):
         try:
             global_vars.TIME_STEP = float(time_step)
         except ValueError:
-            if user_settings.DEBUG:
+            if settings.DEBUG:
                 print("Time step must be a float!")
         self.time_step_input.setText(str(global_vars.TIME_STEP))
         self.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
@@ -565,7 +560,7 @@ class MainWindow(QMainWindow):
             mask_QImage(
                 q_img,
                 np.transpose(binary_contour_slice),
-                string_to_QColor(user_settings.CONTOUR_COLOR),
+                string_to_QColor(settings.CONTOUR_COLOR),
             )
 
         elif global_vars.VIEW != constants.View.Z:
@@ -576,7 +571,7 @@ class MainWindow(QMainWindow):
             mask_QImage(
                 q_img,
                 np.transpose(z_indicator),
-                string_to_QColor(user_settings.CONTOUR_COLOR),
+                string_to_QColor(settings.CONTOUR_COLOR),
             )
 
         self.render_scaled_qpixmap_from_qimage(q_img)
@@ -629,7 +624,7 @@ class MainWindow(QMainWindow):
         # This is also the same as get_curr_rotated_slice().GetSpacing(), just without index [2]
         spacing: tuple = get_curr_image().GetSpacing()
 
-        if user_settings.DEBUG:
+        if settings.DEBUG:
             print(f"Computing circumference, and this is the spacing: {spacing}")
 
         # TODO
@@ -640,7 +635,7 @@ class MainWindow(QMainWindow):
         )
         # circumference: float = imgproc.length_of_contour(binary_contour_slice)
         self.circumference_label.setText(
-            f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
+            f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else constants.MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )
         return circumference
 
@@ -818,7 +813,7 @@ class MainWindow(QMainWindow):
         Assume that anything you put here will be overwritten freely.
 
         :return: None"""
-        self.image.setPixmap(QPixmap(f":/{user_settings.THEME_NAME}/help.svg"))
+        self.image.setPixmap(QPixmap(f":/{settings.THEME_NAME}/help.svg"))
         self.image.setStatusTip(
             "This is intentional, if it's a question mark then that's good :), means we can display icons"
         )
@@ -843,7 +838,7 @@ class MainWindow(QMainWindow):
         :return: `None`"""
         file_name = (
             global_vars.CURR_IMAGE_INDEX + 1
-            if user_settings.EXPORTED_FILE_NAMES_USE_INDEX
+            if settings.EXPORTED_FILE_NAMES_USE_INDEX
             else get_curr_path().name
         )
         path: str = str(
@@ -893,7 +888,7 @@ def display_metadata() -> None:
         print("Can't print metadata when there's no image!")
         return
     message: str = pprint.pformat(get_curr_metadata())
-    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+    if settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
         print(message)
     else:
         information_dialog("Metadata", message)
@@ -907,7 +902,7 @@ def display_dimensions() -> None:
         print("Can't print dimensions when there's no image!")
         return
     message: str = pprint.pformat(get_curr_image().GetSize())
-    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+    if settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
         print(message)
     else:
         information_dialog("Dimensions", message)
@@ -934,7 +929,7 @@ def display_properties() -> None:
         exit(1)
     # Pretty sure the dict(zip(...)) goes through fields in alphabetical order
     message: str = pprint.pformat(dict(zip(fields, curr_properties)))
-    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+    if settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
         print(message)
     else:
         information_dialog("Properties", message)
@@ -948,7 +943,7 @@ def display_direction() -> None:
         print("Can't print direction when there's no image!")
         return
     message: str = pprint.pformat(get_curr_image().GetDirection())
-    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+    if settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
         print(message)
     else:
         information_dialog("Direction", message)
@@ -962,7 +957,7 @@ def display_spacing() -> None:
         print("Can't print spacing when there's no image!")
         return
     message: str = pprint.pformat(get_curr_image().GetSpacing())
-    if user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
+    if settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL:
         print(message)
     else:
         information_dialog("Spacing", message)
@@ -975,7 +970,7 @@ def main() -> None:
     # This imports globally
     # For example, NeuroRuler/GUI/helpers.py can access resource files without having to import there
     importlib.import_module(
-        f"NeuroRuler.GUI.themes.{user_settings.THEME_NAME}.resources"
+        f"NeuroRuler.GUI.themes.{settings.THEME_NAME}.resources"
     )
 
     app = QApplication(sys.argv)
@@ -996,7 +991,7 @@ def main() -> None:
     MAIN_WINDOW: MainWindow = MainWindow()
 
     with open(
-        constants.THEME_DIR / user_settings.THEME_NAME / "stylesheet.qss", "r"
+            constants.THEME_DIR / settings.THEME_NAME / "stylesheet.qss", "r"
     ) as f:
         MAIN_WINDOW.setStyleSheet(f.read())
 
@@ -1006,10 +1001,10 @@ def main() -> None:
     MAIN_WINDOW.setMinimumSize(QSize(1, 1))
     MAIN_WINDOW.resize(
         int(
-            user_settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]
+            settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]
         ),
         int(
-            user_settings.STARTUP_HEIGHT_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[1]
+            settings.STARTUP_HEIGHT_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[1]
         ),
     )
 
@@ -1022,13 +1017,13 @@ def main() -> None:
         # because the Python process wouldn't end
         os._exit(app.exec())
     except:
-        if user_settings.DEBUG:
+        if settings.DEBUG:
             print("Exiting")
 
 
 if __name__ == "__main__":
     import NeuroRuler.utils.parser as parser
 
-    parser.parse_config_json()
+    parser.parse_gui_config()
     parser.parse_gui_cli()
     main()

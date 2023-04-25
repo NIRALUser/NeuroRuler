@@ -30,7 +30,7 @@ import NeuroRuler.utils.constants as constants
 # This would make the global variables not work
 import NeuroRuler.utils.global_vars as global_vars
 import NeuroRuler.utils.imgproc as imgproc
-import NeuroRuler.utils.user_settings as user_settings
+import NeuroRuler.utils.gui_settings as gui_settings
 
 
 def calculate_circumference(path) -> float:
@@ -43,7 +43,7 @@ def calculate_circumference(path) -> float:
     window.set_view_z()
     window.orient_curr_image()
     window.toggle_setting_to_false()
-    user_settings.CONTOUR_COLOR = "red"
+    gui_settings.CONTOUR_COLOR = "red"
     binary_contour_slice: np.ndarray = window.render_curr_slice()
     return window.render_circumference(binary_contour_slice)
 

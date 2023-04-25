@@ -41,11 +41,6 @@ def gui() -> None:
     except:
         pass
 
-    parser.parse_config_json()
+    parser.parse_gui_config()
     parser.parse_gui_cli()
     main.main()
-
-
-def GUI() -> None:
-    """Alias for gui()."""
-    gui()

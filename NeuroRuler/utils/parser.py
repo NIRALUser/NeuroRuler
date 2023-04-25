@@ -5,7 +5,8 @@ import json
 from pathlib import Path
 import string
 
-import NeuroRuler.utils.user_settings as user_settings
+import NeuroRuler.utils.cli_settings as cli_settings
+import NeuroRuler.utils.gui_settings as gui_settings
 import NeuroRuler.utils.constants as constants
 import NeuroRuler.utils.exceptions as exceptions
 
@@ -13,8 +14,66 @@ JSON_SETTINGS: dict = dict()
 """Dict of settings resulting from JSON file parsing. Global within this file."""
 
 
+def parse_cli() -> None:
+    """Parse CLI (non-GUI) args and set settings in `cli_settings.py`.
+
+    :return: None"""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
+    parser.add_argument("-r", "--raw", help="print just the \"raw\" circumference", action="store_true")
+    parser.add_argument("-x", "--x", type=int, help="x transformation (in degrees)")
+    parser.add_argument("-y", "--y", type=int, help="y transformation (in degrees)")
+    parser.add_argument("-z", "--z", type=int, help="z transformation (in degrees)")
+    parser.add_argument("-s", "--slice", type=int, help="slice (0-indexed)")
+    parser.add_argument("-c", "--conductance", type=float, help="conductance smoothing parameter")
+    parser.add_argument("-i", "--iterations", type=int, help="smoothing iterations")
+    parser.add_argument("-t", "--step", type=float, help="time step (smoothing parameter)")
+    parser.add_argument("-o", "--otsu", help="use Otsu instead of binary", action="store_true")
+    parser.add_argument("-l", "--lower", type=float, help="lower threshold for binary threshold")
+    parser.add_argument("-u", "--upper", type=float, help="upper threshold for binary threshold")
+    parser.add_argument("file", help="file to compute")
+    args = parser.parse_args()
+
+    if args.debug:
+        cli_settings.DEBUG = True
+        print("Debug CLI option supplied.")
+
+    cli_settings.RAW = args.raw
+
+    if args.x:
+        cli_settings.THETA_X = args.x
+
+    if args.y:
+        cli_settings.THETA_Y = args.y
+
+    if args.z:
+        cli_settings.THETA_Z = args.z
+
+    if args.slice:
+        cli_settings.SLICE = args.slice
+
+    if args.conductance:
+        cli_settings.CONDUCTANCE_PARAMETER = args.conductance
+
+    if args.iterations:
+        cli_settings.SMOOTHING_ITERATIONS = args.iterations
+
+    if args.step:
+        cli_settings.TIME_STEP = args.step
+
+    cli_settings.USE_OTSU = args.otsu
+
+    if args.lower:
+        cli_settings.LOWER_THRESHOLD = args.lower
+
+    if args.upper:
+        cli_settings.UPPER_THRESHOLD = args.upper
+
+    cli_settings.FILE = args.file
+
+
 def parse_gui_cli() -> None:
-    """Parse GUI CLI args and set global settings in `user_settings.py`.
+    """Parse GUI CLI args and set settings in `gui_settings.py`.
 
     :return: None"""
     parser = argparse.ArgumentParser()
@@ -40,11 +99,11 @@ def parse_gui_cli() -> None:
     args = parser.parse_args()
 
     if args.debug:
-        user_settings.DEBUG = True
+        gui_settings.DEBUG = True
         print("Debug CLI option supplied.")
 
     if args.export_index:
-        user_settings.EXPORTED_FILE_NAMES_USE_INDEX = True
+        gui_settings.EXPORTED_FILE_NAMES_USE_INDEX = True
         print("Exported files will use the index displayed in the GUI.")
 
     if args.theme:
@@ -54,52 +113,68 @@ def parse_gui_cli() -> None:
             )
             exit(1)
 
-        user_settings.THEME_NAME = args.theme
-        user_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
+        gui_settings.THEME_NAME = args.theme
+        gui_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
         print(f"Theme {args.theme} specified.")
 
     if args.color:
-        user_settings.CONTOUR_COLOR = args.color
+        gui_settings.CONTOUR_COLOR = args.color
         print(
             f"Contour color is {'#' if not args.color.isalpha() else ''}{args.color}."
         )
 
 
-def parse_config_json() -> None:
-    """Parse config JSON and set user settings in user_settings.py.
+def parse_cli_config() -> None:
+    """Parse CLI JSON config and set user settings in gui_settings.py.
 
-    load_json will load constants.JSON_CONFIG_PATH."""
+    load_json will load constants.JSON_CLI_CONFIG_PATH."""
     global JSON_SETTINGS
-    JSON_SETTINGS = load_json(constants.JSON_CONFIG_PATH)
-    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_JSON:
+    JSON_SETTINGS = load_json(constants.JSON_CLI_CONFIG_PATH)
+    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG:
         raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_JSON} rows in JSON file but found {len(JSON_SETTINGS)}."
+            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
+        )
+    # WIP obviously -Eric
+    gui_settings.DEBUG = parse_bool("DEBUG")
+    if gui_settings.DEBUG:
+        print("Printing debug messages.")
+
+
+def parse_gui_config() -> None:
+    """Parse GUI JSON config and set user settings in gui_settings.py.
+
+    load_json will load constants.JSON_GUI_CONFIG_PATH."""
+    global JSON_SETTINGS
+    JSON_SETTINGS = load_json(constants.JSON_GUI_CONFIG_PATH)
+    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG:
+        raise Exception(
+            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
         )
 
-    user_settings.DEBUG = parse_bool("DEBUG")
-    if user_settings.DEBUG:
+    gui_settings.DEBUG = parse_bool("DEBUG")
+    if gui_settings.DEBUG:
         print("Printing debug messages.")
-    user_settings.FILE_BROWSER_START_DIR = parse_path("FILE_BROWSER_START_DIR")
-    user_settings.EXPORTED_FILE_NAMES_USE_INDEX = parse_bool(
+    gui_settings.FILE_BROWSER_START_DIR = parse_path("FILE_BROWSER_START_DIR")
+    gui_settings.EXPORTED_FILE_NAMES_USE_INDEX = parse_bool(
         "EXPORTED_FILE_NAMES_USE_INDEX"
     )
 
-    user_settings.THEME_NAME = JSON_SETTINGS["THEME_NAME"]
-    if user_settings.THEME_NAME not in constants.THEMES:
+    gui_settings.THEME_NAME = JSON_SETTINGS["THEME_NAME"]
+    if gui_settings.THEME_NAME not in constants.THEMES:
         raise exceptions.InvalidJSONField(
             "THEME_NAME", list_of_options_to_str(constants.THEMES)
         )
 
     contour_color: str = JSON_SETTINGS["CONTOUR_COLOR"]
     if contour_color == "":
-        user_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
+        gui_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
     # A name, e.g. red, green, blue. etc., which can be converted to a QColor
     elif contour_color.isalpha():
-        user_settings.CONTOUR_COLOR = contour_color
+        gui_settings.CONTOUR_COLOR = contour_color
     elif len(contour_color) == 6 and all(
         char in string.hexdigits for char in contour_color
     ):
-        user_settings.CONTOUR_COLOR = contour_color
+        gui_settings.CONTOUR_COLOR = contour_color
     else:
         raise exceptions.InvalidJSONField(
             "CONTOUR_COLOR",
@@ -107,9 +182,9 @@ def parse_config_json() -> None:
             "to set a default color based on theme",
         )
 
-    user_settings.STARTUP_WIDTH_RATIO = parse_float("STARTUP_WIDTH_RATIO")
-    user_settings.STARTUP_HEIGHT_RATIO = parse_float("STARTUP_HEIGHT_RATIO")
-    user_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL = parse_bool(
+    gui_settings.STARTUP_WIDTH_RATIO = parse_float("STARTUP_WIDTH_RATIO")
+    gui_settings.STARTUP_HEIGHT_RATIO = parse_float("STARTUP_HEIGHT_RATIO")
+    gui_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL = parse_bool(
         "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL"
     )
 
@@ -117,15 +192,15 @@ def parse_config_json() -> None:
 def parse_main_color_from_theme_json() -> str:
     """Parse the main color from the theme JSON file (user_settings.THEME_NAME) in the highlight field.
 
-    Uses user_settings.THEME_NAME so must be called after parse_config_json sets user_settings.THEME_NAME
-    (i.e. can be called within parse_config_json).
+    Uses user_settings.THEME_NAME so must be called after parse_gui_config sets user_settings.THEME_NAME
+    (i.e. can be called within parse_gui_config).
 
     :return: main color rrggbb (hexits)
     :rtype: str"""
     path_to_theme_json: Path = (
-        constants.THEME_DIR
-        / user_settings.THEME_NAME
-        / (user_settings.THEME_NAME + ".json")
+            constants.THEME_DIR
+            / gui_settings.THEME_NAME
+            / (gui_settings.THEME_NAME + ".json")
     )
     theme_json: dict = load_json(path_to_theme_json)
     color: str = theme_json["highlight"]

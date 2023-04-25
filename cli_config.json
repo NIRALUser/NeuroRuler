@@ -1,0 +1,9 @@
+// Comments beginning with // are ignored.
+// Use "True" or "False" for binary options
+// For other field types, the comments specify what the allowed values are.
+// Do not add or remove fields in this file if you're a user
+// If you're a developer who's adding or removing options,
+// modify parser.py and constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG
+{
+    "DEBUG": "False"
+}

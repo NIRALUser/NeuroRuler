@@ -4,7 +4,7 @@ from NeuroRuler.utils.constants import (
     deprecated,
     ROTATION_MAX,
     ROTATION_MIN,
-    JSON_CONFIG_PATH,
+    JSON_GUI_CONFIG_PATH,
 )
 
 
@@ -56,5 +56,5 @@ class InvalidJSONField(Exception):
         """`field` is the name of the invalid field
 
         `expected` is some information about what the expected value should be"""
-        self.message = f"The field {field} in {JSON_CONFIG_PATH} has an invalid type or value.\nExpected: {expected}"
+        self.message = f"The field {field} in {JSON_GUI_CONFIG_PATH} has an invalid type or value.\nExpected: {expected}"
         super().__init__(self.message)
