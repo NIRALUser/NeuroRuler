@@ -1,7 +1,7 @@
 ---
 name: Custom issue template
 about: Issue template for miscellaneous issues.
-title: "[OTHER]"
+title: "[OTHER] "
 labels: ''
 assignees:
 ---
