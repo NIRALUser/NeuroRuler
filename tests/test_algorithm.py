@@ -1,4 +1,6 @@
 import re
+
+import pytest
 from NeuroRuler.utils.img_helpers import *
 from NeuroRuler.GUI.main import *
 import NeuroRuler.utils.global_vars as global_vars
@@ -10,8 +12,7 @@ from typing import Union
 import SimpleITK as sitk
 import numpy as np
 
-from PyQt6 import QtGui, QtCore
-from PyQt6.QtGui import QPixmap, QAction, QImage, QIcon, QResizeEvent
+from PyQt6.QtTest import QTest
 from PyQt6.QtWidgets import (
     QPushButton,
     QApplication,
@@ -29,6 +30,9 @@ import NeuroRuler.utils.global_vars as global_vars
 import NeuroRuler.utils.imgproc as imgproc
 import NeuroRuler.utils.user_settings as user_settings
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason = "Test doesn't work for CI")
 def calculate_circumference(path) -> float:
     # set up ui
     app = QApplication(sys.argv)
@@ -38,18 +42,20 @@ def calculate_circumference(path) -> float:
     window.browse_files(False, path)
     window.set_view_z()
     window.orient_curr_image()
-    window.disable_setting()
+    window.toggle_setting_to_false()
     user_settings.CONTOUR_COLOR = "red"
     binary_contour_slice: np.ndarray = window.render_curr_slice()
     return window.render_circumference(binary_contour_slice)
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason = "Test doesn't work for CI")
 def labeled_result(path) -> float:
     with open(path, 'r') as file:
         line = file.readline().strip()
         parts = line.split('\t')
         last_section = parts[-1]
         return float(last_section)
-
+    
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason = "Test doesn't work for CI")
 def test_algorithm():
     labeled_data = []
     calculated_data = []

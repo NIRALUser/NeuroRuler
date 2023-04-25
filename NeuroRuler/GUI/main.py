@@ -642,7 +642,7 @@ class MainWindow(QMainWindow):
         )
         return circumference
     
-    def disable_setting(self) -> None:
+    def toggle_setting_to_false(self) -> None:
         """Used in testing.
 
         Flipping the SETTINGS_VIEW_ENABLED
@@ -650,6 +650,16 @@ class MainWindow(QMainWindow):
         :return: None"""
         global SETTINGS_VIEW_ENABLED
         if SETTINGS_VIEW_ENABLED:
+            SETTINGS_VIEW_ENABLED = not SETTINGS_VIEW_ENABLED
+
+    def toggle_setting_to_true(self) -> None:
+        """Used in testing.
+
+        Flipping the SETTINGS_VIEW_ENABLED
+
+        :return: None"""
+        global SETTINGS_VIEW_ENABLED
+        if not SETTINGS_VIEW_ENABLED:
             SETTINGS_VIEW_ENABLED = not SETTINGS_VIEW_ENABLED
 
     def render_image_num_and_path(self) -> None:
