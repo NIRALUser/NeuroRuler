@@ -13,14 +13,6 @@ jobs:
         run: |
           sudo apt-get install curl
           sudo apt-get install unzip
-      - name: Download NeuroRuler data into data/
-        # Source: https://stackoverflow.com/questions/21322614/use-curl-to-download-a-dropbox-folder-via-shared-link-not-public-link
-        # Also https://stackoverflow.com/questions/21322416/unzip-warning-and-mapname
-        run: |
-          curl -L -o data.zip https://www.dropbox.com/sh/3k3p0o14rdwrx7p/AAAGSpXdVkyBXAnanPZgwRP4a/?dl/=1
-          unzip data.zip -x / -d data/
-          ls -R data/
-          rm data.zip
 
   test:
     runs-on: ${{ matrix.os }}
