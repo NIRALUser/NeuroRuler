@@ -341,7 +341,7 @@ class MainWindow(QMainWindow):
             files = QFileDialog.getOpenFileNames(
                 self,
                 "Open files",
-                str(user_settings.FILE_BROWSER_START_DIR),
+                str(settings.FILE_BROWSER_START_DIR),
                 file_filter,
             )
             # list[str]
@@ -624,7 +624,7 @@ class MainWindow(QMainWindow):
         # This is also the same as get_curr_rotated_slice().GetSpacing(), just without index [2]
         spacing: tuple = get_curr_image().GetSpacing()
 
-        if user_settings.DEBUG:
+        if settings.DEBUG:
             print(f"Computing circumference, and this is the spacing: {spacing}")
 
         # TODO
