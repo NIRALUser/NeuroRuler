@@ -1,22 +1,10 @@
-# You should upload new data into your local data/, but don't commit it to the repo
-# Data will be downloaded into data/ during GitHub CI tests
-# See .github/workflows/tests.yml
-data/*.nrrd
-data/*.nii.gz
-data/*.nii
-data/*.tsv
-
 output/
 scripts/pypi
 scripts/pypi_upload
 scripts/testpypi
 scripts/testpypi_upload
 
-.ipynb_checkpoints
 .DS_Store
-venv/
-.idea/
-.tox/
 Playground/imgproc/contour_numpy.txt
 Playground/imgproc/contour_sitk.txt
 Playground/imgproc/numpy_array_255.png
@@ -24,10 +12,7 @@ NeuroRuler/HeadCircumferenceTool.egg-info
 tests/noise_vals.txt
 tests/noise_vals_copy.txt
 out/
-.pytest_cache/
-__pycache__/
 bin/
-lib/
 etc/
 include/
 share/
