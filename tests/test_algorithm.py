@@ -2,9 +2,10 @@ import re
 import os
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+CI = os.getenv("CI") == "true"
 import pytest
 
-if not IN_GITHUB_ACTIONS:
+if not IN_GITHUB_ACTIONS and not CI:
     from NeuroRuler.utils.img_helpers import *
     from NeuroRuler.GUI.main import *
     import NeuroRuler.utils.global_vars as global_vars
@@ -35,7 +36,7 @@ if not IN_GITHUB_ACTIONS:
     import NeuroRuler.utils.user_settings as user_settings
 
 
-@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work for CI")
+@pytest.mark.skipif(IN_GITHUB_ACTIONS or CI, reason="Test doesn't work for CI")
 def calculate_circumference(path) -> float:
     # set up ui
     app = QApplication(sys.argv)
@@ -51,7 +52,7 @@ def calculate_circumference(path) -> float:
     return window.render_circumference(binary_contour_slice)
 
 
-@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work for CI")
+@pytest.mark.skipif(IN_GITHUB_ACTIONS or CI, reason="Test doesn't work for CI")
 def labeled_result(path) -> float:
     with open(path, "r") as file:
         line = file.readline().strip()
@@ -60,7 +61,7 @@ def labeled_result(path) -> float:
         return float(last_section)
 
 
-@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work for CI")
+@pytest.mark.skipif(IN_GITHUB_ACTIONS or CI, reason="Test doesn't work for CI")
 def test_algorithm():
     labeled_data = []
     calculated_data = []

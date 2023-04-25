@@ -1,13 +1,14 @@
 import os
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+CI = os.getenv("CI") == "true"
 
 import sys
 import unittest
 
 import pytest
 
-if not IN_GITHUB_ACTIONS:
+if not IN_GITHUB_ACTIONS and not CI:
     from NeuroRuler.utils.img_helpers import *
     from NeuroRuler.GUI.main import *
 
@@ -16,7 +17,7 @@ if not IN_GITHUB_ACTIONS:
     from PyQt6.QtCore import Qt
 
 
-@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work for CI")
+@pytest.mark.skipif(IN_GITHUB_ACTIONS or CI, reason="Test doesn't work for CI")
 class MainWindowTest(unittest.TestCase):
     """Test the program by simulating GUI actions"""
 
