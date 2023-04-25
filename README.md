@@ -1,6 +1,6 @@
 # NeuroRuler
 
-![Tests](https://github.com/COMP523TeamD/HeadCircumferenceTool/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/COMP523TeamD/NeuroRuler/actions/workflows/tests.yml/badge.svg)
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Python](https://img.shields.io/badge/python-3670A0?style=plastic&logo=python&logoColor=ffdd54)
 
@@ -18,7 +18,7 @@ If you want 😉 format is bibtex.
 @misc{neuroruler,
   title={NeuroRuler},
   author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
-  howpublished={\url{https://github.com/COMP523TeamD/HeadCircumferenceTool}},
+  howpublished={\url{https://github.com/COMP523TeamD/NeuroRuler}},
   year={2023}
 }
 ```
@@ -31,21 +31,20 @@ Your Python version needs to be 3.8+. Check with `python --version`. Install via
 pip install NeuroRuler
 ```
 
-If `pip` doesn't work, try `pip3` or `python3 -m pip`.
+If `pip` doesn't work, try `pip3`.
 
-If contributing to this repo, please also run `pip install -r requirements.txt` to install additional development dependencies (e.g., formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
+If contributing to this repo, please fork and run `pip install -r requirements.txt` to install additional development dependencies (for code formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
 
 ## Run GUI
 
 Run these commands in a Python terminal:
 
 ```py
-from NeuroRuler import gui
-
+from NeuroRuler.GUI import gui
 gui()
 ```
 
-Note: If you make changes to the repo, then use the [`gui.py`](https://github.com/COMP523TeamD/HeadCircumferenceTool/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPI.
+Note: If you make changes to the repo, then use the [`gui.py`](gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPI.
 
 See [release](#release) for how to upload to PyPI or Test PyPI.
 
@@ -73,9 +72,11 @@ options:
 
 `pytest`
 
+Our unit tests run on GitHub Actions on push and PR. The results are on GitHub.
+
 ## Documentation
 
-[https://headcircumferencetool.readthedocs.io](https://headcircumferencetool.readthedocs.io)
+[https://NeuroRuler.readthedocs.io](https://NeuroRuler.readthedocs.io)
 
 See [`.readthedocs.yaml`](.readthedocs.yaml) and [`docs/`](docs/).
 
@@ -90,8 +91,8 @@ Before each commit, the actions in [`.pre-commit-config.yaml`](.pre-commit-confi
 * [PyPI page](https://pypi.org/project/NeuroRuler/)
 * [TestPyPI page](https://test.pypi.org/project/NeuroRuler/)
 
-To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). Then create a branch named `release-pypi/version-num`. Push a tagged (use the version number) commit to that branch to run the `pypi.yml` action, which will publish to PyPI.
+To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [`setup.py`](setup.py). Push a **tagged (use the version number) commit** to the `main` branch (can be done through PR) to publish to PyPI (these actions cause the [`pypi.yml`](.github/workflows/pypi.yml) action to run).
 
 The version number on PyPI will be the one in `setup.py`, so make sure it's correct!
 
-Follow a similar process to publish to TestPyPI.
+To publish on Test PyPI, edit the version number, and push to a branch called `release-testpypi` (create it if it doesn't exist).
