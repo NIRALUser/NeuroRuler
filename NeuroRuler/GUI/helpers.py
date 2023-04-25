@@ -28,7 +28,7 @@ from PyQt6.QtCore import Qt
 import qimage2ndarray
 
 import NeuroRuler.utils.exceptions as exceptions
-import NeuroRuler.utils.user_settings as user_settings
+import NeuroRuler.utils.gui_settings as user_settings
 from NeuroRuler.utils.constants import deprecated
 
 MACOS: bool = "macOS" in platform.platform()

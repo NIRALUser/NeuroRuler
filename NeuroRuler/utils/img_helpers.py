@@ -312,11 +312,11 @@ def get_curr_metadata() -> dict[str, str]:
     return rv
 
 
-# TODO: works only for NIFTI, not NRRD
+# TODO works only for NIFTI, not NRRD
 def get_curr_physical_units() -> Union[str, None]:
     """Return currently displayed image's physical units from sitk.GetMetaData if it exists, else None.
 
-    TODO: works only for NIFTI, not NRRD.
+    TODO works only for NIFTI, not NRRD.
 
     :return: units or None
     :rtype: str or None"""

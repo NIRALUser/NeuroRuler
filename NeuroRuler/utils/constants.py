@@ -1,7 +1,7 @@
 """Constant values and functions. DO NOT MUTATE ANY VARIABLE IN THIS FILE FROM OUTSIDE OF THIS FILE!
 
 This file holds values that will never change outside of this file, unlike global_vars.py.
-No values here should be directly modifiable by the user, unlike user_settings.py.
+No values here should be directly modifiable by the user, unlike gui_settings.py.
 
 This file should not import any module in this repo to avoid circular imports."""
 
@@ -25,19 +25,27 @@ IMG_DIR: Path = OUTPUT_DIR / "img"
 if not IMG_DIR.exists():
     IMG_DIR.mkdir()
 
-# Moved this because pkg_resources needs it to be in a package
-JSON_CONFIG_PATH: Path = Path("config.json")
-"""Settings that configure user_settings.py."""
-if not JSON_CONFIG_PATH.exists():
+JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
+"""Settings that configure cli_settings.py."""
+if not JSON_CLI_CONFIG_PATH.exists():
     # __name__ will get to the utils module
-    # and config.json is at root directory
-    JSON_CONFIG_PATH = Path(pkg_resources.resource_filename(__name__, "../../config.json"))
+    # and cli_config.json is at root directory
+    JSON_CLI_CONFIG = Path(pkg_resources.resource_filename(__name__, "../../cli_config.json"))
+EXPECTED_NUM_FIELDS_IN_CLI_CONFIG: int = 1
+"""Number of expected fields in the CLI config file. If the number of fields discovered does not match this, an exception
+will be raised."""
+
+JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
+"""Settings that configure gui_settings.py."""
+if not JSON_GUI_CONFIG_PATH.exists():
+    # __name__ will get to the utils module
+    # and gui_config.json is at root directory
+    JSON_GUI_CONFIG = Path(pkg_resources.resource_filename(__name__, "../../gui_config.json"))
+EXPECTED_NUM_FIELDS_IN_GUI_CONFIG: int = 8
+"""Number of expected fields in the GUI config file. If the number of fields discovered does not match this, an exception
+will be raised."""
 
 DATA_DIR: Path = Path("data")
-
-EXPECTED_NUM_FIELDS_IN_JSON: int = 8
-"""Number of expected fields in JSON config file. If the number of fields discovered does not match this, an exception
-will be raised."""
 
 SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """File formats supported. Must be a subset of the file formats supported by SimpleITK.
@@ -154,6 +162,10 @@ try:
 except ScreenInfoError:
     # This will occur in GH automated tests.
     pass
+
+
+MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND: str = "millimeters (mm)"
+"""We assume units are millimeters if we can't find units in metadata"""
 
 
 # Source: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically

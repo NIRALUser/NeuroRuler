@@ -1,14 +1,15 @@
-"""Global settings that the user should be able to modify directly, unlike global_vars.py and constants.py, via
+"""Global GUI settings that the user should be able to modify directly, unlike global_vars.py and constants.py, via
 JSON, GUI, CLI, etc.
 
 Default values are mostly what's in the config.json file.
 
-However, there shouldn't be any blank values here (that could be set to a real default value in parser.py)
+However, there shouldn't be any blank (empty string) values here
+(like the blank values in gui_config.json that are set to default values by parser.py)
 because if parsing the GUI json fails (e.g., doesn't exist),
 then we need an actual working value here.
 
-The values in this file don't matter since they'll be overwritten by what's in config.json and then by CLI options,
-if any. But the values here should match the values in config.json for consistency."""
+The values in this file don't matter since they'll be overwritten by what's in gui_config.json and then by CLI options,
+if any. But the values here should match the values in gui_config.json for consistency."""
 
 from pathlib import Path
 

@@ -1,8 +1,8 @@
 """After installing NeuroRuler via pip, the functions here are importable like so
 
-from NeuroRuler.GUI import {function}
+from NeuroRuler import {function}
 
-where NeuroRuler.GUI is the name of the package this __init__.py file is in."""
+where NeuroRuler is the name of the package this __init__.py file is in."""
 
 import sys
 import os
@@ -41,11 +41,6 @@ def gui() -> None:
     except:
         pass
 
-    parser.parse_config_json()
+    parser.parse_gui_config()
     parser.parse_gui_cli()
     main.main()
-
-
-def GUI() -> None:
-    """Alias for gui()."""
-    gui()
