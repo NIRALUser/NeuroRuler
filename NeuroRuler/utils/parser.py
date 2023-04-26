@@ -18,13 +18,17 @@ def parse_cli() -> None:
     """Parse CLI (non-GUI) args and set settings in `cli_settings.py`.
 
     :return: None"""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        prog="NeuroRuler",
+        description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`)."
+    )
+
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
     parser.add_argument("-r", "--raw", help="print just the \"raw\" circumference", action="store_true")
-    parser.add_argument("-x", "--x", type=int, help="x transformation (in degrees)")
-    parser.add_argument("-y", "--y", type=int, help="y transformation (in degrees)")
-    parser.add_argument("-z", "--z", type=int, help="z transformation (in degrees)")
-    parser.add_argument("-s", "--slice", type=int, help="slice (0-indexed)")
+    parser.add_argument("-x", "--x", type=int, help="x rotation (in degrees)")
+    parser.add_argument("-y", "--y", type=int, help="y rotation (in degrees)")
+    parser.add_argument("-z", "--z", type=int, help="z rotation (in degrees)")
+    parser.add_argument("-s", "--slice", type=int, help="slice (cervical, 0-indexed)")
     parser.add_argument("-c", "--conductance", type=float, help="conductance smoothing parameter")
     parser.add_argument("-i", "--iterations", type=int, help="smoothing iterations")
     parser.add_argument("-t", "--step", type=float, help="time step (smoothing parameter)")
