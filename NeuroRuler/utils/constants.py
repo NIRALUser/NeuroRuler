@@ -30,20 +30,14 @@ JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
 if not JSON_CLI_CONFIG_PATH.exists():
     # __name__ will get to the utils module
     # and cli_config.json is at root directory
-    JSON_CLI_CONFIG = Path(pkg_resources.resource_filename(__name__, "../../cli_config.json"))
-EXPECTED_NUM_FIELDS_IN_CLI_CONFIG: int = 1
-"""Number of expected fields in the CLI config file. If the number of fields discovered does not match this, an exception
-will be raised."""
+    JSON_CLI_CONFIG_PATH = Path(pkg_resources.resource_filename(__name__, "../../cli_config.json"))
 
 JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
 """Settings that configure gui_settings.py."""
 if not JSON_GUI_CONFIG_PATH.exists():
     # __name__ will get to the utils module
     # and gui_config.json is at root directory
-    JSON_GUI_CONFIG = Path(pkg_resources.resource_filename(__name__, "../../gui_config.json"))
-EXPECTED_NUM_FIELDS_IN_GUI_CONFIG: int = 8
-"""Number of expected fields in the GUI config file. If the number of fields discovered does not match this, an exception
-will be raised."""
+    JSON_GUI_CONFIG_PATH = Path(pkg_resources.resource_filename(__name__, "../../gui_config.json"))
 
 DATA_DIR: Path = Path("data")
 

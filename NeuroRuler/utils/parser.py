@@ -9,7 +9,6 @@ import NeuroRuler.utils.cli_settings as cli_settings
 import NeuroRuler.utils.gui_settings as gui_settings
 import NeuroRuler.utils.constants as constants
 import NeuroRuler.utils.exceptions as exceptions
-import pkg_resources
 
 JSON_SETTINGS: dict = dict()
 """Dict of settings resulting from JSON file parsing. Global within this file."""
@@ -131,10 +130,6 @@ def parse_cli_config() -> None:
     load_json will load constants.JSON_CLI_CONFIG_PATH."""
     global JSON_SETTINGS
     JSON_SETTINGS = load_json(constants.JSON_CLI_CONFIG_PATH)
-    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG:
-        raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
-        )
     # WIP obviously -Eric
     gui_settings.DEBUG = parse_bool("DEBUG")
     if gui_settings.DEBUG:
@@ -147,10 +142,6 @@ def parse_gui_config() -> None:
     load_json will load constants.JSON_GUI_CONFIG_PATH."""
     global JSON_SETTINGS
     JSON_SETTINGS = load_json(constants.JSON_GUI_CONFIG_PATH)
-    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG:
-        raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
-        )
 
     gui_settings.DEBUG = parse_bool("DEBUG")
     if gui_settings.DEBUG:

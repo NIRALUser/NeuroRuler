@@ -167,6 +167,9 @@ def length_of_contour_with_spacing(
     :rtype: float
     """
     contours, hierarchy = cv2.findContours(
+        # TC89_L1 works better than SIMPLE
+        # That is, when (a, a, a) pixel spacing image is converted to (a, b, c) pixel spacing via Slicer,
+        # The arc length is closer to the (a, a, a) arc length if using TC89_L1 than when using SIMPLE
         binary_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1
     )
 

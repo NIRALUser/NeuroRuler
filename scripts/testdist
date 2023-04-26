@@ -1,9 +1,15 @@
-#!/bin/zsh
+# This script should be sourced
+# Run with . scripts/testdist
 
 rm -r dist
-pip uninstall NeuroRuler
+pip uninstall NeuroRuler -y
 python3 setup.py sdist
 # There will be only one file
 for file in dist/*; do
     pip install $file;
 done
+
+# Should test from directory that isn't NeuroRuler
+# Importing NeuroRuler stuff from NeuroRuler directory will import from the NeuroRuler directory
+# Not the pip package
+cd ..
