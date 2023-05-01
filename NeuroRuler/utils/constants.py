@@ -24,6 +24,11 @@ IMG_DIR: Path = OUTPUT_DIR / "img"
 if not IMG_DIR.exists():
     IMG_DIR.mkdir()
 
+JSON_DIR: Path = OUTPUT_DIR / "json"
+"""Directory for storing outputted json files."""
+if not JSON_DIR.exists():
+    JSON_DIR.mkdir()
+
 JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
 """Settings that configure gui_settings.py."""
 EXPECTED_NUM_FIELDS_IN_CLI_CONFIG: int = 1

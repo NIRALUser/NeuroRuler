@@ -15,6 +15,8 @@ then you will need to modify those."""
 import importlib
 import sys
 import os
+import json
+import re
 import webbrowser
 from pathlib import Path
 from typing import Union
@@ -167,6 +169,8 @@ class MainWindow(QMainWindow):
         self.x_view_radio_button.clicked.connect(self.update_view)
         self.y_view_radio_button.clicked.connect(self.update_view)
         self.z_view_radio_button.clicked.connect(self.update_view)
+
+        self.export_button.clicked.connect(self.export_json)
 
     def enable_elements(self) -> None:
         """Called after File > Open.
@@ -846,6 +850,49 @@ class MainWindow(QMainWindow):
             / f"{file_name}_{'contoured_' if not SETTINGS_VIEW_ENABLED else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
         )
         self.image.pixmap().save(path, extension)
+
+    def export_json(self) -> None:
+        """Called when "export" button is clicked
+        
+        :return: `None`"""
+        file_name = (
+            global_vars.CURR_IMAGE_INDEX + 1
+            if settings.EXPORTED_FILE_NAMES_USE_INDEX
+            else get_curr_path().name
+        )
+        path: str = str(
+            constants.JSON_DIR
+            / f"{file_name}.json"
+        )
+
+        output_path: str = str(constants.JSON_DIR)
+        
+        circumference = self.get_circumference()
+
+        data = {
+        "Image_name": file_name,
+        "output_folder": output_path,
+        "x_rotation": global_vars.THETA_X,
+        "y_rotation": global_vars.THETA_Y,
+        "z_rotation": global_vars.THETA_Z,
+        "slice": global_vars.SLICE,
+        "smoothing_conductance": global_vars.CONDUCTANCE_PARAMETER,
+        "smoothing_iterations": global_vars.SMOOTHING_ITERATIONS,
+        "smoothing_time_step": global_vars.TIME_STEP,
+        "circumference": circumference
+        }
+
+        with open(path, 'w') as outfile:
+            json.dump(data, outfile)
+
+    def get_circumference(self) -> str:
+        """Get the value on the "circumference_label"
+
+        :return: `str`"""
+        circumference_label: str = self.circumference_label.text()
+        split_parts = re.split('[:(]', circumference_label)
+        circumference = split_parts[1].strip()
+        return circumference
 
     def orient_curr_image(self) -> None:
         """Orient the current image for the current view (global_vars.VIEW) by applying ORIENT_FILTER on it.
