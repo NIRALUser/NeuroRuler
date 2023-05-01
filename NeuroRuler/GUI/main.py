@@ -92,6 +92,8 @@ DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 
+CIRCUMFERENCE_RESULT: float = 0.0
+
 UNSCALED_QPIXMAP: QPixmap
 """Unscaled QPixmap from which the scaled version is rendered in the GUI.
 
@@ -641,6 +643,8 @@ class MainWindow(QMainWindow):
         self.circumference_label.setText(
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else constants.MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )
+        global CIRCUMFERENCE_RESULT
+        CIRCUMFERENCE_RESULT = circumference
         return circumference
 
     def toggle_setting_to_false(self) -> None:
@@ -866,8 +870,16 @@ class MainWindow(QMainWindow):
         )
 
         output_path: str = str(constants.JSON_DIR)
-        
-        circumference = self.get_circumference()
+        circumference: float = CIRCUMFERENCE_RESULT
+
+        if self.otsu_radio_button.isChecked():
+            filter_option: str = "Otsu"
+            upper_threshold: str = "N/A"
+            lower_threshold: str = "N/A"
+        else:
+            filter_option: str = "Binary"
+            upper_threshold: float = global_vars.UPPER_THRESHOLD
+            lower_threshold: float = global_vars.LOWER_THRESHOLD
 
         data = {
         "Image_name": file_name,
@@ -879,21 +891,15 @@ class MainWindow(QMainWindow):
         "smoothing_conductance": global_vars.CONDUCTANCE_PARAMETER,
         "smoothing_iterations": global_vars.SMOOTHING_ITERATIONS,
         "smoothing_time_step": global_vars.TIME_STEP,
+        "filter_option": filter_option,
+        "upper_threshold": upper_threshold,
+        "lower_threshold": lower_threshold,
         "circumference": circumference
         }
 
         with open(path, 'w') as outfile:
             json.dump(data, outfile)
-
-    def get_circumference(self) -> str:
-        """Get the value on the "circumference_label"
-
-        :return: `str`"""
-        circumference_label: str = self.circumference_label.text()
-        split_parts = re.split('[:(]', circumference_label)
-        circumference = split_parts[1].strip()
-        return circumference
-
+    
     def orient_curr_image(self) -> None:
         """Orient the current image for the current view (global_vars.VIEW) by applying ORIENT_FILTER on it.
 
