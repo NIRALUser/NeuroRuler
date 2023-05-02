@@ -138,6 +138,7 @@ class MainWindow(QMainWindow):
         self.action_print_properties.triggered.connect(display_properties)
         self.action_print_direction.triggered.connect(display_direction)
         self.action_print_spacing.triggered.connect(display_spacing)
+        self.action_export_csv.triggered.connect(self.export_json)
         self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -156,6 +157,7 @@ class MainWindow(QMainWindow):
         self.action_export_xpm.triggered.connect(
             lambda: self.export_curr_slice_as_img("xpm")
         )
+        self.action_import.triggered.connect(self.import_json)
         self.next_button.clicked.connect(self.next_img)
         self.previous_button.clicked.connect(self.previous_img)
         self.apply_button.clicked.connect(self.settings_export_view_toggle)
@@ -244,6 +246,7 @@ class MainWindow(QMainWindow):
         # TODO: Call enable_elements and then a disable method (code another one, and it'd be short)
         # If not settings_view_enabled
         self.action_open.setEnabled(settings_view_enabled)
+        self.action_import.setEnabled(settings_view_enabled)
         self.action_add_images.setEnabled(settings_view_enabled)
         self.action_remove_image.setEnabled(settings_view_enabled)
         self.x_slider.setEnabled(settings_view_enabled)
@@ -855,9 +858,83 @@ class MainWindow(QMainWindow):
         )
         self.image.pixmap().save(path, extension)
 
+    def import_json(self) -> None:
+        """Called when "import" button is clicked
+        
+        Imported parameters include: image_name, output_folder, x_rotation, y_rotation, z_rotation, slice,
+        smoothing_conductance, smoothing_iterations, smoothing_time_step, filter_option, upper_threshold, lower_threshold,
+        and circumference
+
+        image_name is the only mandatary field.
+
+        :return: `None`"""
+        file_filter: str = "MRI images json " + str(
+                ("*.json")
+            ).replace("'", "").replace(",", "")
+
+        files, _ = QFileDialog.getOpenFileNames(
+                self,
+                "Open file",
+                str(settings.FILE_IMPORT_START_DIR),
+                file_filter
+            )
+        
+        # list[str]
+        path_list = files
+        if len(path_list) == 0:
+            return
+        
+        with open(path_list[0], 'r') as file:
+            # Parse the JSON data into a dictionary
+            data = json.load(file)
+        
+        image_path: str = str(constants.DATA_DIR) + "/" + data["image_name"]
+        self.browse_files(False, image_path)
+        
+        if "x_rotation" in data:
+            global_vars.THETA_X = data["x_rotation"]
+            self.x_slider.setValue(global_vars.THETA_X)
+
+        if "y_rotation" in data:
+            global_vars.THETA_Y = data["y_rotation"]
+            self.y_slider.setValue(global_vars.THETA_Y)
+        
+        if "z_rotation" in data:
+            global_vars.THETA_Z = data["z_rotation"]
+            self.z_slider.setValue(global_vars.THETA_Z)
+        
+        self.update_view()
+
+        if "slice" in data:
+            global_vars.SLICE = data["slice"]
+
+        if "smoothing_conductance" in data:
+            global_vars.CONDUCTANCE_PARAMETER = data["smoothing_conductance"]
+        
+        if "smoothing_iterations" in data:
+            global_vars.SMOOTHING_ITERATIONS = data["smoothing_iterations"]
+
+        if "smoothing_time_step" in data:
+            global_vars.TIME_STEP = data["smoothing_time_step"]    
+
+        self.update_smoothing_settings()    
+
+        if "filter_option" in data:
+            if data["filter_option"] == "Otsu":
+                self.disable_binary_threshold_inputs()
+            else:
+                self.enable_binary_threshold_inputs()
+                global_vars.UPPER_THRESHOLD = data["upper_threshold"]
+                global_vars.LOWER_THRESHOLD = data["lower_threshold"]
+                self.update_binary_filter_settings()
+
     def export_json(self) -> None:
         """Called when "export" button is clicked
         
+        Exported parameters include: image_name, output_folder, x_rotation, y_rotation, z_rotation, slice,
+        smoothing_conductance, smoothing_iterations, smoothing_time_step, filter_option, upper_threshold, lower_threshold,
+        and circumference
+
         :return: `None`"""
         file_name = (
             global_vars.CURR_IMAGE_INDEX + 1
@@ -882,7 +959,7 @@ class MainWindow(QMainWindow):
             lower_threshold: float = global_vars.LOWER_THRESHOLD
 
         data = {
-        "Image_name": file_name,
+        "image_name": file_name,
         "output_folder": output_path,
         "x_rotation": global_vars.THETA_X,
         "y_rotation": global_vars.THETA_Y,

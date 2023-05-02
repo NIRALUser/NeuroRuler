@@ -1082,7 +1082,7 @@
      <x>0</x>
      <y>0</y>
      <width>1308</width>
-     <height>18</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="nativeMenuBar">
@@ -1116,6 +1116,7 @@
     <addaction name="action_remove_image"/>
     <addaction name="action_export"/>
     <addaction name="action_exit"/>
+    <addaction name="action_import"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
@@ -1442,6 +1443,11 @@
   <action name="action_show_credits">
    <property name="text">
     <string>Show Credits</string>
+   </property>
+  </action>
+  <action name="action_import">
+   <property name="text">
+    <string>Import</string>
    </property>
   </action>
  </widget>
