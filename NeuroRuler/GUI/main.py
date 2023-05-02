@@ -888,6 +888,7 @@ class MainWindow(QMainWindow):
             # Parse the JSON data into a dictionary
             data = json.load(file)
         
+        #TODO: when we give up using "DATA_DIR", we need to modify this.
         image_path: str = str(constants.DATA_DIR) + "/" + data["image_name"]
         self.browse_files(False, image_path)
         
@@ -907,6 +908,8 @@ class MainWindow(QMainWindow):
 
         if "slice" in data:
             global_vars.SLICE = data["slice"]
+            self.slice_slider.setValue(global_vars.SLICE)
+            self.slice_update()
 
         if "smoothing_conductance" in data:
             global_vars.CONDUCTANCE_PARAMETER = data["smoothing_conductance"]
