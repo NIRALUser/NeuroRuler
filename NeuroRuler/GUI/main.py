@@ -927,6 +927,7 @@ class MainWindow(QMainWindow):
                 self.disable_binary_threshold_inputs()
             else:
                 self.enable_binary_threshold_inputs()
+                self.binary_radio_button.click()
                 global_vars.UPPER_THRESHOLD = data["upper_threshold"]
                 global_vars.LOWER_THRESHOLD = data["lower_threshold"]
                 self.update_binary_filter_settings()
