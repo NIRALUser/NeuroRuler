@@ -7,11 +7,11 @@
 {
     "DEBUG": "False",
     "RAW": "False",
-    "X": 0.0,
-    "Y": 0.0,
-    "Z": 0.0,
+    "X": 0,
+    "Y": 0,
+    "Z": 0,
     // -1 means NeuroRuler will put calculuate the middle
-    "SLICE": -1.0,
+    "SLICE": -1,
     "CONDUCTANCE": 3.0,
     "SMOOTHING": 5,
     "TIME_STEP": 0.0625,

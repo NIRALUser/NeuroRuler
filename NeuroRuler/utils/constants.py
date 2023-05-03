@@ -26,9 +26,8 @@ if not IMG_DIR.exists():
 
 JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
 """Settings that configure gui_settings.py."""
-EXPECTED_NUM_FIELDS_IN_CLI_CONFIG: int = 1
-"""Number of expected fields in the CLI config file. If the number of fields discovered does not match this, an exception
-will be raised."""
+EXPECTED_NUM_FIELDS_IN_CLI_CONFIG: int = 12
+"""Number of expected fields in the CLI config file. If the number of fields discovered does not match this, an exception will be raised."""
 
 JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
 """Settings that configure gui_settings.py."""

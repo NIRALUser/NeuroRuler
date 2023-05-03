@@ -1,3 +1,4 @@
+# TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively, and we should just keep the general parse functions here
 """Parse config JSON and CLI arguments to set global settings."""
 
 import argparse
@@ -138,10 +139,22 @@ def parse_cli_config() -> None:
         raise Exception(
             f"Expected {constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
         )
-    # WIP obviously -Eric
-    gui_settings.DEBUG = parse_bool("DEBUG")
-    if gui_settings.DEBUG:
+
+    cli_settings.DEBUG = parse_bool("DEBUG")
+    if cli_settings.DEBUG:
         print("Printing debug messages.")
+
+    cli_settings.RAW = parse_bool("RAW")
+    cli_settings.THETA_X = parse_int("X")
+    cli_settings.THETA_Y = parse_int("Y")
+    cli_settings.THETA_Z = parse_int("Z")
+    cli_settings.SLICE = parse_int("SLICE")
+    cli_settings.CONDUCTANCE_PARAMETER = parse_float("CONDUCTANCE")
+    cli_settings.SMOOTHING_ITERATIONS = parse_int("SMOOTHING")
+    cli_settings.TIME_STEP = parse_float("TIME_STEP")
+    cli_settings.USE_OTSU = parse_bool("USE_OTSU")
+    cli_settings.LOWER_THRESHOLD = parse_float("LOWER_THRESHOLD")
+    cli_settings.UPPER_THRESHOLD = parse_float("UPPER_THRESHOLD")
 
 
 def parse_gui_config() -> None:
