@@ -3,7 +3,7 @@
 Loads `NeuroRuler/GUI/mainwindow.ui`, made in QtDesigner.
 
 Loads `.qss` stylesheets and `resources.py` (icons) files, generated
-by BreezeStyleSheets. Our fork of the repo: https://github.com/COMP523TeamD/BreezeStyleSheets.
+by BreezeStyleSheets. Our fork of the repo: https://github.com/NIRALUser/BreezeStyleSheets.
 
 If adding a new GUI element (in the GUI or in the menubar, whatever), you'll have to modify
 modify __init__ and settings_view_toggle.
@@ -84,7 +84,7 @@ SETTINGS_VIEW_ENABLED: bool = True
 
 DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
 DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
-GITHUB_LINK: str = "https://github.com/COMP523TeamD/NeuroRuler"
+GITHUB_LINK: str = "https://github.com/NIRALUser/NeuroRuler"
 DOCUMENTATION_LINK: str = "https://NeuroRuler.readthedocs.io/en/latest/"
 DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
@@ -996,7 +996,7 @@ def main() -> None:
         MAIN_WINDOW.setStyleSheet(f.read())
 
     # Non-zero min width and height is needed to prevent
-    # this bug https://github.com/COMP523TeamD/NeuroRuler/issues/42
+    # this bug https://github.com/NIRALUser/NeuroRuler/issues/42
     # However, this also seems to affect startup GUI size or at least GUI element spacing
     MAIN_WINDOW.setMinimumSize(QSize(1, 1))
     MAIN_WINDOW.resize(

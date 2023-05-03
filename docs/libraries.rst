@@ -155,7 +155,7 @@ that are then loaded into Python code.
     :alt: QtDesigner
 
 `Install it <https://build-system.fman.io/qt-designer-download>`_. In QtDesigner, open
-`mainwindow.ui <https://github.com/COMP523TeamD/NeuroRuler/blob/main/NeuroRuler/GUI/mainwindow.ui>`_.
+`mainwindow.ui <https://github.com/NIRALUser/NeuroRuler/blob/main/NeuroRuler/GUI/mainwindow.ui>`_.
 You'll get the idea.
 
 .. _PyQt6Controller:
@@ -258,7 +258,7 @@ Mostly everything in PySide6 and PyQt6 is exactly the same, but there are some a
 
 * When we had multiple windows, switching to PySide6 broke window switching, and I couldn't figure it out.
 * There are minor naming differences, such as QImage.Format.Format_Grayscale16 (PyQt6) vs. QImage.Format_Grayscale16 (PySide6).
-* Loading a :code:`.ui` file is `different <https://github.com/COMP523TeamD/NeuroRuler/pull/26>`_.
+* Loading a :code:`.ui` file is `different <https://github.com/NIRALUser/NeuroRuler/pull/26>`_.
 
 .. warning:: Note QImage and :ref:`numpy` treat width and height differently!
 
@@ -319,17 +319,17 @@ BreezeStyleSheets
 
 Used to generate our GUI's :code:`.qss` stylesheets and corresponding :code:`resources.py` files.
 
-We have a custom `fork <https://github.com/COMP523TeamD/BreezeStyleSheets>`_ with a script
-(`hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_) that automates the process.
+We have a custom `fork <https://github.com/NIRALUser/BreezeStyleSheets>`_ with a script
+(`hct.py <https://github.com/NIRALUser/BreezeStyleSheets/blob/main/hct.py>`_) that automates the process.
 
 .. _BreezeStyleSheetsHowItWorks:
 
 How it works
 ============
 
-Read the brief README in our `BSS fork <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
+Read the brief README in our `BSS fork <https://github.com/NIRALUser/BreezeStyleSheets>`_.
 
-Then see the `hct.py <https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/hct.py>`_
+Then see the `hct.py <https://github.com/NIRALUser/BreezeStyleSheets/blob/main/hct.py>`_
 script, which automates everything below.
 
 In a nutshell, we edit a JSON file with hex color codes (the JSON controls only the colors of elements)
@@ -348,7 +348,7 @@ for more information.
 Installation instructions
 =========================
 
-1. Clone our fork of the `repo <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
+1. Clone our fork of the `repo <https://github.com/NIRALUser/BreezeStyleSheets>`_.
 2. Run :code:`pip install PyQt5`.
 
 .. note:: If you successfully installed PyQt5, then move on to :ref:`BreezeStyleSheetsConfiguration`.
@@ -361,7 +361,7 @@ Installation instructions
 Configuration instructions
 ==========================
 
-See the instructions in our BSS fork's brief `README <https://github.com/COMP523TeamD/BreezeStyleSheets>`_.
+See the instructions in our BSS fork's brief `README <https://github.com/NIRALUser/BreezeStyleSheets>`_.
 
 .. _BreezeStyleSheetsResource:
 
@@ -430,7 +430,7 @@ python-black
 This autoformatter is awesome 😳
 
 This is run automatically before each commit (see
-`.pre-commit-config.yaml <https://github.com/COMP523TeamD/NeuroRuler/blob/main/.pre-commit-config.yaml>`_)
+`.pre-commit-config.yaml <https://github.com/NIRALUser/NeuroRuler/blob/main/.pre-commit-config.yaml>`_)
 with some excluded files. To run manually, run
 
 .. code-block:: text
@@ -456,7 +456,7 @@ For unit testing.
 All unit tests run automatically on push and PR using `tox <https://tox.wiki/en/latest/>`_, which runs
 all tests on several Python versions.
 
-This is handled in the `tests.yml <https://github.com/COMP523TeamD/NeuroRuler/blob/main/.github/workflows/tests.yml>`_ file.
+This is handled in the `tests.yml <https://github.com/NIRALUser/NeuroRuler/blob/main/.github/workflows/tests.yml>`_ file.
 
 .. _warningsfunctools:
 
@@ -507,8 +507,8 @@ However, you may need to run :code:`sphinx-apidoc -o . ../NeuroRuler` from the :
 if a new package is created. Make sure :code:`__init__.py` files exist for any package you want
 to be discovered.
 
-You can edit `docs/index.rst <https://github.com/COMP523TeamD/NeuroRuler/blob/main/docs/index.rst>`_,
-which is the homepage, or `docs/libraries.rst <https://github.com/COMP523TeamD/NeuroRuler/blob/main/docs/libraries.rst>`_, which
+You can edit `docs/index.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/index.rst>`_,
+which is the homepage, or `docs/libraries.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/libraries.rst>`_, which
 is this page. `Documentation <modules.html>`_ for `source code <_modules/index.html>`_ is automatically generated.
 
 .. _sphinxBuildFromScratch:
@@ -535,7 +535,7 @@ Type `n` for the first question, which asks about splitting source and build dir
 
 Copy over :code:`docs/conf.py` (install another theme with pip and modify :code:`html_theme` if you want),
 :code:`docs/requirements.txt`, :code:`.readthedocs.yaml`, :code:`pyproject.toml`, and :code:`setup.py` from the
-`HCT repo <https://github.com/COMP523TeamD/NeuroRuler>`_,
+`HCT repo <https://github.com/NIRALUser/NeuroRuler>`_,
 overwriting if necessary. Modify the info inside for your purposes.
 The root :code:`requirements.txt` and :code:`requirements_CI.txt` might also need to include
 setuptools, but I'm not certain.
@@ -556,8 +556,8 @@ You can open it in a web browser to check it out before pushing, which will auto
 website. From now on, you can just run :code:`make html` to update the html pages. You don't need to run
 :code:`sphinx-apidoc` unless you create a new package.
 
-You can edit `docs/index.rst <https://github.com/COMP523TeamD/NeuroRuler/blob/main/docs/index.rst>`_,
-which is the homepage, or `docs/libraries.rst <https://github.com/COMP523TeamD/NeuroRuler/blob/main/docs/libraries.rst>`_, which
+You can edit `docs/index.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/index.rst>`_,
+which is the homepage, or `docs/libraries.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/libraries.rst>`_, which
 is this page. `Documentation <modules.html>`_ for `source code <_modules/index.html>`_ is automatically generated.
 
 Now follow the Read the Docs tutorial starting from `Sign up for Read the Docs <https://docs.readthedocs.io/en/stable/tutorial/#sign-up-for-read-the-docs>`_.
@@ -611,7 +611,7 @@ pre-commit
 
 Configures pre-commit git hook.
 
-Modify `.pre-commit-config.yaml <https://github.com/COMP523TeamD/NeuroRuler/blob/main/.pre-commit-config.yaml>`_
+Modify `.pre-commit-config.yaml <https://github.com/NIRALUser/NeuroRuler/blob/main/.pre-commit-config.yaml>`_
 to configure. Then run :code:`pre-commit install`.
 
 More instructions `here <https://pre-commit.com/>`_.
@@ -635,5 +635,5 @@ More instructions `here <https://pre-commit.com/>`_.
 .. [#sphinx] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
 .. [#macos_open_html] On macOS, you can open an HTML document using :code:`open -a "Safari" _build/html/index.html"`
 .. [#venv] Thanks to the teammate who suggested this to me!
-.. [#npqimage] https://github.com/COMP523TeamD/NeuroRuler/pull/3#issuecomment-1468075389
+.. [#npqimage] https://github.com/NIRALUser/NeuroRuler/pull/3#issuecomment-1468075389
 .. [#why_importlib] We can't just use a single :code:`resources.py` file because BreezeStyleSheets generates icons based on theme color.
