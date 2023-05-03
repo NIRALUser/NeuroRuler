@@ -30,7 +30,7 @@ MAX_NUM_MISMATCHED_PIXELS_FOR_BACKGROUND_COLOR_DETECTION: int = 3
 def contour(
     img_2d: sitk.Image, threshold_filter: ThresholdFilter = ThresholdFilter.Otsu
 ) -> np.ndarray:
-    """Generate the contour of a 2D slice by applying smoothing, Otsu threshold or binary threshold,
+    r"""Generate the contour of a 2D slice by applying smoothing, Otsu threshold or binary threshold,
     hole filling, and island removal (select largest component). Return a binary (0|1) numpy
     array with only the points within the contour=1.
 
@@ -78,7 +78,7 @@ def contour(
 
 # Credit: https://discourse.itk.org/t/simpleitk-extract-largest-connected-component-from-binary-image/4958
 def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
-    """Remove islands from a binary (0|1) 2D slice. Return a binary slice
+    r"""Remove islands from a binary (0|1) 2D slice. Return a binary slice
     containing only the largest connected component.
 
     :param binary_slice: Binary (0|1) 2D slice
@@ -96,7 +96,7 @@ def select_largest_component(binary_slice: sitk.Image) -> sitk.Image:
 def length_of_contour(
     binary_contour_slice: np.ndarray, raise_exception: bool = True
 ) -> float:
-    """Given a 2D binary slice, return the arc length of the parent contour.
+    r"""Given a 2D binary slice, return the arc length of the parent contour.
 
     `cv2.findContours` will find all contours if there is more than one. Most valid brain slices have 2 or 3.
 
@@ -148,7 +148,7 @@ def length_of_contour(
 def length_of_contour_with_spacing(
     binary_contour_slice: np.ndarray, x_spacing: float, y_spacing: float
 ) -> float:
-    """Given a 2D binary slice (i.e., RV of contour()), return arc length of parent contour,
+    r"""Given a 2D binary slice (i.e., RV of contour()), return arc length of parent contour,
     accounting for x_spacing and y_spacing values.
     MAKE SURE x_spacing and y_spacing values are passed in the correct order!
     The binary slice passed into this function should be processed by `contour()`
@@ -156,6 +156,7 @@ def length_of_contour_with_spacing(
     Slices for which circumference is calculated are always parallel to z,
     so the z spacing value is always ignored.
     This function assumes the contour is a closed curve.
+
     :param binary_contour_slice:
     :type binary_contour_slice: np.ndarray
     :param x_spacing:
@@ -199,7 +200,7 @@ def length_of_contour_with_spacing(
 
 
 def distance_2d_with_spacing(p1, p2, x_spacing: float, y_spacing: float) -> float:
-    """Return the distance between two 2D iterables (list or tuple) given x and y spacing values.
+    r"""Return the distance between two 2D iterables (list or tuple) given x and y spacing values.
     :param p1: 2D point
     :type p1: iterable
     :param p2: 2D point
@@ -216,7 +217,7 @@ def distance_2d_with_spacing(p1, p2, x_spacing: float, y_spacing: float) -> floa
 
 # TODO: Super naive, but realistically will work fine
 def background_color_of_binary_thresholded_slice(img_2d: sitk.Image) -> BinaryColor:
-    """Checks the background color of the slice returning from binary threshold filter
+    r"""Checks the background color of the slice returning from binary threshold filter
     since some settings result in fg 0, bg 1, and other settings result in fg 1, bg 0.
 
     Internally, compares the pixel value at (0, 0) to pixel values at the top, bottom, left, and right edges.
