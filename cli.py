@@ -4,6 +4,6 @@
 
 Run with ./cli.py. If that doesn't work, run however you normally run a Python script."""
 
-from NeuroRuler.utils.CLI import cli
+from NeuroRuler.CLI import cli
 
 cli()
