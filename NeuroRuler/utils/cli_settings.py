@@ -30,7 +30,7 @@ SMOOTHING_ITERATIONS: int = global_vars.SMOOTHING_ITERATIONS
 TIME_STEP: float = global_vars.TIME_STEP
 """Smoothing option. See global_vars.TIME_STEP."""
 
-USE_OTSU: bool = True
+USE_OTSU: bool = False
 """Whether to use a otsu or a binary threshold."""
 
 LOWER_THRESHOLD: float = global_vars.LOWER_THRESHOLD
