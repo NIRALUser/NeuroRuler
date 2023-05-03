@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         self.action_show_credits.triggered.connect(
             lambda: information_dialog(
                 "Credits",
-                'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.',
+                'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.\n\nUniversity of North Carolina at Chapel Hill, 2023. See the GitHub page for more info.',
             )
         )
         self.action_test_stuff.triggered.connect(self.test_stuff)

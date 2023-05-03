@@ -25,8 +25,8 @@ classifiers = [
 dynamic = ["dependencies", "version", "keywords"]
 
 [project.urls]
-"Homepage" = "https://github.com/COMP523TeamD/HeadCircumferenceTool"
-"Bug Tracker" = "https://github.com/COMP523TeamD/HeadCircumferenceTool/issues"
+"Homepage" = "https://github.com/COMP523TeamD/NeuroRuler"
+"Bug Tracker" = "https://github.com/COMP523TeamD/NeuroRuler/issues"
 
 [build-system]
 requires = ["setuptools>=67.6.0", "wheel"]
