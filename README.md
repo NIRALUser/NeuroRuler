@@ -4,7 +4,7 @@
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Python](https://img.shields.io/badge/python-3670A0?style=plastic&logo=python&logoColor=ffdd54)
 
-> A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).
+NeuroRuler is a program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).
 
 <p align="center">
   <img src="https://i.imgur.com/nqwqHq8.gif" alt="GUI demo"/>
