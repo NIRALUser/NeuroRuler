@@ -1,3 +1,4 @@
+# TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively, and we should just keep the general parse functions here
 """Parse config JSON and CLI arguments to set global settings."""
 
 import argparse
@@ -18,13 +19,17 @@ def parse_cli() -> None:
     """Parse CLI (non-GUI) args and set settings in `cli_settings.py`.
 
     :return: None"""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        prog="NeuroRuler",
+        description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`)."
+    )
+
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
     parser.add_argument("-r", "--raw", help="print just the \"raw\" circumference", action="store_true")
-    parser.add_argument("-x", "--x", type=int, help="x transformation (in degrees)")
-    parser.add_argument("-y", "--y", type=int, help="y transformation (in degrees)")
-    parser.add_argument("-z", "--z", type=int, help="z transformation (in degrees)")
-    parser.add_argument("-s", "--slice", type=int, help="slice (0-indexed)")
+    parser.add_argument("-x", "--x", type=int, help="x rotation (in degrees)")
+    parser.add_argument("-y", "--y", type=int, help="y rotation (in degrees)")
+    parser.add_argument("-z", "--z", type=int, help="z rotation (in degrees)")
+    parser.add_argument("-s", "--slice", type=int, help="slice (Z slice, 0-indexed)")
     parser.add_argument("-c", "--conductance", type=float, help="conductance smoothing parameter")
     parser.add_argument("-i", "--iterations", type=int, help="smoothing iterations")
     parser.add_argument("-t", "--step", type=float, help="time step (smoothing parameter)")
@@ -130,10 +135,21 @@ def parse_cli_config() -> None:
     load_json will load constants.JSON_CLI_CONFIG_PATH."""
     global JSON_SETTINGS
     JSON_SETTINGS = load_json(constants.JSON_CLI_CONFIG_PATH)
-    # WIP obviously -Eric
-    gui_settings.DEBUG = parse_bool("DEBUG")
-    if gui_settings.DEBUG:
+    cli_settings.DEBUG = parse_bool("DEBUG")
+    if cli_settings.DEBUG:
         print("Printing debug messages.")
+
+    cli_settings.RAW = parse_bool("RAW")
+    cli_settings.THETA_X = parse_int("X")
+    cli_settings.THETA_Y = parse_int("Y")
+    cli_settings.THETA_Z = parse_int("Z")
+    cli_settings.SLICE = parse_int("SLICE")
+    cli_settings.CONDUCTANCE_PARAMETER = parse_float("CONDUCTANCE")
+    cli_settings.SMOOTHING_ITERATIONS = parse_int("SMOOTHING")
+    cli_settings.TIME_STEP = parse_float("TIME_STEP")
+    cli_settings.USE_OTSU = parse_bool("USE_OTSU")
+    cli_settings.LOWER_THRESHOLD = parse_float("LOWER_THRESHOLD")
+    cli_settings.UPPER_THRESHOLD = parse_float("UPPER_THRESHOLD")
 
 
 def parse_gui_config() -> None:
