@@ -1,6 +1,6 @@
 # NeuroRuler
 
-![Tests](https://github.com/COMP523TeamD/NeuroRuler/actions/workflows/tests.yml/badge.svg)
+![Tests](https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg)
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Python](https://img.shields.io/badge/python-3670A0?style=plastic&logo=python&logoColor=ffdd54)
 
@@ -18,7 +18,7 @@ If you want 😉 format is bibtex.
 @misc{neuroruler,
   title={NeuroRuler},
   author={Wei, Jesse and Lester, Madison and He, Peifeng and Schneider, Eric and Styner, Martin},
-  howpublished={\url{https://github.com/COMP523TeamD/NeuroRuler}},
+  howpublished={\url{https://github.com/NIRALUser/NeuroRuler}},
   year={2023}
 }
 ```

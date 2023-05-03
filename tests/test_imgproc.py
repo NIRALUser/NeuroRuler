@@ -179,7 +179,7 @@ def test_arc_length_of_copy_after_transpose_same_as_no_copy_after_transpose():
     reason="User can see in the GUI the contour generated to confirm its accuracy. Also, this won't matter except for edge cases where the slice is invalid"
 )
 def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
-    """Per discussion here https://github.com/COMP523TeamD/NeuroRuler/commit/a230a6b57dc34ec433e311d760cc53841ddd6a49,
+    """Per discussion here https://github.com/NIRALUser/NeuroRuler/commit/a230a6b57dc34ec433e311d760cc53841ddd6a49,
 
     Test that the arc length of a contour and its transpose is the same in a specific case. It probably generalizes to the general case.
 
