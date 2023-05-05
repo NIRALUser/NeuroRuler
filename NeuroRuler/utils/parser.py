@@ -135,11 +135,6 @@ def parse_cli_config() -> None:
     load_json will load constants.JSON_CLI_CONFIG_PATH."""
     global JSON_SETTINGS
     JSON_SETTINGS = load_json(constants.JSON_CLI_CONFIG_PATH)
-    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG:
-        raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
-        )
-
     cli_settings.DEBUG = parse_bool("DEBUG")
     if cli_settings.DEBUG:
         print("Printing debug messages.")
@@ -163,10 +158,6 @@ def parse_gui_config() -> None:
     load_json will load constants.JSON_GUI_CONFIG_PATH."""
     global JSON_SETTINGS
     JSON_SETTINGS = load_json(constants.JSON_GUI_CONFIG_PATH)
-    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG:
-        raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
-        )
 
     gui_settings.DEBUG = parse_bool("DEBUG")
     if gui_settings.DEBUG:

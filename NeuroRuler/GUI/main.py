@@ -39,6 +39,7 @@ from PyQt6.uic.load_ui import loadUi
 from PyQt6.QtCore import Qt, QSize
 
 import pprint
+import pkg_resources
 from NeuroRuler.utils.constants import View, ThresholdFilter
 import NeuroRuler.utils.constants as constants
 
@@ -75,8 +76,13 @@ from NeuroRuler.utils.img_helpers import (
 import NeuroRuler.utils.img_helpers as img_helpers
 
 
+
 PATH_TO_UI_FILE: Path = Path("NeuroRuler") / "GUI" / "mainwindow.ui"
+if not PATH_TO_UI_FILE.exists():
+    PATH_TO_UI_FILE = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "mainwindow.ui"))
 PATH_TO_HCT_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "hct_logo.png"
+if not PATH_TO_HCT_LOGO.exists():
+    PATH_TO_HCT_LOGO = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "static/hct_logo.png"))
 
 SETTINGS_VIEW_ENABLED: bool = True
 """Whether the user is able to adjust settings (settings screen) or not

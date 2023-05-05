@@ -1,10 +1,10 @@
 # Source: https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
-# This job runs only when pushing to release-testpypi/**
+# This job runs only when pushing to release-testpypi
 # Version number (manually set in setup.py) must differ from the current version number
 # for the upload to succeed
 # https://test.pypi.org/project/NeuroRuler/
 
-name: Publish to Test PyPI
+name: test_pypi
 
 on:
   push:
@@ -12,8 +12,12 @@ on:
       - 'release-testpypi'
 
 jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml    # Use the callable tests job to run tests
+
   build-and-publish:
     name: Build and publish to Test PyPI
+    needs: [tests]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -41,5 +45,7 @@ jobs:
     - name: Publish to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
+        # See https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository
+        # for how to add a secret
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository-url: https://test.pypi.org/legacy/

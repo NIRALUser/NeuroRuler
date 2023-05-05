@@ -13,9 +13,10 @@ from NeuroRuler.utils.constants import (
     DATA_DIR,
     NUM_CONTOURS_IN_INVALID_SLICE,
     SUPPORTED_EXTENSIONS,
+    degrees_to_radians,
 )
 from NeuroRuler.utils.global_vars import READER
-from NeuroRuler.utils.img_helpers import get_rotated_slice_hardcoded
+from NeuroRuler.utils.img_helpers import get_rotated_slice_hardcoded, get_center_of_rotation
 
 EPSILON: float = 0.001
 """Used for `float` comparisons."""
@@ -108,7 +109,7 @@ def test_contour_retranspose_has_same_dimensions_as_original_image():
                         rotated_slice = get_rotated_slice_hardcoded(
                             img, theta_x, theta_y, theta_z, slice_num
                         )
-                        contour_slice: np.ndarray = contour(rotated_slice, True)
+                        contour_slice: np.ndarray = contour(rotated_slice)
                         assert (
                             contour_slice.shape[0] == img.GetSize()[0]
                             and contour_slice.shape[1] == img.GetSize()[1]
@@ -193,14 +194,14 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
 
     TODO: Unit test with pre-computed circumferences to really confirm this."""
     # Write settings of slices that cause ComputeCircumferenceOfInvalidSlice to a file to make sure they actually are just noise and not brain slices.
-    f = open(Path("tests") / "noise_vals.txt", "w")
-    f.write(
-        f"Write settings of slices that cause ComputeCircumferenceOfInvalidSlice (>= {NUM_CONTOURS_IN_INVALID_SLICE} contours detected)\nto this file to make sure they actually are invalid brain slices\n\n"
-    )
-    f.write("From test_arc_length_of_transposed_matrix_is_same\n\n")
+    # f = open(Path("tests") / "noise_vals.txt", "w")
+    # f.write(
+    #     f"Write settings of slices that cause ComputeCircumferenceOfInvalidSlice (>= {NUM_CONTOURS_IN_INVALID_SLICE} contours detected)\nto this file to make sure they actually are invalid brain slices\n\n"
+    # )
+    # f.write("From test_arc_length_of_transposed_matrix_is_same\n\n")
 
     for img in EXAMPLE_IMAGES.values():
-        f.write(f"{DATA_DIR.name}/{img.path.name}\n")
+        # f.write(f"{DATA_DIR.name}/{img.path.name}\n")
         for theta_x in range(0, 31, 15):
             for theta_y in range(0, 31, 15):
                 for theta_z in range(0, 31, 15):
@@ -208,7 +209,7 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
                         rotated_slice: sitk.Image = get_rotated_slice_hardcoded(
                             img, theta_x, theta_y, theta_z, slice_num
                         )
-                        contour_slice: np.ndarray = contour(rotated_slice, True)
+                        contour_slice: np.ndarray = contour(rotated_slice)
                         # .copy() probably isn't needed if above test passes
                         contour_slice_transposed: np.ndarray = np.transpose(
                             contour_slice
@@ -255,8 +256,25 @@ def test_contour_slice_retranspose_same_dimensions_as_original_slice():
                         rotated_slice: sitk.Image = get_rotated_slice_hardcoded(
                             img, theta_x, theta_y, theta_z, slice_num
                         )
-                        binary_contour = contour(rotated_slice, True)
+                        binary_contour = contour(rotated_slice)
                         assert (
                             original_dimensions[0] == binary_contour.shape[0]
                             and original_dimensions[1] == binary_contour.shape[1]
                         )
+
+@pytest.mark.skip(reason="Passed locally, doesn't need to run again")
+def test_rotation_doesnt_affect_spacing():
+     img = list(EXAMPLE_IMAGES.values())[0]
+     e3d = sitk.Euler3DTransform()
+     e3d.SetCenter(get_center_of_rotation(img))
+     spacing = img.GetSpacing()
+     for theta_x in range(0, 100, 25):
+         for theta_y in range(0, 100, 25):
+             for theta_z in range(0, 100, 25):
+                 e3d.SetRotation(
+                     degrees_to_radians(theta_x),
+                     degrees_to_radians(theta_y),
+                     degrees_to_radians(theta_z),
+                 )
+                 new_img = sitk.Resample(img, e3d)
+                 assert new_img.GetSpacing() == spacing

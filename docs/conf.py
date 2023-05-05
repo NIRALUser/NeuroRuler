@@ -15,9 +15,15 @@ sys.path.insert(0, os.path.abspath(".."))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "NeuroRuler"
-copyright = '2023 Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider'
+copyright = '2023, Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider'
 author = 'Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider'
-release = "0.0"
+release = ""
+
+with open("../setup.py", "r") as f:
+    for line in f:
+        if line.strip().startswith("version"):
+            release = line.split('"')[1]
+            break
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -27,10 +33,13 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
     "sphinx_rtd_theme",
+    # For parsing Markdown
+    "m2r2",
 ]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+source_suffix = [".rst", ".md", ".markdown"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -39,6 +48,15 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # Good themes: python_docs_theme and sphinx_rtd_theme (looks amazing but has ads)
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+
+# Source: https://stackoverflow.com/questions/59215996/how-to-add-a-logo-to-my-readthedocs-logo-rendering-at-0px-wide
+html_static_path = ["_static"]
+html_favicon = "hct_logo.ico"
+html_logo = "_static/hct_logo.jpg"
+html_theme_options = {
+    "logo_only": True,
+    "display_version": False,
+}
 
 
 # Prevents __init__ from being ignored

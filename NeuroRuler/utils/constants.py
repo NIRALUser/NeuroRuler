@@ -13,6 +13,7 @@ from screeninfo import get_monitors, ScreenInfoError
 from numpy import pi
 from typing import Union
 from enum import Enum
+import pkg_resources
 
 OUTPUT_DIR: Path = Path("output")
 """Directory for storing output."""
@@ -25,38 +26,50 @@ if not IMG_DIR.exists():
     IMG_DIR.mkdir()
 
 JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
-"""Settings that configure gui_settings.py."""
-EXPECTED_NUM_FIELDS_IN_CLI_CONFIG: int = 12
-"""Number of expected fields in the CLI config file. If the number of fields discovered does not match this, an exception will be raised."""
+"""Settings that configure cli_settings.py."""
+if not JSON_CLI_CONFIG_PATH.exists():
+    # __name__ will get to the utils module
+    # and cli_config.json is at root directory
+    JSON_CLI_CONFIG_PATH = Path(pkg_resources.resource_filename(__name__, "../../cli_config.json"))
 
 JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
 """Settings that configure gui_settings.py."""
-EXPECTED_NUM_FIELDS_IN_GUI_CONFIG: int = 8
-"""Number of expected fields in the GUI config file. If the number of fields discovered does not match this, an exception
-will be raised."""
+if not JSON_GUI_CONFIG_PATH.exists():
+    # __name__ will get to the utils module
+    # and gui_config.json is at root directory
+    JSON_GUI_CONFIG_PATH = Path(pkg_resources.resource_filename(__name__, "../../gui_config.json"))
+
+DATA_DIR: Path = Path("data")
 
 SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """File formats supported. Must be a subset of the file formats supported by SimpleITK.
 
 TODO: Support .txt for loading image paths from text file (which we can quite easily export using global_vars.IMAGE_DICT)."""
-DATA_DIR: Path = Path("data")
-"""Directory for storing example data."""
-
-UI_FILE_PATH: Path = Path("NeuroRuler") / "GUI" / "mainwindow.ui"
 
 THEME_DIR: Path = Path("NeuroRuler") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
+if not THEME_DIR.exists():
+    try:
+        THEME_DIR = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "themes"))
+    # This will occur on circular import, which will occur when running
+    # from NeuroRuler.CLI import CLI
+    # but CLI doesn't care about THEME_DIR
+    # This is a janky way to avoid circular import
+    except ImportError:
+        pass
+
 THEMES: list[str] = []
 """List of themes, i.e. the names of the directories in THEME_DIR."""
+
+# Without this, autodocumentation might crash
+# THEME_DIR obviously exists at this point, except maybe in autodocumentation code
 if THEME_DIR.exists():
     for path in THEME_DIR.iterdir():
         if path.is_dir():
             THEMES.append(path.name)
     THEMES = sorted(THEMES)
-# Without this, autodocumentation crashes
 else:
     pass
-
 
 class View(Enum):
     """X, Y, or Z view.
