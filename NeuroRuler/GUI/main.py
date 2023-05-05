@@ -244,9 +244,9 @@ class MainWindow(QMainWindow):
             binary_contour_slice: np.ndarray = self.render_curr_slice()
             self.render_circumference(binary_contour_slice)
 
-        # TODO: Call enable_elements and then a disable method (code another one, and it'd be short)
-        # If not settings_view_enabled
-        self.action_open.setEnabled(settings_view_enabled)
+        # Open button is always enabled.
+        # If pressing it in circumference mode, then browse_files() will toggle to settings view.
+        self.action_open.setEnabled(True)
         self.action_add_images.setEnabled(settings_view_enabled)
         self.action_remove_image.setEnabled(settings_view_enabled)
         self.x_slider.setEnabled(settings_view_enabled)
@@ -337,10 +337,15 @@ class MainWindow(QMainWindow):
 
         Renders various elements depending on the value of `extend`.
 
+        If called in circumference mode, then will toggle to settings mode.
+
         :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
         :param path: Used for unit testing, when only one path is imported. Normally, the path(s) are selected by user in a QFileDialog.
         :type extend: bool
         :return: None"""
+        # If called in circumference mode, then toggle to settings mode.
+        if not SETTINGS_VIEW_ENABLED:
+            self.settings_export_view_toggle()
 
         if path is None:
             file_filter: str = "MRI Images ("

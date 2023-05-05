@@ -72,7 +72,7 @@ TIME_STEP: float = 0.0625
 """Smoothing option.
 
 The time step depends on the dimensionality of the image.
-In Slicer the images are 3D and the default (.0625) time step will provide a stable solution."""
+In Slicer, the images are 3D and the default (.0625) time step will provide a stable solution."""
 
 OTSU_THRESHOLD_FILTER: sitk.OtsuThresholdImageFilter = sitk.OtsuThresholdImageFilter()
 """Global Otsu threshold filter."""

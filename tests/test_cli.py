@@ -1,4 +1,7 @@
-"""Black box integration tests for the command line."""
+"""Black box integration tests for the command line.
+
+For some reason, these tests fail when I'm not in my virtual environment. But they work on CI and locally
+when I'm in my virtual environment. Not gonna think too much of it - Jesse"""
 
 import subprocess
 from subprocess import PIPE
