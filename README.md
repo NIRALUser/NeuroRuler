@@ -56,13 +56,13 @@ Apply the `-h` command-line option when running those scripts to see the list of
 
 ## Run tests
 
-`pytest`
+For local testing, run `pytest`.
 
 Our unit tests run on GitHub Actions on push and PR. If the image below says "passing," then the tests are passing.
 
 ![Tests](https://github.com/COMP523TeamD/NeuroRuler/actions/workflows/tests.yml/badge.svg)
 
-**Note**: The tests in [tests/imports_GUI](https://github.com/COMP523TeamD/NeuroRuler/tree/main/tests/imports_GUI) are ignored during CI tests (see [tox.ini](https://github.com/COMP523TeamD/NeuroRuler/blob/main/tox.ini)) because they require a GUI to run, and running them in CI would cause a "libEGL.so not found" error. These tests should be run locally only.
+**Note**: The tests in [tests/imports_GUI](https://github.com/COMP523TeamD/NeuroRuler/tree/main/tests/imports_GUI) are ignored during CI tests (see [tox.ini](https://github.com/COMP523TeamD/NeuroRuler/blob/main/tox.ini)) because in GitHub Actions causes a "libEGL.so not found" error (likely because the computers running the tests don't have monitors). These tests should be run locally only.
 
 ## Documentation
 

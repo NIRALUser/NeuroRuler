@@ -57,7 +57,7 @@ if THEME_DIR.exists():
         if path.is_dir():
             THEMES.append(path.name)
     THEMES = sorted(THEMES)
-# Without this, autodocumentation crashes
+# Without this, autodocumentation might crash
 else:
     pass
 
