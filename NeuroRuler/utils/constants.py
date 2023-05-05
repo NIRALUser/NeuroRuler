@@ -30,21 +30,23 @@ JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
 if not JSON_CLI_CONFIG_PATH.exists():
     # __name__ will get to the utils module
     # and cli_config.json is at root directory
-    JSON_CLI_CONFIG_PATH = Path(pkg_resources.resource_filename(__name__, "../../cli_config.json"))
+    JSON_CLI_CONFIG_PATH = Path(
+        pkg_resources.resource_filename(__name__, "../../cli_config.json")
+    )
 
 JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
 """Settings that configure gui_settings.py."""
 if not JSON_GUI_CONFIG_PATH.exists():
     # __name__ will get to the utils module
     # and gui_config.json is at root directory
-    JSON_GUI_CONFIG_PATH = Path(pkg_resources.resource_filename(__name__, "../../gui_config.json"))
+    JSON_GUI_CONFIG_PATH = Path(
+        pkg_resources.resource_filename(__name__, "../../gui_config.json")
+    )
 
 DATA_DIR: Path = Path("data")
 
-SUPPORTED_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
-"""File formats supported. Must be a subset of the file formats supported by SimpleITK.
-
-TODO: Support .txt for loading image paths from text file (which we can quite easily export using global_vars.IMAGE_DICT)."""
+SUPPORTED_IMAGE_EXTENSIONS: tuple = (".nii.gz", ".nii", ".nrrd")
+"""Image file formats supported. Must be a subset of the file formats supported by SimpleITK."""
 
 THEME_DIR: Path = Path("NeuroRuler") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
@@ -70,6 +72,7 @@ if THEME_DIR.exists():
     THEMES = sorted(THEMES)
 else:
     pass
+
 
 class View(Enum):
     """X, Y, or Z view.
