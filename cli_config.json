@@ -3,19 +3,20 @@
 // For other field types, the comments specify what the allowed values are.
 // Do not add or remove fields in this file if you're a user
 // If you're a developer who's adding or removing options,
-// modify parser.py and constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG
+// modify parser.py
 {
     "DEBUG": "False",
     "RAW": "False",
     "X": 0,
     "Y": 0,
     "Z": 0,
-    // -1 means NeuroRuler will put calculuate the middle
+    // -1 means NeuroRuler will use the middle slice
     "SLICE": -1,
     "CONDUCTANCE": 3.0,
     "SMOOTHING": 5,
     "TIME_STEP": 0.0625,
-    "USE_OTSU": "False",
-    "LOWER_THRESHOLD": 0.0,
-    "UPPER_THRESHOLD": 200.0
+    // THRESHOLD_FILTER can be "Otsu" or "Binary"
+    "THRESHOLD_FILTER": "Otsu",
+    "LOWER_BINARY_THRESHOLD": 0.0,
+    "UPPER_BINARY_THRESHOLD": 200.0
 }

@@ -76,13 +76,16 @@ from NeuroRuler.utils.img_helpers import (
 import NeuroRuler.utils.img_helpers as img_helpers
 
 
-
 PATH_TO_UI_FILE: Path = Path("NeuroRuler") / "GUI" / "mainwindow.ui"
 if not PATH_TO_UI_FILE.exists():
-    PATH_TO_UI_FILE = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "mainwindow.ui"))
+    PATH_TO_UI_FILE = Path(
+        pkg_resources.resource_filename("NeuroRuler.GUI", "mainwindow.ui")
+    )
 PATH_TO_HCT_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "hct_logo.png"
 if not PATH_TO_HCT_LOGO.exists():
-    PATH_TO_HCT_LOGO = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "static/hct_logo.png"))
+    PATH_TO_HCT_LOGO = Path(
+        pkg_resources.resource_filename("NeuroRuler.GUI", "static/hct_logo.png")
+    )
 
 SETTINGS_VIEW_ENABLED: bool = True
 """Whether the user is able to adjust settings (settings screen) or not
@@ -335,14 +338,17 @@ class MainWindow(QMainWindow):
         Renders various elements depending on the value of `extend`.
 
         :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
-        :param path: Used for testing, when only one path is imported.
+        :param path: Used for unit testing, when only one path is imported. Normally, the path(s) are selected by user in a QFileDialog.
         :type extend: bool
         :return: None"""
 
-        if path == None:
-            file_filter: str = "MRI images " + str(
-                constants.SUPPORTED_EXTENSIONS
-            ).replace("'", "").replace(",", "")
+        if path is None:
+            file_filter: str = "MRI Images ("
+            for extension in constants.SUPPORTED_IMAGE_EXTENSIONS:
+                file_filter += "*" + extension + " "
+            # Get rid of trailing whitespace
+            file_filter = file_filter[:-1]
+            file_filter += ")"
 
             files = QFileDialog.getOpenFileNames(
                 self,
@@ -475,24 +481,28 @@ class MainWindow(QMainWindow):
         """
         lower_threshold: str = self.lower_threshold_input.displayText()
         try:
-            global_vars.LOWER_THRESHOLD = float(lower_threshold)
+            global_vars.LOWER_BINARY_THRESHOLD = float(lower_threshold)
         except ValueError:
             pass
-        self.lower_threshold_input.setText(str(global_vars.LOWER_THRESHOLD))
-        self.lower_threshold_input.setPlaceholderText(str(global_vars.LOWER_THRESHOLD))
+        self.lower_threshold_input.setText(str(global_vars.LOWER_BINARY_THRESHOLD))
+        self.lower_threshold_input.setPlaceholderText(
+            str(global_vars.LOWER_BINARY_THRESHOLD)
+        )
         global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
-            global_vars.LOWER_THRESHOLD
+            global_vars.LOWER_BINARY_THRESHOLD
         )
 
         upper_threshold: str = self.upper_threshold_input.displayText()
         try:
-            global_vars.UPPER_THRESHOLD = float(upper_threshold)
+            global_vars.UPPER_BINARY_THRESHOLD = float(upper_threshold)
         except ValueError:
             pass
-        self.upper_threshold_input.setText(str(global_vars.UPPER_THRESHOLD))
-        self.upper_threshold_input.setPlaceholderText(str(global_vars.UPPER_THRESHOLD))
+        self.upper_threshold_input.setText(str(global_vars.UPPER_BINARY_THRESHOLD))
+        self.upper_threshold_input.setPlaceholderText(
+            str(global_vars.UPPER_BINARY_THRESHOLD)
+        )
         global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(
-            global_vars.UPPER_THRESHOLD
+            global_vars.UPPER_BINARY_THRESHOLD
         )
 
     def render_scaled_qpixmap_from_qimage(self, q_img: QImage) -> None:
@@ -975,9 +985,7 @@ def main() -> None:
     # because gui.py.parse_gui_cli() has to set THEME_NAME before the import occurs
     # This imports globally
     # For example, NeuroRuler/GUI/helpers.py can access resource files without having to import there
-    importlib.import_module(
-        f"NeuroRuler.GUI.themes.{settings.THEME_NAME}.resources"
-    )
+    importlib.import_module(f"NeuroRuler.GUI.themes.{settings.THEME_NAME}.resources")
 
     app = QApplication(sys.argv)
 
@@ -996,9 +1004,7 @@ def main() -> None:
 
     MAIN_WINDOW: MainWindow = MainWindow()
 
-    with open(
-            constants.THEME_DIR / settings.THEME_NAME / "stylesheet.qss", "r"
-    ) as f:
+    with open(constants.THEME_DIR / settings.THEME_NAME / "stylesheet.qss", "r") as f:
         MAIN_WINDOW.setStyleSheet(f.read())
 
     # Non-zero min width and height is needed to prevent
@@ -1006,12 +1012,8 @@ def main() -> None:
     # However, this also seems to affect startup GUI size or at least GUI element spacing
     MAIN_WINDOW.setMinimumSize(QSize(1, 1))
     MAIN_WINDOW.resize(
-        int(
-            settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]
-        ),
-        int(
-            settings.STARTUP_HEIGHT_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[1]
-        ),
+        int(settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]),
+        int(settings.STARTUP_HEIGHT_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[1]),
     )
 
     MAIN_WINDOW.show()
