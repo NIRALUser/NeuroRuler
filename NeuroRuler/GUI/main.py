@@ -76,6 +76,7 @@ from NeuroRuler.utils.img_helpers import (
 import NeuroRuler.utils.img_helpers as img_helpers
 
 
+
 PATH_TO_UI_FILE: Path = Path("NeuroRuler") / "GUI" / "mainwindow.ui"
 if not PATH_TO_UI_FILE.exists():
     PATH_TO_UI_FILE = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "mainwindow.ui"))

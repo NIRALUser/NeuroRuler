@@ -22,7 +22,8 @@ Non-functional (e.g., formatting, documentation) dependencies listed in requirem
 
 setup(
     name="NeuroRuler",
-    # Version number that appears on PyPI and Test PyPI
+    # For current version number, see
+    # https://pypi.org/project/NeuroRuler/
     version="0.0.5",
     description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
     # Cannot use multiple authors

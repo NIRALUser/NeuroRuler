@@ -49,18 +49,27 @@ TODO: Support .txt for loading image paths from text file (which we can quite ea
 THEME_DIR: Path = Path("NeuroRuler") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
 if not THEME_DIR.exists():
-    THEME_DIR = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "themes"))
+    try:
+        THEME_DIR = Path(pkg_resources.resource_filename("NeuroRuler.GUI", "themes"))
+    # This will occur on circular import, which will occur when running
+    # from NeuroRuler.CLI import CLI
+    # but CLI doesn't care about THEME_DIR
+    # This is a janky way to avoid circular import
+    except ImportError:
+        pass
+
 THEMES: list[str] = []
 """List of themes, i.e. the names of the directories in THEME_DIR."""
+
+# Without this, autodocumentation might crash
+# THEME_DIR obviously exists at this point, except maybe in autodocumentation code
 if THEME_DIR.exists():
     for path in THEME_DIR.iterdir():
         if path.is_dir():
             THEMES.append(path.name)
     THEMES = sorted(THEMES)
-# Without this, autodocumentation might crash
 else:
     pass
-
 
 class View(Enum):
     """X, Y, or Z view.

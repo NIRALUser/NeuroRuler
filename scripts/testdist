@@ -1,5 +1,7 @@
 # This script should be sourced
 # Run with . scripts/testdist
+# This script uninstalls NeuroRuler, builds the package, and installs it locally
+# Please see the comment above the cd ..
 
 rm -r dist
 pip uninstall NeuroRuler -y
@@ -9,7 +11,7 @@ for file in dist/*; do
     pip install $file;
 done
 
-# Should test from directory that isn't NeuroRuler
+# Need to test from directory that isn't NeuroRuler/
 # Importing NeuroRuler stuff from NeuroRuler directory will import from the NeuroRuler directory
 # Not the pip package
 cd ..

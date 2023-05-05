@@ -44,7 +44,7 @@ from NeuroRuler.GUI import gui
 gui()
 ```
 
-Note: If you make changes to the repo, use the [gui.py](https://github.com/COMP523TeamD/NeuroRuler/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the package from pip until uploaded to PyPI.
+Note: If you make changes to the repo, use the [gui.py](https://github.com/COMP523TeamD/NeuroRuler/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the pip package until uploaded to PyPI.
 
 ## Configure settings
 
@@ -68,30 +68,22 @@ Our unit tests run on GitHub Actions on push and PR. If the image below says "pa
 
 [https://NeuroRuler.readthedocs.io](https://NeuroRuler.readthedocs.io)
 
-See [`.readthedocs.yaml`](https://github.com/COMP523TeamD/NeuroRuler/blob/main/.readthedocs.yaml) and [`docs/`](https://github.com/COMP523TeamD/NeuroRuler/tree/main/docs) to contribute.
+See [.readthedocs.yaml](https://github.com/COMP523TeamD/NeuroRuler/blob/main/.readthedocs.yaml) and [docs/](https://github.com/COMP523TeamD/NeuroRuler/tree/main/docs) to contribute.
 
 ## Pre-commit actions
 
 Run `pre-commit install` to enable pre-commit actions.
 
-Before each commit, the actions in [`.pre-commit-config.yaml`](https://github.com/COMP523TeamD/NeuroRuler/blob/main/.pre-commit-config.yaml) will be run. Specifically, code will be reformatted with `black`.
+Before each commit, the actions in [.pre-commit-config.yaml](https://github.com/COMP523TeamD/NeuroRuler/blob/main/.pre-commit-config.yaml) will be run. Specifically, code will be reformatted with `black`.
 
 **Note**: Some file names are excluded, so don't name any source code files those names.
 
 ## Release
 
-To test the package locally before releasing, run these commands from the `NeuroRuler` directory.
+To test the package locally before releasing, use [scripts/testdist](scripts/testdist). If using macOS, run with `. scripts/testdist`. If using Windows, you may need to modify the script slightly.
 
-```sh
-rm -r dist/
-pip uninstall NeuroRuler
-python setup.py sdist
-pip install dist/*.tar.gz
-cd ..
-```
+You must test from a directory that isn't `NeuroRuler/`. If your directory is `NeuroRuler/`, then imports will import from the source code, not the package.
 
-The `cd docs` is there because you should test imports from a directory that isn't `NeuroRuler`.
-
-To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [setup.py](https://github.com/COMP523TeamD/NeuroRuler/blob/main/setup.py). Then push to a branch called `release-pypi` (create it if it doesn't exist). This will trigger [pypi.yml](https://github.com/COMP523TeamD/NeuroRuler/blob/main/.github/workflows/pypi.yml).
+To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [setup.py](https://github.com/COMP523TeamD/NeuroRuler/blob/main/setup.py). Then push to a branch called `release-pypi` (create it if it doesn't exist). This will trigger [pypi.yml](https://github.com/COMP523TeamD/NeuroRuler/blob/main/.github/workflows/pypi.yml), which will run tests and publish to PyPI.
 
 To publish on Test PyPI, do the same as above, but push to a branch called `release-testpypi`.
