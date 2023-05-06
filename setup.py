@@ -24,7 +24,7 @@ setup(
     name="NeuroRuler",
     # For current version number, see
     # https://pypi.org/project/NeuroRuler/
-    version="0.0.5",
+    version="0.0.6",
     description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
     # Cannot use multiple authors
     # https://stackoverflow.com/questions/9999829/how-to-specify-multiple-authors-emails-in-setup-py
@@ -45,7 +45,9 @@ setup(
     # See https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
     package_dir={"NeuroRuler": "NeuroRuler"},
     packages=find_packages(),
-    package_data={"NeuroRuler":["GUI/*.ui", "GUI/static/*", "GUI/themes/*/*", "../*.json"]},
+    package_data={
+        "NeuroRuler": ["GUI/*.ui", "GUI/static/*", "GUI/themes/*/*", "../*.json"]
+    },
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
