@@ -65,23 +65,23 @@ Apply the `-h` command-line option when running those scripts to see the list of
 
 ## Run tests
 
-For local testing, run `pytest`.
+To test locally, run `pytest`.
 
 Our algorithm tests assert that our GUI calculations have at least a 0.98 R<sup>2</sup> value with ground truth data from the old Head Circumference Tool. Additionally, we test that our CLI and GUI produce the same results. Lastly, we verified that our circumference result is correct for images with non-(1.0, 1.0, 1.0) pixel spacing.
 
-Our unit tests run on GitHub Actions on push and PR via `tox`, which tests on several versions of Python in Ubuntu and Windows environments. If the image below says "passing," then the tests are passing.
+Our tests run on GitHub Actions on push and PR via `tox` ([tests.yml](https://github.com/NIRALUser/NeuroRuler/blob/main/.github/workflows/tests.yml)). If the image below says "passing," then the tests are passing.
 
 <p align="center">
   <img src="https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg" alt="GitHub actions tests.yml badge"/>
 </p>
-
-Tests involving the GUI are skipped in Ubuntu GH Actions CI environments but run in Windows environments. For more information, see [tests/README.md](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/README.md).
 
 ## Documentation
 
 [https://NeuroRuler.readthedocs.io](https://NeuroRuler.readthedocs.io)
 
 See [.readthedocs.yaml](https://github.com/NIRALUser/NeuroRuler/blob/main/.readthedocs.yaml) and [docs/](https://github.com/NIRALUser/NeuroRuler/tree/main/docs) to contribute.
+
+[Team website](https://tarheels.live/comp523teamd/)
 
 ## Pre-commit actions
 

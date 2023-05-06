@@ -1,6 +1,6 @@
-"""CLI settings set through arguments.
+"""CLI settings set through command-line arguments and ``cli_config.json``.
 
-Default values for some are in the cli_config.json file."""
+Command-line arguments override the values in the JSON."""
 
 from typing import Any
 import NeuroRuler.utils.global_vars as global_vars

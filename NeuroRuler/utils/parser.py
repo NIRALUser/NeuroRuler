@@ -1,5 +1,7 @@
-# TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively, and we should just keep the general parse functions here
-"""Parse config JSON and CLI arguments to set global settings."""
+"""Parse config JSON and CLI arguments to set global settings in ``gui_settings.py`` and ``cli_settings.py``."""
+
+# TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively,
+# and we should just keep the general parse functions here
 
 import argparse
 import json
@@ -16,12 +18,12 @@ JSON_SETTINGS: dict = dict()
 
 
 def parse_cli() -> None:
-    """Parse CLI (non-GUI) args and set settings in `cli_settings.py`.
+    """Parse CLI (non-GUI) args and set settings in ``cli_settings.py``.
 
     :return: None"""
     parser = argparse.ArgumentParser(
         prog="NeuroRuler",
-        description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
+        description="A program that calculates head circumference from MRI data (``.nii``, ``.nii.gz``, ``.nrrd``).",
     )
 
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
@@ -96,10 +98,10 @@ def parse_cli() -> None:
             exit(1)
 
     if args.lower:
-        cli_settings.LOWER_THRESHOLD = args.lower
+        cli_settings.LOWER_BINARY_THRESHOLD = args.lower
 
     if args.upper:
-        cli_settings.UPPER_THRESHOLD = args.upper
+        cli_settings.UPPER_BINARY_THRESHOLD = args.upper
 
     # Would use pathlib.Path .suffix here
     # However, '.nii.gz'.suffix would return '.gz'
@@ -115,7 +117,7 @@ def parse_cli() -> None:
 
 
 def parse_gui_cli() -> None:
-    """Parse GUI CLI args and set settings in `gui_settings.py`.
+    """Parse GUI CLI args and set settings in ``gui_settings.py``.
 
     :return: None"""
     parser = argparse.ArgumentParser()
@@ -289,9 +291,9 @@ def parse_str(field: str) -> str:
     """For str field, return the str.
 
     :param field: JSON field
-    :type field: ``str``
+    :type field: ````str````
     :return: string
-    :rtype: ``str``"""
+    :rtype: ````str````"""
     try:
         return JSON_SETTINGS[field]
     except:

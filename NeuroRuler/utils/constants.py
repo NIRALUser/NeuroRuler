@@ -1,10 +1,6 @@
 """Constant values and functions. DO NOT MUTATE ANY VARIABLE IN THIS FILE FROM OUTSIDE OF THIS FILE!
 
-This file holds values that will never change outside of this file, unlike global_vars.py.
-No values here should be directly modifiable by the user, unlike gui_settings.py.
-
 This file should not import any module in this repo to avoid circular imports."""
-
 
 from pathlib import Path
 import warnings
@@ -120,7 +116,7 @@ NIFTI_METADATA_UNITS_VALUE_TO_PHYSICAL_UNITS: dict[str, str] = {
     "40": "parts-per-million (ppm)",
     "48": "radians per second (rad/s)",
 }
-"""Maps the value of `xyzt_units` of the metadata of a NIfTI file to physical meaning.
+"""Maps the value of ``xyzt_units`` of the metadata of a NIfTI file to physical meaning.
 
 Based on https://brainder.org/2012/09/23/the-nifti-file-format/.
 

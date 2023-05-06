@@ -1,5 +1,4 @@
-"""Global variables and functions that change throughout program execution, unlike constants.py,
-that the user should not be able to modify directly, unlike gui_settings.py."""
+"""Global variables that change throughout program execution."""
 
 import SimpleITK as sitk
 from pathlib import Path
@@ -23,7 +22,7 @@ You should probably use the helper functions in img_helpers instead of this (unl
 functions)."""
 
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
-"""Global `sitk.ImageFileReader`."""
+"""Global ``sitk.ImageFileReader``."""
 
 ORIENT_FILTER: sitk.DICOMOrientImageFilter = sitk.DICOMOrientImageFilter()
 """Global sitk.DICOMOrientImageFilter for orienting images.

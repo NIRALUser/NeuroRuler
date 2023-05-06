@@ -21,6 +21,7 @@ Contents
    :maxdepth: 2
 
    libraries
+   structure
    modules
 
 Indices and tables

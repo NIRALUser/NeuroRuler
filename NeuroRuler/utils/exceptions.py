@@ -1,4 +1,4 @@
-"""Custom exceptions"""
+"""Custom exceptions."""
 
 from NeuroRuler.utils.constants import (
     deprecated,
@@ -16,7 +16,7 @@ class ComputeCircumferenceOfInvalidSlice(Exception):
 
     Most valid brain slices have only 2 or 3 detectable contours.
 
-    Change the number in global_vars.py, then run `pytest` and examine slices given by settings in
+    Change the number in global_vars.py, then run ``pytest`` and examine slices given by settings in
     tests/noise_vals.txt. Some valid slices have 6 or 7 contours.
 
     See NIFTI file (0, 0, 0, 151) for a valid slice with 9 contours. 9 seems like a good limit.
@@ -53,8 +53,8 @@ class RotationOutOfBounds(Exception):
 
 class InvalidJSONField(Exception):
     def __init__(self, field: str, expected: str):
-        """`field` is the name of the invalid field
+        """``field`` is the name of the invalid field
 
-        `expected` is some information about what the expected value should be"""
+        ``expected`` is some information about what the expected value should be"""
         self.message = f"The field {field} in {JSON_GUI_CONFIG_PATH} has an invalid type or value.\nExpected: {expected}"
         super().__init__(self.message)
