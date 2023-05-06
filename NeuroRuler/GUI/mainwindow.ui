@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1308</width>
-    <height>864</height>
+    <height>819</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -324,6 +324,12 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="toolTip">
+               <string>Displays an axial slice indicator. Cannot calculate circumference from this view.</string>
+              </property>
+              <property name="statusTip">
+               <string>Displays an axial slice indicator. Cannot calculate circumference from this view.</string>
+              </property>
               <property name="text">
                <string>Sagittal</string>
               </property>
@@ -340,6 +346,12 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="toolTip">
+               <string>Displays an axial slice indicator. Cannot calculate circumference from this view.</string>
+              </property>
+              <property name="statusTip">
+               <string>Displays an axial slice indicator. Cannot calculate circumference from this view.</string>
+              </property>
               <property name="text">
                <string>Coronal</string>
               </property>
@@ -355,6 +367,12 @@
              <widget class="QRadioButton" name="z_view_radio_button">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>The view from which circumference is calculated.</string>
+              </property>
+              <property name="statusTip">
+               <string>The view from which circumference is calculated.</string>
               </property>
               <property name="text">
                <string>Axial</string>
@@ -465,6 +483,14 @@
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
+                  <property name="toolTip">
+                   <string>Conductance controls the sensitivity of the conductance term.
+As a general rule, the lower the value, the more strongly the filter preserves edges.
+A high value will cause diffusion (smoothing) across edges.</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>Conductance controls the sensitivity of the conductance term. As a general rule, the lower the value, the more strongly the filter preserves edges. A high value will cause diffusion (smoothing) across edges.</string>
+                  </property>
                   <property name="text">
                    <string>Conductance:</string>
                   </property>
@@ -517,6 +543,14 @@
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
+                  <property name="toolTip">
+                   <string>The more iterations, the more smoothing. Each iteration takes the same amount of time.
+If it takes 10 seconds for one iteration, then it will take 100 seconds for 10 iterations.
+Note that the conductance controls how much each iteration smooths across edges</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>The more iterations, the more smoothing. Each iteration takes the same amount of time. If it takes 10 seconds for one iteration, then it will take 100 seconds for 10 iterations. Note that the conductance controls how much each iteration smooths across edges</string>
+                  </property>
                   <property name="text">
                    <string>Iterations:</string>
                   </property>
@@ -568,6 +602,13 @@
                  <widget class="QLabel" name="time_step_label">
                   <property name="enabled">
                    <bool>false</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>The time step depends on the dimensionality of the image.
+In Slicer, the images are 3D and the default (.0625) time step will provide a stable solution</string>
+                  </property>
+                  <property name="statusTip">
+                   <string>The time step depends on the dimensionality of the image. In Slicer, the images are 3D and the default (.0625) time step will provide a stable solution</string>
                   </property>
                   <property name="text">
                    <string>Time Step:</string>
@@ -623,6 +664,12 @@
              <widget class="QPushButton" name="smoothing_preview_button">
               <property name="enabled">
                <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Preview what the image looks like after smoothing options are applied.</string>
+              </property>
+              <property name="statusTip">
+               <string>Preview what the image looks like after smoothing options are applied.</string>
               </property>
               <property name="text">
                <string>Preview</string>
@@ -712,6 +759,12 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="toolTip">
+                 <string>Automatic image thresholding (no need for manual threshold settings).</string>
+                </property>
+                <property name="statusTip">
+                 <string>Automatic image thresholding (no need for manual threshold settings).</string>
+                </property>
                 <property name="text">
                  <string>Otsu Threshold</string>
                 </property>
@@ -744,6 +797,12 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="toolTip">
+                 <string>Binary image will be created based on the lower and upper threshold values.</string>
+                </property>
+                <property name="statusTip">
+                 <string>Binary image will be created based on the lower and upper threshold values.</string>
+                </property>
                 <property name="text">
                  <string>Binary Threshold</string>
                 </property>
@@ -763,6 +822,12 @@
                    <widget class="QLabel" name="lower_threshold">
                     <property name="enabled">
                      <bool>false</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>Lower threshold for binary threshold filter.</string>
+                    </property>
+                    <property name="statusTip">
+                     <string>Lower threshold for binary threshold filter.</string>
                     </property>
                     <property name="text">
                      <string>Lower Threshold:</string>
@@ -812,6 +877,12 @@
                    <widget class="QLabel" name="upper_threshold">
                     <property name="enabled">
                      <bool>false</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>Upper threshold for binary threshold filter.</string>
+                    </property>
+                    <property name="statusTip">
+                     <string>Upper threshold for binary threshold filter.</string>
                     </property>
                     <property name="text">
                      <string>Upper Threshold:</string>
@@ -867,6 +938,12 @@
               <property name="enabled">
                <bool>false</bool>
               </property>
+              <property name="toolTip">
+               <string>Preview what the image looks like after Otsu or binary threshold (using lower and upper settings) filter is applied.</string>
+              </property>
+              <property name="statusTip">
+               <string>Preview what the image looks like after Otsu or binary threshold (using lower and upper settings) filter is applied.</string>
+              </property>
               <property name="text">
                <string>Preview</string>
               </property>
@@ -903,10 +980,10 @@
          <cursorShape>ArrowCursor</cursorShape>
         </property>
         <property name="toolTip">
-         <string>Compute circumference using current settings.</string>
+         <string>Compute circumference from axial view using current settings.</string>
         </property>
         <property name="statusTip">
-         <string>Compute circumference using current settings.</string>
+         <string>Compute circumference from axial view using current settings.</string>
         </property>
         <property name="text">
          <string>Apply</string>
@@ -949,6 +1026,12 @@
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="toolTip">
+         <string>Circumference computed from axial view. Units are assumed to be millimeters (mm) if metadata regarding units is not found for the image (generally occurs if the image is .nrrd).</string>
+        </property>
+        <property name="statusTip">
+         <string>Circumference computed from axial view. Units are assumed to be millimeters (mm) if metadata regarding units is not found for the image (generally occurs if the image is .nrrd).</string>
+        </property>
         <property name="text">
          <string>Calculated Circumference: N/A</string>
         </property>
@@ -981,7 +1064,7 @@
          </size>
         </property>
         <property name="statusTip">
-         <string>Image path is displayed here.</string>
+         <string/>
         </property>
         <property name="text">
          <string>Select images using File &gt; Open!</string>
@@ -1066,6 +1149,12 @@
        <widget class="QPushButton" name="export_button">
         <property name="enabled">
          <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Export data to output/ directory.</string>
+        </property>
+        <property name="statusTip">
+         <string>Export data to output/ directory.</string>
         </property>
         <property name="text">
          <string>Export</string>
@@ -1454,7 +1543,7 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="threshold_button_group"/>
   <buttongroup name="view_button_group"/>
+  <buttongroup name="threshold_button_group"/>
  </buttongroups>
 </ui>

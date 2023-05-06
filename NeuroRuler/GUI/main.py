@@ -3,7 +3,7 @@
 Loads `NeuroRuler/GUI/mainwindow.ui`, made in QtDesigner.
 
 Loads `.qss` stylesheets and `resources.py` (icons) files, generated
-by BreezeStyleSheets. Our fork of the repo: https://github.com/COMP523TeamD/BreezeStyleSheets.
+by BreezeStyleSheets. Our fork of the repo: https://github.com/NIRALUser/BreezeStyleSheets.
 
 If adding a new GUI element (in the GUI or in the menubar, whatever), you'll have to modify
 modify __init__ and settings_view_toggle.
@@ -41,6 +41,7 @@ from PyQt6.uic.load_ui import loadUi
 from PyQt6.QtCore import Qt, QSize
 
 import pprint
+import pkg_resources
 from NeuroRuler.utils.constants import View, ThresholdFilter
 import NeuroRuler.utils.constants as constants
 
@@ -78,7 +79,15 @@ import NeuroRuler.utils.img_helpers as img_helpers
 
 
 PATH_TO_UI_FILE: Path = Path("NeuroRuler") / "GUI" / "mainwindow.ui"
-PATH_TO_HCT_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "hct_logo.png"
+if not PATH_TO_UI_FILE.exists():
+    PATH_TO_UI_FILE = Path(
+        pkg_resources.resource_filename("NeuroRuler.GUI", "mainwindow.ui")
+    )
+PATH_TO_NR_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "nr_logo.png"
+if not PATH_TO_NR_LOGO.exists():
+    PATH_TO_NR_LOGO = Path(
+        pkg_resources.resource_filename("NeuroRuler.GUI", "static/nr_logo.png")
+    )
 
 SETTINGS_VIEW_ENABLED: bool = True
 """Whether the user is able to adjust settings (settings screen) or not
@@ -86,7 +95,7 @@ SETTINGS_VIEW_ENABLED: bool = True
 
 DEFAULT_CIRCUMFERENCE_LABEL_TEXT: str = "Calculated Circumference: N/A"
 DEFAULT_IMAGE_PATH_LABEL_TEXT: str = "Image path"
-GITHUB_LINK: str = "https://github.com/COMP523TeamD/NeuroRuler"
+GITHUB_LINK: str = "https://github.com/NIRALUser/NeuroRuler"
 DOCUMENTATION_LINK: str = "https://NeuroRuler.readthedocs.io/en/latest/"
 DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
@@ -129,7 +138,7 @@ class MainWindow(QMainWindow):
         self.action_show_credits.triggered.connect(
             lambda: information_dialog(
                 "Credits",
-                'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.',
+                'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.\n\nUniversity of North Carolina at Chapel Hill, 2023. See the GitHub page for more info.',
             )
         )
         self.action_test_stuff.triggered.connect(self.test_stuff)
@@ -243,9 +252,9 @@ class MainWindow(QMainWindow):
             binary_contour_slice: np.ndarray = self.render_curr_slice()
             self.render_circumference(binary_contour_slice)
 
-        # TODO: Call enable_elements and then a disable method (code another one, and it'd be short)
-        # If not settings_view_enabled
-        self.action_open.setEnabled(settings_view_enabled)
+        # Open button is always enabled.
+        # If pressing it in circumference mode, then browse_files() will toggle to settings view.
+        self.action_open.setEnabled(True)
         self.action_import.setEnabled(settings_view_enabled)
         self.action_add_images.setEnabled(settings_view_enabled)
         self.action_remove_image.setEnabled(settings_view_enabled)
@@ -337,15 +346,23 @@ class MainWindow(QMainWindow):
 
         Renders various elements depending on the value of `extend`.
 
+        If called in circumference mode, then will toggle to settings mode.
+
         :param extend: Whether to clear IMAGE_DICT and (re)initialize or add images to it. Determines which GUI elements are rendered.
-        :param path: Used for testing, when only one path is imported.
+        :param path: Used for unit testing, when only one path is imported. Normally, the path(s) are selected by user in a QFileDialog.
         :type extend: bool
         :return: None"""
+        # If called in circumference mode, then toggle to settings mode.
+        if not SETTINGS_VIEW_ENABLED:
+            self.settings_export_view_toggle()
 
-        if path == None:
-            file_filter: str = "MRI images " + str(
-                constants.SUPPORTED_EXTENSIONS
-            ).replace("'", "").replace(",", "")
+        if path is None:
+            file_filter: str = "MRI Images ("
+            for extension in constants.SUPPORTED_IMAGE_EXTENSIONS:
+                file_filter += "*" + extension + " "
+            # Get rid of trailing whitespace
+            file_filter = file_filter[:-1]
+            file_filter += ")"
 
             files = QFileDialog.getOpenFileNames(
                 self,
@@ -478,24 +495,28 @@ class MainWindow(QMainWindow):
         """
         lower_threshold: str = self.lower_threshold_input.displayText()
         try:
-            global_vars.LOWER_THRESHOLD = float(lower_threshold)
+            global_vars.LOWER_BINARY_THRESHOLD = float(lower_threshold)
         except ValueError:
             pass
-        self.lower_threshold_input.setText(str(global_vars.LOWER_THRESHOLD))
-        self.lower_threshold_input.setPlaceholderText(str(global_vars.LOWER_THRESHOLD))
+        self.lower_threshold_input.setText(str(global_vars.LOWER_BINARY_THRESHOLD))
+        self.lower_threshold_input.setPlaceholderText(
+            str(global_vars.LOWER_BINARY_THRESHOLD)
+        )
         global_vars.BINARY_THRESHOLD_FILTER.SetLowerThreshold(
-            global_vars.LOWER_THRESHOLD
+            global_vars.LOWER_BINARY_THRESHOLD
         )
 
         upper_threshold: str = self.upper_threshold_input.displayText()
         try:
-            global_vars.UPPER_THRESHOLD = float(upper_threshold)
+            global_vars.UPPER_BINARY_THRESHOLD = float(upper_threshold)
         except ValueError:
             pass
-        self.upper_threshold_input.setText(str(global_vars.UPPER_THRESHOLD))
-        self.upper_threshold_input.setPlaceholderText(str(global_vars.UPPER_THRESHOLD))
+        self.upper_threshold_input.setText(str(global_vars.UPPER_BINARY_THRESHOLD))
+        self.upper_threshold_input.setPlaceholderText(
+            str(global_vars.UPPER_BINARY_THRESHOLD)
+        )
         global_vars.BINARY_THRESHOLD_FILTER.SetUpperThreshold(
-            global_vars.UPPER_THRESHOLD
+            global_vars.UPPER_BINARY_THRESHOLD
         )
 
     def render_scaled_qpixmap_from_qimage(self, q_img: QImage) -> None:
@@ -1103,16 +1124,14 @@ def main() -> None:
     # because gui.py.parse_gui_cli() has to set THEME_NAME before the import occurs
     # This imports globally
     # For example, NeuroRuler/GUI/helpers.py can access resource files without having to import there
-    importlib.import_module(
-        f"NeuroRuler.GUI.themes.{settings.THEME_NAME}.resources"
-    )
+    importlib.import_module(f"NeuroRuler.GUI.themes.{settings.THEME_NAME}.resources")
 
     app = QApplication(sys.argv)
 
     # On macOS, sets the application logo in the dock (but no window icon on macOS)
     # TODO
     # On Windows, sets the window icon at the top left of the window (but no dock icon on Windows)
-    app.setWindowIcon(QIcon(str(PATH_TO_HCT_LOGO)))
+    app.setWindowIcon(QIcon(str(PATH_TO_NR_LOGO)))
 
     # TODO: Put arrow buttons on the left and right endpoints of the sliders
     # These arrow buttons already show up if commenting in app.setStyle("Fusion")
@@ -1124,22 +1143,16 @@ def main() -> None:
 
     MAIN_WINDOW: MainWindow = MainWindow()
 
-    with open(
-            constants.THEME_DIR / settings.THEME_NAME / "stylesheet.qss", "r"
-    ) as f:
+    with open(constants.THEME_DIR / settings.THEME_NAME / "stylesheet.qss", "r") as f:
         MAIN_WINDOW.setStyleSheet(f.read())
 
     # Non-zero min width and height is needed to prevent
-    # this bug https://github.com/COMP523TeamD/NeuroRuler/issues/42
+    # this bug https://github.com/NIRALUser/NeuroRuler/issues/42
     # However, this also seems to affect startup GUI size or at least GUI element spacing
     MAIN_WINDOW.setMinimumSize(QSize(1, 1))
     MAIN_WINDOW.resize(
-        int(
-            settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]
-        ),
-        int(
-            settings.STARTUP_HEIGHT_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[1]
-        ),
+        int(settings.STARTUP_WIDTH_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[0]),
+        int(settings.STARTUP_HEIGHT_RATIO * constants.PRIMARY_MONITOR_DIMENSIONS[1]),
     )
 
     MAIN_WINDOW.show()

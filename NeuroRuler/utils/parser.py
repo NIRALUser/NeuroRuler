@@ -1,3 +1,4 @@
+# TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively, and we should just keep the general parse functions here
 """Parse config JSON and CLI arguments to set global settings."""
 
 import argparse
@@ -18,20 +19,34 @@ def parse_cli() -> None:
     """Parse CLI (non-GUI) args and set settings in `cli_settings.py`.
 
     :return: None"""
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        prog="NeuroRuler",
+        description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
+    )
+
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
-    parser.add_argument("-r", "--raw", help="print just the \"raw\" circumference", action="store_true")
-    parser.add_argument("-x", "--x", type=int, help="x transformation (in degrees)")
-    parser.add_argument("-y", "--y", type=int, help="y transformation (in degrees)")
-    parser.add_argument("-z", "--z", type=int, help="z transformation (in degrees)")
-    parser.add_argument("-s", "--slice", type=int, help="slice (0-indexed)")
-    parser.add_argument("-c", "--conductance", type=float, help="conductance smoothing parameter")
+    parser.add_argument(
+        "-r", "--raw", help='print just the "raw" circumference', action="store_true"
+    )
+    parser.add_argument("-x", "--x", type=int, help="x rotation (in degrees)")
+    parser.add_argument("-y", "--y", type=int, help="y rotation (in degrees)")
+    parser.add_argument("-z", "--z", type=int, help="z rotation (in degrees)")
+    parser.add_argument("-s", "--slice", type=int, help="slice (Z slice, 0-indexed)")
+    parser.add_argument(
+        "-c", "--conductance", type=float, help="conductance smoothing parameter"
+    )
     parser.add_argument("-i", "--iterations", type=int, help="smoothing iterations")
-    parser.add_argument("-t", "--step", type=float, help="time step (smoothing parameter)")
-    parser.add_argument("-o", "--otsu", help="use Otsu instead of binary", action="store_true")
-    parser.add_argument("-l", "--lower", type=float, help="lower threshold for binary threshold")
-    parser.add_argument("-u", "--upper", type=float, help="upper threshold for binary threshold")
-    parser.add_argument("file", help="file to compute")
+    parser.add_argument(
+        "-t", "--step", type=float, help="time step (smoothing parameter)"
+    )
+    parser.add_argument("-f", "--filter", help="which filter to use (Otsu or binary)")
+    parser.add_argument(
+        "-l", "--lower", type=float, help="lower threshold for binary threshold"
+    )
+    parser.add_argument(
+        "-u", "--upper", type=float, help="upper threshold for binary threshold"
+    )
+    parser.add_argument("file", help="file to compute circumference from")
     args = parser.parse_args()
 
     if args.debug:
@@ -61,13 +76,40 @@ def parse_cli() -> None:
     if args.step:
         cli_settings.TIME_STEP = args.step
 
-    cli_settings.USE_OTSU = args.otsu
+    if args.filter:
+        if args.filter.lower() == "otsu":
+            cli_settings.THRESHOLD_FILTER = constants.ThresholdFilter.Otsu
+        elif args.filter.lower() == "binary":
+            if args.lower is None:
+                print(
+                    "Must specify lower binary threshold with CLI option if using binary threshold"
+                )
+                exit(1)
+            if args.upper is None:
+                print(
+                    "Must specify upper binary threshold with CLI option if using binary threshold"
+                )
+                exit(1)
+            cli_settings.THRESHOLD_FILTER = constants.ThresholdFilter.Binary
+        else:
+            print("Invalid setting entered for CLI filter option.")
+            exit(1)
 
     if args.lower:
         cli_settings.LOWER_THRESHOLD = args.lower
 
     if args.upper:
         cli_settings.UPPER_THRESHOLD = args.upper
+
+    # Would use pathlib.Path .suffix here
+    # However, '.nii.gz'.suffix would return '.gz'
+    # But we expect '.nii.gz'
+    extension = args.file[args.file.find(".") :]
+    if extension not in constants.SUPPORTED_IMAGE_EXTENSIONS:
+        print(
+            f"Image has an unsupported extension. Supported image extensions are {str(constants.SUPPORTED_IMAGE_EXTENSIONS)}."
+        )
+        exit(1)
 
     cli_settings.FILE = args.file
 
@@ -130,14 +172,26 @@ def parse_cli_config() -> None:
     load_json will load constants.JSON_CLI_CONFIG_PATH."""
     global JSON_SETTINGS
     JSON_SETTINGS = load_json(constants.JSON_CLI_CONFIG_PATH)
-    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG:
-        raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_CLI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
-        )
-    # WIP obviously -Eric
-    gui_settings.DEBUG = parse_bool("DEBUG")
-    if gui_settings.DEBUG:
+    cli_settings.DEBUG = parse_bool("DEBUG")
+    if cli_settings.DEBUG:
         print("Printing debug messages.")
+
+    cli_settings.RAW = parse_bool("RAW")
+    cli_settings.THETA_X = parse_int("X")
+    cli_settings.THETA_Y = parse_int("Y")
+    cli_settings.THETA_Z = parse_int("Z")
+    cli_settings.SLICE = parse_int("SLICE")
+    cli_settings.CONDUCTANCE_PARAMETER = parse_float("CONDUCTANCE")
+    cli_settings.SMOOTHING_ITERATIONS = parse_int("SMOOTHING")
+    cli_settings.TIME_STEP = parse_float("TIME_STEP")
+    if parse_str("THRESHOLD_FILTER").lower() == "otsu":
+        cli_settings.THRESHOLD_FILTER = constants.ThresholdFilter.Otsu
+    elif parse_str("THRESHOLD_FILTER").lower() == "binary":
+        cli_settings.THRESHOLD_FILTER = constants.ThresholdFilter.Binary
+    else:
+        raise exceptions.InvalidJSONField("THRESHOLD_FILTER", "str")
+    cli_settings.LOWER_BINARY_THRESHOLD = parse_float("LOWER_BINARY_THRESHOLD")
+    cli_settings.UPPER_BINARY_THRESHOLD = parse_float("UPPER_BINARY_THRESHOLD")
 
 
 def parse_gui_config() -> None:
@@ -146,10 +200,6 @@ def parse_gui_config() -> None:
     load_json will load constants.JSON_GUI_CONFIG_PATH."""
     global JSON_SETTINGS
     JSON_SETTINGS = load_json(constants.JSON_GUI_CONFIG_PATH)
-    if len(JSON_SETTINGS) != constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG:
-        raise Exception(
-            f"Expected {constants.EXPECTED_NUM_FIELDS_IN_GUI_CONFIG} rows in JSON file but found {len(JSON_SETTINGS)}."
-        )
 
     gui_settings.DEBUG = parse_bool("DEBUG")
     if gui_settings.DEBUG:
@@ -198,9 +248,9 @@ def parse_main_color_from_theme_json() -> str:
     :return: main color rrggbb (hexits)
     :rtype: str"""
     path_to_theme_json: Path = (
-            constants.THEME_DIR
-            / gui_settings.THEME_NAME
-            / (gui_settings.THEME_NAME + ".json")
+        constants.THEME_DIR
+        / gui_settings.THEME_NAME
+        / (gui_settings.THEME_NAME + ".json")
     )
     theme_json: dict = load_json(path_to_theme_json)
     color: str = theme_json["highlight"]
@@ -233,6 +283,19 @@ def load_json(path: Path) -> dict:
         lines = f.read().splitlines()
     lines = [i for i in lines if not i.strip().startswith("//")]
     return json.loads("\n".join(lines))
+
+
+def parse_str(field: str) -> str:
+    """For str field, return the str.
+
+    :param field: JSON field
+    :type field: ``str``
+    :return: string
+    :rtype: ``str``"""
+    try:
+        return JSON_SETTINGS[field]
+    except:
+        raise exceptions.InvalidJSONField(field, "str")
 
 
 def parse_bool(field: str) -> bool:

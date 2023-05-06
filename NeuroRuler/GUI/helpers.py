@@ -1,6 +1,4 @@
-"""GUI helper functions.
-
-Note, importing PyQt6 in any file that's imported by a test file will cause an error."""
+"""GUI helper functions."""
 
 import platform
 import string

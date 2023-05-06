@@ -1,8 +1,6 @@
 output/
 scripts/pypi
-scripts/pypi_upload
 scripts/testpypi
-scripts/testpypi_upload
 
 .DS_Store
 Playground/imgproc/contour_numpy.txt

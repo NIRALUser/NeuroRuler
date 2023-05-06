@@ -1,3 +1,7 @@
+"""Test that ``unittest`` tests are discovered when running ``pytest`` and ``tox`` (run in GitHub CI).
+
+The failed test cases caused failures in CI when not skipped, as expected."""
+
 import unittest
 
 
