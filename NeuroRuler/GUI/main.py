@@ -103,8 +103,6 @@ DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 
-CIRCUMFERENCE_RESULT: float = 0.0
-
 UNSCALED_QPIXMAP: QPixmap
 """Unscaled QPixmap from which the scaled version is rendered in the GUI.
 
@@ -681,8 +679,6 @@ class MainWindow(QMainWindow):
         self.circumference_label.setText(
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else constants.MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )
-        global CIRCUMFERENCE_RESULT
-        CIRCUMFERENCE_RESULT = circumference
         return circumference
 
     def toggle_setting_to_false(self) -> None:
