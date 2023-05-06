@@ -1,6 +1,7 @@
-"""
-Defines main(), the entrypoint of the CLI.
-"""
+"""Defines main(), the entrypoint of the CLI.
+
+This file is meant to be run as a module."""
+
 import NeuroRuler.utils.constants as constants
 import NeuroRuler.utils.global_vars as global_vars
 import NeuroRuler.utils.imgproc as imgproc
