@@ -41,7 +41,7 @@ pip install NeuroRuler
 
 If `pip` doesn't work, try `pip3`.
 
-If contributing to this repo, run `pip install -r requirements.txt` to install additional development dependencies (for code formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
+If contributing to this repo, clone/fork and run `pip install -r requirements.txt` to install additional development dependencies (for code formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
 
 ## Run GUI
 
@@ -56,11 +56,11 @@ Note: If you make changes to the repo, use the [gui.py](https://github.com/NIRAL
 
 ## Configure settings
 
-Edit the JSON configuration files [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json) and [gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json).
+After cloning the repo, edit the JSON configuration files [gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json).
 
-You can also supply CLI arguments to the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json) script, which will override settings in [gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json).
+You can also supply CLI arguments to the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) or [cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli.py) scripts, which will override settings in the JSON configuration files.
 
-Apply the `-h` command-line option when running those scripts to see the list of options.
+Apply the `-h` command-line option when running those scripts to see the list of options. You can see some examples of CLI options in [test_cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/test_cli.py).
 
 ## Run tests
 

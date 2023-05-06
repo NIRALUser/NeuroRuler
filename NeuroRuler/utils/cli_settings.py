@@ -1,6 +1,7 @@
 """CLI settings set through arguments.
 
 Default values for some are in the cli_config.json file."""
+
 from typing import Any
 import NeuroRuler.utils.global_vars as global_vars
 from NeuroRuler.utils.constants import ThresholdFilter
