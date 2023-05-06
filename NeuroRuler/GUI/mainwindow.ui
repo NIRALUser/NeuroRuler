@@ -1183,15 +1183,15 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     </property>
     <widget class="QMenu" name="action_export">
      <property name="toolTip">
-      <string extracomment="Export image data as CSV or export the image.">Export image data as CSV or export the image.</string>
+      <string extracomment="Export image data to output/.">Export image data to output/.</string>
      </property>
      <property name="statusTip">
-      <string extracomment="Export slice data to CSV or to image format.">Export image data as CSV or export the image.</string>
+      <string extracomment="Export image data to output/.">Export image data to output/.</string>
      </property>
      <property name="title">
       <string>Export</string>
      </property>
-     <addaction name="action_export_csv"/>
+     <addaction name="action_export_json"/>
      <addaction name="separator"/>
      <addaction name="action_export_png"/>
      <addaction name="action_export_jpg"/>
@@ -1351,21 +1351,21 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     <string>Ctrl+E, Ctrl+J</string>
    </property>
   </action>
-  <action name="action_export_csv">
+  <action name="action_export_json">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>CSV</string>
+    <string>JSON</string>
    </property>
    <property name="toolTip">
-    <string extracomment="Click Apply to enable this option.">Export image data as CSV.</string>
+    <string extracomment="Export image data as JSON to output/ and save the contoured slice.">Export image data as JSON to output/ and save the contoured slice.</string>
    </property>
    <property name="statusTip">
-    <string extracomment="Click Apply to enable this option.">Export image data as CSV.</string>
+    <string extracomment="Export image data as JSON to output/ and save the contoured slice.">Export image data as JSON to output/ and save the contoured slice.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E, Ctrl+C</string>
+    <string>Ctrl+E, Ctrl+J</string>
    </property>
   </action>
   <action name="action_export_bmp">
@@ -1497,6 +1497,15 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
   <action name="action_import">
    <property name="text">
     <string>Import Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Import a JSON file in the format that's exported by NeuroRuler.</string>
+   </property>
+   <property name="statusTip">
+    <string>Import a JSON file in the format that's exported by NeuroRuler.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
   <action name="action_show_credits">

@@ -18,13 +18,6 @@ FILE_BROWSER_START_DIR: Path = Path.cwd()
 
 Defaults to cwd."""
 
-FILE_IMPORT_START_DIR: Path = constants.JSON_DIR
-"""The starting directory that is opened when importing json files.
-
-Defaults to JSON_DIR during development, for now.
-
-Should default to user's home directory later."""
-
 EXPORTED_FILE_NAMES_USE_INDEX: bool = False
 """If True, then exported files will be named using the index in the program.
 
