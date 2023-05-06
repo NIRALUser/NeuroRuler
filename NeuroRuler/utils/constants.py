@@ -1,10 +1,6 @@
 """Constant values and functions. DO NOT MUTATE ANY VARIABLE IN THIS FILE FROM OUTSIDE OF THIS FILE!
 
-This file holds values that will never change outside of this file, unlike global_vars.py.
-No values here should be directly modifiable by the user, unlike gui_settings.py.
-
 This file should not import any module in this repo to avoid circular imports."""
-
 
 from pathlib import Path
 import warnings

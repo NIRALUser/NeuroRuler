@@ -1,6 +1,6 @@
-"""Image helper functions that don't quite fit into the main algorithm, unlike imgproc.py.
+"""Image helper functions that aren't quite part of the main algorithm, unlike ``imgproc.py``.
 
-Mostly holds helper functions for working with IMAGE_DICT in global_vars.py."""
+Mostly holds helper functions for working with ``IMAGE_DICT`` in ``global_vars.py``."""
 
 from typing import Union
 import SimpleITK as sitk

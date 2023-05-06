@@ -1,4 +1,4 @@
-"""Helper functions for image processing. Essentially, the main algorithm."""
+"""Helper functions for image processing. Main algorithm."""
 
 import SimpleITK as sitk
 import cv2

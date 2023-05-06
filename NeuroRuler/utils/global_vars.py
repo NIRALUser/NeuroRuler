@@ -1,5 +1,4 @@
-"""Global variables and functions that change throughout program execution, unlike constants.py,
-that the user should not be able to modify directly, unlike gui_settings.py."""
+"""Global variables and functions that change throughout program execution."""
 
 import SimpleITK as sitk
 from pathlib import Path

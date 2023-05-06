@@ -1,4 +1,4 @@
-"""Parse config JSON and CLI arguments to set global settings."""
+"""Parse config JSON and CLI arguments to set global settings in ``gui_settings.py`` and ``cli_settings.py``."""
 
 # TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively,
 # and we should just keep the general parse functions here

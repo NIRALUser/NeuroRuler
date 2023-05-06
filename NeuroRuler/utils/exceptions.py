@@ -1,4 +1,4 @@
-"""Custom exceptions"""
+"""Custom exceptions."""
 
 from NeuroRuler.utils.constants import (
     deprecated,
