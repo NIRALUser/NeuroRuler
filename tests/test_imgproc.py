@@ -1,4 +1,7 @@
-"""Test stuff in Playground.imgproc.
+"""Test stuff in imgproc.py.
+
+A lot of tests here test behavior of libraries instead of our code. This was useful when learning how
+to use the libraries, not so useful anymore.
 
 We use == for float comparison instead of |a-b|<epsilon when the numbers should be *exactly* the same."""
 
@@ -11,7 +14,6 @@ from NeuroRuler.utils.imgproc import contour, length_of_contour
 import NeuroRuler.utils.exceptions as exceptions
 from NeuroRuler.utils.constants import (
     DATA_DIR,
-    NUM_CONTOURS_IN_INVALID_SLICE,
     SUPPORTED_IMAGE_EXTENSIONS,
     degrees_to_radians,
 )
@@ -196,13 +198,6 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
     But the pixel spacing of the underlying `np.ndarray` passed into cv2.findContours *seems* to be fine. See discussion in the GH link.
 
     TODO: Unit test with pre-computed circumferences to really confirm this."""
-    # Write settings of slices that cause ComputeCircumferenceOfInvalidSlice to a file to make sure they actually are just noise and not brain slices.
-    # f = open(Path("tests") / "noise_vals.txt", "w")
-    # f.write(
-    #     f"Write settings of slices that cause ComputeCircumferenceOfInvalidSlice (>= {NUM_CONTOURS_IN_INVALID_SLICE} contours detected)\nto this file to make sure they actually are invalid brain slices\n\n"
-    # )
-    # f.write("From test_arc_length_of_transposed_matrix_is_same\n\n")
-
     for img in EXAMPLE_IMAGES.values():
         # f.write(f"{DATA_DIR.name}/{img.path.name}\n")
         for theta_x in range(0, 31, 15):
@@ -222,8 +217,7 @@ def test_arc_length_of_transposed_matrix_is_same_except_for_invalid_slice():
                             length_2 = length_of_contour(contour_slice_transposed)
                             assert length_1 == length_2
                         except exceptions.ComputeCircumferenceOfInvalidSlice:
-                            f.write(f"{theta_x, theta_y, theta_z, slice_num}\n")
-    f.close()
+                            pass
 
 
 @pytest.mark.skip(reason="")

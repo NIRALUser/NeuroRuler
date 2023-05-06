@@ -2720,7 +2720,13 @@ ads--CDockOverlayCross
     qproperty-iconShadowColor: transparent;
 }
 
-/* These lines are appended to the compiled stylesheets by the hct.py script */
+/**
+ * These lines are appended to the compiled stylesheets by the nr.py script
+ * at https://github.com/COMP523TeamD/BreezeStyleSheets/blob/main/nr.py
+ *
+ * Ignore that this file is a .css file. It's for syntax highlighting, but everything here
+ * should be QSS.
+ */
 
 /* To make QMessageBox font not bold */
 QMessageBox QLabel {

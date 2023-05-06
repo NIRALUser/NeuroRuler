@@ -320,7 +320,7 @@ BreezeStyleSheets
 Used to generate our GUI's :code:`.qss` stylesheets and corresponding :code:`resources.py` files.
 
 We have a custom `fork <https://github.com/NIRALUser/BreezeStyleSheets>`_ with a script
-(`hct.py <https://github.com/NIRALUser/BreezeStyleSheets/blob/main/hct.py>`_) that automates the process.
+(`nr.py <https://github.com/NIRALUser/BreezeStyleSheets/blob/main/nr.py>`_) that automates the process.
 
 .. _BreezeStyleSheetsHowItWorks:
 
@@ -329,7 +329,7 @@ How it works
 
 Read the brief README in our `BSS fork <https://github.com/NIRALUser/BreezeStyleSheets>`_.
 
-Then see the `hct.py <https://github.com/NIRALUser/BreezeStyleSheets/blob/main/hct.py>`_
+Then see the `nr.py <https://github.com/NIRALUser/BreezeStyleSheets/blob/main/nr.py>`_
 script, which automates everything below.
 
 In a nutshell, we edit a JSON file with hex color codes (the JSON controls only the colors of elements)
@@ -369,7 +369,7 @@ Accessing resources
 ===================
 
 See :ref:`QRC file <PyQt6QRC>` for an example of how to access a resource from within code.
-Since we're using compiled :code:`resource.py` files, we don't have the :code:`.svg` files in our HCT repo.
+Since we're using compiled :code:`resource.py` files, we don't have the :code:`.svg` files in our NR repo.
 Check the BreezeStyleSheets repo for `resource names <https://github.com/Alexhuszagh/BreezeStyleSheets/tree/main/dist/qrc/dark>`_.
 
 .. _pathlib:
@@ -477,15 +477,15 @@ sphinx, setuptools
 
 For automatically generating these documentation pages.
 
-.. note:: This website is automatically updated on push to HCT's main branch, so you don't need to follow these steps unless you're making a change to a webpage and want to be able to build the website locally to review changes before pushing.
+.. note:: This website is automatically updated on push to NR's main branch, so you don't need to follow these steps unless you're making a change to a webpage and want to be able to build the website locally to review changes before pushing.
 
 `Read the Docs tutorial <https://docs.readthedocs.io/en/stable/tutorial/>`_ (some steps caused deployment errors 💀)
 and `YouTube video <https://www.youtube.com/watch?v=BWIrhgCAae0>`_ about Sphinx.
 
 .. _sphinxBuildSite:
 
-Build HCT docs site locally
-===========================
+Build docs site locally
+=======================
 
 Your current working directory should be :code:`.../NeuroRuler`, and
 you should have already installed dependencies via pip.
@@ -516,7 +516,7 @@ is this page. `Documentation <modules.html>`_ for `source code <_modules/index.h
 Steps for building from scratch
 ===============================
 
-.. note:: This does not have to be done for the HCT repo since setup is already complete.
+.. note:: This does not have to be done for the NR repo since setup is already complete.
     It's mostly here for my reference since there's not a lot of information about this process online and I'd forget
     how to do it.
 
@@ -535,7 +535,7 @@ Type `n` for the first question, which asks about splitting source and build dir
 
 Copy over :code:`docs/conf.py` (install another theme with pip and modify :code:`html_theme` if you want),
 :code:`docs/requirements.txt`, :code:`.readthedocs.yaml`, :code:`pyproject.toml`, and :code:`setup.py` from the
-`HCT repo <https://github.com/NIRALUser/NeuroRuler>`_,
+`NR repo <https://github.com/NIRALUser/NeuroRuler>`_,
 overwriting if necessary. Modify the info inside for your purposes.
 The root :code:`requirements.txt` and :code:`requirements_CI.txt` might also need to include
 setuptools, but I'm not certain.

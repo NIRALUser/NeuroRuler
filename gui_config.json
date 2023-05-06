@@ -13,7 +13,7 @@
     // Whether exported file names use the image number in the program or the original file name
     "EXPORTED_FILE_NAMES_USE_INDEX": "False",
     // For list of options, see the GitHub README or run gui.py with the -h option
-    "THEME_NAME": "dark-hct",
+    "THEME_NAME": "dark-nr",
     // Defaults to "" (empty string) to be automatically set by THEME_NAME.
     // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that
     "CONTOUR_COLOR": "",

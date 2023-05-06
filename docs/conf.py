@@ -51,8 +51,8 @@ html_static_path = ["_static"]
 
 # Source: https://stackoverflow.com/questions/59215996/how-to-add-a-logo-to-my-readthedocs-logo-rendering-at-0px-wide
 html_static_path = ["_static"]
-html_favicon = "hct_logo.ico"
-html_logo = "_static/hct_logo.jpg"
+html_favicon = "nr_logo.ico"
+html_logo = "_static/nr_logo.jpg"
 html_theme_options = {
     "logo_only": True,
     "display_version": False,

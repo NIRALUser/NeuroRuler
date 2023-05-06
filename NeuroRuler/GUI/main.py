@@ -81,10 +81,10 @@ if not PATH_TO_UI_FILE.exists():
     PATH_TO_UI_FILE = Path(
         pkg_resources.resource_filename("NeuroRuler.GUI", "mainwindow.ui")
     )
-PATH_TO_HCT_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "hct_logo.png"
-if not PATH_TO_HCT_LOGO.exists():
-    PATH_TO_HCT_LOGO = Path(
-        pkg_resources.resource_filename("NeuroRuler.GUI", "static/hct_logo.png")
+PATH_TO_NR_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "nr_logo.png"
+if not PATH_TO_NR_LOGO.exists():
+    PATH_TO_NR_LOGO = Path(
+        pkg_resources.resource_filename("NeuroRuler.GUI", "static/nr_logo.png")
     )
 
 SETTINGS_VIEW_ENABLED: bool = True
@@ -997,7 +997,7 @@ def main() -> None:
     # On macOS, sets the application logo in the dock (but no window icon on macOS)
     # TODO
     # On Windows, sets the window icon at the top left of the window (but no dock icon on Windows)
-    app.setWindowIcon(QIcon(str(PATH_TO_HCT_LOGO)))
+    app.setWindowIcon(QIcon(str(PATH_TO_NR_LOGO)))
 
     # TODO: Put arrow buttons on the left and right endpoints of the sliders
     # These arrow buttons already show up if commenting in app.setStyle("Fusion")

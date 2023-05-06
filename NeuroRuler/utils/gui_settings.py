@@ -31,7 +31,7 @@ If False (default), then exported files will be named using the file name of the
 
 E.g. MicroBiome_1month_T1w_0_0_0_0.png, MicroBiome_1month_T1w_90_180_0_60.csv."""
 
-THEME_NAME: str = "dark-hct"
+THEME_NAME: str = "dark-nr"
 """Name of theme in NeuroRuler/GUI/themes.
 
 The full path to the .qss file is {constants.THEME_DIR}/{THEME_NAME}/stylesheet.qss."""
