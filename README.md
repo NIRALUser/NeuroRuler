@@ -1,6 +1,7 @@
 # NeuroRuler <span><img width="20" src="https://i.imgur.com/pYlhHqu.png"></span>
 
 ![Tests](https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg)
+![Documentation](https://readthedocs.org/projects/neuroruler/badge/?version=latest)
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Python](https://img.shields.io/badge/python-3670A0?style=plastic&logo=python&logoColor=ffdd54)
 
