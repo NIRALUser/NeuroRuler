@@ -16,11 +16,6 @@ OUTPUT_DIR: Path = Path("output")
 if not OUTPUT_DIR.exists():
     OUTPUT_DIR.mkdir()
 
-IMG_DIR: Path = OUTPUT_DIR / "img"
-"""Directory for storing outputted images."""
-if not IMG_DIR.exists():
-    IMG_DIR.mkdir()
-
 JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
 """Settings that configure cli_settings.py."""
 if not JSON_CLI_CONFIG_PATH.exists():

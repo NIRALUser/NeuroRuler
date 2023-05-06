@@ -131,6 +131,14 @@ def get_curr_path() -> Path:
     return list(global_vars.IMAGE_DICT.keys())[global_vars.CURR_IMAGE_INDEX]
 
 
+def get_all_paths() -> list[Path]:
+    """Return all Paths in IMAGE_DICT.
+
+    :return: All paths in IMAGE_DICT
+    :rtype: list[Path]"""
+    return list(global_vars.IMAGE_DICT.keys())
+
+
 def get_curr_image() -> sitk.Image:
     """Return the sitk.Image at the current index in global_vars.IMAGE_DICT.
 

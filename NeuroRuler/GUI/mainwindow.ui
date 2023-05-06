@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1308</width>
-    <height>819</height>
+    <height>746</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1183,15 +1183,15 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     </property>
     <widget class="QMenu" name="action_export">
      <property name="toolTip">
-      <string extracomment="Export image data as CSV or export the image.">Export image data as CSV or export the image.</string>
+      <string extracomment="Export image data to output/.">Export image data to output/.</string>
      </property>
      <property name="statusTip">
-      <string extracomment="Export slice data to CSV or to image format.">Export image data as CSV or export the image.</string>
+      <string extracomment="Export image data to output/.">Export image data to output/.</string>
      </property>
      <property name="title">
       <string>Export</string>
      </property>
-     <addaction name="action_export_csv"/>
+     <addaction name="action_export_json"/>
      <addaction name="separator"/>
      <addaction name="action_export_png"/>
      <addaction name="action_export_jpg"/>
@@ -1203,6 +1203,7 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     <addaction name="action_open"/>
     <addaction name="action_add_images"/>
     <addaction name="action_remove_image"/>
+    <addaction name="action_import"/>
     <addaction name="action_export"/>
     <addaction name="action_exit"/>
    </widget>
@@ -1223,23 +1224,21 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     <property name="title">
      <string>Advanced</string>
     </property>
-    <addaction name="action_test_stuff"/>
-    <addaction name="action_print_metadata"/>
-    <addaction name="action_print_dimensions"/>
-    <addaction name="action_print_properties"/>
-    <addaction name="action_print_direction"/>
-    <addaction name="action_print_spacing"/>
+    <addaction name="action_show_dimensions"/>
+    <addaction name="action_show_properties"/>
+    <addaction name="action_show_direction"/>
+    <addaction name="action_show_spacing"/>
    </widget>
-   <widget class="QMenu" name="menu_view">
+   <widget class="QMenu" name="menu_credits">
     <property name="title">
-     <string>View</string>
+     <string>Credits</string>
     </property>
     <addaction name="action_show_credits"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_help"/>
-   <addaction name="menu_view"/>
    <addaction name="menu_debug"/>
+   <addaction name="menu_credits"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_documentation">
@@ -1352,21 +1351,21 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     <string>Ctrl+E, Ctrl+J</string>
    </property>
   </action>
-  <action name="action_export_csv">
+  <action name="action_export_json">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>CSV</string>
+    <string>JSON</string>
    </property>
    <property name="toolTip">
-    <string extracomment="Click Apply to enable this option.">Export image data as CSV.</string>
+    <string extracomment="Export image data as JSON to output/ and save the contoured slice.">Export image data as JSON to output/ and save the contoured slice.</string>
    </property>
    <property name="statusTip">
-    <string extracomment="Click Apply to enable this option.">Export image data as CSV.</string>
+    <string extracomment="Export image data as JSON to output/ and save the contoured slice.">Export image data as JSON to output/ and save the contoured slice.</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+E, Ctrl+C</string>
+    <string>Ctrl+E, Ctrl+J</string>
    </property>
   </action>
   <action name="action_export_bmp">
@@ -1442,65 +1441,37 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     <string>Ctrl+G</string>
    </property>
   </action>
-  <action name="action_test_stuff">
+  <action name="action_show_dimensions">
    <property name="text">
-    <string>Test stuff</string>
+    <string>Show Dimensions</string>
    </property>
    <property name="toolTip">
-    <string>Connected to test_stuff method. Modify to test stuff.</string>
+    <string>Show dimensions.</string>
    </property>
    <property name="statusTip">
-    <string>Connected to test_stuff method. Modify to test stuff.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+T</string>
-   </property>
-  </action>
-  <action name="action_print_metadata">
-   <property name="text">
-    <string>Print metadata (broken)</string>
-   </property>
-   <property name="toolTip">
-    <string>Print metadata to terminal.</string>
-   </property>
-   <property name="statusTip">
-    <string>Print metadata to terminal.</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+P, Ctrl+M</string>
-   </property>
-  </action>
-  <action name="action_print_dimensions">
-   <property name="text">
-    <string>Print dimensions</string>
-   </property>
-   <property name="toolTip">
-    <string>Print dimensions to terminal.</string>
-   </property>
-   <property name="statusTip">
-    <string>Print dimensions to terminal.</string>
+    <string>Show dimensions.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P, Ctrl+S</string>
    </property>
   </action>
-  <action name="action_print_properties">
+  <action name="action_show_properties">
    <property name="text">
-    <string>Print properties</string>
+    <string>Show Properties</string>
    </property>
    <property name="toolTip">
-    <string>Print properties of the loaded batch.</string>
+    <string>Show properties of the loaded batch.</string>
    </property>
    <property name="statusTip">
-    <string>Print properties of the loaded batch.</string>
+    <string>Show properties of the loaded batch.</string>
    </property>
   </action>
-  <action name="action_print_direction">
+  <action name="action_show_direction">
    <property name="text">
-    <string>Print direction</string>
+    <string>Show Direction</string>
    </property>
    <property name="statusTip">
-    <string>Print direction</string>
+    <string>Show direction</string>
    </property>
   </action>
   <action name="action_orient_for_x_view">
@@ -1518,14 +1489,23 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     <string>Orient for Z view</string>
    </property>
   </action>
-  <action name="action_print_spacing">
+  <action name="action_show_spacing">
    <property name="text">
-    <string>Print spacing</string>
+    <string>Show Spacing</string>
    </property>
   </action>
-  <action name="actionCredits">
+  <action name="action_import">
    <property name="text">
-    <string>Credits</string>
+    <string>Import Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Import a JSON file in the format that's exported by NeuroRuler.</string>
+   </property>
+   <property name="statusTip">
+    <string>Import a JSON file in the format that's exported by NeuroRuler.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
   <action name="action_show_credits">

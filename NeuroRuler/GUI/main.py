@@ -15,12 +15,15 @@ then you will need to modify those."""
 import importlib
 import sys
 import os
+import json
+import re
 import webbrowser
 from pathlib import Path
 from typing import Union
 
 import SimpleITK as sitk
 import numpy as np
+from typing import Any
 
 from PyQt6 import QtGui, QtCore
 from PyQt6.QtGui import QPixmap, QAction, QImage, QIcon, QResizeEvent
@@ -69,6 +72,7 @@ from NeuroRuler.utils.img_helpers import (
     get_curr_otsu_slice,
     get_curr_physical_units,
     get_curr_path,
+    get_all_paths,
     get_curr_properties_tuple,
     get_middle_dimension,
 )
@@ -99,6 +103,8 @@ DEFAULT_IMAGE_TEXT: str = "Select images using File > Open!"
 DEFAULT_IMAGE_NUM_LABEL_TEXT: str = "Image 0 of 0"
 DEFAULT_IMAGE_STATUS_TEXT: str = "Image path is displayed here."
 
+CIRCUMFERENCE_RESULT: float = 0.0
+
 UNSCALED_QPIXMAP: QPixmap
 """Unscaled QPixmap from which the scaled version is rendered in the GUI.
 
@@ -107,6 +113,7 @@ QPixmap generated from that unscaled QImage.
 
 This variable will not change on resizeEvent. resizeEvent will scale this. Otherwise, if scaling
 self.image's pixmap (which is already scaled), there would be loss of detail."""
+OUTPUT_SLICE_EXTENSION: str = "png"
 
 
 class MainWindow(QMainWindow):
@@ -137,12 +144,11 @@ class MainWindow(QMainWindow):
                 'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.\n\nUniversity of North Carolina at Chapel Hill, 2023. See the GitHub page for more info.',
             )
         )
-        self.action_test_stuff.triggered.connect(self.test_stuff)
-        self.action_print_metadata.triggered.connect(display_metadata)
-        self.action_print_dimensions.triggered.connect(display_dimensions)
-        self.action_print_properties.triggered.connect(display_properties)
-        self.action_print_direction.triggered.connect(display_direction)
-        self.action_print_spacing.triggered.connect(display_spacing)
+        self.action_show_dimensions.triggered.connect(display_dimensions)
+        self.action_show_properties.triggered.connect(display_properties)
+        self.action_show_direction.triggered.connect(display_direction)
+        self.action_show_spacing.triggered.connect(display_spacing)
+        self.action_export_json.triggered.connect(self.export_json)
         self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
         )
@@ -161,6 +167,7 @@ class MainWindow(QMainWindow):
         self.action_export_xpm.triggered.connect(
             lambda: self.export_curr_slice_as_img("xpm")
         )
+        self.action_import.triggered.connect(self.import_json)
         self.next_button.clicked.connect(self.next_img)
         self.previous_button.clicked.connect(self.previous_img)
         self.apply_button.clicked.connect(self.settings_export_view_toggle)
@@ -176,6 +183,8 @@ class MainWindow(QMainWindow):
         self.x_view_radio_button.clicked.connect(self.update_view)
         self.y_view_radio_button.clicked.connect(self.update_view)
         self.z_view_radio_button.clicked.connect(self.update_view)
+
+        self.export_button.clicked.connect(self.export_json)
 
     def enable_elements(self) -> None:
         """Called after File > Open.
@@ -193,7 +202,7 @@ class MainWindow(QMainWindow):
         for widget in self.findChildren(QAction):
             widget.setEnabled(True)
 
-        self.action_export_csv.setEnabled(not SETTINGS_VIEW_ENABLED)
+        self.action_export_json.setEnabled(not SETTINGS_VIEW_ENABLED)
         self.export_button.setEnabled(not SETTINGS_VIEW_ENABLED)
         self.disable_binary_threshold_inputs()
 
@@ -247,6 +256,7 @@ class MainWindow(QMainWindow):
         # Open button is always enabled.
         # If pressing it in circumference mode, then browse_files() will toggle to settings view.
         self.action_open.setEnabled(True)
+        self.action_import.setEnabled(settings_view_enabled)
         self.action_add_images.setEnabled(settings_view_enabled)
         self.action_remove_image.setEnabled(settings_view_enabled)
         self.x_slider.setEnabled(settings_view_enabled)
@@ -266,7 +276,7 @@ class MainWindow(QMainWindow):
         self.upper_threshold.setEnabled(settings_view_enabled)
         self.upper_threshold_input.setEnabled(settings_view_enabled)
         self.threshold_preview_button.setEnabled(settings_view_enabled)
-        self.action_export_csv.setEnabled(not settings_view_enabled)
+        self.action_export_json.setEnabled(not settings_view_enabled)
         self.circumference_label.setEnabled(not settings_view_enabled)
         self.export_button.setEnabled(not settings_view_enabled)
         self.smoothing_preview_button.setEnabled(settings_view_enabled)
@@ -636,7 +646,8 @@ class MainWindow(QMainWindow):
 
         :param binary_contour_slice: Result of previously calling render_curr_slice when ``not SETTINGS_VIEW_ENABLED``
         :type binary_contour_slice: np.ndarray
-        :return: None"""
+        :return: circumference
+        :rtype: float"""
         if SETTINGS_VIEW_ENABLED:
             raise Exception("Rendering circumference label when SETTINGS_VIEW_ENABLED")
         units: Union[str, None] = get_curr_physical_units()
@@ -658,6 +669,8 @@ class MainWindow(QMainWindow):
         self.circumference_label.setText(
             f"Calculated Circumference: {round(circumference, constants.NUM_DIGITS_TO_ROUND_TO)} {units if units is not None else constants.MESSAGE_TO_SHOW_IF_UNITS_NOT_FOUND}"
         )
+        global CIRCUMFERENCE_RESULT
+        CIRCUMFERENCE_RESULT = circumference
         return circumference
 
     def toggle_setting_to_false(self) -> None:
@@ -843,30 +856,164 @@ class MainWindow(QMainWindow):
     def export_curr_slice_as_img(self, extension: str) -> None:
         """Called when an Export as image menu item is clicked.
 
-        Exports ``self.image`` to ``settings.OUTPUT_DIR/img/``. Thus, calling this when ``SETTINGS_VIEW_ENABLED`` will
+        Exports ``self.image`` to ``constants.OUTPUT_DIR/image_stem/``. Thus, calling this when ``SETTINGS_VIEW_ENABLED`` will
         save a non-contoured image. Calling this when ``not SETTINGS_VIEW_ENABLED`` will save a contoured
         image.
 
-        Filename has format <file_name>_[contoured_]<theta_x>_<theta_y>_<theta_z>_<slice_num>.<extension>
+        Filename has format <file_name>[_contoured].<extension>
 
-        contoured_ will be in the name if ``not SETTINGS_VIEW_ENABLED``.
+        _contoured will be in the name if ``not SETTINGS_VIEW_ENABLED``.
 
         Supported formats in this function are the ones supported by QPixmap,
         namely BMP, JPG, JPEG, PNG, PPM, XBM, XPM.
 
         :param extension: BMP, JPG, JPEG, PNG, PPM, XBM, XPM
         :type extension: str
+        :param path:
+        :type path: Path
         :return: ``None``"""
-        file_name = (
-            global_vars.CURR_IMAGE_INDEX + 1
-            if settings.EXPORTED_FILE_NAMES_USE_INDEX
-            else get_curr_path().name
-        )
+        file_stem: str = get_curr_path().stem
+        output_path: Path = constants.OUTPUT_DIR / file_stem
+
+        if not output_path.exists():
+            output_path.mkdir()
+
         path: str = str(
-            constants.IMG_DIR
-            / f"{file_name}_{'contoured_' if not SETTINGS_VIEW_ENABLED else ''}{global_vars.THETA_X}_{global_vars.THETA_Y}_{global_vars.THETA_Z}_{global_vars.SLICE}.{extension}"
+            output_path
+            / f"{file_stem}{'_contoured' if not SETTINGS_VIEW_ENABLED else ''}.{extension}"
         )
         self.image.pixmap().save(path, extension)
+
+    def import_json(self) -> None:
+        """Called when "import" button is clicked
+
+        Imported parameters include: input_image_path, output_folder, x_rotation, y_rotation, z_rotation, slice,
+        smoothing_conductance, smoothing_iterations, smoothing_time_step, filter_option, upper_binary_threshold, lower_binary_threshold,
+        and circumference
+
+        input_image_path is the only mandatory field.
+
+        :return: `None`"""
+        file_filter: str = "NeuroRuler MRI image JSON " + str(("*.json")).replace(
+            "'", ""
+        ).replace(",", "")
+
+        files, _ = QFileDialog.getOpenFileNames(
+            self, "Open file", str(settings.FILE_BROWSER_START_DIR), file_filter
+        )
+
+        # list[str]
+        path_list = files
+        if len(path_list) == 0:
+            return
+        elif len(path_list) > 1:
+            information_dialog(
+                "Multiple imports",
+                "Multiple JSON files were selected. Only the first will be imported.",
+            )
+
+        with open(path_list[0], "r") as file:
+            # Parse the JSON data into a dictionary
+            data = json.load(file)
+
+        image_path: str = data["input_image_path"]
+        self.browse_files(False, image_path)
+
+        if "x_rotation" in data:
+            global_vars.THETA_X = data["x_rotation"]
+            self.x_slider.setValue(global_vars.THETA_X)
+
+        if "y_rotation" in data:
+            global_vars.THETA_Y = data["y_rotation"]
+            self.y_slider.setValue(global_vars.THETA_Y)
+
+        if "z_rotation" in data:
+            global_vars.THETA_Z = data["z_rotation"]
+            self.z_slider.setValue(global_vars.THETA_Z)
+
+        self.update_view()
+
+        if "slice" in data:
+            global_vars.SLICE = data["slice"]
+            self.slice_slider.setValue(global_vars.SLICE)
+            self.slice_update()
+
+        if "smoothing_conductance" in data:
+            global_vars.CONDUCTANCE_PARAMETER = data["smoothing_conductance"]
+
+        if "smoothing_iterations" in data:
+            global_vars.SMOOTHING_ITERATIONS = data["smoothing_iterations"]
+
+        if "smoothing_time_step" in data:
+            global_vars.TIME_STEP = data["smoothing_time_step"]
+
+        self.update_smoothing_settings()
+
+        if "filter_option" in data:
+            if data["filter_option"] == "Otsu":
+                self.disable_binary_threshold_inputs()
+            else:
+                self.enable_binary_threshold_inputs()
+                self.binary_radio_button.click()
+                global_vars.UPPER_BINARY_THRESHOLD = data["upper_binary_threshold"]
+                global_vars.LOWER_BINARY_THRESHOLD = data["lower_binary_threshold"]
+                self.update_binary_filter_settings()
+
+    def export_json(self) -> None:
+        """Called when "export" button is clicked and when Menu > Export > JSON is clicked.
+
+        Exported parameters include: image_name, output_folder, x_rotation, y_rotation, z_rotation, slice,
+        smoothing_conductance, smoothing_iterations, smoothing_time_step, filter_option, upper_binary_threshold, lower_binary_threshold,
+        and circumference
+
+        :return: `None`"""
+
+        if self.otsu_radio_button.isChecked():
+            filter_option: str = "Otsu"
+            upper_binary_threshold = "N/A"
+            lower_binary_threshold = "N/A"
+        else:
+            filter_option: str = "Binary"
+            upper_binary_threshold = global_vars.UPPER_BINARY_THRESHOLD
+            lower_binary_threshold = global_vars.LOWER_BINARY_THRESHOLD
+
+        global_vars.CURR_IMAGE_INDEX = 0
+        self.render_image_num_and_path()
+        for image_num in range(len(global_vars.IMAGE_DICT)):
+            curr_path: Path = get_curr_path()
+            stem: str = curr_path.stem
+            binary_contour_slice: np.ndarray = self.render_curr_slice()
+            circumference: float = self.render_circumference(binary_contour_slice)
+            output_dir: Path = constants.OUTPUT_DIR / stem
+            if not output_dir.exists():
+                output_dir.mkdir()
+
+            self.export_curr_slice_as_img(OUTPUT_SLICE_EXTENSION)
+
+            data: dict[str, Any] = {
+                "input_image_path": str(curr_path),
+                "output_contoured_slice_path": str(
+                    Path.cwd()
+                    / output_dir
+                    / (stem + f"_contoured.{OUTPUT_SLICE_EXTENSION}")
+                ),
+                "x_rotation": global_vars.THETA_X,
+                "y_rotation": global_vars.THETA_Y,
+                "z_rotation": global_vars.THETA_Z,
+                "slice": global_vars.SLICE,
+                "smoothing_conductance": global_vars.CONDUCTANCE_PARAMETER,
+                "smoothing_iterations": global_vars.SMOOTHING_ITERATIONS,
+                "smoothing_time_step": global_vars.TIME_STEP,
+                "filter_option": filter_option,
+                "upper_binary_threshold": upper_binary_threshold,
+                "lower_binary_threshold": lower_binary_threshold,
+                "circumference": circumference,
+            }
+
+            with open(output_dir / (stem + "_settings.json"), "w") as outfile:
+                json.dump(data, outfile, indent=4)
+
+            self.next_img()
 
     def orient_curr_image(self) -> None:
         """Orient the current image for the current view (global_vars.VIEW) by applying ORIENT_FILTER on it.
