@@ -12,6 +12,7 @@ The values in this file don't matter since they'll be overwritten by what's in g
 if any. But the values here should match the values in gui_config.json for consistency."""
 
 from pathlib import Path
+import NeuroRuler.utils.constants as constants
 
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""

@@ -1,6 +1,8 @@
-"""Defines main(), the entrypoint of the CLI.
+"""Defines ``main()``, the entrypoint of the CLI.
 
-This file is meant to be run as a module."""
+See ``tests/test_cli.py`` for examples of how to use this script.
+
+Run with the ``-h`` option to see all CLI options."""
 
 import NeuroRuler.utils.constants as constants
 import NeuroRuler.utils.global_vars as global_vars

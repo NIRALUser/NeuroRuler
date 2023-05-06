@@ -2,7 +2,9 @@
 
 """Runs the CLI.
 
-Run with ./cli.py. If that doesn't work, run however you normally run a Python script."""
+Run with python cli.py. If that doesn't work, try python3 cli.py.
+
+Apply the -h flag to see CLI options, which override options in ``cli_config.json``."""
 
 from NeuroRuler.CLI import cli
 

@@ -1,8 +1,8 @@
-"""Defines MainWindow and main(), the entrypoint of the GUI.
+"""Defines ``MainWindow`` and ``main()``, the entrypoint of the GUI.
 
-Loads `NeuroRuler/GUI/mainwindow.ui`, made in QtDesigner.
+Loads ``NeuroRuler/GUI/mainwindow.ui``, made in QtDesigner.
 
-Loads `.qss` stylesheets and `resources.py` (icons) files, generated
+Loads ``.qss`` stylesheets and ``resources.py`` (icons) files, generated
 by BreezeStyleSheets. Our fork of the repo: https://github.com/NIRALUser/BreezeStyleSheets.
 
 If adding a new GUI element (in the GUI or in the menubar, whatever), you'll have to modify
@@ -328,14 +328,14 @@ class MainWindow(QMainWindow):
     def browse_files(self, extend: bool, path=None) -> None:
         """Called after File > Open or File > Add Images.
 
-        If `extend`, then `IMAGE_DICT` will be updated with new images.
+        If ``extend``, then ``IMAGE_DICT`` will be updated with new images.
 
-        Else, `IMAGE_DICT` will be cleared and
+        Else, ``IMAGE_DICT`` will be cleared and
         (re)initialized (e.g. when choosing files for the first time or re-opening).
 
         Opens file menu.
 
-        Renders various elements depending on the value of `extend`.
+        Renders various elements depending on the value of ``extend``.
 
         If called in circumference mode, then will toggle to settings mode.
 
@@ -550,15 +550,15 @@ class MainWindow(QMainWindow):
         """Resamples the currently selected image using its rotation and slice settings,
         then renders the resulting slice (scaled to the size of self.image) in the GUI.
 
-        DOES NOT set text for `image_num_label` and file path labels.
+        DOES NOT set text for ``image_num_label`` and file path labels.
 
-        If `not SETTINGS_VIEW_ENABLED`, also calls `imgproc.contour()` and outlines
+        If ``not SETTINGS_VIEW_ENABLED``, also calls ``imgproc.contour()`` and outlines
         the contour of the QImage (mutating it).
 
-        Additionally, also returns a view of the binary contoured slice if `not SETTINGS_VIEW_ENABLED`.
+        Additionally, also returns a view of the binary contoured slice if ``not SETTINGS_VIEW_ENABLED``.
         This saves work when computing circumference.
 
-        :return: np.ndarray if `not SETTINGS_VIEW_ENABLED` else None
+        :return: np.ndarray if ``not SETTINGS_VIEW_ENABLED`` else None
         :rtype: np.ndarray or None"""
 
         if not SETTINGS_VIEW_ENABLED:
@@ -634,7 +634,7 @@ class MainWindow(QMainWindow):
         binary_contour_slice is always the return value of render_curr_slice since render_curr_slice must have
         already been called. If calling this function, render_curr_slice must have been called first.
 
-        :param binary_contour_slice: Result of previously calling render_curr_slice when `not SETTINGS_VIEW_ENABLED`
+        :param binary_contour_slice: Result of previously calling render_curr_slice when ``not SETTINGS_VIEW_ENABLED``
         :type binary_contour_slice: np.ndarray
         :return: None"""
         if SETTINGS_VIEW_ENABLED:
@@ -719,7 +719,7 @@ class MainWindow(QMainWindow):
     def rotate_x(self) -> None:
         """Called when the user updates the x slider.
 
-        Render image and set `x_rotation_label`.
+        Render image and set ``x_rotation_label``.
 
         :return: None"""
         x_slider_val: int = self.x_slider.value()
@@ -730,7 +730,7 @@ class MainWindow(QMainWindow):
     def rotate_y(self) -> None:
         """Called when the user updates the y slider.
 
-        Render image and set `y_rotation_label`.
+        Render image and set ``y_rotation_label``.
 
         :return: None"""
         y_slider_val: int = self.y_slider.value()
@@ -741,7 +741,7 @@ class MainWindow(QMainWindow):
     def rotate_z(self) -> None:
         """Called when the user updates the z slider.
 
-        Render image and set `z_rotation_label`.
+        Render image and set ``z_rotation_label``.
 
         :return: None"""
         z_slider_val: int = self.z_slider.value()
@@ -752,7 +752,7 @@ class MainWindow(QMainWindow):
     def slice_update(self) -> None:
         """Called when the user updates the slice slider.
 
-        Render image and set `slice_num_label`.
+        Render image and set ``slice_num_label``.
 
         :return: None"""
         slice_slider_val: int = self.slice_slider.value()
@@ -763,7 +763,7 @@ class MainWindow(QMainWindow):
     def reset_settings(self) -> None:
         """Called when Reset is clicked.
 
-        Resets rotation values to 0 and slice num to the default `int((z-1)/2)`
+        Resets rotation values to 0 and slice num to the default ``int((z-1)/2)``
         for the current image, then renders current image and sliders.
 
         :return: None"""
@@ -811,8 +811,8 @@ class MainWindow(QMainWindow):
     def remove_curr_img(self) -> None:
         """Called after File > Remove File.
 
-        Removes current image from `IMAGE_DICT`. Since `IMAGE_DICT` is a reference to an image dict
-        in `IMAGE_GROUPS`, it's removed from `IMAGE_GROUPS` as well.
+        Removes current image from ``IMAGE_DICT``. Since ``IMAGE_DICT`` is a reference to an image dict
+        in ``IMAGE_GROUPS``, it's removed from ``IMAGE_GROUPS`` as well.
 
         :return: None"""
         img_helpers.del_curr_img()
@@ -843,20 +843,20 @@ class MainWindow(QMainWindow):
     def export_curr_slice_as_img(self, extension: str) -> None:
         """Called when an Export as image menu item is clicked.
 
-        Exports `self.image` to `settings.OUTPUT_DIR/img/`. Thus, calling this when `SETTINGS_VIEW_ENABLED` will
-        save a non-contoured image. Calling this when `not SETTINGS_VIEW_ENABLED` will save a contoured
+        Exports ``self.image`` to ``settings.OUTPUT_DIR/img/``. Thus, calling this when ``SETTINGS_VIEW_ENABLED`` will
+        save a non-contoured image. Calling this when ``not SETTINGS_VIEW_ENABLED`` will save a contoured
         image.
 
         Filename has format <file_name>_[contoured_]<theta_x>_<theta_y>_<theta_z>_<slice_num>.<extension>
 
-        contoured_ will be in the name if `not SETTINGS_VIEW_ENABLED`.
+        contoured_ will be in the name if ``not SETTINGS_VIEW_ENABLED``.
 
         Supported formats in this function are the ones supported by QPixmap,
         namely BMP, JPG, JPEG, PNG, PPM, XBM, XPM.
 
         :param extension: BMP, JPG, JPEG, PNG, PPM, XBM, XPM
         :type extension: str
-        :return: `None`"""
+        :return: ``None``"""
         file_name = (
             global_vars.CURR_IMAGE_INDEX + 1
             if settings.EXPORTED_FILE_NAMES_USE_INDEX

@@ -120,7 +120,7 @@ NIFTI_METADATA_UNITS_VALUE_TO_PHYSICAL_UNITS: dict[str, str] = {
     "40": "parts-per-million (ppm)",
     "48": "radians per second (rad/s)",
 }
-"""Maps the value of `xyzt_units` of the metadata of a NIfTI file to physical meaning.
+"""Maps the value of ``xyzt_units`` of the metadata of a NIfTI file to physical meaning.
 
 Based on https://brainder.org/2012/09/23/the-nifti-file-format/.
 

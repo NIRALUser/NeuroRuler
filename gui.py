@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-"""Start the GUI.
+"""Runs the GUI.
 
-Run with ./gui.py. If that doesn't work, run however you normally run a Python script."""
+Run with python gui.py. If that doesn't work, try python3 gui.py.
 
-# Imports from NeuroRuler/GUI/__init__.py
-# This is exactly what the user can access after installing via pip
+Apply the -h flag to see CLI options, which override options in ``gui_config.json``."""
+
 from NeuroRuler.GUI import gui
-
 gui()

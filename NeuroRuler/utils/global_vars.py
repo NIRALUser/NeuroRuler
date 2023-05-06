@@ -23,7 +23,7 @@ You should probably use the helper functions in img_helpers instead of this (unl
 functions)."""
 
 READER: sitk.ImageFileReader = sitk.ImageFileReader()
-"""Global `sitk.ImageFileReader`."""
+"""Global ``sitk.ImageFileReader``."""
 
 ORIENT_FILTER: sitk.DICOMOrientImageFilter = sitk.DICOMOrientImageFilter()
 """Global sitk.DICOMOrientImageFilter for orienting images.

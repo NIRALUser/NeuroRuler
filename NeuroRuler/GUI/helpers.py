@@ -40,13 +40,13 @@ WINDOW_TITLE_PADDING: int = 12
 # qimage2ndarray supports scalar/gray + alpha and RGB + alpha, but perhaps the numpy arrays
 # we get from sitk.Image don't have alpha. We don't need to go to the effort of adding alpha.
 def string_to_QColor(name_or_hex: str) -> QColor:
-    """Convert a name (e.g. red) or 6-hexit rrggbb string to a `QColor`.
+    """Convert a name (e.g. red) or 6-hexit rrggbb string to a ``QColor``.
 
     :param name_or_hex: name of color (e.g. blue) or rrggbb (hexits)
     :type name_or_hex: str
     :return: QColor
     :rtype: QColor
-    :raise: exceptions.InvalidColor if `name_or_hex` not in specified formats"""
+    :raise: exceptions.InvalidColor if ``name_or_hex`` not in specified formats"""
     if name_or_hex.isalpha():
         return QColor(name_or_hex)
     if not all(char in string.hexdigits for char in name_or_hex):
@@ -60,13 +60,13 @@ def string_to_QColor(name_or_hex: str) -> QColor:
 
 
 def mask_QImage(q_img: QImage, binary_mask: np.ndarray, color: QColor) -> None:
-    """Given 2D `q_img` and 2D `binary_mask` of the same shape, apply `binary_mask` on `q_img`
-    to change `q_img` pixels corresponding to `binary_mask`=1 to `color`. Mutates `q_img`.
+    """Given 2D ``q_img`` and 2D ``binary_mask`` of the same shape, apply ``binary_mask`` on ``q_img``
+    to change ``q_img`` pixels corresponding to ``binary_mask``=1 to ``color``. Mutates ``q_img``.
 
     QImage and numpy use [reversed w,h order](https://stackoverflow.com/a/68220805/18479243).
 
     This function checks that
-    `q_img.size().width() == binary_mask.shape[0]` and `q_img.size().height() == binary_mask.shape[1]`.
+    ``q_img.size().width() == binary_mask.shape[0]`` and ``q_img.size().height() == binary_mask.shape[1]``.
 
     :param q_img:
     :type q_img: QImage

@@ -98,9 +98,9 @@ def length_of_contour(
 ) -> float:
     r"""Given a 2D binary slice, return the arc length of the parent contour.
 
-    `cv2.findContours` will find all contours if there is more than one. Most valid brain slices have 2 or 3.
+    ``cv2.findContours`` will find all contours if there is more than one. Most valid brain slices have 2 or 3.
 
-    The binary slice passed into this function should be processed by `contour()`
+    The binary slice passed into this function should be processed by ``contour()``
     (i.e., hole-filling, island removal, threshold, etc.)
     to contain just one contour (except in edge cases that we don't need to worry about)
     to guarantee an accurate result.
@@ -151,7 +151,7 @@ def length_of_contour_with_spacing(
     r"""Given a 2D binary slice (i.e., RV of contour()), return arc length of parent contour,
     accounting for x_spacing and y_spacing values.
     MAKE SURE x_spacing and y_spacing values are passed in the correct order!
-    The binary slice passed into this function should be processed by `contour()`
+    The binary slice passed into this function should be processed by ``contour()``
     to guarantee an accurate result.
     Slices for which circumference is calculated are always parallel to z,
     so the z spacing value is always ignored.
@@ -171,7 +171,9 @@ def length_of_contour_with_spacing(
         # TC89_L1 works better than SIMPLE
         # That is, when (a, a, a) pixel spacing image is converted to (a, b, c) pixel spacing via Slicer,
         # The arc length is closer to the (a, a, a) arc length if using TC89_L1 than when using SIMPLE
-        binary_contour_slice, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1
+        binary_contour_slice,
+        cv2.RETR_TREE,
+        cv2.CHAIN_APPROX_TC89_L1,
     )
 
     num_contours: int = len(contours)
