@@ -66,11 +66,15 @@ Apply the `-h` command-line option when running those scripts to see the list of
 
 For local testing, run `pytest`.
 
-Our unit tests run on GitHub Actions on push and PR. If the image below says "passing," then the tests are passing.
+Our algorithm tests assert that our GUI calculations have at least a 0.98 R<sup>2</sup> value with ground truth data from the old Head Circumference Tool. Additionally, we test that our CLI and GUI produce the same results. Lastly, we verified that our circumference result is correct for images with non-(1.0, 1.0, 1.0) pixel spacing.
 
-![Tests](https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg)
+Our unit tests run on GitHub Actions on push and PR via `tox`, which tests on several versions of Python in Ubuntu and Windows environments. If the image below says "passing," then the tests are passing.
 
-**Note**: The tests in [tests/imports_GUI](https://github.com/COMP523TeamD/NeuroRuler/tree/main/tests/imports_GUI) are ignored during CI tests (specifically, ignored by `tox`: see [tox.ini](https://github.com/COMP523TeamD/NeuroRuler/blob/main/tox.ini)) because running them in GitHub Actions causes a "libEGL.so not found" error (likely because the computers running the tests don't have monitors). These tests should be run locally only.
+<p align="center">
+  <img src="https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg" alt="GitHub actions tests.yml badge"/>
+</p>
+
+Tests involving the GUI are skipped in Ubuntu GH Actions CI environments. For more information, see [tests/README.md](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/README.md).
 
 ## Documentation
 
@@ -92,6 +96,6 @@ To test the package locally before releasing, use [scripts/testdist](scripts/tes
 
 You must test from a directory that isn't `NeuroRuler/`. If your directory is `NeuroRuler/`, then imports will import from the source code, not the package.
 
-To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [setup.py](https://github.com/COMP523TeamD/NeuroRuler/blob/main/setup.py). Then push to a branch called `release-pypi` (create it if it doesn't exist). This will trigger [pypi.yml](https://github.com/COMP523TeamD/NeuroRuler/blob/main/.github/workflows/pypi.yml), which will run tests and publish to PyPI.
+To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [setup.py](https://github.com/COMP523TeamD/NeuroRuler/blob/main/setup.py). Then push to a branch called `release-pypi` (create it if it doesn't exist). This will trigger [pypi.yml](https://github.com/COMP523TeamD/NeuroRuler/blob/main/.github/workflows/pypi.yml), which will run tests and publish to PyPI if the tests pass.
 
-To publish on Test PyPI, do the same as above, but push to a branch called `release-testpypi`.
+To publish to [Test PyPI](https://test.pypi.org/project/NeuroRuler/), do the same as above, but push to a branch called `release-testpypi`.

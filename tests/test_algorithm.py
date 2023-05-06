@@ -1,7 +1,13 @@
+"""Test algorithm by computing R^2 from GUI calculation and ground truth data.
+
+Simulates GUI button clicks.
+
+Uses GUI. GUI imports and tests will not run in CI. See note in tests/README.md."""
+
 from tests.constants import (
     TARGET_R_SQUARED,
     labeled_result,
-    GITHUB_ACTIONS_CI,
+    UBUNTU_GITHUB_ACTIONS_CI,
     compute_r_squared,
 )
 import re
@@ -14,7 +20,7 @@ from typing import Union
 import SimpleITK as sitk
 import numpy as np
 
-if not GITHUB_ACTIONS_CI:
+if not UBUNTU_GITHUB_ACTIONS_CI:
     from PyQt6.QtTest import QTest
     from PyQt6.QtWidgets import (
         QPushButton,
@@ -36,7 +42,7 @@ if not GITHUB_ACTIONS_CI:
     import NeuroRuler.utils.gui_settings as gui_settings
 
 
-@pytest.mark.skipif(GITHUB_ACTIONS_CI, reason="No GUI on GitHub Actions CI")
+@pytest.mark.skipif(UBUNTU_GITHUB_ACTIONS_CI, reason="No GUI on GitHub Actions CI")
 def calculate_circumference(path) -> float:
     # Set up UI
     app = QApplication(sys.argv)
@@ -52,7 +58,7 @@ def calculate_circumference(path) -> float:
     return window.render_circumference(binary_contour_slice)
 
 
-@pytest.mark.skipif(GITHUB_ACTIONS_CI, reason="No GUI on GitHub Actions CI")
+@pytest.mark.skipif(UBUNTU_GITHUB_ACTIONS_CI, reason="No GUI on GitHub Actions CI")
 def test_algorithm():
     labeled_data = []
     calculated_data = []
