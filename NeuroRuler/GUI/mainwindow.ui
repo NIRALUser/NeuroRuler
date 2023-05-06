@@ -1496,13 +1496,13 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
   </action>
   <action name="action_import">
    <property name="text">
-    <string>Import Settings</string>
+    <string>Import MRI Settings</string>
    </property>
    <property name="toolTip">
-    <string>Import a JSON file in the format that's exported by NeuroRuler.</string>
+    <string>Import an MRI setting JSON file (i.e., not gui_config or cli_config) in the format that's exported by NeuroRuler.</string>
    </property>
    <property name="statusTip">
-    <string>Import a JSON file in the format that's exported by NeuroRuler.</string>
+    <string>Import an MRI setting JSON file (i.e., not gui_config or cli_config) in the format that's exported by NeuroRuler.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>

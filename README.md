@@ -55,6 +55,12 @@ gui()
 
 Note: If you make changes to the repo, use the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the pip package until uploaded to PyPI.
 
+## Import/Export
+
+In "circumference mode" (after clicking Apply), click Export to export JSON files containing the circumferences of all loaded images, along with the settings applied to each image.
+
+You can then use File > Import MRI Settings to import a JSON file of this kind to load the same image with the same settings.
+
 ## Configure settings
 
 After cloning the repo, edit the JSON configuration files [gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json).
