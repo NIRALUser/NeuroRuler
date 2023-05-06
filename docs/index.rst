@@ -14,7 +14,7 @@ NeuroRuler
 
    A program that calculates head circumference from MRI data (:code:`.nii`, :code:`.nii.gz`, :code:`.nrrd`).
 
-.. image:: _static/hct_demo.gif
+.. image:: _static/nr_demo.gif
    :alt: NeuroRuler GUI demo
    :align: center
 

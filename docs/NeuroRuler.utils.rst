@@ -4,6 +4,14 @@ NeuroRuler.utils package
 Submodules
 ----------
 
+NeuroRuler.utils.cli\_settings module
+-------------------------------------
+
+.. automodule:: NeuroRuler.utils.cli_settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 NeuroRuler.utils.constants module
 ---------------------------------
 
@@ -28,6 +36,14 @@ NeuroRuler.utils.global\_vars module
    :undoc-members:
    :show-inheritance:
 
+NeuroRuler.utils.gui\_settings module
+-------------------------------------
+
+.. automodule:: NeuroRuler.utils.gui_settings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 NeuroRuler.utils.img\_helpers module
 ------------------------------------
 
@@ -48,14 +64,6 @@ NeuroRuler.utils.parser module
 ------------------------------
 
 .. automodule:: NeuroRuler.utils.parser
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-NeuroRuler.utils.user\_settings module
---------------------------------------
-
-.. automodule:: NeuroRuler.utils.user_settings
    :members:
    :undoc-members:
    :show-inheritance:

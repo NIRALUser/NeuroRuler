@@ -3,7 +3,7 @@
 # Files are excluded if they're generated and shouldn't be autoformatted
 # gui.py is excluded because it uses a u"..." (unicode string), and the u would be removed
 # Large files, such as images, are excluded from the large file check
-exclude: stylesheet.qss|resources.py|gui.py|docs/_static/QtDesigner.jpg|docs/_static/hct_demo.gif
+exclude: stylesheet.qss|resources.py|gui.py|docs/_static/QtDesigner.jpg|docs/_static/nr_demo.gif
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0

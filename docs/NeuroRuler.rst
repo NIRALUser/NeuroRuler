@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   NeuroRuler.CLI
    NeuroRuler.GUI
    NeuroRuler.utils
 

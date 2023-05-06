@@ -1,4 +1,4 @@
-# NeuroRuler
+# NeuroRuler <span><img width="20" src="https://i.imgur.com/pYlhHqu.png"></span>
 
 ![Tests](https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg)
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
