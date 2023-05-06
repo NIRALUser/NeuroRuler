@@ -2,6 +2,7 @@
 
 import SimpleITK as sitk
 from pathlib import Path
+from typing import Any
 from NeuroRuler.utils.constants import View
 
 IMAGE_DICT: dict[Path, sitk.Image] = dict()

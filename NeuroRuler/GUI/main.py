@@ -246,8 +246,8 @@ class MainWindow(QMainWindow):
             self.set_view_z()
             self.orient_curr_image()
 
-            self.update_smoothing_settings()
-            self.update_binary_filter_settings()
+            self.update_smoothing_settings(True)
+            self.update_binary_filter_settings(True)
             # Ignore the type annotation warning here.
             # render_curr_slice() must return np.ndarray since not settings_view_enabled here
             binary_contour_slice: np.ndarray = self.render_curr_slice()
@@ -446,17 +446,21 @@ class MainWindow(QMainWindow):
         self.y_view_radio_button.setChecked(False)
         self.z_view_radio_button.setChecked(True)
 
-    def update_smoothing_settings(self) -> None:
-        """Updates global smoothing settings.
+    def update_smoothing_settings(self, set_global_vars_to_GUI_text: bool) -> None:
+        """Update smoothing text in the GUI and set SMOOTHING_FILTER parameters.
 
+        :param set_global_vars_to_GUI_text: If True, will first try to modify global_vars variables to the text in the GUI before updating GUI text and filter parameters. If False, will not do so.
+        :type set_global_vars_to_GUI_text: bool
         :return: None
         """
-        conductance: str = self.conductance_parameter_input.displayText()
-        try:
-            global_vars.CONDUCTANCE_PARAMETER = float(conductance)
-        except ValueError:
-            if settings.DEBUG:
-                print("Conductance must be a float!")
+        if set_global_vars_to_GUI_text:
+            try:
+                global_vars.CONDUCTANCE_PARAMETER = float(
+                    self.conductance_parameter_input.displayText()
+                )
+            except ValueError:
+                if settings.DEBUG:
+                    print("Conductance must be a float!")
         self.conductance_parameter_input.setText(str(global_vars.CONDUCTANCE_PARAMETER))
         self.conductance_parameter_input.setPlaceholderText(
             str(global_vars.CONDUCTANCE_PARAMETER)
@@ -465,12 +469,14 @@ class MainWindow(QMainWindow):
             global_vars.CONDUCTANCE_PARAMETER
         )
 
-        iterations: str = self.smoothing_iterations_input.displayText()
-        try:
-            global_vars.SMOOTHING_ITERATIONS = int(iterations)
-        except ValueError:
-            if settings.DEBUG:
-                print("Iterations must be an integer!")
+        if set_global_vars_to_GUI_text:
+            try:
+                global_vars.SMOOTHING_ITERATIONS = int(
+                    self.smoothing_iterations_input.displayText()
+                )
+            except ValueError:
+                if settings.DEBUG:
+                    print("Iterations must be an integer!")
         self.smoothing_iterations_input.setText(str(global_vars.SMOOTHING_ITERATIONS))
         self.smoothing_iterations_input.setPlaceholderText(
             str(global_vars.SMOOTHING_ITERATIONS)
@@ -479,26 +485,30 @@ class MainWindow(QMainWindow):
             global_vars.SMOOTHING_ITERATIONS
         )
 
-        time_step: str = self.time_step_input.displayText()
-        try:
-            global_vars.TIME_STEP = float(time_step)
-        except ValueError:
-            if settings.DEBUG:
-                print("Time step must be a float!")
+        if set_global_vars_to_GUI_text:
+            try:
+                global_vars.TIME_STEP = float(self.time_step_input.displayText())
+            except ValueError:
+                if settings.DEBUG:
+                    print("Time step must be a float!")
         self.time_step_input.setText(str(global_vars.TIME_STEP))
         self.time_step_input.setPlaceholderText(str(global_vars.TIME_STEP))
         global_vars.SMOOTHING_FILTER.SetTimeStep(global_vars.TIME_STEP)
 
-    def update_binary_filter_settings(self) -> None:
-        """Updates global binary filter settings.
+    def update_binary_filter_settings(self, set_global_vars_to_GUI_text: bool) -> None:
+        """Updates binary threshold filter text in the GUI and set BINARY_THRESHOLD_FILTER parameters.
 
+        :param set_global_vars_to_GUI_text: If True, will first try to modify global_vars variables to the text in the GUI before updating GUI text and filter parameters. If False, will not do so.
+        :type set_global_vars_to_GUI_text: bool
         :return: None
         """
-        lower_threshold: str = self.lower_threshold_input.displayText()
-        try:
-            global_vars.LOWER_BINARY_THRESHOLD = float(lower_threshold)
-        except ValueError:
-            pass
+        if set_global_vars_to_GUI_text:
+            try:
+                global_vars.LOWER_BINARY_THRESHOLD = float(
+                    self.lower_threshold_input.displayText()
+                )
+            except ValueError:
+                pass
         self.lower_threshold_input.setText(str(global_vars.LOWER_BINARY_THRESHOLD))
         self.lower_threshold_input.setPlaceholderText(
             str(global_vars.LOWER_BINARY_THRESHOLD)
@@ -507,11 +517,13 @@ class MainWindow(QMainWindow):
             global_vars.LOWER_BINARY_THRESHOLD
         )
 
-        upper_threshold: str = self.upper_threshold_input.displayText()
-        try:
-            global_vars.UPPER_BINARY_THRESHOLD = float(upper_threshold)
-        except ValueError:
-            pass
+        if set_global_vars_to_GUI_text:
+            try:
+                global_vars.UPPER_BINARY_THRESHOLD = float(
+                    self.upper_threshold_input.displayText()
+                )
+            except ValueError:
+                pass
         self.upper_threshold_input.setText(str(global_vars.UPPER_BINARY_THRESHOLD))
         self.upper_threshold_input.setPlaceholderText(
             str(global_vars.UPPER_BINARY_THRESHOLD)
@@ -614,7 +626,7 @@ class MainWindow(QMainWindow):
         """Renders smooth slice in GUI. Allows user to preview result of smoothing settings.
 
         :return: None"""
-        self.update_smoothing_settings()
+        self.update_smoothing_settings(True)
         # Preview should apply filter only on axial slice
         self.set_view_z()
         smooth_slice: sitk.Image = get_curr_smooth_slice()
@@ -630,7 +642,7 @@ class MainWindow(QMainWindow):
         if self.otsu_radio_button.isChecked():
             filter_img: sitk.Image = get_curr_otsu_slice()
         else:
-            self.update_binary_filter_settings()
+            self.update_binary_filter_settings(True)
             filter_img: sitk.Image = get_curr_binary_thresholded_slice()
         q_img: QImage = sitk_slice_to_qimage(filter_img)
         self.render_scaled_qpixmap_from_qimage(q_img)
@@ -947,17 +959,27 @@ class MainWindow(QMainWindow):
         if "smoothing_time_step" in data:
             global_vars.TIME_STEP = data["smoothing_time_step"]
 
-        self.update_smoothing_settings()
+        self.update_smoothing_settings(False)
 
         if "filter_option" in data:
+            if (
+                not "upper_binary_threshold" in data
+                or not "lower_binary_threshold" in data
+            ):
+                print(
+                    "If the imported JSON has filter_option (whether Otsu or binary), it must have upper_binary_threshold and lower_binary_threshold"
+                )
+                exit(1)
+            global_vars.UPPER_BINARY_THRESHOLD = data["upper_binary_threshold"]
+            global_vars.LOWER_BINARY_THRESHOLD = data["lower_binary_threshold"]
+            self.update_binary_filter_settings(False)
+
             if data["filter_option"] == "Otsu":
+                self.otsu_radio_button.click()
                 self.disable_binary_threshold_inputs()
             else:
                 self.enable_binary_threshold_inputs()
                 self.binary_radio_button.click()
-                global_vars.UPPER_BINARY_THRESHOLD = data["upper_binary_threshold"]
-                global_vars.LOWER_BINARY_THRESHOLD = data["lower_binary_threshold"]
-                self.update_binary_filter_settings()
 
     def export_json(self) -> None:
         """Called when "export" button is clicked and when Menu > Export > JSON is clicked.
@@ -967,15 +989,6 @@ class MainWindow(QMainWindow):
         and circumference
 
         :return: `None`"""
-
-        if self.otsu_radio_button.isChecked():
-            filter_option: str = "Otsu"
-            upper_binary_threshold = "N/A"
-            lower_binary_threshold = "N/A"
-        else:
-            filter_option: str = "Binary"
-            upper_binary_threshold = global_vars.UPPER_BINARY_THRESHOLD
-            lower_binary_threshold = global_vars.LOWER_BINARY_THRESHOLD
 
         global_vars.CURR_IMAGE_INDEX = 0
         self.render_image_num_and_path()
@@ -1004,9 +1017,11 @@ class MainWindow(QMainWindow):
                 "smoothing_conductance": global_vars.CONDUCTANCE_PARAMETER,
                 "smoothing_iterations": global_vars.SMOOTHING_ITERATIONS,
                 "smoothing_time_step": global_vars.TIME_STEP,
-                "filter_option": filter_option,
-                "upper_binary_threshold": upper_binary_threshold,
-                "lower_binary_threshold": lower_binary_threshold,
+                "filter_option": "Otsu"
+                if self.otsu_radio_button.isChecked()
+                else "Binary",
+                "upper_binary_threshold": global_vars.UPPER_BINARY_THRESHOLD,
+                "lower_binary_threshold": global_vars.LOWER_BINARY_THRESHOLD,
                 "circumference": circumference,
             }
 
