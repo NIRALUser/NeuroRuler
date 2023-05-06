@@ -96,10 +96,10 @@ def parse_cli() -> None:
             exit(1)
 
     if args.lower:
-        cli_settings.LOWER_THRESHOLD = args.lower
+        cli_settings.LOWER_BINARY_THRESHOLD = args.lower
 
     if args.upper:
-        cli_settings.UPPER_THRESHOLD = args.upper
+        cli_settings.UPPER_BINARY_THRESHOLD = args.upper
 
     # Would use pathlib.Path .suffix here
     # However, '.nii.gz'.suffix would return '.gz'
