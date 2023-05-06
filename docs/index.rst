@@ -6,28 +6,13 @@
 .. role:: raw-html(raw)
     :format: html
 
-##########
-NeuroRuler
-##########
-
-.. topic:: Overview
-
-   A program that calculates head circumference from MRI data (:code:`.nii`, :code:`.nii.gz`, :code:`.nrrd`).
-
-.. image:: _static/nr_demo.gif
-   :alt: NeuroRuler GUI demo
-   :align: center
-
-:raw-html:`<br />`
-
 .. note::
 
-   The theme we're using for this site has ads 😔. Use adblock.
+   Most of this page is the README from `GitHub <https://github.com/NIRALUser/NeuroRuler>`_.
 
-Install
-#######
+   For content unique to this site, see the sidebar :math:`\leftarrow`
 
-See our `GitHub README <https://github.com/NIRALUser/NeuroRuler#install>`_.
+.. mdinclude:: ../README.md
 
 Contents
 ########
