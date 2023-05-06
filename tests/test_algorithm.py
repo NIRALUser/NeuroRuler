@@ -42,7 +42,9 @@ if not UBUNTU_GITHUB_ACTIONS_CI:
     import NeuroRuler.utils.gui_settings as gui_settings
 
 
-@pytest.mark.skipif(UBUNTU_GITHUB_ACTIONS_CI, reason="No GUI on GitHub Actions CI")
+@pytest.mark.skipif(
+    UBUNTU_GITHUB_ACTIONS_CI, reason="No GUI on Ubuntu GitHub Actions CI environment"
+)
 def calculate_circumference(path) -> float:
     # Set up UI
     app = QApplication(sys.argv)
@@ -58,7 +60,9 @@ def calculate_circumference(path) -> float:
     return window.render_circumference(binary_contour_slice)
 
 
-@pytest.mark.skipif(UBUNTU_GITHUB_ACTIONS_CI, reason="No GUI on GitHub Actions CI")
+@pytest.mark.skipif(
+    UBUNTU_GITHUB_ACTIONS_CI, reason="No GUI on Ubuntu GitHub Actions CI environment"
+)
 def test_algorithm():
     labeled_data = []
     calculated_data = []

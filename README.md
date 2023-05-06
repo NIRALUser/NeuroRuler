@@ -74,7 +74,7 @@ Our unit tests run on GitHub Actions on push and PR via `tox`, which tests on se
   <img src="https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg" alt="GitHub actions tests.yml badge"/>
 </p>
 
-Tests involving the GUI are skipped in Ubuntu GH Actions CI environments. For more information, see [tests/README.md](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/README.md).
+Tests involving the GUI are skipped in Ubuntu GH Actions CI environments (but run in Windows environments). For more information, see [tests/README.md](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/README.md).
 
 ## Documentation
 

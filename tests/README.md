@@ -1,10 +1,9 @@
 # README
 
-Unit tests and PyQt6 imports in `test_algorithm.py` and `test_algorithm_unittest.py` are skipped when run in an
-Ubuntu environment in GitHub Actions CI due to missing dependencies.
+Unit tests and PyQt6 imports in `test_algorithm.py` and `test_algorithm_unittest.py` are skipped when run in
+Ubuntu environments in GitHub Actions CI due to missing dependencies. However, the tests run in Windows environments.
 
-See the docstring of `tests.constants.UBUNTU_GITHUB_ACTIONS_CI` for more information. For convenience, it's reproduced
-here but could be outdated.
+See the docstring of `tests.constants.UBUNTU_GITHUB_ACTIONS_CI` for more information. For convenience, it's reproduced here but could be outdated.
 
 ```py
 import os

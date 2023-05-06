@@ -26,7 +26,10 @@ if not UBUNTU_GITHUB_ACTIONS_CI:
 class MainWindowTest(unittest.TestCase):
     """Test the program by simulating GUI actions."""
 
-    @unittest.skipIf(UBUNTU_GITHUB_ACTIONS_CI, reason="No GUI on GitHub Actions CI")
+    @unittest.skipIf(
+        UBUNTU_GITHUB_ACTIONS_CI,
+        reason="No GUI on Ubuntu GitHub Actions CI environment",
+    )
     def test_alg(self):
         app = QApplication(sys.argv)
         self.form = (
