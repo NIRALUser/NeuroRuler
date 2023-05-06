@@ -24,7 +24,7 @@ setup(
     name="NeuroRuler",
     # For current version number, see
     # https://pypi.org/project/NeuroRuler/
-    version="0.0.6",
+    version="0.0.7",
     description="A program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).",
     # Cannot use multiple authors
     # https://stackoverflow.com/questions/9999829/how-to-specify-multiple-authors-emails-in-setup-py
