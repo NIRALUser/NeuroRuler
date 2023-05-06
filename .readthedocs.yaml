@@ -26,5 +26,4 @@ sphinx:
 # Optionally declare the Python requirements required to build your docs
 python:
    install:
-   # This should be docs/requirements.txt, but I don't want to update another requirements.txt file
    - requirements: requirements.txt

@@ -351,9 +351,11 @@ Installation instructions
 1. Clone our fork of the `repo <https://github.com/NIRALUser/BreezeStyleSheets>`_.
 2. Run :code:`pip install PyQt5`.
 
-.. note:: If you successfully installed PyQt5, then move on to :ref:`BreezeStyleSheetsConfiguration`.
+.. note:: PyQt5 is necessary for BSS because it uses ``pyrcc5`` to compile QRC files.
 
-    Otherwise, see these instructions [#macpyqt]_. Pretty sure the PyQt5 installation is bugged on
+    If you successfully installed PyQt5, then move on to :ref:`BreezeStyleSheetsConfiguration`.
+
+    Otherwise, see these instructions. [#macpyqt]_ Pretty sure the PyQt5 installation is bugged on
     macOS but not Windows.
 
 .. _BreezeStyleSheetsConfiguration:
@@ -419,7 +421,7 @@ For parsing CLI arguments.
 Virtual environment
 ###################
 
-This isn't a library, but it's worth noting. See the `virtual environment documentation <https://packaging.python.org/en/latest/tutorials/installing-packages/#creating-and-using-virtual-environments>`_ [#venv]_.
+This isn't a library, but it's worth noting. See the `virtual environment documentation <https://packaging.python.org/en/latest/tutorials/installing-packages/#creating-and-using-virtual-environments>`_. [#venv]_
 
 python-black
 ############
@@ -531,7 +533,7 @@ Your current working directory should be whatever repo you want to automatically
     cd docs
     sphinx-quickstart
 
-Type `n` for the first question, which asks about splitting source and build directories [#sphinx]_.
+Type `n` for the first question, which asks about splitting source and build directories. [#sphinx]_
 
 Copy over :code:`docs/conf.py` (install another theme with pip and modify :code:`html_theme` if you want),
 :code:`docs/requirements.txt`, :code:`.readthedocs.yaml`, :code:`pyproject.toml`, and :code:`setup.py` from the
@@ -552,7 +554,7 @@ you want to auto-generate documentation for.
     make html
 
 :code:`docs/_build/html/index.html` will now contain the local version of the documentation pages.
-You can open it in a web browser to check it out before pushing, which will automatically update the
+You can open it in a web browser [#macos_open_html]_ to check it out before pushing, which will automatically update the
 website. From now on, you can just run :code:`make html` to update the html pages. You don't need to run
 :code:`sphinx-apidoc` unless you create a new package.
 
@@ -602,7 +604,7 @@ However, if :code:`THEME_NAME` is :code:`'light'`, then the import statement wou
 
     import NeuroRuler.GUI.styles.light.resources
 
-Therefore, we use importlib to control the import name there [#why_importlib]_.
+Therefore, we use importlib to control the import name there. [#why_importlib]_
 
 .. _pre-commit:
 
@@ -623,17 +625,14 @@ More instructions `here <https://pre-commit.com/>`_.
 
 .. rubric:: Footnotes
 
-.. [#macpyqt] These are the the commands I ran to install PyQt5 on macOS. Took a while to install...
+.. [#macpyqt] This is the command I ran to install PyQt5 (``pyrcc5``) on macOS. Took a while to install...
 
 .. code-block:: text
-    :linenos:
 
-    brew install qt5
-    brew link qt5 --force
     pip3 install pyqt5 --config-settings --confirm-license= --verbose
 
 .. [#sphinx] Not sure if this actually needs to be `n`, but I'm not messing around with it any more.
 .. [#macos_open_html] On macOS, you can open an HTML document using :code:`open -a "Safari" _build/html/index.html"`
-.. [#venv] Thanks to the teammate who suggested this to me!
+.. [#venv] Thanks to Madison for suggesting this to me!
 .. [#npqimage] https://github.com/NIRALUser/NeuroRuler/pull/3#issuecomment-1468075389
 .. [#why_importlib] We can't just use a single :code:`resources.py` file because BreezeStyleSheets generates icons based on theme color.
