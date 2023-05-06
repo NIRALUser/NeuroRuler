@@ -141,12 +141,10 @@ class MainWindow(QMainWindow):
                 'Credit to Jesse Wei, Madison Lester, Peifeng "Hank" He, Eric Schneider, and Martin Styner.\n\nUniversity of North Carolina at Chapel Hill, 2023. See the GitHub page for more info.',
             )
         )
-        self.action_test_stuff.triggered.connect(self.test_stuff)
-        self.action_print_metadata.triggered.connect(display_metadata)
-        self.action_print_dimensions.triggered.connect(display_dimensions)
-        self.action_print_properties.triggered.connect(display_properties)
-        self.action_print_direction.triggered.connect(display_direction)
-        self.action_print_spacing.triggered.connect(display_spacing)
+        self.action_show_dimensions.triggered.connect(display_dimensions)
+        self.action_show_properties.triggered.connect(display_properties)
+        self.action_show_direction.triggered.connect(display_direction)
+        self.action_show_spacing.triggered.connect(display_spacing)
         self.action_export_csv.triggered.connect(self.export_json)
         self.action_export_png.triggered.connect(
             lambda: self.export_curr_slice_as_img("png")
@@ -881,7 +879,7 @@ class MainWindow(QMainWindow):
 
     def import_json(self) -> None:
         """Called when "import" button is clicked
-        
+
         Imported parameters include: image_name, output_folder, x_rotation, y_rotation, z_rotation, slice,
         smoothing_conductance, smoothing_iterations, smoothing_time_step, filter_option, upper_threshold, lower_threshold,
         and circumference
@@ -889,30 +887,27 @@ class MainWindow(QMainWindow):
         image_name is the only mandatary field.
 
         :return: `None`"""
-        file_filter: str = "MRI images json " + str(
-                ("*.json")
-            ).replace("'", "").replace(",", "")
+        file_filter: str = "MRI images json " + str(("*.json")).replace(
+            "'", ""
+        ).replace(",", "")
 
         files, _ = QFileDialog.getOpenFileNames(
-                self,
-                "Open file",
-                str(settings.FILE_IMPORT_START_DIR),
-                file_filter
-            )
-        
+            self, "Open file", str(settings.FILE_IMPORT_START_DIR), file_filter
+        )
+
         # list[str]
         path_list = files
         if len(path_list) == 0:
             return
-        
-        with open(path_list[0], 'r') as file:
+
+        with open(path_list[0], "r") as file:
             # Parse the JSON data into a dictionary
             data = json.load(file)
-        
-        #TODO: when we give up using "DATA_DIR", we need to modify this.
+
+        # TODO: when we give up using "DATA_DIR", we need to modify this.
         image_path: str = str(constants.DATA_DIR) + "/" + data["image_name"]
         self.browse_files(False, image_path)
-        
+
         if "x_rotation" in data:
             global_vars.THETA_X = data["x_rotation"]
             self.x_slider.setValue(global_vars.THETA_X)
@@ -920,11 +915,11 @@ class MainWindow(QMainWindow):
         if "y_rotation" in data:
             global_vars.THETA_Y = data["y_rotation"]
             self.y_slider.setValue(global_vars.THETA_Y)
-        
+
         if "z_rotation" in data:
             global_vars.THETA_Z = data["z_rotation"]
             self.z_slider.setValue(global_vars.THETA_Z)
-        
+
         self.update_view()
 
         if "slice" in data:
@@ -934,14 +929,14 @@ class MainWindow(QMainWindow):
 
         if "smoothing_conductance" in data:
             global_vars.CONDUCTANCE_PARAMETER = data["smoothing_conductance"]
-        
+
         if "smoothing_iterations" in data:
             global_vars.SMOOTHING_ITERATIONS = data["smoothing_iterations"]
 
         if "smoothing_time_step" in data:
-            global_vars.TIME_STEP = data["smoothing_time_step"]    
+            global_vars.TIME_STEP = data["smoothing_time_step"]
 
-        self.update_smoothing_settings()    
+        self.update_smoothing_settings()
 
         if "filter_option" in data:
             if data["filter_option"] == "Otsu":
@@ -955,7 +950,7 @@ class MainWindow(QMainWindow):
 
     def export_json(self) -> None:
         """Called when "export" button is clicked
-        
+
         Exported parameters include: image_name, output_folder, x_rotation, y_rotation, z_rotation, slice,
         smoothing_conductance, smoothing_iterations, smoothing_time_step, filter_option, upper_threshold, lower_threshold,
         and circumference
@@ -966,10 +961,7 @@ class MainWindow(QMainWindow):
             if settings.EXPORTED_FILE_NAMES_USE_INDEX
             else get_curr_path().name
         )
-        path: str = str(
-            constants.JSON_DIR
-            / f"{file_name}.json"
-        )
+        path: str = str(constants.JSON_DIR / f"{file_name}.json")
 
         output_path: str = str(constants.JSON_DIR)
         circumference: float = CIRCUMFERENCE_RESULT
@@ -984,24 +976,24 @@ class MainWindow(QMainWindow):
             lower_threshold: float = global_vars.LOWER_THRESHOLD
 
         data = {
-        "image_name": file_name,
-        "output_folder": output_path,
-        "x_rotation": global_vars.THETA_X,
-        "y_rotation": global_vars.THETA_Y,
-        "z_rotation": global_vars.THETA_Z,
-        "slice": global_vars.SLICE,
-        "smoothing_conductance": global_vars.CONDUCTANCE_PARAMETER,
-        "smoothing_iterations": global_vars.SMOOTHING_ITERATIONS,
-        "smoothing_time_step": global_vars.TIME_STEP,
-        "filter_option": filter_option,
-        "upper_threshold": upper_threshold,
-        "lower_threshold": lower_threshold,
-        "circumference": circumference
+            "image_name": file_name,
+            "output_folder": output_path,
+            "x_rotation": global_vars.THETA_X,
+            "y_rotation": global_vars.THETA_Y,
+            "z_rotation": global_vars.THETA_Z,
+            "slice": global_vars.SLICE,
+            "smoothing_conductance": global_vars.CONDUCTANCE_PARAMETER,
+            "smoothing_iterations": global_vars.SMOOTHING_ITERATIONS,
+            "smoothing_time_step": global_vars.TIME_STEP,
+            "filter_option": filter_option,
+            "upper_threshold": upper_threshold,
+            "lower_threshold": lower_threshold,
+            "circumference": circumference,
         }
 
-        with open(path, 'w') as outfile:
+        with open(path, "w") as outfile:
             json.dump(data, outfile)
-    
+
     def orient_curr_image(self) -> None:
         """Orient the current image for the current view (global_vars.VIEW) by applying ORIENT_FILTER on it.
 
