@@ -20,8 +20,8 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   libraries
    structure
+   libraries
    modules
 
 Indices and tables
