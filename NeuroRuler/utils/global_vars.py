@@ -1,4 +1,4 @@
-"""Global variables and functions that change throughout program execution."""
+"""Global variables that change throughout program execution."""
 
 import SimpleITK as sitk
 from pathlib import Path
