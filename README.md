@@ -10,6 +10,14 @@ NeuroRuler is a program that calculates head circumference from MRI data (`.nii`
   <img src="https://i.imgur.com/nqwqHq8.gif" alt="GUI demo"/>
 </p>
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=ZhSg5xwzbmo"><img src="https://img.youtube.com/vi/ZhSg5xwzbmo/0.jpg" alt="full demo video"></a>
+</p>
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=ZhSg5xwzbmo">Full demo</a>
+</p>
+
 ## Cite this tool
 
 If you want 😉 format is bibtex.
