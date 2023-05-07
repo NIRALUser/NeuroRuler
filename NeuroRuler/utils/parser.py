@@ -3,7 +3,6 @@
 # TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively,
 # and we should just keep the general parse functions here
 
-import re
 import argparse
 import json
 from pathlib import Path
@@ -56,34 +55,38 @@ def parse_cli() -> None:
     )
     args = parser.parse_args()
 
+    # store_true option is True or False, never None
+    # Don't do `if args.debug is not None`
     if args.debug:
         cli_settings.DEBUG = True
         print("Debug CLI option supplied.")
 
     cli_settings.RAW = args.raw
 
-    if args.x:
+    # bool(0) is False
+    # If we use `if args.x`, then x=0 would cause the if condition to be False (not what we want)
+    if args.x is not None:
         cli_settings.THETA_X = args.x
 
-    if args.y:
+    if args.y is not None:
         cli_settings.THETA_Y = args.y
 
-    if args.z:
+    if args.z is not None:
         cli_settings.THETA_Z = args.z
 
-    if args.slice:
+    if args.slice is not None:
         cli_settings.SLICE = args.slice
 
-    if args.conductance:
+    if args.conductance is not None:
         cli_settings.CONDUCTANCE_PARAMETER = args.conductance
 
-    if args.iterations:
+    if args.iterations is not None:
         cli_settings.SMOOTHING_ITERATIONS = args.iterations
 
-    if args.step:
+    if args.step is not None:
         cli_settings.TIME_STEP = args.step
 
-    if args.filter:
+    if args.filter is not None:
         if args.filter.lower() == "otsu":
             cli_settings.THRESHOLD_FILTER = constants.ThresholdFilter.Otsu
         elif args.filter.lower() == "binary":
@@ -102,10 +105,11 @@ def parse_cli() -> None:
             print("Invalid setting entered for CLI filter option.")
             exit(1)
 
-    if args.lower:
+    # Otsu will ignore these
+    if args.lower is not None:
         cli_settings.LOWER_BINARY_THRESHOLD = args.lower
 
-    if args.upper:
+    if args.upper is not None:
         cli_settings.UPPER_BINARY_THRESHOLD = args.upper
 
     if not any(
@@ -129,13 +133,6 @@ def parse_gui_cli() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--debug", help="print debug info", action="store_true")
     parser.add_argument(
-        "-e",
-        "--export-index",
-        help="exported file names use the index displayed in the GUI instead of the \
-                        original file name",
-        action="store_true",
-    )
-    parser.add_argument(
         "-t",
         "--theme",
         help="configure theme, options are " + iterable_of_str_to_str(constants.THEMES),
@@ -151,11 +148,7 @@ def parse_gui_cli() -> None:
         gui_settings.DEBUG = True
         print("Debug CLI option supplied.")
 
-    if args.export_index:
-        gui_settings.EXPORTED_FILE_NAMES_USE_INDEX = True
-        print("Exported files will use the index displayed in the GUI.")
-
-    if args.theme:
+    if args.theme is not None:
         if args.theme not in constants.THEMES:
             print(
                 f"Invalid theme specified. Options are {iterable_of_str_to_str(constants.THEMES)}"
@@ -166,7 +159,7 @@ def parse_gui_cli() -> None:
         gui_settings.CONTOUR_COLOR = parse_main_color_from_theme_json()
         print(f"Theme {args.theme} specified.")
 
-    if args.color:
+    if args.color is not None:
         gui_settings.CONTOUR_COLOR = args.color
         print(
             f"Contour color is {'#' if not args.color.isalpha() else ''}{args.color}."
@@ -212,10 +205,6 @@ def parse_gui_config() -> None:
     if gui_settings.DEBUG:
         print("Printing debug messages.")
     gui_settings.FILE_BROWSER_START_DIR = parse_path("FILE_BROWSER_START_DIR")
-    gui_settings.EXPORTED_FILE_NAMES_USE_INDEX = parse_bool(
-        "EXPORTED_FILE_NAMES_USE_INDEX"
-    )
-
     gui_settings.THEME_NAME = JSON_SETTINGS["THEME_NAME"]
     if gui_settings.THEME_NAME not in constants.THEMES:
         raise exceptions.InvalidJSONField(
