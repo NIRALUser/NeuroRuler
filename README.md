@@ -40,26 +40,80 @@ Your Python version needs to be 3.8+. Check with `python --version`. Install wit
 pip install NeuroRuler
 ```
 
-If `pip` doesn't work, try `pip3`.
+If `python` or `pip` don't work, try `python3` and `pip3`.
 
-If contributing to this repo, clone/fork and run `pip install -r requirements.txt` to install additional development dependencies (for code formatting, documentation, etc.). After installing additional dependencies, run `pre-commit install` to enable pre-commit actions.
+## Usage
+
+Download the latest [release](https://github.com/NIRALUser/NeuroRuler/releases).
+
+The [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) and [cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli.py) scripts, further described below, are entry points for NeuroRuler's GUI and CLI.
+
+[gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json) set default settings for the GUI and CLI. `gui.py` and `cli.py` will create `gui_config.json` and `cli_config.json` if they don't exist. For more information, see [Configure default settings](#configure-default-settings).
+
+## For developers
+
+Developers contributing to the repository should clone the repository. These scripts will then import from the local repository and reflect changes made to the codebase.
+
+Developers should run `pip install -r requirements.txt` to install additional development dependencies and `pre-commit install` to install pre-commit git hooks.
 
 ## Run GUI
 
-Run these commands in a Python terminal:
+```sh
+python gui.py
+```
+
+Run `python gui.py -h` to see command-line options.
+
+The GUI can also be run from any directory from a Python terminal. After opening a Python terminal, run these commands:
 
 ```py
 from NeuroRuler.GUI import gui
 gui()
 ```
 
-Note: If you make changes to the repo, use the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the pip package until uploaded to PyPI.
+<p align="center">Same as the code in <code>gui.py</code></p>
+
+## Run CLI
+
+```sh
+python cli.py <file>
+```
+
+See [test_cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/test_cli.py) for some example usages.
+
+```text
+positional arguments:
+  file                  file to compute circumference from, extension must be .nii.gz, .nii, or .nrrd
+
+options:
+  -h, --help            show this help message and exit
+  -d, --debug           print debug info
+  -r, --raw             print just the "raw" circumference
+  -x X, --x X           x rotation (in degrees)
+  -y Y, --y Y           y rotation (in degrees)
+  -z Z, --z Z           z rotation (in degrees)
+  -s SLICE, --slice SLICE
+                        slice (Z slice, 0-indexed)
+  -c CONDUCTANCE, --conductance CONDUCTANCE
+                        conductance smoothing parameter
+  -i ITERATIONS, --iterations ITERATIONS
+                        smoothing iterations
+  -t STEP, --step STEP  time step (smoothing parameter)
+  -f FILTER, --filter FILTER
+                        which filter to use (Otsu or binary)
+  -l LOWER, --lower LOWER
+                        lower threshold for binary threshold
+  -u UPPER, --upper UPPER
+                        upper threshold for binary threshold
+```
+
+<p align="center">Output of <code>python cli.py -h</code> (could be outdated)</p>
 
 ## Import/export image settings JSON
 
-In "circumference mode" (after clicking Apply), click the large Export button under the image to export image setting JSON file(s) containing the circumferences of all loaded images and the settings applied to each image.
+In the GUI's "circumference mode" (after clicking Apply), click the large Export button under the image to export image settings JSON file(s) containing the circumferences of all loaded images and the settings applied to each image.
 
-You can then use File > Import Image Settings to import an image setting JSON to load the same image with the same settings.
+You can then use File > Import Image Settings to import an image settings JSON to load the same image with the same settings.
 
 Here is an example:
 
@@ -91,13 +145,11 @@ output
     └── MicroBiome_1month_T1w_settings.json
 ```
 
-## Configure settings
+## Configure default settings
 
-After cloning the repo, edit the JSON configuration files [gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json).
+Edit the JSON configuration files [gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json). Settings here are default values for the GUI and CLI. `gui.py` and `cli.py` will create these files if they don't exist.
 
-You can also supply CLI arguments to the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) or [cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli.py) scripts, which will override settings in the JSON configuration files.
-
-Apply the `-h` command-line option when running those scripts to see the list of options. You can see some examples of CLI options in [test_cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/test_cli.py).
+Command-line arguments supplied to the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) or [cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli.py) scripts will override settings in the JSON configuration files. If a setting in the JSON file is not overriden by a CLI argument, the JSON file setting will be used.
 
 ## Run tests
 
@@ -119,20 +171,14 @@ See [.readthedocs.yaml](https://github.com/NIRALUser/NeuroRuler/blob/main/.readt
 
 [Team website](https://tarheels.live/comp523teamd/)
 
-## Pre-commit actions
-
-Run `pre-commit install` to enable pre-commit actions.
-
-Before each commit, the actions in [.pre-commit-config.yaml](https://github.com/NIRALUser/NeuroRuler/blob/main/.pre-commit-config.yaml) will be run. Specifically, code will be reformatted with `black`.
-
-**Note**: Some file names are excluded, so don't name any source code files those names.
-
 ## Release
 
-To test the package locally before releasing, use the [testdist](https://github.com/NIRALUser/NeuroRuler/blob/main/testdist) script. If using macOS, run with `. ./testdist`. If using Windows, you may need to modify the script slightly.
+To test the package locally before releasing on PyPI, use the [testdist](https://github.com/NIRALUser/NeuroRuler/blob/main/testdist) script. If using macOS, run with `. ./testdist`. If using Windows, you may need to modify the script slightly.
 
 You must test from a directory that isn't `NeuroRuler/`. If your directory is `NeuroRuler/`, then imports will import from the source code, not the package.
 
 To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [setup.py](https://github.com/NIRALUser/NeuroRuler/blob/main/setup.py). Then push to a branch called `release-pypi` (create it if it doesn't exist). This will trigger [pypi.yml](https://github.com/NIRALUser/NeuroRuler/blob/main/.github/workflows/pypi.yml), which will run tests and publish to PyPI if the tests pass.
 
 To publish to [Test PyPI](https://test.pypi.org/project/NeuroRuler/), do the same as above, but push to a branch called `release-testpypi`.
+
+If any of these files changes, they should be re-released on GitHub releases: `gui.py`, `cli.py`, `gui_config.json`, `cli_config.json`.

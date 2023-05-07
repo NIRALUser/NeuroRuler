@@ -1,9 +1,9 @@
+// Default settings for GUI. Can be overriden by command-line arguments.
 // Comments beginning with // are ignored.
-// Use "True" or "False" for binary options
+// Use "True" or "False" for binary options.
 // For other field types, the comments specify what the allowed values are.
-// Do not add or remove fields in this file if you're a user
-// If you're a developer who's adding or removing options,
-// modify parser.py
+// If you're a user, do not remove fields.
+// If you're a developer who's adding or removing fields, modify parser.py.
 {
     // Print debugging messages during execution
     "DEBUG": "False",

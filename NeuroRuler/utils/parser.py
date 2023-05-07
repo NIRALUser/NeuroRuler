@@ -3,10 +3,12 @@
 # TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively,
 # and we should just keep the general parse functions here
 
+import re
 import argparse
 import json
 from pathlib import Path
 import string
+from typing import Union
 
 import NeuroRuler.utils.cli_settings as cli_settings
 import NeuroRuler.utils.gui_settings as gui_settings
@@ -48,7 +50,10 @@ def parse_cli() -> None:
     parser.add_argument(
         "-u", "--upper", type=float, help="upper threshold for binary threshold"
     )
-    parser.add_argument("file", help="file to compute circumference from")
+    parser.add_argument(
+        "file",
+        help=f"file to compute circumference from, file format must be {iterable_of_str_to_str(constants.SUPPORTED_IMAGE_EXTENSIONS)}",
+    )
     args = parser.parse_args()
 
     if args.debug:
@@ -103,13 +108,14 @@ def parse_cli() -> None:
     if args.upper:
         cli_settings.UPPER_BINARY_THRESHOLD = args.upper
 
-    # Would use pathlib.Path .suffix here
-    # However, '.nii.gz'.suffix would return '.gz'
-    # But we expect '.nii.gz'
-    extension = args.file[args.file.find(".") :]
-    if extension not in constants.SUPPORTED_IMAGE_EXTENSIONS:
+    if not any(
+        [
+            pattern.match(args.file)
+            for pattern in constants.SUPPORTED_IMAGE_EXTENSIONS_REGEX
+        ]
+    ):
         print(
-            f"Image has an unsupported extension. Supported image extensions are {str(constants.SUPPORTED_IMAGE_EXTENSIONS)}."
+            f"Invalid file extension. Supported file formats are {iterable_of_str_to_str(constants.SUPPORTED_IMAGE_EXTENSIONS)}"
         )
         exit(1)
 
@@ -132,8 +138,7 @@ def parse_gui_cli() -> None:
     parser.add_argument(
         "-t",
         "--theme",
-        help="configure theme, options are "
-        + list_of_options_to_str(constants.THEMES).replace('"', ""),
+        help="configure theme, options are " + iterable_of_str_to_str(constants.THEMES),
     )
     parser.add_argument(
         "-c",
@@ -153,7 +158,7 @@ def parse_gui_cli() -> None:
     if args.theme:
         if args.theme not in constants.THEMES:
             print(
-                f"Invalid theme specified. Options are {list_of_options_to_str(constants.THEMES)}"
+                f"Invalid theme specified. Options are {iterable_of_str_to_str(constants.THEMES)}"
             )
             exit(1)
 
@@ -214,7 +219,7 @@ def parse_gui_config() -> None:
     gui_settings.THEME_NAME = JSON_SETTINGS["THEME_NAME"]
     if gui_settings.THEME_NAME not in constants.THEMES:
         raise exceptions.InvalidJSONField(
-            "THEME_NAME", list_of_options_to_str(constants.THEMES)
+            "THEME_NAME", iterable_of_str_to_str(constants.THEMES)
         )
 
     contour_color: str = JSON_SETTINGS["CONTOUR_COLOR"]
@@ -357,16 +362,28 @@ def parse_float(field: str) -> float:
         raise exceptions.InvalidJSONField(field, "float")
 
 
-def list_of_options_to_str(strs: list[str]) -> str:
-    r"""Convert list[str] of options of the form ['a', 'b', 'c', 'd'] to str representation
-    "a", "b", "c", or "d"
+def iterable_of_str_to_str(
+    iterable: Union[list[str], tuple[str]], use_or: bool = True
+) -> str:
+    """Convert iterable of ``str`` to ``str``, with some formatting.
 
-    :param strs:
-    :type strs: list[str]
-    :return: str representation "a", "b", "c", or "d"
+    For example, ('.nii.gz', '.nii', '.nrrd') becomes '.nii.gz, .nii, [or] .nrrd'.
+
+    :param iterable:
+    :type iterable: Union[list[str], tuple[str]]
+    :param use_or: Whether to use 'or' in the string
+    :type use_or: bool
+    :return: String representation of tuple
     :rtype: str"""
-    # Need at least 1 comma in the list
-    assert len(strs) > 2
-    s = str(strs)[1:-1].replace("'", '"')
-    final_comma_position: int = s.rfind(",")
-    return s[: final_comma_position + 1] + " or " + s[final_comma_position + 2 :]
+    # Need at least one comma in the list
+    # TODO: Maybe could just assert len > 1 but not sure what would happen
+    assert len(iterable) > 2
+    formatted_tuple: str = str(iterable).replace("'", "").replace('"', "")[1:-1]
+    if use_or:
+        position_of_final_comma: int = formatted_tuple.rfind(",")
+        formatted_tuple = (
+            formatted_tuple[: position_of_final_comma + 1]
+            + " or"
+            + formatted_tuple[position_of_final_comma + 1 :]
+        )
+    return formatted_tuple

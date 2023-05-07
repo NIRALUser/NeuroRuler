@@ -2,6 +2,7 @@
 
 This file should not import any module in this repo to avoid circular imports."""
 
+import re
 from pathlib import Path
 import warnings
 import functools
@@ -17,27 +18,28 @@ if not OUTPUT_DIR.exists():
     OUTPUT_DIR.mkdir()
 
 JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
-"""Settings that configure cli_settings.py."""
-if not JSON_CLI_CONFIG_PATH.exists():
-    # __name__ will get to the utils module
-    # and cli_config.json is at root directory
-    JSON_CLI_CONFIG_PATH = Path(
-        pkg_resources.resource_filename(__name__, "../../cli_config.json")
-    )
+"""Settings that configure cli_settings.py.
 
+In CLI.__init__.py cli(), will be created using package's ``cli_config.json`` if it doesn't already exist."""
 JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
-"""Settings that configure gui_settings.py."""
-if not JSON_GUI_CONFIG_PATH.exists():
-    # __name__ will get to the utils module
-    # and gui_config.json is at root directory
-    JSON_GUI_CONFIG_PATH = Path(
-        pkg_resources.resource_filename(__name__, "../../gui_config.json")
-    )
+"""Settings that configure gui_settings.py.
+
+In GUI.__init__.py gui(), will be created using package's ``cli_config.json`` if it doesn't already exist."""
 
 DATA_DIR: Path = Path("data")
 
-SUPPORTED_IMAGE_EXTENSIONS: tuple = (".nii.gz", ".nii", ".nrrd")
+SUPPORTED_IMAGE_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """Image file formats supported. Must be a subset of the file formats supported by SimpleITK."""
+SUPPORTED_IMAGE_EXTENSIONS_REGEX: tuple[re.Pattern, ...] = tuple(
+    map(
+        re.compile,
+        tuple(
+            "^" + extension.replace(".", "\\.").replace("*", ".*") + "$"
+            for extension in SUPPORTED_IMAGE_EXTENSIONS
+        ),
+    )
+)
+"""Tuple of ``re.Pattern`` for supported image extensions."""
 
 THEME_DIR: Path = Path("NeuroRuler") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""

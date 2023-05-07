@@ -356,12 +356,9 @@ class MainWindow(QMainWindow):
             self.settings_export_view_toggle()
 
         if path is None:
-            file_filter: str = "MRI Images ("
-            for extension in constants.SUPPORTED_IMAGE_EXTENSIONS:
-                file_filter += "*" + extension + " "
-            # Get rid of trailing whitespace
-            file_filter = file_filter[:-1]
-            file_filter += ")"
+            file_filter: str = "MRI images " + str(
+                constants.SUPPORTED_IMAGE_EXTENSIONS
+            ).replace("'", "").replace(",", "")
 
             files = QFileDialog.getOpenFileNames(
                 self,
