@@ -19,7 +19,6 @@
     "THRESHOLD_FILTER": "Otsu",
     // Binary threshold filter uses lower and upper threshold values.
     // Otsu ignores them (automatically calculates threshold values).
-    // If using Otsu, these variables will be set to None in cli_settings.py.
     "LOWER_BINARY_THRESHOLD": 0.0,
     "UPPER_BINARY_THRESHOLD": 200.0
 }

@@ -2,7 +2,7 @@
 
 Command-line arguments override the values in the JSON."""
 
-from typing import Any, Union
+from typing import Any
 import NeuroRuler.utils.global_vars as global_vars
 from NeuroRuler.utils.constants import ThresholdFilter
 
@@ -36,9 +36,9 @@ TIME_STEP: float = global_vars.TIME_STEP
 THRESHOLD_FILTER: ThresholdFilter = ThresholdFilter.Otsu
 """Which threshold filter to use. Default is Otsu."""
 
-LOWER_BINARY_THRESHOLD: Union[float, None] = global_vars.LOWER_BINARY_THRESHOLD
+LOWER_BINARY_THRESHOLD: float = global_vars.LOWER_BINARY_THRESHOLD
 """Threshold option for binary threshold."""
-UPPER_BINARY_THRESHOLD: Union[float, None] = global_vars.UPPER_BINARY_THRESHOLD
+UPPER_BINARY_THRESHOLD: float = global_vars.UPPER_BINARY_THRESHOLD
 """Threshold option for binary threshold."""
 
 
