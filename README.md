@@ -52,9 +52,9 @@ The [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) and [cli.
 
 ## For developers
 
-Developers contributing to the repository should clone the repository. These scripts will then import from the local repository and reflect changes made to the codebase.
+Developers contributing to the repository should clone the repository. `gui.py` and `cli.py` will then import from the local repository and reflect changes made to the codebase.
 
-Developers should run `pip install -r requirements.txt` to install additional development dependencies and `pre-commit install` to install pre-commit git hooks.
+Developers should also run `pip install -r requirements.txt` to install additional development dependencies and `pre-commit install` to install pre-commit git hooks.
 
 ## Run GUI
 
@@ -75,11 +75,11 @@ gui()
 
 ## Run CLI
 
-```sh
+```text
 python cli.py <file>
 ```
 
-See [test_cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/test_cli.py) for some example usages.
+See [test_cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/test_cli.py) for example usages.
 
 ```text
 positional arguments:
@@ -147,15 +147,17 @@ output
 
 ## Configure default settings
 
-Edit the JSON configuration files [gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json). Settings here are default values for the GUI and CLI. `gui.py` and `cli.py` will create these files if they don't exist.
+Edit the JSON configuration files [gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json). `gui.py` and `cli.py` will create these files if they don't exist.
 
-Command-line arguments supplied to the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) or [cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli.py) scripts will override settings in the JSON configuration files. If a setting in the JSON file is not overriden by a CLI argument, the JSON file setting will be used.
+Command-line arguments supplied to the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) or [cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli.py) scripts override settings in the JSON configuration files. JSON settings are default values for the GUI and CLI: If a setting in the JSON file is not overriden by a CLI argument, the JSON file setting will be used.
 
 ## Run tests
 
 To test locally, run `pytest`.
 
-Our algorithm tests assert that our GUI calculations have at least a 0.98 R<sup>2</sup> value with ground truth data from the old Head Circumference Tool. Additionally, we test that our CLI and GUI produce the same results. Lastly, we verified that our circumference result is correct for images with non-(1.0, 1.0, 1.0) pixel spacing.
+Our algorithm tests assert that our GUI calculations have at least a 0.98 R<sup>2</sup> value with ground truth data from the old Head Circumference Tool. We use a similar R<sup>2</sup> test to verify that our circumference result is correct for images with non-(1.0, 1.0, 1.0) pixel spacing. We verified manually (no unit test) that the GUI computes similar circumferences for (a, b, c) pixel spacing images generated from (1.0, 1.0, 1.0) pixel spacing images.
+
+To test CLI, we test that our CLI produces the same results as the GUI.
 
 Our tests run on GitHub Actions on push and PR via `tox` ([tests.yml](https://github.com/NIRALUser/NeuroRuler/blob/main/.github/workflows/tests.yml)). If the image below says "passing," then the tests are passing.
 
@@ -181,4 +183,4 @@ To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version num
 
 To publish to [Test PyPI](https://test.pypi.org/project/NeuroRuler/), do the same as above, but push to a branch called `release-testpypi`.
 
-If any of these files changes, they should be re-released on GitHub releases: `gui.py`, `cli.py`, `gui_config.json`, `cli_config.json`.
+If any of these files changes, they should be re-released on our GitHub release page: `gui.py`, `cli.py`, `gui_config.json`, `cli_config.json`.
