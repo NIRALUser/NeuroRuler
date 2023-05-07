@@ -2,7 +2,7 @@
 
 import SimpleITK as sitk
 from pathlib import Path
-from typing import Any
+from typing import Union
 from NeuroRuler.utils.constants import View
 
 IMAGE_DICT: dict[Path, sitk.Image] = dict()
@@ -81,7 +81,7 @@ BINARY_THRESHOLD_FILTER: sitk.BinaryThresholdImageFilter = (
     sitk.BinaryThresholdImageFilter()
 )
 """Global binary threshold filter."""
-LOWER_BINARY_THRESHOLD: float = 0.0
+LOWER_BINARY_THRESHOLD: Union[float, None] = 0.0
 """Threshold option for binary threshold."""
-UPPER_BINARY_THRESHOLD: float = 200.0
+UPPER_BINARY_THRESHOLD: Union[float, None] = 200.0
 """Threshold option for binary threshold."""
