@@ -165,7 +165,7 @@ class MainWindow(QMainWindow):
         self.action_export_xpm.triggered.connect(
             lambda: self.export_curr_slice_as_img("xpm")
         )
-        self.action_import.triggered.connect(self.import_json)
+        self.action_import_image_settings.triggered.connect(self.import_json)
         self.next_button.clicked.connect(self.next_img)
         self.previous_button.clicked.connect(self.previous_img)
         self.apply_button.clicked.connect(self.settings_export_view_toggle)
@@ -254,7 +254,7 @@ class MainWindow(QMainWindow):
         # Open button is always enabled.
         # If pressing it in circumference mode, then browse_files() will toggle to settings view.
         self.action_open.setEnabled(True)
-        self.action_import.setEnabled(settings_view_enabled)
+        self.action_import_image_settings.setEnabled(settings_view_enabled)
         self.action_add_images.setEnabled(settings_view_enabled)
         self.action_remove_image.setEnabled(settings_view_enabled)
         self.x_slider.setEnabled(settings_view_enabled)
@@ -880,7 +880,7 @@ class MainWindow(QMainWindow):
         :param path:
         :type path: Path
         :return: ``None``"""
-        file_stem: str = get_curr_path().stem
+        file_stem: str = constants.get_path_stem(get_curr_path())
         output_path: Path = constants.OUTPUT_DIR / file_stem
 
         if not output_path.exists():
@@ -895,14 +895,14 @@ class MainWindow(QMainWindow):
     def import_json(self) -> None:
         """Called when "import" button is clicked
 
-        Imported parameters include: input_image_path, output_folder, x_rotation, y_rotation, z_rotation, slice,
-        smoothing_conductance, smoothing_iterations, smoothing_time_step, filter_option, upper_binary_threshold, lower_binary_threshold,
+        Imported parameters include input_image_path, output_contoured_slice_path, x_rotation, y_rotation, z_rotation, slice,
+        smoothing_conductance, smoothing_iterations, smoothing_time_step, threshold_filter, upper_binary_threshold, lower_binary_threshold,
         and circumference
 
         input_image_path is the only mandatory field.
 
         :return: `None`"""
-        file_filter: str = "NeuroRuler MRI image JSON " + str(("*.json")).replace(
+        file_filter: str = "NeuroRuler image settings JSON " + str(("*.json")).replace(
             "'", ""
         ).replace(",", "")
 
@@ -913,6 +913,12 @@ class MainWindow(QMainWindow):
         # list[str]
         path_list = files
         if len(path_list) == 0:
+            return
+        elif "gui_config" in path_list[0]:
+            information_dialog(
+                "Invalid JSON",
+                "You selected a GUI configuration file. Please select an image settings JSON (fields circumference, x_rotation, y_rotation, etc.).",
+            )
             return
         elif len(path_list) > 1:
             information_dialog(
@@ -957,31 +963,33 @@ class MainWindow(QMainWindow):
 
         self.update_smoothing_settings(False)
 
-        if "filter_option" in data:
-            if (
-                not "upper_binary_threshold" in data
-                or not "lower_binary_threshold" in data
-            ):
-                print(
-                    "If the imported JSON has filter_option (whether Otsu or binary), it must have upper_binary_threshold and lower_binary_threshold"
-                )
-                exit(1)
-            global_vars.UPPER_BINARY_THRESHOLD = data["upper_binary_threshold"]
-            global_vars.LOWER_BINARY_THRESHOLD = data["lower_binary_threshold"]
-            self.update_binary_filter_settings(False)
-
-            if data["filter_option"] == "Otsu":
+        if "threshold_filter" in data:
+            if data["threshold_filter"] == "Binary":
+                if (
+                    not "upper_binary_threshold" in data
+                    or not "lower_binary_threshold" in data
+                ):
+                    print(
+                        "If the imported JSON has threshold_filter Binary, it must have upper_binary_threshold and lower_binary_threshold"
+                    )
+                    exit(1)
+                global_vars.UPPER_BINARY_THRESHOLD = data["upper_binary_threshold"]
+                global_vars.LOWER_BINARY_THRESHOLD = data["lower_binary_threshold"]
+                self.update_binary_filter_settings(False)
+                self.enable_binary_threshold_inputs()
+                self.binary_radio_button.click()
+            elif data["threshold_filter"] == "Otsu":
                 self.otsu_radio_button.click()
                 self.disable_binary_threshold_inputs()
             else:
-                self.enable_binary_threshold_inputs()
-                self.binary_radio_button.click()
+                print("Invalid threshold_filter in imported JSON")
+                exit(1)
 
     def export_json(self) -> None:
         """Called when "export" button is clicked and when Menu > Export > JSON is clicked.
 
-        Exported parameters include: image_name, output_folder, x_rotation, y_rotation, z_rotation, slice,
-        smoothing_conductance, smoothing_iterations, smoothing_time_step, filter_option, upper_binary_threshold, lower_binary_threshold,
+        Exported parameters include: input_image_path, output_contoured_slice_path, x_rotation, y_rotation, z_rotation, slice,
+        smoothing_conductance, smoothing_iterations, smoothing_time_step, threshold_filter, upper_binary_threshold, lower_binary_threshold,
         and circumference
 
         :return: `None`"""
@@ -990,7 +998,7 @@ class MainWindow(QMainWindow):
         self.render_image_num_and_path()
         for image_num in range(len(global_vars.IMAGE_DICT)):
             curr_path: Path = get_curr_path()
-            stem: str = curr_path.stem
+            stem: str = constants.get_path_stem(curr_path)
             binary_contour_slice: np.ndarray = self.render_curr_slice()
             circumference: float = self.render_circumference(binary_contour_slice)
             output_dir: Path = constants.OUTPUT_DIR / stem
@@ -1006,6 +1014,7 @@ class MainWindow(QMainWindow):
                     / output_dir
                     / (stem + f"_contoured.{OUTPUT_SLICE_EXTENSION}")
                 ),
+                "circumference": circumference,
                 "x_rotation": global_vars.THETA_X,
                 "y_rotation": global_vars.THETA_Y,
                 "z_rotation": global_vars.THETA_Z,
@@ -1013,13 +1022,16 @@ class MainWindow(QMainWindow):
                 "smoothing_conductance": global_vars.CONDUCTANCE_PARAMETER,
                 "smoothing_iterations": global_vars.SMOOTHING_ITERATIONS,
                 "smoothing_time_step": global_vars.TIME_STEP,
-                "filter_option": "Otsu"
+                "threshold_filter": "Otsu"
                 if self.otsu_radio_button.isChecked()
                 else "Binary",
                 "upper_binary_threshold": global_vars.UPPER_BINARY_THRESHOLD,
                 "lower_binary_threshold": global_vars.LOWER_BINARY_THRESHOLD,
-                "circumference": circumference,
             }
+            # Otsu doesn't use the upper/lower binary thresholds set in the GUI
+            if data["threshold_filter"] == "Otsu":
+                data.pop("upper_binary_threshold")
+                data.pop("lower_binary_threshold")
 
             with open(output_dir / (stem + "_settings.json"), "w") as outfile:
                 json.dump(data, outfile, indent=4)

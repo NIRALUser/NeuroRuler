@@ -1203,7 +1203,7 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     <addaction name="action_open"/>
     <addaction name="action_add_images"/>
     <addaction name="action_remove_image"/>
-    <addaction name="action_import"/>
+    <addaction name="action_import_image_settings"/>
     <addaction name="action_export"/>
     <addaction name="action_exit"/>
    </widget>
@@ -1494,15 +1494,15 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
     <string>Show Spacing</string>
    </property>
   </action>
-  <action name="action_import">
+  <action name="action_import_image_settings">
    <property name="text">
-    <string>Import MRI Settings</string>
+    <string>Import Image Settings</string>
    </property>
    <property name="toolTip">
-    <string>Import an MRI setting JSON file (i.e., not gui_config or cli_config) in the format that's exported by NeuroRuler.</string>
+    <string>Import image setting JSON file in the format exported by NeuroRuler.</string>
    </property>
    <property name="statusTip">
-    <string>Import an MRI setting JSON file (i.e., not gui_config or cli_config) in the format that's exported by NeuroRuler.</string>
+    <string>Import image setting JSON file in the format exported by NeuroRuler.</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
@@ -1517,7 +1517,7 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="view_button_group"/>
   <buttongroup name="threshold_button_group"/>
+  <buttongroup name="view_button_group"/>
  </buttongroups>
 </ui>

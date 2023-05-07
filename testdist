@@ -1,7 +1,7 @@
-# This script should be sourced
-# Run with . scripts/testdist
-# This script uninstalls NeuroRuler, builds the package, and installs it locally
-# Please see the comment above the cd ..
+# This script allows you to test the package
+# It uninstalls NeuroRuler, builds the package, and installs NR locally
+# This script should be sourced so that cd works
+# Run with . ./testdist
 
 rm -r dist
 pip uninstall NeuroRuler -y
