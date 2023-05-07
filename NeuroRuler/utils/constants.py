@@ -2,6 +2,7 @@
 
 This file should not import any module in this repo to avoid circular imports."""
 
+import re
 from pathlib import Path
 import warnings
 import functools
@@ -27,8 +28,18 @@ In GUI.__init__.py gui(), will be created using package's ``cli_config.json`` if
 
 DATA_DIR: Path = Path("data")
 
-SUPPORTED_IMAGE_EXTENSIONS: tuple = (".nii.gz", ".nii", ".nrrd")
+SUPPORTED_IMAGE_EXTENSIONS: tuple = ("*.nii.gz", "*.nii", "*.nrrd")
 """Image file formats supported. Must be a subset of the file formats supported by SimpleITK."""
+SUPPORTED_IMAGE_EXTENSIONS_REGEX: tuple[re.Pattern, ...] = tuple(
+    map(
+        re.compile,
+        tuple(
+            "^" + extension.replace(".", "\\.").replace("*", ".*") + "$"
+            for extension in SUPPORTED_IMAGE_EXTENSIONS
+        ),
+    )
+)
+"""Tuple of ``re.Pattern`` for supported image extensions."""
 
 THEME_DIR: Path = Path("NeuroRuler") / "GUI" / "themes"
 """themes/ directory where .qss stylesheets and resources.py files are stored."""
@@ -198,27 +209,3 @@ def get_path_stem(path: Path) -> str:
     :return: True stem of path
     :rtype: str"""
     return path.stem.split(".")[0]
-
-
-def str_iterable_to_str(
-    iterable: Union[list[str], tuple[str]], use_or: bool = True
-) -> str:
-    """Convert iterable of ``str`` to ``str``, with some formatting.
-
-    For example, ('.nii.gz', '.nii', '.nrrd') becomes '.nii.gz, .nii, [or] .nrrd'.
-
-    :param iterable:
-    :type iterable: Union[list[str], tuple[str]]
-    :param use_or: Whether to use 'or' in the string
-    :type use_or: bool
-    :return: String representation of tuple
-    :rtype: str"""
-    formatted_tuple: str = str(iterable).replace("'", "")[1:-1]
-    if use_or:
-        position_of_final_comma: int = formatted_tuple.rfind(",")
-        formatted_tuple = (
-            formatted_tuple[: position_of_final_comma + 1]
-            + " or"
-            + formatted_tuple[position_of_final_comma + 1 :]
-        )
-    return formatted_tuple
