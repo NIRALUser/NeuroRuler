@@ -1,11 +1,9 @@
-# NeuroRuler <span><img width="20" src="https://i.imgur.com/pYlhHqu.png"></span>
+[![tests GitHub action](https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg)](https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml)
+[![documentation badge](https://readthedocs.org/projects/neuroruler/badge/?version=latest)](https://NeuroRuler.readthedocs.io/en/latest/)
 
-![Tests](https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg)
-![Documentation](https://readthedocs.org/projects/neuroruler/badge/?version=latest)
-![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
-![Python](https://img.shields.io/badge/python-3670A0?style=plastic&logo=python&logoColor=ffdd54)
+# NeuroRuler
 
-NeuroRuler is a program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).
+Cross-platform program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).
 
 <p align="center">
   <img src="https://i.imgur.com/nqwqHq8.gif" alt="GUI demo"/>
@@ -16,7 +14,7 @@ NeuroRuler is a program that calculates head circumference from MRI data (`.nii`
 </p>
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=ZhSg5xwzbmo">Full demo</a>
+  <a href="https://www.youtube.com/watch?v=ZhSg5xwzbmo">Demo</a>
 </p>
 
 ## Cite this tool
@@ -46,13 +44,15 @@ If `python` or `pip` don't work, try `python3` and `pip3`.
 
 Download the latest [release](https://github.com/NIRALUser/NeuroRuler/releases).
 
-The [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) and [cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli.py) scripts, further described below, are entry points for NeuroRuler's GUI and CLI.
+The [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) and [cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/cli.py) scripts are entry points for NeuroRuler's GUI and CLI.
 
-[gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json) set default settings for the GUI and CLI. `gui.py` and `cli.py` will create `gui_config.json` and `cli_config.json` if they don't exist. For more information, see [Configure default settings](#configure-default-settings).
+[gui_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/gui_config.json) and [cli_config.json](https://github.com/NIRALUser/NeuroRuler/blob/main/cli_config.json) set default settings for the GUI and CLI. For more information, see [Configure default settings](#configure-default-settings).
 
 ## For developers
 
 Developers contributing to the repository should clone the repository. `gui.py` and `cli.py` will then import from the local repository and reflect changes made to the codebase.
+
+**Note**: Cloning (but not installing via pip) will use ~2G because of the large test data files in [data/](https://github.com/NIRALUser/NeuroRuler/tree/main/data). You can avoid this with `git clone https://github.com/NIRALUser/NeuroRuler.git --depth=1 --no-single-branch`.
 
 Developers should also run `pip install -r requirements.txt` to install additional development dependencies and `pre-commit install` to install pre-commit git hooks.
 
@@ -168,7 +168,9 @@ To test CLI, we test that our CLI produces the same results as the GUI.
 Our tests run on GitHub Actions on push and PR via `tox` ([tests.yml](https://github.com/NIRALUser/NeuroRuler/blob/main/.github/workflows/tests.yml)). If the image below says "passing," then the tests are passing.
 
 <p align="center">
+  <a href="https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml">
   <img src="https://github.com/NIRALUser/NeuroRuler/actions/workflows/tests.yml/badge.svg" alt="GitHub actions tests.yml badge"/>
+  </a>
 </p>
 
 ## Documentation
@@ -183,7 +185,7 @@ See [.readthedocs.yaml](https://github.com/NIRALUser/NeuroRuler/blob/main/.readt
 
 To test the package locally before releasing on PyPI, use the [testdist](https://github.com/NIRALUser/NeuroRuler/blob/main/testdist) script. If using macOS, run with `. ./testdist`. If using Windows, you may need to modify the script slightly.
 
-You must test from a directory that isn't `NeuroRuler/`. If your directory is `NeuroRuler/`, then imports will import from the source code, not the package.
+You should test from a directory that isn't `NeuroRuler/`. If your directory is `NeuroRuler/`, then imports will import from the source code, not the package.
 
 To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version number in [setup.py](https://github.com/NIRALUser/NeuroRuler/blob/main/setup.py). Then push to a branch called `release-pypi` (create it if it doesn't exist). This will trigger [pypi.yml](https://github.com/NIRALUser/NeuroRuler/blob/main/.github/workflows/pypi.yml), which will run tests and publish to PyPI if the tests pass.
 

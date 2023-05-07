@@ -5,18 +5,18 @@
 // If you're a user, do not remove fields.
 // If you're a developer who's adding or removing fields, modify parser.py.
 {
-    // Print debugging messages during execution
+    // Print debugging messages during execution.
     "DEBUG": "False",
-    // Directory that the file browser (File > Open or File > Add Images) will start searching from
-    // Leave as "." to start searching from your current working directory
+    // Directory that the file browser (File > Open or File > Add Images) will start searching from.
+    // Leave as "." to start searching from your current working directory.
     "FILE_BROWSER_START_DIR": ".",
-    // For list of options, see the GitHub README or run gui.py with the -h option
+    // For list of options, see the GitHub README or run gui.py with the -h option.
     "THEME_NAME": "dark-nr",
     // Defaults to "" (empty string) to be automatically set by THEME_NAME.
-    // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that
+    // Enter a color (name, e.g. "red" or "blue", or 6-hexit color code RRGGBB) to override that.
     "CONTOUR_COLOR": "",
     // Startup width and height of the GUI as a ratio of primary monitor size.
-    // Enter a number between 0 (not inclusive) and 1
+    // Enter a number between 0 (not inclusive) and 1.
     "STARTUP_WIDTH_RATIO": 0.75,
     "STARTUP_HEIGHT_RATIO": 0.7,
     "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL": "False"
