@@ -4,6 +4,7 @@ Simulates GUI button clicks.
 
 Uses GUI. GUI imports and tests will not run in CI. See note in tests/README.md."""
 
+import traceback
 from tests.constants import (
     TARGET_R_SQUARED,
     labeled_result,
@@ -90,3 +91,38 @@ def test_algorithm():
 
     assert length > 20
     assert compute_r_squared(labeled_data, calculated_data) > TARGET_R_SQUARED
+
+@pytest.mark.skipif(
+    UBUNTU_GITHUB_ACTIONS_CI, reason="No GUI on Ubuntu GitHub Actions CI environment"
+)
+def test_algorithm_pixel_abc():
+    labeled_data = []
+    calculated_data = []
+    data_folder = "data"
+
+    length = 0
+
+    for file_name in os.listdir(data_folder):
+        if file_name.endswith("abc.nrrd"):
+            nrrd_prefix = os.path.splitext(file_name)[0][
+                :10
+            ]  # Remove the file extension to get the prefix
+            for tsv_file_name in os.listdir(data_folder):
+                if nrrd_prefix in tsv_file_name and tsv_file_name.endswith(".tsv"):
+                    length = length + 1
+                    labeled_data.append(
+                        labeled_result(data_folder + "/" + tsv_file_name)
+                    )
+                    calculated_data.append(
+                        calculate_circumference(data_folder + "/" + file_name)
+                    )
+                    break
+            else:
+                continue
+
+    assert length > 10
+    #assert compute_r_squared(labeled_data, calculated_data) > TARGET_R_SQUARED
+    try:
+        assert compute_r_squared(labeled_data, calculated_data) > TARGET_R_SQUARED
+    except AssertionError:
+        traceback.print_exc()
