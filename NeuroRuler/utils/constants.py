@@ -193,3 +193,17 @@ def degrees_to_radians(angle: Union[int, float]) -> float:
     :return: Equivalent radian measure
     :rtype: float"""
     return angle * pi / 180
+
+
+def get_path_stem(path: Path) -> str:
+    """Get true stem of ``path``.
+
+    E.g., stem of ``a.nii`` is ``a``, and stem of ``a.nii.gz`` is also ``a``.
+
+    Note that ``Path('a.nii.gz').stem`` is ``'a.nii'``, not expected in this project.
+
+    :param path:
+    :type path: Path
+    :return: True stem of path
+    :rtype: str"""
+    return path.stem.split(".")[0]

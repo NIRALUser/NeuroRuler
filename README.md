@@ -55,11 +55,41 @@ gui()
 
 Note: If you make changes to the repo, use the [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) script to run the GUI. Changes you make will not be reflected in the pip package until uploaded to PyPI.
 
-## Import/Export
+## Import/export image settings JSON
 
-In "circumference mode" (after clicking Apply), click Export to export JSON files containing the circumferences of all loaded images, along with the settings applied to each image.
+In "circumference mode" (after clicking Apply), click the large Export button under the image to export image setting JSON file(s) containing the circumferences of all loaded images and the settings applied to each image.
 
-You can then use File > Import MRI Settings to import a JSON file of this kind to load the same image with the same settings.
+You can then use File > Import Image Settings to import an image setting JSON to load the same image with the same settings.
+
+Here is an example:
+
+```py
+{
+    "input_image_path": "/Users/jesse/Documents/GitHub/COMP523/NeuroRuler/data/MicroBiome_1month_T1w.nii.gz",
+    "output_contoured_slice_path": "/Users/jesse/Documents/GitHub/COMP523/NeuroRuler/output/MicroBiome_1month_T1w/MicroBiome_1month_T1w_contoured.png",
+    "circumference": 285.04478394448125,
+    "x_rotation": -17,
+    "y_rotation": -18,
+    "z_rotation": 24,
+    "slice": 131,
+    "smoothing_conductance": 4.0,
+    "smoothing_iterations": 10,
+    "smoothing_time_step": 0.08,
+    "threshold_filter": "Otsu"
+}
+```
+
+When multiple images are exported, the output directory structure looks like this:
+
+```text
+output
+├── 150649_V06_t1w
+│   ├── 150649_V06_t1w_contoured.png
+│   └── 150649_V06_t1w_settings.json
+└── MicroBiome_1month_T1w
+    ├── MicroBiome_1month_T1w_contoured.png
+    └── MicroBiome_1month_T1w_settings.json
+```
 
 ## Configure settings
 
@@ -99,7 +129,7 @@ Before each commit, the actions in [.pre-commit-config.yaml](https://github.com/
 
 ## Release
 
-To test the package locally before releasing, use [scripts/testdist](scripts/testdist). If using macOS, run with `. scripts/testdist`. If using Windows, you may need to modify the script slightly.
+To test the package locally before releasing, use the [testdist](https://github.com/NIRALUser/NeuroRuler/blob/main/testdist) script. If using macOS, run with `. ./testdist`. If using Windows, you may need to modify the script slightly.
 
 You must test from a directory that isn't `NeuroRuler/`. If your directory is `NeuroRuler/`, then imports will import from the source code, not the package.
 
