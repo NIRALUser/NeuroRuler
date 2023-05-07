@@ -82,8 +82,14 @@ python cli.py <file>
 See [test_cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/test_cli.py) for example usages.
 
 ```text
+usage: cli.py [-h] [-d] [-r] [-x X] [-y Y] [-z Z] [-s SLICE] [-c CONDUCTANCE] [-i ITERATIONS] [-t STEP] [-f FILTER] [-l LOWER]
+              [-u UPPER]
+              file
+
+A program that calculates head circumference from MRI data (``.nii``, ``.nii.gz``, ``.nrrd``).
+
 positional arguments:
-  file                  file to compute circumference from, extension must be .nii.gz, .nii, or .nrrd
+  file                  file to compute circumference from, file format must be *.nii.gz, *.nii, or *.nrrd
 
 options:
   -h, --help            show this help message and exit
@@ -100,7 +106,7 @@ options:
                         smoothing iterations
   -t STEP, --step STEP  time step (smoothing parameter)
   -f FILTER, --filter FILTER
-                        which filter to use (Otsu or binary)
+                        which filter to use (Otsu or binary), default is Otsu
   -l LOWER, --lower LOWER
                         lower threshold for binary threshold
   -u UPPER, --upper UPPER

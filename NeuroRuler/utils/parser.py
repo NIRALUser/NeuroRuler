@@ -2,8 +2,8 @@
 
 # TODO: (Eric) I think most of this should be refactored into the CLI/GUI packages respectively,
 # and we should just keep the general parse functions here
+# Agree - Jesse
 
-import sys
 import argparse
 import json
 from pathlib import Path
@@ -24,7 +24,6 @@ def parse_cli() -> None:
 
     :return: None"""
     parser = argparse.ArgumentParser(
-        prog="NeuroRuler",
         description="A program that calculates head circumference from MRI data (``.nii``, ``.nii.gz``, ``.nrrd``).",
     )
 
@@ -43,7 +42,9 @@ def parse_cli() -> None:
     parser.add_argument(
         "-t", "--step", type=float, help="time step (smoothing parameter)"
     )
-    parser.add_argument("-f", "--filter", help="which filter to use (Otsu or binary)")
+    parser.add_argument(
+        "-f", "--filter", help="which filter to use (Otsu or binary), default is Otsu"
+    )
     parser.add_argument(
         "-l", "--lower", type=float, help="lower threshold for binary threshold"
     )
@@ -182,8 +183,10 @@ def parse_cli_config() -> None:
     cli_settings.TIME_STEP = parse_float("TIME_STEP")
     if parse_str("THRESHOLD_FILTER").lower() == "otsu":
         cli_settings.THRESHOLD_FILTER = constants.ThresholdFilter.Otsu
-        # Don't print anything.
+        # Don't print anything if lower and upper thresholds are in the JSON.
         # Not a serious error and would mess up parsing of results.
+        # Lastly, JSON and code documentation specify that Otsu doesn't use these fields.
+        # Users and developers should know.
         # if "LOWER_BINARY_THRESHOLD" in JSON_SETTINGS or "UPPER_BINARY_THRESHOLD" in JSON_SETTINGS:
         #     print(
         #         "NOTE: Otsu threshold filter automatically computes lower and upper threshold values. The values you entered in the JSON will be ignored.", file=sys.stderr)
@@ -197,12 +200,10 @@ def parse_cli_config() -> None:
                 "Must specify LOWER_BINARY_THRESHOLD and UPPER_BINARY_THRESHOLD values if using Binary threshold filter. Exiting."
             )
             exit(1)
+        cli_settings.LOWER_BINARY_THRESHOLD = parse_float("LOWER_BINARY_THRESHOLD")
+        cli_settings.UPPER_BINARY_THRESHOLD = parse_float("UPPER_BINARY_THRESHOLD")
     else:
         raise exceptions.InvalidJSONField("THRESHOLD_FILTER", "Otsu or Binary")
-
-    # Set these even though Otsu ignores them
-    cli_settings.LOWER_BINARY_THRESHOLD = parse_float("LOWER_BINARY_THRESHOLD")
-    cli_settings.UPPER_BINARY_THRESHOLD = parse_float("UPPER_BINARY_THRESHOLD")
 
 
 def parse_gui_config() -> None:

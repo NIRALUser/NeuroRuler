@@ -15,7 +15,7 @@ RAW: bool = False
 If false, it prints a \"pretty\", rounded output with units included."""
 
 FILE: str = ""
-"""The file."""
+"""The file path."""
 
 THETA_X: int = global_vars.THETA_X
 """In degrees"""
@@ -37,9 +37,16 @@ THRESHOLD_FILTER: ThresholdFilter = ThresholdFilter.Otsu
 """Which threshold filter to use. Default is Otsu."""
 
 LOWER_BINARY_THRESHOLD: float = global_vars.LOWER_BINARY_THRESHOLD
-"""Threshold option for binary threshold."""
+"""Required threshold option for binary threshold.
+
+If ``THRESHOLD_FILTER`` is ``ThresholdFilter.Otsu``, then this field will not be updated by CLI args
+or by ``cli_config.json``."""
+
 UPPER_BINARY_THRESHOLD: float = global_vars.UPPER_BINARY_THRESHOLD
-"""Threshold option for binary threshold."""
+"""Required threshold option for binary threshold.
+
+If ``THRESHOLD_FILTER`` is ``ThresholdFilter.Otsu``, then this field will not be updated by CLI args
+or by ``cli_config.json``."""
 
 
 def get_settings() -> dict[str, Any]:
