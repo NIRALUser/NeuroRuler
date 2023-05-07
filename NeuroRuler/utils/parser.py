@@ -48,7 +48,10 @@ def parse_cli() -> None:
     parser.add_argument(
         "-u", "--upper", type=float, help="upper threshold for binary threshold"
     )
-    parser.add_argument("file", help="file to compute circumference from")
+    parser.add_argument(
+        "file",
+        help=f"file to compute circumference from, extension must be {constants.str_iterable_to_str(constants.SUPPORTED_IMAGE_EXTENSIONS)}",
+    )
     args = parser.parse_args()
 
     if args.debug:
@@ -103,7 +106,7 @@ def parse_cli() -> None:
     if args.upper:
         cli_settings.UPPER_BINARY_THRESHOLD = args.upper
 
-    # Would use pathlib.Path .suffix here
+    # Would use pathlib.Path's .suffix here
     # However, '.nii.gz'.suffix would return '.gz'
     # But we expect '.nii.gz'
     extension = args.file[args.file.find(".") :]

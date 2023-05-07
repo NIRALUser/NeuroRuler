@@ -17,22 +17,13 @@ if not OUTPUT_DIR.exists():
     OUTPUT_DIR.mkdir()
 
 JSON_CLI_CONFIG_PATH: Path = Path("cli_config.json")
-"""Settings that configure cli_settings.py."""
-if not JSON_CLI_CONFIG_PATH.exists():
-    # __name__ will get to the utils module
-    # and cli_config.json is at root directory
-    JSON_CLI_CONFIG_PATH = Path(
-        pkg_resources.resource_filename(__name__, "../../cli_config.json")
-    )
+"""Settings that configure cli_settings.py.
 
+In CLI.__init__.py cli(), will be created using package's ``cli_config.json`` if it doesn't already exist."""
 JSON_GUI_CONFIG_PATH: Path = Path("gui_config.json")
-"""Settings that configure gui_settings.py."""
-if not JSON_GUI_CONFIG_PATH.exists():
-    # __name__ will get to the utils module
-    # and gui_config.json is at root directory
-    JSON_GUI_CONFIG_PATH = Path(
-        pkg_resources.resource_filename(__name__, "../../gui_config.json")
-    )
+"""Settings that configure gui_settings.py.
+
+In GUI.__init__.py gui(), will be created using package's ``cli_config.json`` if it doesn't already exist."""
 
 DATA_DIR: Path = Path("data")
 
@@ -207,3 +198,27 @@ def get_path_stem(path: Path) -> str:
     :return: True stem of path
     :rtype: str"""
     return path.stem.split(".")[0]
+
+
+def str_iterable_to_str(
+    iterable: Union[list[str], tuple[str]], use_or: bool = True
+) -> str:
+    """Convert iterable of ``str`` to ``str``, with some formatting.
+
+    For example, ('.nii.gz', '.nii', '.nrrd') becomes '.nii.gz, .nii, [or] .nrrd'.
+
+    :param iterable:
+    :type iterable: Union[list[str], tuple[str]]
+    :param use_or: Whether to use 'or' in the string
+    :type use_or: bool
+    :return: String representation of tuple
+    :rtype: str"""
+    formatted_tuple: str = str(iterable).replace("'", "")[1:-1]
+    if use_or:
+        position_of_final_comma: int = formatted_tuple.rfind(",")
+        formatted_tuple = (
+            formatted_tuple[: position_of_final_comma + 1]
+            + " or"
+            + formatted_tuple[position_of_final_comma + 1 :]
+        )
+    return formatted_tuple

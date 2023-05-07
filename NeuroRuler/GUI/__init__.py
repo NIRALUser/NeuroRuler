@@ -6,12 +6,19 @@ where NeuroRuler is the name of the package this __init__.py file is in."""
 
 import sys
 import os
+import shutil
+from pathlib import Path
+import pkg_resources
 import NeuroRuler.GUI.main as main
 import NeuroRuler.utils.parser as parser
+import NeuroRuler.utils.constants as constants
 
 
 def gui() -> None:
-    """Start GUI."""
+    """Run GUI.
+
+    Will create ``gui_config.json`` using package's ``gui_config.json`` if it doesn't already exist.
+    """
     # Source: https://stackoverflow.com/questions/5047734/in-osx-change-application-name-from-python
     if sys.platform.startswith("darwin"):
         # Set app name, if PyObjC is installed
@@ -40,6 +47,12 @@ def gui() -> None:
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     except:
         pass
+
+    if not constants.JSON_GUI_CONFIG_PATH.exists():
+        json_gui_from_package: Path = Path(
+            pkg_resources.resource_filename(__name__, "../../gui_config.json")
+        )
+        shutil.copy(json_gui_from_package, constants.JSON_GUI_CONFIG_PATH)
 
     parser.parse_gui_config()
     parser.parse_gui_cli()

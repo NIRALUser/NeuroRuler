@@ -8,6 +8,7 @@ include/
 share/
 pyvenv.cfg
 docs/_build
+scripts/
 
 ################################################
 # Standard Python gitignore from

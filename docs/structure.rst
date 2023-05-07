@@ -9,7 +9,7 @@ Project structure
 
 .. topic:: Overview
 
-    This page describes the high-level structure of the codebase.
+    This page describes the high-level structure of the codebase. Most descriptions are paraphrased from the docstrings of the files.
 
 .. contents::
     :depth: 2
@@ -22,24 +22,24 @@ Top-level
 
     NeuroRuler
     ├── .github                     GitHub Actions CI configuration.
-    ├── .pre-commit-config.yaml     Pre-commit actions configuration.
+    ├── .pre-commit-config.yaml     Pre-commit actions (formatting) configuration.
     ├── .readthedocs.yaml           ReadTheDocs configuration.
     ├── LICENSE
-    ├── NeuroRuler                  Source code
+    ├── NeuroRuler                  Source code.
     ├── README.md
     ├── cli.py                      Script for running CLI. Apply -h option to see command-line options.
-    ├── cli_config.json             Configuration file for CLI. Overriden by CLI.
+    ├── cli_config.json             Configuration file for CLI. Overriden by command-line arguments.
     ├── data                        Images and ground truth data for unit tests.
     ├── docs                        Documentation.
     ├── gui.py                      Script for running GUI. Apply -h option to see command-line options.
-    ├── gui_config.json             Configuration file for GUI. Overriden by CLI.
+    ├── gui_config.json             Configuration file for GUI. Overriden by command-line arguments.
     ├── output                      Output directory.
     ├── pyproject.toml              Python project configuration.
     ├── requirements.txt            Developer dependencies. Contains all dependencies from setup.py.
     ├── requirements_CI.txt         GitHub Actions CI dependencies. Contains all dependencies from setup.py.
-    ├── scripts
     ├── setup.py                    Lists all necessary dependencies installed during pip install. Python package configuration.
-    ├── tests                       Tests. See tests/README.md for a note about CI tests in Ubuntu environments.
+    ├── testdist                    Script for testing pip package before PyPI release.
+    ├── tests                       Tests. See tests/README.md for a note about skipped CI tests in Ubuntu environments.
     └── tox.ini                     tox config file. Tox is used for running tests in different OS and Python environments.
 
 Source code
@@ -72,12 +72,12 @@ Source code
     └── utils
         ├── __init__.py
         ├── cli_settings.py         CLI settings set through command-line arguments and cli_config.json.
-        ├── constants.py            Constant values and functions. Don't mutate any variable in this file from outside of this file.
+        ├── constants.py            Constant values and helper functions. Don't mutate any variable in this file from outside of this file.
         ├── exceptions.py           Custom exceptions.
         ├── global_vars.py          Global variables that change throughout program execution.
         ├── gui_settings.py         GUI settings set through command-line arguments and gui_config.json.
         ├── img_helpers.py          Image helper functions that aren't quite part of the main algorithm. Mostly holds helper functions for working with global_vars.IMAGE_DICT.
-        ├── imgproc.py              The main algorithm.
+        ├── imgproc.py              The main contour and arc length algorithm.
         └── parser.py               Parse config JSON and CLI arguments to set global settings in gui_settings.py and cli_settings.py.
 
 Tree
