@@ -363,28 +363,13 @@ def parse_float(field: str) -> float:
         raise exceptions.InvalidJSONField(field, "float")
 
 
-def iterable_of_str_to_str(
-    iterable: Union[list[str], tuple[str]], use_or: bool = True
-) -> str:
-    """Convert iterable of ``str`` to ``str``, with some formatting.
+def iterable_of_str_to_str(iterable: Union[list[str], tuple[str]]) -> str:
+    """``', '.join(iterable)``
 
-    For example, ('.nii.gz', '.nii', '.nrrd') becomes '.nii.gz, .nii, [or] .nrrd'.
+    For example, ('.nii.gz', '.nii', '.nrrd') becomes '.nii.gz, .nii, .nrrd'.
 
     :param iterable:
-    :type iterable: Union[list[str], tuple[str]]
-    :param use_or: Whether to use 'or' in the string
-    :type use_or: bool
-    :return: String representation of tuple
-    :rtype: str"""
-    # Need at least one comma in the list
-    # TODO: Maybe could just assert len > 1 but not sure what would happen
-    assert len(iterable) > 2
-    formatted_tuple: str = str(iterable).replace("'", "").replace('"', "")[1:-1]
-    if use_or:
-        position_of_final_comma: int = formatted_tuple.rfind(",")
-        formatted_tuple = (
-            formatted_tuple[: position_of_final_comma + 1]
-            + " or"
-            + formatted_tuple[position_of_final_comma + 1 :]
-        )
-    return formatted_tuple
+    :type iterable: ``Union[list[str], tuple[str]]``
+    :return: ``str`` representation of iterable of ``str`` with commas and spaces
+    :rtype: ``str``"""
+    return ", ".join(iterable)

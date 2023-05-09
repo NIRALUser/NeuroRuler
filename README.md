@@ -52,9 +52,9 @@ The [gui.py](https://github.com/NIRALUser/NeuroRuler/blob/main/gui.py) and [cli.
 
 Developers contributing to the repository should clone the repository. `gui.py` and `cli.py` will then import from the local repository and reflect changes made to the codebase.
 
-**Note**: Cloning (but not installing via pip) will use ~2G because of the large test data files in [data/](https://github.com/NIRALUser/NeuroRuler/tree/main/data). You can avoid this with `git clone https://github.com/NIRALUser/NeuroRuler.git --depth=1 --no-single-branch`.
-
 Developers should also run `pip install -r requirements.txt` to install additional development dependencies and `pre-commit install` to install pre-commit git hooks.
+
+**Note**: Cloning (but not installing via pip) will use ~2G because of the large data files in [data/](https://github.com/NIRALUser/NeuroRuler/tree/main/data) used in our unit tests. You can mitigate this with `git clone https://github.com/NIRALUser/NeuroRuler.git --depth=1 --no-single-branch`. If you don't need to run those tests, you should run `rm -r data && echo "data/" >> .gitignore`. Then, when running tests locally, use pytest's `--ignore` flag to ignore tests that use files in `data/`.
 
 ## Run GUI
 
