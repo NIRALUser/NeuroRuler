@@ -6,7 +6,7 @@
 Cross-platform program that calculates head circumference from MRI data (`.nii`, `.nii.gz`, `.nrrd`).
 
 <p align="center">
-  <img src="https://i.imgur.com/nqwqHq8.gif" alt="GUI demo"/>
+  <img src="https://i.imgur.com/cdtsrwD.gif" alt="GUI demo"/>
 </p>
 
 <p align="center">
@@ -16,6 +16,8 @@ Cross-platform program that calculates head circumference from MRI data (`.nii`,
 <p align="center">
   <a href="https://www.youtube.com/watch?v=ZhSg5xwzbmo">Demo</a>
 </p>
+
+The demo is slightly outdated, but most information is relevant.
 
 ## Cite this tool
 
@@ -54,7 +56,9 @@ Developers contributing to the repository should clone the repository. `gui.py` 
 
 Developers should also run `pip install -r requirements.txt` to install additional development dependencies and `pre-commit install` to install pre-commit git hooks.
 
-**Note**: Cloning (but not installing via pip) will use ~2G because of the large data files in [data/](https://github.com/NIRALUser/NeuroRuler/tree/main/data) used in our unit tests. You can mitigate this with `git clone https://github.com/NIRALUser/NeuroRuler.git --depth=1 --no-single-branch`. If you don't need to run those tests, you should run `rm -r data && echo "data/" >> .gitignore`. Then, when running tests locally, use pytest's `--ignore` flag to ignore tests that use files in `data/`.
+**Note**: Cloning (but not installing via pip) will use ~2G because of the large data files in [data/](https://github.com/NIRALUser/NeuroRuler/tree/main/data) used in our unit tests.
+
+To improve this, please see [issue #93](https://github.com/NIRALUser/NeuroRuler/issues/93).
 
 ## Run GUI
 
