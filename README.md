@@ -165,7 +165,9 @@ Command-line arguments supplied to the [gui.py](https://github.com/NIRALUser/Neu
 
 To test locally, run `pytest`.
 
-Our algorithm tests assert that our GUI calculations have at least a 0.98 R<sup>2</sup> value with ground truth data from the old Head Circumference Tool. We use a similar R<sup>2</sup> test to verify that our circumference result is correct for images with non-(1.0, 1.0, 1.0) pixel spacing. We verified manually (no unit test) that the GUI computes similar circumferences for (a, b, c) pixel spacing images generated from (1.0, 1.0, 1.0) pixel spacing images.
+Our algorithm tests assert that our GUI calculations have at least a 0.98 R<sup>2</sup> value with ground truth data from the old Head Circumference Tool (the `.tsv` files in `data/`). In all unit tests, we calculate circumference from the middle axial slice with all rotation values set to 0. Also, we use the default smoothing parameters and Otsu threshold.
+
+We use a similar R<sup>2</sup> test to verify that our circumference result is correct for images with non-(1.0, 1.0, 1.0) pixel spacing. We verified manually (no unit test) that the GUI computes similar circumferences for (a, b, c) pixel spacing images generated from (1.0, 1.0, 1.0) pixel spacing images.
 
 To test CLI, we test that our CLI produces the same results as the GUI.
 
