@@ -38,3 +38,6 @@ STARTUP_HEIGHT_RATIO: float = 0.6
 
 DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL: bool = False
 """Whether the advanced menu messages display in terminal or new window"""
+
+GROUP_MAX_DIFF: float = 0.0001
+"""The maximum difference between two images of the group, such that they may be considered to be the same size."""

@@ -19,5 +19,6 @@
     // Enter a number between 0 (not inclusive) and 1.
     "STARTUP_WIDTH_RATIO": 0.75,
     "STARTUP_HEIGHT_RATIO": 0.7,
-    "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL": "False"
+    "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL": "False",
+    "GROUP_DELTA": 0.0001
 }

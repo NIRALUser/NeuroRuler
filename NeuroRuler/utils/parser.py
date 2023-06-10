@@ -245,6 +245,7 @@ def parse_gui_config() -> None:
     gui_settings.DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL = parse_bool(
         "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL"
     )
+    gui_settings.GROUP_MAX_DIFF = parse_float("GROUP_MAX_DIFF")
 
 
 def parse_main_color_from_theme_json() -> str:
