@@ -9,13 +9,13 @@ Project structure
 
 .. topic:: Overview
 
-    This page describes the high-level structure of the codebase. Most descriptions are paraphrased from the docstrings of the files.
+    This page describes the structure of the codebase. Most descriptions of files are paraphrased from the docstrings of the files.
 
 .. contents::
     :depth: 2
 
-Top-level
-#########
+Root
+####
 
 .. code-block:: text
     :linenos:
@@ -24,7 +24,8 @@ Top-level
     ├── .github                     GitHub Actions CI configuration
     ├── .pre-commit-config.yaml     Pre-commit actions (formatting) configuration
     ├── .readthedocs.yaml           ReadTheDocs configuration
-    ├── LICENSE
+    ├── CITATION.cff                Metadata for "Cite this repository" button on GitHub homepage
+    ├── LICENSE                     MIT
     ├── NeuroRuler                  Source code
     ├── README.md
     ├── cli.py                      Script for running CLI. Apply -h option to see command-line options

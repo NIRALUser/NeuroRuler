@@ -1,0 +1,49 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: NeuroRuler
+message: 'If you use NeuroRuler, please cite it!'
+type: software
+authors:
+  - given-names: Jesse
+    family-names: Wei
+    email: jesse@cs.unc.edu
+    affiliation: UNC
+  - given-names: Madison
+    family-names: Lester
+    email: madiali@cs.unc.edu
+    affiliation: UNC
+  - given-names: Peifeng
+    family-names: He
+    email: hankhe@ad.unc.edu
+    affiliation: UNC
+  - given-names: Eric
+    family-names: Schneider
+    email: eric@cs.unc.edu
+    affiliation: UNC
+  - given-names: Martin
+    family-names: Styner
+    email: styner@cs.unc.edu
+    affiliation: UNC
+    orcid: 'https://orcid.org/0000-0002-8747-5118'
+repository-code: 'https://github.com/NIRALUser/NeuroRuler'
+url: 'https://tarheels.live/comp523teamd/'
+abstract: >-
+  Cross-platform program that calculates head circumference
+  from MRI data (.nii, .nii.gz, .nrrd).
+keywords:
+  - MRI
+  - NIfTI
+  - NRRD
+  - medical imaging
+  - brain
+  - circumference
+  - PyQt6
+  - SimpleITK
+  - NumPy
+  - OpenCV
+license: MIT
+commit: d4e29e4
+version: 1.0.1
+date-released: '2023-05-07'
