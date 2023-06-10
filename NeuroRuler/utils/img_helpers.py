@@ -55,9 +55,7 @@ def update_images(path_list: list[Path]) -> list[Path]:
         new_img = global_vars.ORIENT_FILTER.Execute(new_img)
         new_img_properties: tuple = get_properties_from_sitk_image(new_img)
 
-        is_prop_equal = comparison_properties_tuple[0] == new_img_properties[0] and comparison_properties_tuple[1] == new_img_properties[1] and abs(comparison_properties_tuple[2] - new_img_properties[2]) <= global_vars.GROUP_MAX_SPACING_DIFF
-
-        if not is_prop_equal:
+        if not are_properties_eq(comparison_properties_tuple, new_img_properties):
             differing_image_paths.append(path)
         else:
             new_img_axial: sitk.Image = global_vars.ORIENT_FILTER.Execute(new_img)
@@ -169,6 +167,20 @@ def get_properties_from_sitk_image(img: sitk.Image) -> tuple:
         img.GetSpacing(),
     )
 
+
+def are_properties_eq(props1: tuple, props2: tuple) -> bool:
+    """:param props1:
+    :type props1: tuple
+    :param props2:
+    :type props2: tuple
+    :return: true if the two image properties are considered equal.
+    :rtype: bool"""
+    is_center_eq = props1[0] == props2[0]
+    is_size_eq = props1[1] == props2[1]
+    spacing1 = props1[2]
+    spacing2 = props2[2]
+    is_spacing_eq = abs(spacing1[0] - spacing2[0]) <= global_vars.GROUP_MAX_SPACING_DIFF and abs(spacing1[1] - spacing2[1]) <= global_vars.GROUP_MAX_SPACING_DIFF and abs(spacing1[2] - spacing2[2]) <= global_vars.GROUP_MAX_SPACING_DIFF
+    return is_center_eq and is_size_eq and is_spacing_eq
 
 def get_properties_from_path(path: Path) -> tuple:
     """Tuple of properties of the sitk.Image we get from path. Uses global_vars.READER.
