@@ -155,7 +155,8 @@ def get_properties_from_sitk_image(img: sitk.Image) -> tuple:
 
     TODO: Add more properties
 
-    If modifying this, NeuroRuler/GUI/main.py print_properties also has to be modified slightly.
+    If modifying this, NeuroRuler/GUI/main.py print_properties also has to be modified slightly,
+    as well are_properties_eq below.
 
     :param img:
     :type img: sitk.Image
@@ -180,6 +181,7 @@ def are_properties_eq(props1: tuple, props2: tuple) -> bool:
     spacing1 = props1[2]
     spacing2 = props2[2]
     is_spacing_eq = abs(spacing1[0] - spacing2[0]) <= global_vars.GROUP_MAX_SPACING_DIFF and abs(spacing1[1] - spacing2[1]) <= global_vars.GROUP_MAX_SPACING_DIFF and abs(spacing1[2] - spacing2[2]) <= global_vars.GROUP_MAX_SPACING_DIFF
+
     return is_center_eq and is_size_eq and is_spacing_eq
 
 def get_properties_from_path(path: Path) -> tuple:
