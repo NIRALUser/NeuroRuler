@@ -88,7 +88,7 @@ if not PATH_TO_UI_FILE.exists():
 PATH_TO_NR_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "nr_logo.png"
 if not PATH_TO_NR_LOGO.exists():
     PATH_TO_NR_LOGO = Path(
-        pkg_resources.resource_filename("NeuroRuler.GUI", "static/nr_logo.png")
+        pkg_resources.resource_filename("NeuroRuler.GUI", "static/nr_logo.png") # TODO: pkg_resources is deprecated
     )
 
 SETTINGS_VIEW_ENABLED: bool = True
@@ -1153,6 +1153,8 @@ def display_spacing() -> None:
 
 def main() -> None:
     """Main entrypoint of GUI."""
+    global_vars.GROUP_MAX_SPACING_DIFF = settings.GROUP_MAX_SPACING_DIFF
+
     # This import can't go at the top of the file
     # because gui.py.parse_gui_cli() has to set THEME_NAME before the import occurs
     # This imports globally

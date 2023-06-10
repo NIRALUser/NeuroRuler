@@ -55,10 +55,9 @@ def update_images(path_list: list[Path]) -> list[Path]:
         new_img = global_vars.ORIENT_FILTER.Execute(new_img)
         new_img_properties: tuple = get_properties_from_sitk_image(new_img)
 
-        # TODO
-        is_prop_equal = abs(comparison_properties_tuple[0] - new_img_properties) <= gui_settings.GROUP_MAX_DIFF
+        is_prop_equal = comparison_properties_tuple[0] == new_img_properties[0] and comparison_properties_tuple[1] == new_img_properties[1] and abs(comparison_properties_tuple[2] - new_img_properties[2]) <= global_vars.GROUP_MAX_SPACING_DIFF
 
-        if comparison_properties_tuple != new_img_properties:
+        if not is_prop_equal:
             differing_image_paths.append(path)
         else:
             new_img_axial: sitk.Image = global_vars.ORIENT_FILTER.Execute(new_img)
