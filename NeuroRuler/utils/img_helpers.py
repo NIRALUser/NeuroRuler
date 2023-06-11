@@ -147,7 +147,6 @@ def get_curr_image() -> sitk.Image:
     return global_vars.IMAGE_DICT[get_curr_path()]
 
 
-#ImageProperties = namedtuple("ImageProperties", "center, size, spacing")
 class ImageProperties(NamedTuple):
     center: tuple
     size: tuple
