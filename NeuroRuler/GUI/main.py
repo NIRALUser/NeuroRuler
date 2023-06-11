@@ -16,7 +16,6 @@ import importlib
 import sys
 import os
 import json
-import re
 import webbrowser
 from pathlib import Path
 from typing import Union
@@ -25,7 +24,6 @@ import SimpleITK as sitk
 import numpy as np
 from typing import Any
 
-from PyQt6 import QtGui, QtCore
 from PyQt6.QtGui import QPixmap, QAction, QImage, QIcon, QResizeEvent
 from PyQt6.QtWidgets import (
     QApplication,
@@ -72,7 +70,6 @@ from NeuroRuler.utils.img_helpers import (
     get_curr_otsu_slice,
     get_curr_physical_units,
     get_curr_path,
-    get_all_paths,
     get_curr_properties_tuple,
     get_middle_dimension,
 )
@@ -1108,7 +1105,7 @@ def display_properties() -> None:
     if not len(global_vars.IMAGE_DICT):
         print("No loaded image!")
         return
-    curr_properties: tuple = get_curr_properties_tuple()
+    curr_properties: img_helpers.ImageProperties = get_curr_properties_tuple()
     fields: tuple = ("center of rotation", "dimensions", "spacing")
     if len(fields) != len(curr_properties):
         print(

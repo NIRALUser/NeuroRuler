@@ -1,7 +1,7 @@
 """Image helper functions that aren't quite part of the main algorithm, unlike ``imgproc.py``.
 
 Mostly holds helper functions for working with ``IMAGE_DICT`` in ``global_vars.py``."""
-
+from collections import namedtuple
 from typing import Union
 import SimpleITK as sitk
 from pathlib import Path
@@ -34,7 +34,7 @@ def update_images(path_list: list[Path]) -> list[Path]:
         constants.Z_ORIENTATION_STR
     )
 
-    comparison_properties_tuple: tuple
+    comparison_properties_tuple: ImageProperties
     if global_vars.IMAGE_DICT:
         comparison_properties_tuple = get_curr_properties_tuple()
     else:
@@ -148,9 +148,11 @@ def get_curr_image() -> sitk.Image:
     return global_vars.IMAGE_DICT[get_curr_path()]
 
 
+ImageProperties = namedtuple("ImageProperties", "center, size, spacing")
+
+
 # TODO: Add more properties?
-# TODO: Implement tolerance for spacing
-def get_properties_from_sitk_image(img: sitk.Image) -> tuple:
+def get_properties_from_sitk_image(img: sitk.Image) -> ImageProperties:
     """Tuple of properties of a sitk.Image.
 
     TODO: Add more properties
@@ -161,36 +163,37 @@ def get_properties_from_sitk_image(img: sitk.Image) -> tuple:
     :param img:
     :type img: sitk.Image
     :return: (center of rotation used in EULER_3D_TRANSFORM, dimensions, spacing)
-    :rtype: tuple"""
-    return (
+    :rtype: ImageProperties"""
+    return ImageProperties(
         get_center_of_rotation(img),
         img.GetSize(),
         img.GetSpacing(),
     )
 
 
-def are_properties_eq(props1: tuple, props2: tuple) -> bool:
+def are_properties_eq(props1: ImageProperties, props2: ImageProperties) -> bool:
     """:param props1:
-    :type props1: tuple
+    :type props1: ImageProperties
     :param props2:
-    :type props2: tuple
+    :type props2: ImageProperties
     :return: true if the two image properties are considered equal.
     :rtype: bool"""
-    is_center_eq = props1[0] == props2[0]
-    is_size_eq = props1[1] == props2[1]
-    spacing1 = props1[2]
-    spacing2 = props2[2]
+    is_center_eq = props1.center == props2.center
+    is_size_eq = props1.size == props2.size
+    spacing1 = props1.spacing
+    spacing2 = props2.spacing
     is_spacing_eq = abs(spacing1[0] - spacing2[0]) <= global_vars.GROUP_MAX_SPACING_DIFF and abs(spacing1[1] - spacing2[1]) <= global_vars.GROUP_MAX_SPACING_DIFF and abs(spacing1[2] - spacing2[2]) <= global_vars.GROUP_MAX_SPACING_DIFF
 
     return is_center_eq and is_size_eq and is_spacing_eq
 
-def get_properties_from_path(path: Path) -> tuple:
+
+def get_properties_from_path(path: Path) -> ImageProperties:
     """Tuple of properties of the sitk.Image we get from path. Uses global_vars.READER.
 
     :param path: Path from which we can get a sitk.Image
     :type path: Path
     :return: (dimensions, center of rotation used in EULER_3D_TRANSFORM, spacing)
-    :rtype: tuple"""
+    :rtype: ImageProperties"""
     global_vars.READER.SetFileName(str(path))
     img: sitk.Image = global_vars.READER.Execute()
     return get_properties_from_sitk_image(img)
@@ -353,11 +356,11 @@ def get_curr_physical_units() -> Union[str, None]:
     return None
 
 
-def get_curr_properties_tuple() -> tuple:
+def get_curr_properties_tuple() -> ImageProperties:
     """Return properties tuple for the currently loaded batch of images.
 
     :return: current properties tuple
-    :rtype: tuple"""
+    :rtype: ImageProperties"""
     return get_properties_from_sitk_image(list(global_vars.IMAGE_DICT.values())[0])
 
 
