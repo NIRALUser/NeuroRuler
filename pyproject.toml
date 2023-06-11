@@ -38,7 +38,6 @@ testpaths = [
 ]
 
 # Source: https://github.com/mmwave-capture-std/mmwave-capture-std/blob/main/pyproject.toml#LL35C1-L65C2
-
 [tool.mypy]
 python_version = "3.8"
 files = ["NeuroRuler"]
