@@ -1,8 +1,7 @@
 """Image helper functions that aren't quite part of the main algorithm, unlike ``imgproc.py``.
 
 Mostly holds helper functions for working with ``IMAGE_DICT`` in ``global_vars.py``."""
-from collections import namedtuple
-from typing import Union
+from typing import NamedTuple, Union
 import SimpleITK as sitk
 from pathlib import Path
 import NeuroRuler.utils.global_vars as global_vars
@@ -53,7 +52,7 @@ def update_images(path_list: list[Path]) -> list[Path]:
         global_vars.READER.SetFileName(str(path))
         new_img: sitk.Image = global_vars.READER.Execute()
         new_img = global_vars.ORIENT_FILTER.Execute(new_img)
-        new_img_properties: tuple = get_properties_from_sitk_image(new_img)
+        new_img_properties: ImageProperties = get_properties_from_sitk_image(new_img)
 
         if not are_properties_eq(comparison_properties_tuple, new_img_properties):
             differing_image_paths.append(path)
@@ -148,7 +147,11 @@ def get_curr_image() -> sitk.Image:
     return global_vars.IMAGE_DICT[get_curr_path()]
 
 
-ImageProperties = namedtuple("ImageProperties", "center, size, spacing")
+#ImageProperties = namedtuple("ImageProperties", "center, size, spacing")
+class ImageProperties(NamedTuple):
+    center: tuple
+    size: tuple
+    spacing: tuple
 
 
 # TODO: Add more properties?
