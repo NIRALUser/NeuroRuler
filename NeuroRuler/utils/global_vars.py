@@ -2,22 +2,24 @@
 
 import SimpleITK as sitk
 from pathlib import Path
-from typing import Any
 from NeuroRuler.utils.constants import View
 
 IMAGE_DICT: dict[Path, sitk.Image] = dict()
-"""The group of images that have been loaded.
+"""The group of images that has been loaded.
 
-Since Python 3.7+, dicts maintain insertion order. Therefore, we can use CURR_IMAGE_INDEX for retrieval and deletion.
+Since Python 3.7+, dicts maintain insertion order. Therefore, we can use
+CURR_IMAGE_INDEX for retrieval and deletion.
 
 Use list(IMAGE_DICT.keys())[i] to return the i'th key in the dict, which can also index into the dict.
 Not sure about this operation's speed, but it's used only
-in the GUI for insertion and deletion operations, should be fine.
+in the GUI for insertion and deletion operations, which is fine.
 
-All images in the dictionary have matching properties, as defined by mri_image.get_properties."""
+All images in the dictionary have matching properties, as defined by img_helpers.ImageProperties
+(there is a threshold for pixel spacing)."""
 
 GROUP_MAX_SPACING_DIFF: float = 0.0001
-"""The maximum difference in pixel spacing (in mm) between two images of the global group, such that they may be considered to be the same spacing."""
+"""The maximum difference in pixel spacing (in mm) between two images of the global group,
+such that they are considered to have the same spacing."""
 
 CURR_IMAGE_INDEX: int = 0
 """Image of the current image in the loaded batch of images, which is a dict[Path, sitk.Image].
@@ -29,7 +31,7 @@ READER: sitk.ImageFileReader = sitk.ImageFileReader()
 """Global ``sitk.ImageFileReader``."""
 
 ORIENT_FILTER: sitk.DICOMOrientImageFilter = sitk.DICOMOrientImageFilter()
-"""Global sitk.DICOMOrientImageFilter for orienting images.
+"""Global ``sitk.DICOMOrientImageFilter`` for orienting images.
 
 See https://simpleitk.org/doxygen/latest/html/classitk_1_1simple_1_1DICOMOrientImageFilter.html#details
 and the orientation strings in constants.py. Use ITK-SNAP for the orientations that we copy."""

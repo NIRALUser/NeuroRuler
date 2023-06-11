@@ -20,7 +20,10 @@
     "STARTUP_WIDTH_RATIO": 0.75,
     "STARTUP_HEIGHT_RATIO": 0.7,
     "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL": "False",
-    // The maximum difference in pixel spacing (in mm) between two images of the global group, such that they may be considered to be the same spacing.
-    // If for some reason you don't want any tolerance, set this to 0.0.
+    // The maximum difference in pixel spacing (in mm) between any two images of the global group,
+    // such that they are considered to have the same spacing.
+    // For example, if pixel spacing is 0.0001, then the x spacing values of the two images have to be
+    // within 0.0001 of each other, and same for the y and z spacing values.
+    // If, for some reason, you don't want any tolerance, set this to 0.0.
     "GROUP_MAX_SPACING_DIFF": 0.0001
 }

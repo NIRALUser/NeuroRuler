@@ -83,7 +83,7 @@ gui()
 python cli.py <file>
 ```
 
-See [test_cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/test_cli.py) for example usages.
+See [test_cli.py](https://github.com/NIRALUser/NeuroRuler/blob/main/tests/test_cli.py) for example usages. Note that the CLI script accepts only one file at a time because it's expected that you'll use a shell script to loop over multiple files.
 
 ```text
 usage: cli.py [-h] [-d] [-r] [-x X] [-y Y] [-z Z] [-s SLICE] [-c CONDUCTANCE] [-i ITERATIONS] [-t STEP] [-f FILTER] [-l LOWER]
@@ -198,3 +198,5 @@ To publish to [PyPI](https://pypi.org/project/NeuroRuler/), edit the version num
 To publish to [Test PyPI](https://test.pypi.org/project/NeuroRuler/), do the same as above, but push to a branch called `release-testpypi`.
 
 If any of these files changes, they should be re-released on our GitHub release page: `gui.py`, `cli.py`, `gui_config.json`, `cli_config.json`.
+
+Additionally, these files should be updated: `CITATION.cff`

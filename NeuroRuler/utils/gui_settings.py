@@ -8,7 +8,6 @@ because if parsing the GUI json fails (e.g., doesn't exist),
 then we need an actual working value here."""
 
 from pathlib import Path
-import NeuroRuler.utils.constants as constants
 
 DEBUG: bool = False
 """Whether or not to print debugging information throughout execution."""
@@ -40,4 +39,5 @@ DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL: bool = False
 """Whether the advanced menu messages display in terminal or new window"""
 
 GROUP_MAX_SPACING_DIFF: float = 0.0001
-"""The maximum difference in pixel spacing (in mm) between two images of the global group, such that they may be considered to be the same spacing. See global_vars.GROUP_MAX_SPACING_DIFF."""
+"""The maximum difference in pixel spacing (in mm) between two images of the global group,
+such that they are considered to have the same spacing. See ``global_vars.GROUP_MAX_SPACING_DIFF``."""

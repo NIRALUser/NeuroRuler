@@ -9,6 +9,12 @@ from NeuroRuler.utils.constants import degrees_to_radians, View
 import NeuroRuler.utils.constants as constants
 
 
+class ImageProperties(NamedTuple):
+    center: tuple
+    size: tuple
+    spacing: tuple
+
+
 def update_images(path_list: list[Path]) -> list[Path]:
     """Initialize IMAGE_DICT. See the docstring for IMAGE_DICT in global_vars.py for more info.
 
@@ -147,20 +153,14 @@ def get_curr_image() -> sitk.Image:
     return global_vars.IMAGE_DICT[get_curr_path()]
 
 
-class ImageProperties(NamedTuple):
-    center: tuple
-    size: tuple
-    spacing: tuple
-
-
 # TODO: Add more properties?
 def get_properties_from_sitk_image(img: sitk.Image) -> ImageProperties:
     """Tuple of properties of a sitk.Image.
 
     TODO: Add more properties
 
-    If modifying this, NeuroRuler/GUI/main.py print_properties also has to be modified slightly,
-    as well are_properties_eq below.
+    If modifying this, NeuroRuler/GUI/main.py ``print_properties`` also has to be modified slightly,
+    as well as ``are_properties_eq`` below.
 
     :param img:
     :type img: sitk.Image
@@ -178,13 +178,17 @@ def are_properties_eq(props1: ImageProperties, props2: ImageProperties) -> bool:
     :type props1: ImageProperties
     :param props2:
     :type props2: ImageProperties
-    :return: true if the two image properties are considered equal.
+    :return: True if the two image properties are considered equal.
     :rtype: bool"""
     is_center_eq = props1.center == props2.center
     is_size_eq = props1.size == props2.size
     spacing1 = props1.spacing
     spacing2 = props2.spacing
-    is_spacing_eq = abs(spacing1[0] - spacing2[0]) <= global_vars.GROUP_MAX_SPACING_DIFF and abs(spacing1[1] - spacing2[1]) <= global_vars.GROUP_MAX_SPACING_DIFF and abs(spacing1[2] - spacing2[2]) <= global_vars.GROUP_MAX_SPACING_DIFF
+    is_spacing_eq = (
+        abs(spacing1[0] - spacing2[0]) <= global_vars.GROUP_MAX_SPACING_DIFF
+        and abs(spacing1[1] - spacing2[1]) <= global_vars.GROUP_MAX_SPACING_DIFF
+        and abs(spacing1[2] - spacing2[2]) <= global_vars.GROUP_MAX_SPACING_DIFF
+    )
 
     return is_center_eq and is_size_eq and is_spacing_eq
 
