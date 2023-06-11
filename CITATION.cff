@@ -28,7 +28,7 @@ authors:
     affiliation: UNC
     orcid: 'https://orcid.org/0000-0002-8747-5118'
 repository-code: 'https://github.com/NIRALUser/NeuroRuler'
-url: 'https://tarheels.live/comp523teamd/'
+url: 'https://github.com/NIRALUser/NeuroRuler'
 abstract: >-
   Cross-platform program that calculates head circumference
   from MRI data (.nii, .nii.gz, .nrrd).
