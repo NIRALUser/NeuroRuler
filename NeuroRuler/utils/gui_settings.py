@@ -40,4 +40,4 @@ DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL: bool = False
 """Whether the advanced menu messages display in terminal or new window"""
 
 GROUP_MAX_SPACING_DIFF: float = 0.0001
-"""The maximum difference between two images of the same group. See global_vars.GROUP_MAX_SPACING_DIFF."""
+"""The maximum difference in pixel spacing (in mm) between two images of the global group, such that they may be considered to be the same spacing. See global_vars.GROUP_MAX_SPACING_DIFF."""

@@ -17,7 +17,7 @@ in the GUI for insertion and deletion operations, should be fine.
 All images in the dictionary have matching properties, as defined by mri_image.get_properties."""
 
 GROUP_MAX_SPACING_DIFF: float = 0.0001
-"""The maximum difference in pixel spacing between two images of the global group, such that they may be considered to be the same size."""
+"""The maximum difference in pixel spacing (in mm) between two images of the global group, such that they may be considered to be the same spacing."""
 
 CURR_IMAGE_INDEX: int = 0
 """Image of the current image in the loaded batch of images, which is a dict[Path, sitk.Image].

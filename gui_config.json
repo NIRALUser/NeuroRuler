@@ -20,7 +20,7 @@
     "STARTUP_WIDTH_RATIO": 0.75,
     "STARTUP_HEIGHT_RATIO": 0.7,
     "DISPLAY_ADVANCED_MENU_MESSAGES_IN_TERMINAL": "False",
-    // The maximum difference in pixel spacing between two images of the global group, such that they may be considered to be the same size.
-    // If they must be exactly the same instead of approximately the same, set this to 0.0.
+    // The maximum difference in pixel spacing (in mm) between two images of the global group, such that they may be considered to be the same spacing.
+    // If for some reason you don't want any tolerance, set this to 0.0.
     "GROUP_MAX_SPACING_DIFF": 0.0001
 }
