@@ -1,6 +1,8 @@
 """Image helper functions that aren't quite part of the main algorithm, unlike ``imgproc.py``.
 
 Mostly holds helper functions for working with ``IMAGE_DICT`` in ``global_vars.py``."""
+
+from __future__ import annotations
 from typing import NamedTuple, Union
 import SimpleITK as sitk
 from pathlib import Path
@@ -10,9 +12,14 @@ import NeuroRuler.utils.constants as constants
 
 
 class ImageProperties(NamedTuple):
-    center: tuple
-    size: tuple
-    spacing: tuple
+    # Center of the image (x, y, z)
+    center: tuple[float, float, float]
+
+    # Dimensions of the image (x, y, z)
+    size: tuple[int, int, int]
+
+    # Pixel spacing of the image (x, y, z)
+    spacing: tuple[float, float, float]
 
 
 def update_images(path_list: list[Path]) -> list[Path]:
