@@ -6,19 +6,13 @@
 .. role:: raw-html(raw)
     :format: html
 
-.. note::
-
-   Most of this page is the README from `GitHub <https://github.com/NIRALUser/NeuroRuler>`_.
-
-   For content unique to this site, see the sidebar :math:`\leftarrow`
-
 .. mdinclude:: ../README.md
 
 Contents
 ########
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    structure
    libraries

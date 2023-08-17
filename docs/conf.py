@@ -33,8 +33,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
     "sphinx_rtd_theme",
-    # For parsing Markdown
-    "m2r2",
+    "myst_parser",
 ]
 
 templates_path = ["_templates"]
@@ -49,8 +48,6 @@ source_suffix = [".rst", ".md", ".markdown"]
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
-# Source: https://stackoverflow.com/questions/59215996/how-to-add-a-logo-to-my-readthedocs-logo-rendering-at-0px-wide
-html_static_path = ["_static"]
 html_favicon = "nr_logo.ico"
 html_logo = "_static/nr_logo.jpg"
 html_theme_options = {
@@ -59,7 +56,8 @@ html_theme_options = {
 }
 
 
-# Prevents __init__ from being ignored
+# Prevents autodocumentation from ignoring __init__
+# Normally unneeded but we want autodocumentation to pick up Exception __init__ functions
 # Source: https://stackoverflow.com/questions/5599254/how-to-use-sphinxs-autodoc-to-document-a-classs-init-self-method
 def skip(app, what, name, obj, would_skip, options):
     if name == "__init__":

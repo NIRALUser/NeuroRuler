@@ -501,49 +501,53 @@ you should have already installed dependencies via pip.
 
 .. note:: :code:`docs/_build` is gitignored.
 
-You can open :code:`docs/_build/html/index.html` in a web browser #[macos_open_html]_ to check out the site before pushing, which
+You can open :code:`docs/_build/html/index.html` in a web browser [#macos_open_html]_ to check out the site before pushing, which
 will automatically update the
 website. From now on, you can just run :code:`make html` to update the html pages.
 
-However, you may need to run :code:`sphinx-apidoc -o . ../NeuroRuler` from the :code:`docs/` directory
+However, for autodocumentation of source code, you will need to run :code:`sphinx-apidoc -o . ../NeuroRuler` from the :code:`docs/` directory
 if a new package is created. Make sure :code:`__init__.py` files exist for any package you want
-to be discovered.
+to be discovered. See `this page <modules.html>`_ to view our auto-generated documentation of `source code <_modules/index.html>`_.
 
-You can edit `docs/index.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/index.rst>`_,
-which is the homepage, or `docs/libraries.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/libraries.rst>`_, which
-is this page. `Documentation <modules.html>`_ for `source code <_modules/index.html>`_ is automatically generated.
+Edit site
+=========
+
+You can write site content in Markdown instead of RST via `MyST Parser <https://myst-parser.readthedocs.io/en/latest/>`_, while still retaining the ability to write raw RST in the Markdown file for extra functionality that Markdown doesn't provide. See :ref:`markdown-test` for an example. This page was written in RST, unfortunately, since I didn't find out until after this project was complete.
+
+After creating a new file, add it to `docs/index.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/index.rst>`_, which is the homepage.
+
+To learn RST, see the `source code <_sources/libraries.rst.txt>`_
+for this page and `<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_.
 
 .. _sphinxBuildFromScratch:
 
-Steps for building from scratch
-===============================
+Steps for setting up from scratch
+=================================
 
 .. note:: This does not have to be done for the NR repo since setup is already complete.
     It's mostly here for my reference since there's not a lot of information about this process online and I'd forget
     how to do it.
 
-Your current working directory should be whatever repo you want to automatically generate documentation for.
+Your current working directory should be whatever repo you want to automatically generate documentation for. If you just need a local documentation site and not a public one via ReadTheDocs, skip instructions regarding ReadTheDocs.
 
 .. code-block:: text
     :linenos:
 
-    pip install sphinx
-    pip install python-docs-theme
+    pip install sphinx sphinx-rtd-theme myst_parser
     mkdir docs
     cd docs
     sphinx-quickstart
 
-Type `n` for the first question, which asks about splitting source and build directories. [#sphinx]_
+After ``sphinx-quickstart``, type `n` for the first question, which asks about splitting source and build directories. [#sphinx]_
 
-Copy over :code:`docs/conf.py` (install another theme with pip and modify :code:`html_theme` if you want),
-:code:`docs/requirements.txt`, :code:`.readthedocs.yaml`, :code:`pyproject.toml`, and :code:`setup.py` from the
-`NR repo <https://github.com/NIRALUser/NeuroRuler>`_,
-overwriting if necessary. Modify the info inside for your purposes.
-The root :code:`requirements.txt` and :code:`requirements_CI.txt` might also need to include
-setuptools, but I'm not certain.
+Run ``pip install sphinx sphinx-rtd-theme myst-parser``. Consider adding these to your ``requirements.txt``.
+Copy over :code:`docs/conf.py`
+and :code:`.readthedocs.yaml` from the `NR repo <https://github.com/NIRALUser/NeuroRuler>`_.
+Modify the info inside these files for your purposes. In ``conf.py``, you can modify
+``html_theme`` to change the website theme (you'll need to install the theme via pip).
 
-Make sure :code:`NeuroRuler/__init__.py` exists, along with :code:`.../__init__.py` files for any package that
-you want to auto-generate documentation for.
+For autodocumentation of source code, make sure :code:`NeuroRuler/__init__.py` exists, 
+along with :code:`.../__init__.py` files for any package that you want to auto-generate documentation for.
 
 .. note:: Current working directory should still be :code:`docs/`
 
@@ -566,14 +570,6 @@ Now follow the Read the Docs tutorial starting from `Sign up for Read the Docs <
 You can end at Checking the first build. To set up CDD (continuous documentation deployment), check
 `Permissions for connected accounts <https://docs.readthedocs.io/en/stable/guides/git-integrations.html>`_ and
 follow the `Provider-specific instructions steps <https://docs.readthedocs.io/en/stable/guides/git-integrations.html#provider-specific-instructions>`_.
-
-.. _sphinxRST:
-
-RST formatting
-==============
-
-See the `source code <_sources/libraries.rst.txt>`_
-for this page and `<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_.
 
 .. _sphinxResources:
 

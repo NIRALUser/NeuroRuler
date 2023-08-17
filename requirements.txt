@@ -10,10 +10,9 @@
  # .
 
 # Additional non-functional dependencies (e.g., formatting, documentation) for developers
-
 sphinx
 sphinx_rtd_theme
-m2r2
+myst_parser
 ipywidgets
 black
 black[jupyter]

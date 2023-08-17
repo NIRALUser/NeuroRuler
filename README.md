@@ -183,7 +183,7 @@ Our tests run on GitHub Actions on push and PR via `tox` ([tests.yml](https://gi
 
 [https://NeuroRuler.readthedocs.io](https://NeuroRuler.readthedocs.io)
 
-See [.readthedocs.yaml](https://github.com/NIRALUser/NeuroRuler/blob/main/.readthedocs.yaml) and [docs/](https://github.com/NIRALUser/NeuroRuler/tree/main/docs) to contribute.
+To contribute, see [docs/](https://github.com/NIRALUser/NeuroRuler/tree/main/docs). Build/setup instructions [here](https://neuroruler.readthedocs.io/en/latest/libraries.html#sphinx-setuptools). Note that it is possible to write site content in Markdown and inline RST in the Markdown file when needed - I just didn't find out until after this project was completed.
 
 [Team website](https://tarheels.live/comp523teamd/)
 
