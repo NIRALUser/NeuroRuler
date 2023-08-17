@@ -512,9 +512,9 @@ to be discovered. See `this page <modules.html>`_ to view our auto-generated doc
 Edit site
 =========
 
-You can write site content in Markdown instead of RST via `MyST Parser <https://myst-parser.readthedocs.io/en/latest/>`_, while still retaining the ability to write raw RST in the Markdown file for extra functionality that Markdown doesn't provide. See :ref:`markdown-test` for an example. This page was written in RST, unfortunately, since I didn't find out until after this project was complete.
+You can write site content in Markdown instead of RST. See :ref:`markdown-test` for an example and further instructions. This page was written in RST, unfortunately, since I didn't find out until after this project was completed.
 
-After creating a new file, add it to `docs/index.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/index.rst>`_, which is the homepage.
+After creating a new file, index it by adding it to `docs/index.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/index.rst>`_, which is the homepage.
 
 To learn RST, see the `source code <_sources/libraries.rst.txt>`_
 for this page and `<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_.
@@ -525,8 +525,6 @@ Steps for setting up from scratch
 =================================
 
 .. note:: This does not have to be done for the NR repo since setup is already complete.
-    It's mostly here for my reference since there's not a lot of information about this process online and I'd forget
-    how to do it.
 
 Your current working directory should be whatever repo you want to automatically generate documentation for. If you just need a local documentation site and not a public one via ReadTheDocs, skip instructions regarding ReadTheDocs.
 
@@ -561,10 +559,6 @@ along with :code:`.../__init__.py` files for any package that you want to auto-g
 You can open it in a web browser [#macos_open_html]_ to check it out before pushing, which will automatically update the
 website. From now on, you can just run :code:`make html` to update the html pages. You don't need to run
 :code:`sphinx-apidoc` unless you create a new package.
-
-You can edit `docs/index.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/index.rst>`_,
-which is the homepage, or `docs/libraries.rst <https://github.com/NIRALUser/NeuroRuler/blob/main/docs/libraries.rst>`_, which
-is this page. `Documentation <modules.html>`_ for `source code <_modules/index.html>`_ is automatically generated.
 
 Now follow the Read the Docs tutorial starting from `Sign up for Read the Docs <https://docs.readthedocs.io/en/stable/tutorial/#sign-up-for-read-the-docs>`_.
 You can end at Checking the first build. To set up CDD (continuous documentation deployment), check

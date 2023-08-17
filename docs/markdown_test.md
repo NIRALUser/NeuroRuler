@@ -6,7 +6,7 @@
 
 ```{topic} Overview
 
-This page is generated from a Markdown file via [MyST Parser](https://myst-parser.readthedocs.io/en/latest/) and also contains raw RST for extra functionality (i.e., Markdown suffices, and RST is not necessary). To view the source code for this page, click the "View page source" button at the top right.
+This page is generated from a Markdown file via [MyST Parser](https://myst-parser.readthedocs.io/en/latest/) and also contains raw RST for extra functionality (i.e., Markdown suffices, and RST is not necessary). To view the source code for this page, click the "Edit on GitHub" button at the top right.
 ```
 
 ```{contents}
