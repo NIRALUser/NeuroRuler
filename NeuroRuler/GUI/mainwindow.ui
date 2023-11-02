@@ -114,7 +114,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="x_rotation_label">
+           <widget class="QClickableLabel" name="x_rotation_label">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -165,7 +165,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="y_rotation_label">
+           <widget class="QClickableLabel" name="y_rotation_label">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -216,7 +216,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QLabel" name="z_rotation_label">
+           <widget class="QClickableLabel" name="z_rotation_label">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -1171,7 +1171,7 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
      <x>0</x>
      <y>0</y>
      <width>1308</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="nativeMenuBar">
@@ -1514,6 +1514,13 @@ In Slicer, the images are 3D and the default (.0625) time step will provide a st
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QClickableLabel</class>
+   <extends>QLabel</extends>
+   <header location="global">NeuroRuler.GUI.qclickablelabel</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <buttongroups>
