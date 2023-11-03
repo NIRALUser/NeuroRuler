@@ -85,7 +85,9 @@ if not PATH_TO_UI_FILE.exists():
 PATH_TO_NR_LOGO: Path = Path("NeuroRuler") / "GUI" / "static" / "nr_logo.png"
 if not PATH_TO_NR_LOGO.exists():
     PATH_TO_NR_LOGO = Path(
-        pkg_resources.resource_filename("NeuroRuler.GUI", "static/nr_logo.png") # TODO: pkg_resources is deprecated
+        pkg_resources.resource_filename(
+            "NeuroRuler.GUI", "static/nr_logo.png"
+        )  # TODO: pkg_resources is deprecated
     )
 
 SETTINGS_VIEW_ENABLED: bool = True
@@ -166,10 +168,19 @@ class MainWindow(QMainWindow):
         self.next_button.clicked.connect(self.next_img)
         self.previous_button.clicked.connect(self.previous_img)
         self.apply_button.clicked.connect(self.settings_export_view_toggle)
+
         self.x_slider.valueChanged.connect(self.rotate_x)
+        self.x_rotation_label.binded_slider = self.x_slider
+
         self.y_slider.valueChanged.connect(self.rotate_y)
+        self.y_rotation_label.binded_slider = self.y_slider
+
         self.z_slider.valueChanged.connect(self.rotate_z)
+        self.z_rotation_label.binded_slider = self.z_slider
+
         self.slice_slider.valueChanged.connect(self.slice_update)
+        self.slice_num_label.binded_slider = self.slice_slider
+
         self.reset_button.clicked.connect(self.reset_settings)
         self.smoothing_preview_button.clicked.connect(self.render_smooth_slice)
         self.otsu_radio_button.clicked.connect(self.disable_binary_threshold_inputs)
