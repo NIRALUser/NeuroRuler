@@ -42,6 +42,8 @@ pip install NeuroRuler
 
 If `python` or `pip` don't work, try `python3` and `pip3`.
 
+On Linux, please make sure that you have xcb, xcb-util, and xcb-util-cursor packages installed on your system. NeuroRuler further needs a QT6 installation (either user or system).
+
 ## Usage
 
 Download the latest [release](https://github.com/NIRALUser/NeuroRuler/releases).
